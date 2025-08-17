@@ -8,7 +8,7 @@ cmake_minimum_required(VERSION 3.19)
 include(stm32_yml_utils)
 
 # Определяем текущую версию фреймворка.
-set(STM32_CMAKE_YML_VERSION "0.3")
+set(STM32_CMAKE_YML_VERSION "0.4")
 
 # ==============================================================================
 #      [НОВАЯ ФУНКЦИЯ] ПОДГОТОВКА ДАННЫХ ДЛЯ ПРОЕКТА
@@ -52,7 +52,7 @@ function(stm32_yml_prepare_project_data OUT_PROJECT_NAME_VAR OUT_LANGUAGES_VAR)
                                 "проекту (${stm32_cmake_yml_version}). Возможны отсутствующие функции. Рекомендуется обновить фреймворк.")
             elseif(stm32_cmake_yml_version VERSION_LESS STM32_CMAKE_YML_VERSION)
                 message(WARNING "Версия фреймворка (${STM32_CMAKE_YML_VERSION}), которую вы используете, новее, чем та, что требуется "
-                                "проекту (${stm32_cmake_yml_version}). Возможны изменения в поведении. Рекомендуется обновить 'stm32_cmake_yml_version' в вашем .yml файле.")
+                                "проекту (${stm32_cmake_yml_version}). Возможны изменения в поведении. Рекомендуется согласовать описание в вашем .yml файле.")
             endif()
         endif()
     endif()
@@ -164,6 +164,7 @@ function(stm32_yml_prepare_project_data OUT_PROJECT_NAME_VAR OUT_LANGUAGES_VAR)
     set(linker_script ${linker_script} PARENT_SCOPE)
     set(link_options ${link_options} PARENT_SCOPE)
     set(linker_directives ${linker_directives} PARENT_SCOPE)
+    set(custom_libraries ${custom_libraries} PARENT_SCOPE)
     set(link_libraries ${link_libraries} PARENT_SCOPE)
     set(use_newlib_nano ${use_newlib_nano} PARENT_SCOPE)
     set(system_library ${system_library} PARENT_SCOPE)
@@ -660,6 +661,20 @@ endif()
 # 7. ФИНАЛЬНАЯ КОМПОНОВКА БИБЛИОТЕК.
 # =======================================================================
 
+# Обрабатываем список пользовательских статических библиотек.
+set(CUSTOM_LIBRARY_PATHS "")
+if(DEFINED custom_libraries)
+    foreach(lib_path IN LISTS custom_libraries)
+        set(full_lib_path "${CMAKE_SOURCE_DIR}/${lib_path}")
+        if(EXISTS ${full_lib_path})
+            list(APPEND CUSTOM_LIBRARY_PATHS ${full_lib_path})
+            message(STATUS "Подключение пользовательской библиотеки: ${full_lib_path}")
+        else()
+            message(WARNING "Пользовательская библиотека не найдена и будет проигнорирована: ${full_lib_path}")
+        endif()
+    endforeach()
+endif()
+
 # Теперь подключаем все библиотеки одним вызовом.
 target_link_libraries(${TARGET_NAME} PRIVATE
     # Подключаем "матрёшку" CMSIS.
@@ -670,6 +685,9 @@ target_link_libraries(${TARGET_NAME} PRIVATE
 
     # Подключаем цели FreeRTOS
     ${FREERTOS_TARGETS}
+
+    # Добавляем наши кастомные библиотеки
+    ${CUSTOM_LIBRARY_PATHS}
 
     # Подключаем дополнительные библиотеки
     ${link_libraries}
