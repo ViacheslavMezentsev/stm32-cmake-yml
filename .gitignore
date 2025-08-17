@@ -1,0 +1,32 @@
+﻿# CMake build files
+build/
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+compile_commands.json
+
+# VS Code specific
+.vscode/
+*.code-workspace
+
+# User-specific configuration that should not be committed
+project_config.local.yml
+
+# Compiled output files
+*.o
+*.a
+*.elf
+*.bin
+*.hex
+*.map
+*.out
+*.lss
+
+# Editor backup files
+*~
+*.swp
+*.swo
+
+# OS-specific files
+.DS_Store
+Thumbs.db
