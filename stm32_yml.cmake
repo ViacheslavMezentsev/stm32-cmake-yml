@@ -8,7 +8,7 @@ cmake_minimum_required(VERSION 3.19)
 include(stm32_yml_utils)
 
 # Определяем текущую версию фреймворка.
-set(STM32_CMAKE_YML_VERSION "0.4")
+set(STM32_CMAKE_YML_VERSION "0.4.1")
 
 # ==============================================================================
 #      [НОВАЯ ФУНКЦИЯ] ПОДГОТОВКА ДАННЫХ ДЛЯ ПРОЕКТА
@@ -73,7 +73,10 @@ function(stm32_yml_prepare_project_data OUT_PROJECT_NAME_VAR OUT_LANGUAGES_VAR)
         set(project_name ${IOC_PROJECT_NAME})
         set(heap_size ${IOC_HEAP_SIZE})
         set(stack_size ${IOC_STACK_SIZE})
-        set(use_hal_components true)
+
+        # Принудительно включаем CMSIS и HAL, так как проекты из CubeMX всегда их используют.
+        set(use_cmsis true)
+        set(use_hal true)
 
         # Логика для определения версии пакета
         if(IOC_USE_LOCAL_DRIVERS)
