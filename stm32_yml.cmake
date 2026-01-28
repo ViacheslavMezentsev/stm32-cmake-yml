@@ -8,7 +8,7 @@ cmake_minimum_required(VERSION 3.19)
 include(stm32_yml_utils)
 
 # Определяем текущую версию фреймворка.
-set(STM32_CMAKE_YML_VERSION "0.4.1")
+set(STM32_CMAKE_YML_VERSION "0.4.2")
 
 # ==============================================================================
 #      [НОВАЯ ФУНКЦИЯ] ПОДГОТОВКА ДАННЫХ ДЛЯ ПРОЕКТА
@@ -812,21 +812,45 @@ if(validate_linker_script)
 
     # Проверяем, был ли сгенерирован/использован локальный скрипт
     if(LINKER_SCRIPT_PATH AND EXISTS ${LINKER_SCRIPT_PATH})
-        # Читаем содержимое .ld файла (сгенерированного или кастомного)
-        file(STRINGS ${LINKER_SCRIPT_PATH} ld_content REGEX "RAM \\(xrw\\) *: *ORIGIN *= *[0-9xA-Fa-f]+, *LENGTH *= *([0-9]+[KkMm])")
+        # 1. Читаем строки из файла.
+        # Фильтр REGEX ищет строку, где есть слово RAM, а после него (через любые символы) слово LENGTH и знак равно.
+        # [ \t] означает "пробел или табуляция".
+        file(STRINGS ${LINKER_SCRIPT_PATH} ld_lines REGEX "RAM.*LENGTH[ \t]*=")
 
-        if(ld_content)
-            # Извлекаем значение LENGTH, например, "64K"
-            string(REGEX MATCH "LENGTH *= *([0-9]+[KkMm])" ACTUAL_RAM_SIZE_STR "${ld_content}")
-            set(ACTUAL_RAM_SIZE_STR ${CMAKE_MATCH_1})
+        # file(STRINGS) возвращает список. Если нашлось несколько строк (маловероятно, но возможно), берем первую.
+        list(GET ld_lines 0 ld_line)
 
-            # Конвертируем строку "64K" в байты
-            string(TOUPPER ${ACTUAL_RAM_SIZE_STR} ACTUAL_RAM_SIZE_STR_UPPER)
-            string(REGEX REPLACE "K$" " * 1024" ACTUAL_RAM_SIZE_EXPR "${ACTUAL_RAM_SIZE_STR_UPPER}")
-            string(REGEX REPLACE "M$" " * 1024 * 1024" ACTUAL_RAM_SIZE_EXPR "${ACTUAL_RAM_SIZE_EXPR}")
-            math(EXPR ACTUAL_RAM_SIZE_BYTES "${ACTUAL_RAM_SIZE_EXPR}")
+        if(ld_line)
+            # 2. Извлекаем значение.
+            # Ищем: LENGTH, произвольные пробелы, =, произвольные пробелы, (число + необязательный суффикс)
+            # CMAKE_MATCH_1 будет содержать само значение (например, 32K)
+            string(REGEX MATCH "LENGTH[ \t]*=[ \t]*([0-9]+[KkMm]?)" MATCH_RESULT "${ld_line}")
+            
+            if(CMAKE_MATCH_1)
+                set(ACTUAL_RAM_SIZE_STR ${CMAKE_MATCH_1})
+
+                # Конвертируем строку "64K" (или "64k", "64M", "64") в байты
+                string(TOUPPER ${ACTUAL_RAM_SIZE_STR} ACTUAL_RAM_SIZE_STR_UPPER)
+                
+                # Сначала обрабатываем суффиксы
+                if(ACTUAL_RAM_SIZE_STR_UPPER MATCHES "K$")
+                    string(REGEX REPLACE "K$" " * 1024" ACTUAL_RAM_SIZE_EXPR "${ACTUAL_RAM_SIZE_STR_UPPER}")
+                elseif(ACTUAL_RAM_SIZE_STR_UPPER MATCHES "M$")
+                    string(REGEX REPLACE "M$" " * 1024 * 1024" ACTUAL_RAM_SIZE_EXPR "${ACTUAL_RAM_SIZE_STR_UPPER}")
+                else()
+                    # Если суффикса нет, считаем, что это байты
+                    set(ACTUAL_RAM_SIZE_EXPR "${ACTUAL_RAM_SIZE_STR_UPPER}")
+                endif()
+
+                math(EXPR ACTUAL_RAM_SIZE_BYTES "${ACTUAL_RAM_SIZE_EXPR}")
+                
+                # Отладочный вывод (можно убрать)
+                # message(STATUS "RAM detection: Line='${ld_line}' -> Raw='${ACTUAL_RAM_SIZE_STR}' -> Bytes=${ACTUAL_RAM_SIZE_BYTES}")
+            else()
+                message(WARNING "Строка с RAM найдена, но не удалось распарсить значение LENGTH: '${ld_line}'")
+            endif()
         else()
-             message(WARNING "Не удалось извлечь размер RAM из скрипта ${LINKER_SCRIPT_PATH}. Проверка пропущена.")
+             message(WARNING "Не удалось найти определение RAM (MEMORY { RAM ... }) в скрипте ${LINKER_SCRIPT_PATH}. Проверка размера пропущена.")
         endif()
 
     else()
