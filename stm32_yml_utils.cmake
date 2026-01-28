@@ -19,9 +19,12 @@ function(stm32_yml_parse_ioc_file IOC_FILE_PATH PREFIX)
             set(key ${CMAKE_MATCH_1})
             set(val ${CMAKE_MATCH_2})
 
+            # Убираем пробелы и символы переноса (\r) с краев
+            string(STRIP "${val}" val)
+
             if(key STREQUAL "ProjectManager.DeviceId")
                 # Убираем лишние символы типа 'x' в конце (STM32F407VGTx -> STM32F407VGT)
-                string(REGEX REPLACE "x?$" "" val "${val}")
+                string(REGEX REPLACE "x$" "" val "${val}")
                 set(${PREFIX}MCU ${val} PARENT_SCOPE)
 
             elseif(key STREQUAL "ProjectManager.FirmwarePackage")
