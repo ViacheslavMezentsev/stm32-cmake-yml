@@ -8,7 +8,7 @@ cmake_minimum_required(VERSION 3.19)
 include(stm32_yml_utils)
 
 # Определяем текущую версию фреймворка.
-set(STM32_CMAKE_YML_VERSION "0.4.3")
+set(STM32_CMAKE_YML_VERSION "0.5.0")
 
 # ==============================================================================
 #      [НОВАЯ ФУНКЦИЯ] ПОДГОТОВКА ДАННЫХ ДЛЯ ПРОЕКТА
@@ -105,6 +105,11 @@ function(stm32_yml_prepare_project_data OUT_PROJECT_NAME_VAR OUT_LANGUAGES_VAR)
     stm32_yml_ensure_default_value(use_newlib_nano "false")
     stm32_yml_ensure_default_value(mcu_core "")
 
+    # Установка значений по умолчанию для CRC.
+    stm32_yml_ensure_default_value(crc_enable "false")
+    stm32_yml_ensure_default_value(crc_section_name ".checksum")
+    stm32_yml_ensure_default_value(crc_algorithm "STM32_HW_DEFAULT")
+
     # =======================================================================
     # 2. УСТАНОВКА ОСНОВНЫХ ПАРАМЕТРОВ ПРОЕКТА.
     # =======================================================================
@@ -145,7 +150,7 @@ function(stm32_yml_prepare_project_data OUT_PROJECT_NAME_VAR OUT_LANGUAGES_VAR)
     set(${OUT_PROJECT_NAME_VAR} ${LOCAL_PROJECT_NAME} PARENT_SCOPE)
     set(${OUT_LANGUAGES_VAR} ${LOCAL_LANGUAGES} PARENT_SCOPE)
 
-    # Все остальные переменные, которые были прочитаны из YAML или установлены по умолчанию
+    # Все остальные переменные, которые были прочитаны из YAML или установлены по умолчанию.
     set(mcu ${mcu} PARENT_SCOPE)
     set(mcu_core ${mcu_core} PARENT_SCOPE)
     set(c_standard ${c_standard} PARENT_SCOPE)
@@ -175,6 +180,9 @@ function(stm32_yml_prepare_project_data OUT_PROJECT_NAME_VAR OUT_LANGUAGES_VAR)
     set(validate_linker_script ${validate_linker_script} PARENT_SCOPE)
     set(verbose_build ${verbose_build} PARENT_SCOPE)
     set(log_target_properties ${log_target_properties} PARENT_SCOPE)
+    set(crc_enable ${crc_enable} PARENT_SCOPE)
+    set(crc_section_name ${crc_section_name} PARENT_SCOPE)
+    set(crc_algorithm ${crc_algorithm} PARENT_SCOPE)
 
 endfunction()
 
@@ -696,6 +704,72 @@ target_link_libraries(${TARGET_NAME} PRIVATE
     ${link_libraries}
 )
 
+# =======================================================================
+# ВНЕДРЕНИЕ CRC32 В ПРОШИВКУ (POST-BUILD)
+# =======================================================================
+if(crc_enable)
+    message(STATUS "Настройка механизма внедрения CRC32 в прошивку...")
+
+    # По умолчанию считаем, что внедрение возможно
+    set(CRC_POSSIBLE TRUE)
+
+    # 1. Проверяем наличие Python
+    find_package(Python3 COMPONENTS Interpreter QUIET)
+    if(NOT Python3_FOUND)
+        message(WARNING " Интерпретатор Python3 не найден. Расчет CRC отключен.")
+        set(CRC_POSSIBLE FALSE)
+    endif()
+
+    # 2. Проверяем наличие objcopy
+    if(NOT CMAKE_OBJCOPY)
+        message(WARNING " Утилита objcopy не найдена. Расчет CRC отключен.")
+        set(CRC_POSSIBLE FALSE)
+    endif()
+
+    # 3. Проверяем наличие скрипта
+    set(CRC_SCRIPT_PATH "${STM32_YML_FRAMEWORK_DIR}/scripts/stm32_crc.py")
+    if(NOT EXISTS ${CRC_SCRIPT_PATH})
+        message(WARNING " Скрипт расчета не найден по пути: ${CRC_SCRIPT_PATH}. Расчет CRC отключен.")
+        set(CRC_POSSIBLE FALSE)
+    endif()
+
+    # 4. Настраиваем Custom Command, если все проверки пройдены
+    if(CRC_POSSIBLE)
+        message(STATUS " Метод: Внедрение в секцию '${crc_section_name}'")
+        message(STATUS " Алгоритм: ${crc_algorithm}")
+        message(STATUS " ВАЖНО: Убедитесь, что секция '${crc_section_name}' существует в вашем .ld файле, иначе сборка упадет с ошибкой!")
+
+        # Имена временных файлов
+        set(BIN_NO_CRC "${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}_no_crc.bin")
+        set(CRC_VAL_BIN "${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}_crc_val.bin")
+        set(TARGET_ELF "$<TARGET_FILE:${TARGET_NAME}>")
+
+        add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
+            # Выводим сообщение в консоль во время сборки
+            COMMAND ${CMAKE_COMMAND} -E echo " "
+            COMMAND ${CMAKE_COMMAND} -E echo "--- Injecting checksum into ${crc_section_name} ---"
+
+            # Шаг 1: Создаем BIN из ELF без секции CRC
+            COMMAND ${CMAKE_OBJCOPY} -O binary --gap-fill 0xFF --remove-section=${crc_section_name} ${TARGET_ELF} ${BIN_NO_CRC}
+
+            # Шаг 2: Запускаем Python скрипт для расчета CRC
+            COMMAND ${Python3_EXECUTABLE} ${CRC_SCRIPT_PATH} ${BIN_NO_CRC} ${CRC_VAL_BIN}
+
+            # Шаг 3: Внедряем рассчитанный CRC обратно в ELF файл
+            COMMAND ${CMAKE_OBJCOPY} --update-section ${crc_section_name}=${CRC_VAL_BIN} ${TARGET_ELF}
+
+            # Шаг 4 (Опциональный): Выводим подтверждение об успехе
+            COMMAND ${CMAKE_COMMAND} -E echo "--- Injection successful! ---"
+            COMMAND ${CMAKE_COMMAND} -E echo " "
+
+            COMMENT "Calculating and injecting CRC32 into firmware..."
+            VERBATIM
+        )
+    else()
+        message(STATUS " Сборка будет выполнена БЕЗ добавления контрольной суммы.")
+    endif()
+endif()
+
 # Генерируем артефакты сборки на основе списка из конфигурации.
 stm32_print_size_of_target(${TARGET_NAME})
 
@@ -825,13 +899,13 @@ if(validate_linker_script)
             # Ищем: LENGTH, произвольные пробелы, =, произвольные пробелы, (число + необязательный суффикс)
             # CMAKE_MATCH_1 будет содержать само значение (например, 32K)
             string(REGEX MATCH "LENGTH[ \t]*=[ \t]*([0-9]+[KkMm]?)" MATCH_RESULT "${ld_line}")
-            
+
             if(CMAKE_MATCH_1)
                 set(ACTUAL_RAM_SIZE_STR ${CMAKE_MATCH_1})
 
                 # Конвертируем строку "64K" (или "64k", "64M", "64") в байты
                 string(TOUPPER ${ACTUAL_RAM_SIZE_STR} ACTUAL_RAM_SIZE_STR_UPPER)
-                
+
                 # Сначала обрабатываем суффиксы
                 if(ACTUAL_RAM_SIZE_STR_UPPER MATCHES "K$")
                     string(REGEX REPLACE "K$" " * 1024" ACTUAL_RAM_SIZE_EXPR "${ACTUAL_RAM_SIZE_STR_UPPER}")
@@ -843,7 +917,7 @@ if(validate_linker_script)
                 endif()
 
                 math(EXPR ACTUAL_RAM_SIZE_BYTES "${ACTUAL_RAM_SIZE_EXPR}")
-                
+
                 # Отладочный вывод (можно убрать)
                 # message(STATUS "RAM detection: Line='${ld_line}' -> Raw='${ACTUAL_RAM_SIZE_STR}' -> Bytes=${ACTUAL_RAM_SIZE_BYTES}")
             else()
