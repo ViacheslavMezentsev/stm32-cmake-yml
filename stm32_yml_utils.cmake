@@ -6,12 +6,19 @@
 # @param IOC_FILE_PATH - Путь к .ioc файлу.
 # @param PREFIX        - Префикс для всех создаваемых переменных (например, "IOC_").
 #
+# ==============================================================================
+#      ФУНКЦИЯ ДЛЯ РАЗБОРА .ioc ФАЙЛА STM32CUBEMX
+# ==============================================================================
 function(stm32_yml_parse_ioc_file IOC_FILE_PATH PREFIX)
     if(NOT EXISTS ${IOC_FILE_PATH})
         message(FATAL_ERROR "Указанный .ioc файл не найден: ${IOC_FILE_PATH}")
     endif()
 
     file(STRINGS ${IOC_FILE_PATH} IOC_LINES)
+
+    # Устанавливаем значения по умолчанию для опциональных компонентов
+    set(${PREFIX}USE_FREERTOS FALSE PARENT_SCOPE)
+    set(${PREFIX}CMSIS_RTOS_API "none" PARENT_SCOPE)
 
     foreach(line IN LISTS IOC_LINES)
         # Ищем строки формата "ключ=значение"
@@ -46,14 +53,21 @@ function(stm32_yml_parse_ioc_file IOC_FILE_PATH PREFIX)
 
             elseif(key STREQUAL "ProjectManager.LibraryCopy")
                 # Значение '0' означает полное локальное копирование
-                if(val STREQUAL "0")
-                    set(${PREFIX}USE_LOCAL_DRIVERS TRUE PARENT_SCOPE)
                 # Значение '1' означает необходимое локальное копирование
-                elseif(val STREQUAL "1")
+                if(val STREQUAL "0" OR val STREQUAL "1")
                     set(${PREFIX}USE_LOCAL_DRIVERS TRUE PARENT_SCOPE)
                 else()
                     set(${PREFIX}USE_LOCAL_DRIVERS FALSE PARENT_SCOPE)
                 endif()
+
+            # Детектирование FreeRTOS.
+            elseif(val STREQUAL "FREERTOS")
+                # Если какой-либо IP-блок установлен в FREERTOS.
+                set(${PREFIX}USE_FREERTOS TRUE PARENT_SCOPE)
+
+            elseif(key MATCHES "VP_FREERTOS_VS_CMSIS_V([12])")
+                # Извлекаем версию CMSIS-RTOS (v1 или v2).
+                set(${PREFIX}CMSIS_RTOS_API "v${CMAKE_MATCH_1}" PARENT_SCOPE)
             endif()
         endif()
     endforeach()
