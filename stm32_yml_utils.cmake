@@ -74,6 +74,71 @@ function(stm32_yml_parse_ioc_file IOC_FILE_PATH PREFIX)
 endfunction()
 
 # ==============================================================================
+#      ВСПОМОГАТЕЛЬНАЯ ФУНКЦИЯ ДЛЯ РЕКУРСИВНОГО ПАРСИНГА JSON
+# ==============================================================================
+# Обходит вложенные объекты JSON и формирует плоские переменные.
+# Например: { "boot": { "offset": "0x800" } } -> boot_offset = "0x800"
+function(_stm32_yml_parse_json_node JSON_STR PREFIX OUT_VARS_LIST)
+    set(local_vars "")
+    string(JSON num_keys LENGTH "${JSON_STR}")
+
+    if(num_keys GREATER 0)
+        math(EXPR last_key_index "${num_keys} - 1")
+        foreach(idx RANGE ${last_key_index})
+            string(JSON key MEMBER "${JSON_STR}" ${idx})
+            string(JSON type TYPE "${JSON_STR}" "${key}")
+
+            # Формируем имя переменной (с префиксом, если мы внутри объекта)
+            if(PREFIX STREQUAL "")
+                set(new_prefix "${key}")
+            else()
+                set(new_prefix "${PREFIX}_${key}")
+            endif()
+
+            if(type STREQUAL "OBJECT")
+                # РЕКУРСИЯ: Проваливаемся во вложенный словарь
+                string(JSON sub_json GET "${JSON_STR}" "${key}")
+                _stm32_yml_parse_json_node("${sub_json}" "${new_prefix}" sub_vars)
+
+                # Забираем переменные из дочернего вызова и пробрасываем их выше
+                foreach(var IN LISTS sub_vars)
+                    set(${var} "${${var}}" PARENT_SCOPE)
+                    list(APPEND local_vars "${var}")
+                endforeach()
+
+            elseif(type STREQUAL "ARRAY")
+                # ОБРАБОТКА МАССИВА
+                set(temp_list "")
+                string(JSON array_length LENGTH "${JSON_STR}" "${key}")
+                if(array_length GREATER 0)
+                    math(EXPR last_item_index "${array_length} - 1")
+                    foreach(item_idx RANGE ${last_item_index})
+                        string(JSON item_value GET "${JSON_STR}" "${key}" ${item_idx})
+                        list(APPEND temp_list "${item_value}")
+                    endforeach()
+                endif()
+                set(${new_prefix} "${temp_list}" PARENT_SCOPE)
+                list(APPEND local_vars "${new_prefix}")
+
+            elseif(type STREQUAL "NULL")
+                # Пропускаем null значения
+                set(${new_prefix} "" PARENT_SCOPE)
+                list(APPEND local_vars "${new_prefix}")
+
+            else()
+                # БАЗОВЫЕ ТИПЫ (NUMBER, STRING, BOOLEAN)
+                string(JSON value GET "${JSON_STR}" "${key}")
+                set(${new_prefix} "${value}" PARENT_SCOPE)
+                list(APPEND local_vars "${new_prefix}")
+            endif()
+        endforeach()
+    endif()
+
+    # Возвращаем список созданных переменных
+    set(${OUT_VARS_LIST} "${local_vars}" PARENT_SCOPE)
+endfunction()
+
+# ==============================================================================
 #      СОВРЕМЕННЫЙ ПАРСЕР КОНФИГУРАЦИИ (YAML -> JSON)
 # ==============================================================================
 # Эта функция использует внешний инструмент 'yq' для преобразования YAML в JSON,
@@ -90,6 +155,7 @@ function(stm32_yml_parse_config config_file)
     if(NOT EXISTS ${config_file})
         message(FATAL_ERROR "Файл конфигурации не найден: ${config_file}")
     endif()
+
     execute_process(
         COMMAND ${YQ_EXECUTABLE} -o=json "." ${config_file}
         OUTPUT_VARIABLE YAML_AS_JSON
@@ -100,39 +166,17 @@ function(stm32_yml_parse_config config_file)
         message(FATAL_ERROR "Ошибка при конвертации ${config_file} в JSON с помощью yq.")
     endif()
 
-    string(JSON num_keys LENGTH ${YAML_AS_JSON})
-    if(num_keys GREATER 0)
-        math(EXPR last_key_index "${num_keys} - 1")
-        foreach(idx RANGE ${last_key_index})
-            string(JSON key MEMBER ${YAML_AS_JSON} ${idx})
-            string(JSON type TYPE ${YAML_AS_JSON} ${key})
+    # Запускаем рекурсивный парсинг с корня
+    _stm32_yml_parse_json_node("${YAML_AS_JSON}" "" PARSED_VARS)
 
-            # [!! ФИНАЛЬНОЕ ИСПРАВЛЕНИЕ !!]
-            if(type STREQUAL "ARRAY")
-                # 1. Создаем пустой список для этого ключа
-                set(temp_list "")
-                # 2. Узнаем длину JSON-массива
-                string(JSON array_length LENGTH ${YAML_AS_JSON} ${key})
+    # Пробрасываем все найденные переменные в PARENT_SCOPE
+    foreach(var IN LISTS PARSED_VARS)
+        set(${var} "${${var}}" PARENT_SCOPE)
+    endforeach()
 
-                if(array_length GREATER 0)
-                    math(EXPR last_item_index "${array_length} - 1")
-                    # 3. Перебираем массив по индексам от 0 до N-1
-                    foreach(item_idx RANGE ${last_item_index})
-                        # 4. Получаем каждый элемент по его индексу
-                        string(JSON item_value GET ${YAML_AS_JSON} ${key} ${item_idx})
-                        # 5. Добавляем его в наш временный список CMake
-                        list(APPEND temp_list "${item_value}")
-                    endforeach()
-                endif()
-                # 6. Устанавливаем итоговый, правильно сформированный список
-                set(${key} ${temp_list} PARENT_SCOPE)
-            else()
-                # Для простых типов все работает как и раньше
-                string(JSON value GET ${YAML_AS_JSON} ${key})
-                set(${key} "${value}" PARENT_SCOPE)
-            endif()
-        endforeach()
-    endif()
+    # СОХРАНЯЕМ СПИСОК ПЕРЕМЕННЫХ, чтобы следующий модуль мог пробросить их дальше
+    set(YAML_PARSED_KEYS "${PARSED_VARS}" PARENT_SCOPE)
+
     message(STATUS "Конфигурация из ${config_file} успешно загружена.")
 endfunction()
 

@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.19)
 # ==============================================================================
 
 # Определяем текущую версию фреймворка.
-set(STM32_CMAKE_YML_VERSION "0.6.0")
+set(STM32_CMAKE_YML_VERSION "0.7.0")
 
 # 1. Подключаем базовые утилиты.
 include(${CMAKE_CURRENT_LIST_DIR}/stm32_yml_utils.cmake)
@@ -17,6 +17,7 @@ include(${CMAKE_CURRENT_LIST_DIR}/cmake/stm32_yml_frameworks.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/stm32_yml_linker.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/stm32_yml_diagnostics.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/stm32_yml_postbuild.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/cmake/stm32_yml_code_quality.cmake)
 
 # ==============================================================================
 #      ОСНОВНАЯ ФУНКЦИЯ НАСТРОЙКИ ЦЕЛИ СБОРКИ
@@ -44,6 +45,9 @@ function(stm32_yml_setup_project TARGET_NAME)
     target_include_directories(${TARGET_NAME} PRIVATE ${include_directories})
     target_compile_definitions(${TARGET_NAME} PRIVATE ${compile_definitions})
     target_compile_options(${TARGET_NAME} PRIVATE ${compile_options})
+
+    # 2.5 Контроль качества кода (Cppcheck, и т.д.).
+    stm32_yml_setup_code_quality(${TARGET_NAME})
 
     # Опции и директивы линкера.
     if("map" IN_LIST build_artifacts)

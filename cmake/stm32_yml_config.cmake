@@ -117,6 +117,10 @@ else()
     stm32_yml_ensure_default_value(crc_enable "false")
     stm32_yml_ensure_default_value(crc_section_name ".checksum")
     stm32_yml_ensure_default_value(crc_algorithm "STM32_HW_DEFAULT")
+    # --- Значения по умолчанию для Cppcheck ---
+    if(NOT DEFINED cppcheck_ignores OR "${cppcheck_ignores}" STREQUAL "")
+        set(cppcheck_ignores "STM32Cube/Repository" "Drivers" "Middlewares")
+    endif()
 
     # =======================================================================
     # 2. УСТАНОВКА ОСНОВНЫХ ПАРАМЕТРОВ ПРОЕКТА
@@ -144,6 +148,8 @@ else()
     # ==============================================================================
     # "Пробрасываем" ВСЕ переменные, нужные для setup_project, наверх.
     # ==============================================================================
+
+    # 1. Сначала пробрасываем служебные переменные, сгенерированные фреймворком
     set(${OUT_PROJECT_NAME_VAR} ${LOCAL_PROJECT_NAME} PARENT_SCOPE)
     set(${OUT_LANGUAGES_VAR} ${LOCAL_LANGUAGES} PARENT_SCOPE)
 
@@ -179,5 +185,17 @@ else()
     set(crc_enable ${crc_enable} PARENT_SCOPE)
     set(crc_section_name ${crc_section_name} PARENT_SCOPE)
     set(crc_algorithm ${crc_algorithm} PARENT_SCOPE)
+    set(cppcheck_enable ${cppcheck_enable} PARENT_SCOPE)
+    set(cppcheck_args ${cppcheck_args} PARENT_SCOPE)
+    set(cppcheck_ignores ${cppcheck_ignores} PARENT_SCOPE)
+
+    # 2. АВТОМАТИЧЕСКИЙ ПРОБРОС ДИНАМИЧЕСКИХ ПАРАМЕТРОВ ИЗ YAML
+    # Любой новый ключ (в том числе вложенный), добавленный в yaml, автоматически
+    # пробросится в основную цель сборки. Нам больше не нужно писать set() вручную!
+    if(DEFINED YAML_PARSED_KEYS)
+        foreach(yaml_key IN LISTS YAML_PARSED_KEYS)
+            set(${yaml_key} "${${yaml_key}}" PARENT_SCOPE)
+        endforeach()
+    endif()
 
 endfunction()
