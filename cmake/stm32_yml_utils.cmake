@@ -19,6 +19,10 @@ function(stm32_yml_parse_ioc_file IOC_FILE_PATH PREFIX)
     # Устанавливаем значения по умолчанию для опциональных компонентов
     set(${PREFIX}USE_FREERTOS FALSE PARENT_SCOPE)
     set(${PREFIX}CMSIS_RTOS_API "none" PARENT_SCOPE)
+    set(${PREFIX}USE_CUSTOMER_FW_PATH FALSE PARENT_SCOPE)
+    set(${PREFIX}CUSTOMER_FW_FAMILY   ""    PARENT_SCOPE)
+    set(${PREFIX}CUSTOMER_FW_VERSION  ""    PARENT_SCOPE)
+    set(${PREFIX}CUSTOMER_FW_PATH     ""    PARENT_SCOPE)
 
     foreach(line IN LISTS IOC_LINES)
         # Ищем строки формата "ключ=значение"
@@ -34,8 +38,29 @@ function(stm32_yml_parse_ioc_file IOC_FILE_PATH PREFIX)
                 string(REGEX REPLACE "x$" "" val "${val}")
                 set(${PREFIX}MCU ${val} PARENT_SCOPE)
 
+            elseif(key STREQUAL "ProjectManager.DefaultFWLocation")
+                # false — пользователь выбрал нестандартный путь к пакету
+                if(val STREQUAL "false")
+                    set(${PREFIX}USE_CUSTOMER_FW_PATH TRUE PARENT_SCOPE)
+                else()
+                    set(${PREFIX}USE_CUSTOMER_FW_PATH FALSE PARENT_SCOPE)
+                endif()
+
+            elseif(key STREQUAL "ProjectManager.CustomerFirmwarePackage")
+                # Путь вида C:\Users\...\STM32Cube_FW_H7_V1.12.1
+                # Извлекаем семейство и версию из имени последней компоненты пути.
+                string(REGEX MATCH "STM32Cube_FW_([A-Za-z0-9]+)_(V[0-9]+\\.[0-9]+\\.[0-9]+)" _customer_match "${val}")
+                if(_customer_match)
+                    set(${PREFIX}CUSTOMER_FW_FAMILY  "${CMAKE_MATCH_1}" PARENT_SCOPE)
+                    set(${PREFIX}CUSTOMER_FW_VERSION "${CMAKE_MATCH_2}" PARENT_SCOPE)
+                    # Сохраняем сам путь (нормализуем разделители)
+                    string(REPLACE "\\" "/" _customer_path "${val}")
+                    set(${PREFIX}CUSTOMER_FW_PATH "${_customer_path}" PARENT_SCOPE)
+                endif()
+
             elseif(key STREQUAL "ProjectManager.FirmwarePackage")
-                # Из "STM32Cube FW_F4 V1.28.2" извлекаем "V1.28.2"
+                # Из "STM32Cube FW_F4 V1.28.2" извлекаем "V1.28.2".
+                # Используется только когда DefaultFWLocation=true (значение по умолчанию).
                 string(REGEX MATCH "V[0-9]+\\.[0-9]+\\.[0-9]+" fw_version "${val}")
                 set(${PREFIX}CUBEFW_PACKAGE ${fw_version} PARENT_SCOPE)
 
@@ -58,6 +83,14 @@ function(stm32_yml_parse_ioc_file IOC_FILE_PATH PREFIX)
                     set(${PREFIX}USE_LOCAL_DRIVERS TRUE PARENT_SCOPE)
                 else()
                     set(${PREFIX}USE_LOCAL_DRIVERS FALSE PARENT_SCOPE)
+    # После перебора всех строк выбираем финальную версию пакета.
+    # Если пользователь выбрал нестандартный путь и он содержит валидное имя папки —
+    # используем CustomerFirmwarePackage; иначе оставляем FirmwarePackage.
+    if(${PREFIX}USE_CUSTOMER_FW_PATH AND NOT "${${PREFIX}CUSTOMER_FW_VERSION}" STREQUAL "")
+        set(${PREFIX}CUBEFW_PACKAGE "${${PREFIX}CUSTOMER_FW_VERSION}" PARENT_SCOPE)
+        message(STATUS "Используется CustomerFirmwarePackage: семейство=${${PREFIX}CUSTOMER_FW_FAMILY}, версия=${${PREFIX}CUSTOMER_FW_VERSION}")
+        message(STATUS "  Путь: ${${PREFIX}CUSTOMER_FW_PATH}")
+    endif()
                 endif()
 
             # Детектирование FreeRTOS.
@@ -125,8 +158,21 @@ function(_stm32_yml_parse_json_node JSON_STR PREFIX OUT_VARS_LIST)
                 set(${new_prefix} "" PARENT_SCOPE)
                 list(APPEND local_vars "${new_prefix}")
 
+            elseif(type STREQUAL "BOOLEAN")
+                # Явно нормализуем булев тип в стандартные CMake-литералы.
+                # string(JSON GET) для булевых возвращает "TRUE"/"FALSE" (верхний регистр),
+                # но мы явно проверяем и нормализуем на случай любых edge-cases.
+                string(JSON value GET "${JSON_STR}" "${key}")
+                string(TOUPPER "${value}" value_upper)
+                if(value_upper STREQUAL "TRUE" OR value_upper STREQUAL "ON" OR value_upper STREQUAL "1" OR value_upper STREQUAL "YES")
+                    set(${new_prefix} "TRUE" PARENT_SCOPE)
+                else()
+                    set(${new_prefix} "FALSE" PARENT_SCOPE)
+                endif()
+                list(APPEND local_vars "${new_prefix}")
+
             else()
-                # БАЗОВЫЕ ТИПЫ (NUMBER, STRING, BOOLEAN)
+                # БАЗОВЫЕ ТИПЫ (NUMBER, STRING)
                 string(JSON value GET "${JSON_STR}" "${key}")
                 set(${new_prefix} "${value}" PARENT_SCOPE)
                 list(APPEND local_vars "${new_prefix}")
@@ -275,6 +321,62 @@ endfunction()
 # @param VAR_NAME       - Имя переменной, которую нужно проверить.
 # @param DEFAULT_VALUE  - Значение, которое нужно установить по умолчанию.
 #
+# ==============================================================================
+#      ФУНКЦИЯ НОРМАЛИЗАЦИИ СПИСКА ФЛАГОВ КОМПИЛЯТОРА / ЛИНКЕРА
+# ==============================================================================
+# Принимает имя переменной, содержащей список флагов, и нормализует его на месте:
+#
+#   1. Разбивает элементы, содержащие пробелы, на отдельные флаги.
+#      "-Wall -Wextra"  ->  "-Wall"  "-Wextra"
+#      "fdata-sections ffunction-sections"  ->  "-fdata-sections"  "-ffunction-sections"
+#
+#   2. Добавляет ведущий дефис к флагам, у которых его нет.
+#      "Wall"  ->  "-Wall"
+#      "O2"    ->  "-O2"
+#
+#      Не трогает:
+#        - флаги, уже начинающиеся с "-" или "--"
+#        - генераторные выражения CMake: $<...>
+#        - пустые строки
+#
+# @param LIST_VAR  Имя переменной (список). Результат записывается обратно
+#                  в переменную с тем же именем в PARENT_SCOPE.
+#
+# Поддерживаемые режимы:
+#   stm32_yml_normalize_flags(MY_LIST)            — с автодобавлением "-"
+#   stm32_yml_normalize_flags(MY_LIST NO_AUTO_DASH) — только разбивка по пробелам
+function(stm32_yml_normalize_flags LIST_VAR)
+    # Проверяем наличие опционального аргумента NO_AUTO_DASH
+    set(_auto_dash TRUE)
+    if(ARGC GREATER 1 AND ARGV1 STREQUAL "NO_AUTO_DASH")
+        set(_auto_dash FALSE)
+    endif()
+
+    set(_input "${${LIST_VAR}}")
+    set(_result "")
+
+    foreach(_item IN LISTS _input)
+        # Шаг 1: разбиваем элемент по пробелам на части.
+        string(REPLACE " " ";" _parts "${_item}")
+
+        foreach(_flag IN LISTS _parts)
+            # Пропускаем пустые части (двойные пробелы и т.п.)
+            if(_flag STREQUAL "")
+                continue()
+            endif()
+
+            # Шаг 2: добавляем дефис если нужно (только в режиме auto_dash).
+            # Не трогаем: уже начинается с "-", генераторные выражения "$<...>"
+            if(_auto_dash AND NOT _flag MATCHES "^-" AND NOT _flag MATCHES "^\\$<")
+                set(_flag "-${_flag}")
+            endif()
+
+            list(APPEND _result "${_flag}")
+        endforeach()
+    endforeach()
+
+    set(${LIST_VAR} "${_result}" PARENT_SCOPE)
+endfunction()
 function(stm32_yml_ensure_default_value VAR_NAME DEFAULT_VALUE)
     # Проверяем, что переменная НЕ определена ИЛИ она определена, но является пустой строкой.
     # Это надежный способ покрыть оба случая: отсутствие ключа в YAML и ключ с пустым значением.

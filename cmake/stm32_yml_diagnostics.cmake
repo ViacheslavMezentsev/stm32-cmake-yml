@@ -110,49 +110,68 @@ function(stm32_yml_run_diagnostics TARGET_NAME)
         math(EXPR EXPECTED_RAM_SIZE_BYTES "${EXPECTED_RAM_SIZE_EXPR}")
 
         set(ACTUAL_RAM_SIZE_BYTES 0)
+        set(_ram_sections_found "")
 
         if(LINKER_SCRIPT_PATH AND EXISTS ${LINKER_SCRIPT_PATH})
-            # Читаем строки из файла и ищем определение RAM
-            file(STRINGS ${LINKER_SCRIPT_PATH} ld_lines REGEX "RAM.*LENGTH[ \t]*=")
-            list(GET ld_lines 0 ld_line)
+            # Читаем весь файл и ищем все RAM-секции в блоке MEMORY{}.
+            # Стратегия: суммируем LENGTH всех секций с атрибутом (xrw) или (rw),
+            # у которых ORIGIN != 0x00000000 (исключаем ITCMRAM — адрес 0x0).
+            # Это корректно работает как для однорегионных чипов (F4: одна RAM),
+            # так и для многорегионных (H7: DTCMRAM + RAM + RAM_D2 + RAM_D3).
+            file(STRINGS ${LINKER_SCRIPT_PATH} _all_ld_lines)
 
-            if(ld_line)
-                string(REGEX MATCH "LENGTH[ \t]*=[ \t]*([0-9]+[KkMm]?)" MATCH_RESULT "${ld_line}")
-
-                if(CMAKE_MATCH_1)
-                    set(ACTUAL_RAM_SIZE_STR ${CMAKE_MATCH_1})
-                    string(TOUPPER ${ACTUAL_RAM_SIZE_STR} ACTUAL_RAM_SIZE_STR_UPPER)
-
-                    if(ACTUAL_RAM_SIZE_STR_UPPER MATCHES "K$")
-                        string(REGEX REPLACE "K$" " * 1024" ACTUAL_RAM_SIZE_EXPR "${ACTUAL_RAM_SIZE_STR_UPPER}")
-                    elseif(ACTUAL_RAM_SIZE_STR_UPPER MATCHES "M$")
-                        string(REGEX REPLACE "M$" " * 1024 * 1024" ACTUAL_RAM_SIZE_EXPR "${ACTUAL_RAM_SIZE_STR_UPPER}")
-                    else()
-                        set(ACTUAL_RAM_SIZE_EXPR "${ACTUAL_RAM_SIZE_STR_UPPER}")
+            foreach(_line IN LISTS _all_ld_lines)
+                # Ищем строки вида: NAME (xrw) : ORIGIN = 0x..., LENGTH = NNK
+                # Пропускаем FLASH (rx) и секции с ORIGIN = 0x00000000 (ITCM)
+                if(_line MATCHES "[A-Za-z_0-9]+[ \t]*(\\([ \t]*[xr]*rw[xr]*[ \t]*\\))")
+                    if(NOT _line MATCHES "ORIGIN[ \t]*=[ \t]*0x0+[^0-9]")
+                        string(REGEX MATCH "LENGTH[ \t]*=[ \t]*([0-9]+[KkMm]?)" _m "${_line}")
+                        if(CMAKE_MATCH_1)
+                            set(_sz "${CMAKE_MATCH_1}")
+                            string(TOUPPER "${_sz}" _sz_upper)
+                            if(_sz_upper MATCHES "^([0-9]+)K$")
+                                math(EXPR _bytes "${CMAKE_MATCH_1} * 1024")
+                            elseif(_sz_upper MATCHES "^([0-9]+)M$")
+                                math(EXPR _bytes "${CMAKE_MATCH_1} * 1024 * 1024")
+                            else()
+                                set(_bytes "${_sz_upper}")
+                            endif()
+                            math(EXPR ACTUAL_RAM_SIZE_BYTES "${ACTUAL_RAM_SIZE_BYTES} + ${_bytes}")
+                            # Извлекаем имя секции для лога
+                            string(REGEX MATCH "^[ \t]*([A-Za-z_0-9]+)" _nm "${_line}")
+                            list(APPEND _ram_sections_found "${CMAKE_MATCH_1}:${_sz}")
+                        endif()
                     endif()
-
-                    math(EXPR ACTUAL_RAM_SIZE_BYTES "${ACTUAL_RAM_SIZE_EXPR}")
-                else()
-                    message(WARNING "Строка с RAM найдена, но не удалось распарсить значение LENGTH: '${ld_line}'")
                 endif()
+            endforeach()
+
+            if(NOT _ram_sections_found)
+                message(WARNING "Не найдено ни одной RAM-секции (xrw/rw) в скрипте ${LINKER_SCRIPT_PATH}. Проверка размера пропущена.")
+                set(ACTUAL_RAM_SIZE_BYTES ${EXPECTED_RAM_SIZE_BYTES})
             else()
-                 message(WARNING "Не удалось найти определение RAM (MEMORY { RAM ... }) в скрипте ${LINKER_SCRIPT_PATH}. Проверка размера пропущена.")
+                string(REPLACE ";" " + " _ram_sections_str "${_ram_sections_found}")
+                message(STATUS "  RAM-секции в скрипте: ${_ram_sections_str} = ${ACTUAL_RAM_SIZE_BYTES} байт")
             endif()
         else()
             set(ACTUAL_RAM_SIZE_BYTES ${EXPECTED_RAM_SIZE_BYTES})
         endif()
 
-        # Сравниваем и выдаем предупреждение/ошибку
-        if(ACTUAL_RAM_SIZE_BYTES GREATER 0 AND ACTUAL_RAM_SIZE_BYTES LESS EXPECTED_RAM_SIZE_BYTES)
-            message(WARNING "Размер RAM в скрипте компоновщика (${ACTUAL_RAM_SIZE_STR}) МЕНЬШЕ, чем ожидается для ${mcu} (${EXPECTED_RAM_SIZE_STR}). Это может привести к неиспользованию всей памяти.")
-        elseif(ACTUAL_RAM_SIZE_BYTES GREATER EXPECTED_RAM_SIZE_BYTES)
-            message(FATAL_ERROR "КРИТИЧЕСКАЯ ОШИБКА КОНФИГУРАЦИИ!\n"
-                                "Размер RAM в вашем скрипте компоновщика (${ACTUAL_RAM_SIZE_STR}) БОЛЬШЕ, чем физически существует в ${mcu} (${EXPECTED_RAM_SIZE_STR}).\n"
-                                "Это приведет к Hard Fault при запуске, так как указатель стека будет указывать на несуществующую память.\n"
-                                "Исправьте 'LENGTH' для секции 'RAM' в вашем .ld или .ld.in файле!")
+        # Информационное сравнение: скрипт vs stm32-cmake (без FATAL_ERROR)
+        # H7/H5 имеют несколько RAM-регионов, stm32_get_memory_info возвращает
+        # только один — жёсткое равенство здесь неприменимо.
+        math(EXPR _expected_bytes "${EXPECTED_RAM_SIZE_EXPR}")
+        if(ACTUAL_RAM_SIZE_BYTES EQUAL _expected_bytes)
+            set(_rel "==")
+        elseif(ACTUAL_RAM_SIZE_BYTES LESS _expected_bytes)
+            set(_rel "<")
         else()
-            message(STATUS "Проверка размера RAM в скрипте компоновщика пройдена успешно. (${EXPECTED_RAM_SIZE_STR})")
+            set(_rel ">")
         endif()
+
+        math(EXPR _actual_k "${ACTUAL_RAM_SIZE_BYTES} / 1024")
+        message(STATUS "  stm32-cmake RAM : ${EXPECTED_RAM_SIZE_STR}")
+        message(STATUS "  Скрипт RAM сумма: ${ACTUAL_RAM_SIZE_BYTES} байт (${_actual_k}K)")
+        message(STATUS "  Соотношение     : ${_actual_k}K ${_rel} ${EXPECTED_RAM_SIZE_STR}")
     endif()
 
 endfunction()

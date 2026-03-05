@@ -16,22 +16,60 @@ function(stm32_yml_prepare_project_data OUT_PROJECT_NAME_VAR OUT_LANGUAGES_VAR)
     # Парсим конфиг (YAML -> JSON)
     stm32_yml_parse_config("${CONFIG_FILE_PATH}")
 
-    # Проверка версии фреймворка
+    # --- Баннер версий -------------------------------------------------------
+    message(STATUS "Framework : ${STM32_CMAKE_YML_VERSION}")
+
     stm32_yml_ensure_default_value(stm32_cmake_yml_version_check "true")
     if(stm32_cmake_yml_version_check)
         if(NOT DEFINED stm32_cmake_yml_version OR "${stm32_cmake_yml_version}" STREQUAL "")
+            message(STATUS "Config    : (stm32_cmake_yml_version не указан в ${PROJECT_CONFIG_FILE})")
             message(WARNING "В файле '${PROJECT_CONFIG_FILE}' отсутствует обязательный параметр 'stm32_cmake_yml_version'.")
         else()
-            message(STATUS "Версия конфигурации, требуемая проектом STM32-CMAKE-YML: ${stm32_cmake_yml_version}")
+            if(stm32_cmake_yml_version VERSION_EQUAL STM32_CMAKE_YML_VERSION)
+                set(_ver_status "совпадают ✓")
+            elseif(stm32_cmake_yml_version VERSION_GREATER STM32_CMAKE_YML_VERSION)
+                set(_ver_status "конфиг новее — обновите фреймворк !")
+            else()
+                set(_ver_status "фреймворк новее — обновите конфиг")
+            endif()
+            message(STATUS "Config    : ${stm32_cmake_yml_version}  (${_ver_status})")
+
             if(stm32_cmake_yml_version VERSION_GREATER STM32_CMAKE_YML_VERSION)
-                message(WARNING "Версия фреймворка (${STM32_CMAKE_YML_VERSION}) старше, чем требуется (${stm32_cmake_yml_version}). Возможны ошибки.")
+                message(WARNING "Версия фреймворка (${STM32_CMAKE_YML_VERSION}) старше, чем требуется конфигом (${stm32_cmake_yml_version}). Возможны ошибки.")
             elseif(stm32_cmake_yml_version VERSION_LESS STM32_CMAKE_YML_VERSION)
-                message(WARNING "Версия фреймворка (${STM32_CMAKE_YML_VERSION}) новее, чем требуется (${stm32_cmake_yml_version}).")
+                message(WARNING "Версия фреймворка (${STM32_CMAKE_YML_VERSION}) новее, чем указано в конфиге (${stm32_cmake_yml_version}). Рекомендуется обновить stm32_cmake_yml_version.")
             endif()
         endif()
+    else()
     endif()
+    # -------------------------------------------------------------------------
 
+    # Сохраняем значения, явно заданные пользователем в .yml, до того как
+    # override-логика и ensure_default_value могут их изменить.
+    # Используются хелпером _stm32_yml_src для расстановки меток [yml]/[ioc]/[auto].
+    set(_YAML_mcu                "${mcu}")
+    set(_YAML_project_name       "${project_name}")
+    set(_YAML_heap_size          "${heap_size}")
+    set(_YAML_stack_size         "${stack_size}")
+    set(_YAML_cubefw_package     "${cubefw_package}")
+    set(_YAML_use_freertos       "${use_freertos}")
+    set(_YAML_cmsis_rtos_api     "${cmsis_rtos_api}")
+    set(_YAML_freertos_components "${freertos_components}")
     stm32_yml_ensure_default_value(ioc_file "")
+    # Хелпер: определяет и возвращает метку источника значения переменной.
+    # yml_raw  — значение, пришедшее из YAML (до override-логики)
+    # ioc_raw  — значение, пришедшее из .ioc
+    # final    — итоговое значение
+    # out_var  — имя переменной, в которую запишется метка
+    macro(_stm32_yml_src yml_raw ioc_raw final out_var)
+        if(NOT "${yml_raw}" STREQUAL "" AND "${final}" STREQUAL "${yml_raw}")
+            set(${out_var} "[yml]")
+        elseif(NOT "${ioc_raw}" STREQUAL "" AND "${final}" STREQUAL "${ioc_raw}")
+            set(${out_var} "[ioc]")
+        else()
+            set(${out_var} "[auto]")
+        endif()
+    endmacro()
 
 # Обрабатываем IOC или устанавливаем значения по умолчанию
     if(ioc_file)
@@ -41,64 +79,121 @@ function(stm32_yml_prepare_project_data OUT_PROJECT_NAME_VAR OUT_LANGUAGES_VAR)
         # Вызываем парсер для .ioc файла
         stm32_yml_parse_ioc_file(${IOC_FILE_PATH} "IOC_")
 
-        # Переопределяем базовые переменные значениями из .ioc
-        set(mcu ${IOC_MCU})
-        set(project_name ${IOC_PROJECT_NAME})
-        set(heap_size ${IOC_HEAP_SIZE})
-        set(stack_size ${IOC_STACK_SIZE})
+        # ------------------------------------------------------------------
+        # Шаг A: применяем базовые значения из .ioc (они имеют низший приоритет).
+        # Пользователь может переопределить любой из них в stm32_config.yml.
+        # ------------------------------------------------------------------
 
-        # Проекты из CubeMX всегда используют CMSIS и HAL
-        set(use_cmsis true)
-        set(use_hal true)
-
-        if(IOC_USE_LOCAL_DRIVERS)
-            set(cubefw_package "auto")
-        else()
-            set(cubefw_package ${IOC_CUBEFW_PACKAGE})
+        # mcu и project_name: берём из .ioc только если не заданы в YAML явно
+        if(NOT DEFINED mcu OR "${mcu}" STREQUAL "")
+            set(mcu ${IOC_MCU})
+        endif()
+        if(NOT DEFINED project_name OR "${project_name}" STREQUAL "")
+            set(project_name ${IOC_PROJECT_NAME})
         endif()
 
-        # =======================================================
-        # Интеграция FreeRTOS из .ioc файла
-        # =======================================================
-        if(IOC_USE_FREERTOS)
-            set(use_freertos true)
-            set(freertos_version "cube")
+        # heap_size / stack_size: берём из .ioc только если не заданы в YAML
+        if(NOT DEFINED heap_size OR "${heap_size}" STREQUAL "")
+            set(heap_size ${IOC_HEAP_SIZE})
+        endif()
+        if(NOT DEFINED stack_size OR "${stack_size}" STREQUAL "")
+            set(stack_size ${IOC_STACK_SIZE})
+        endif()
 
-            # Если пользователь не указал API вручную в .yml, берем из .ioc
-            if(NOT DEFINED cmsis_rtos_api OR "${cmsis_rtos_api}" STREQUAL "")
-                set(cmsis_rtos_api ${IOC_CMSIS_RTOS_API})
+        # Проекты из CubeMX всегда используют CMSIS и HAL (если не отключено явно)
+        if(NOT DEFINED use_cmsis OR "${use_cmsis}" STREQUAL "")
+            set(use_cmsis true)
+        endif()
+        if(NOT DEFINED use_hal OR "${use_hal}" STREQUAL "")
+            set(use_hal true)
+        endif()
+
+        # cubefw_package: локальные драйверы или версия из .ioc (если не задано в YAML)
+        if(NOT DEFINED cubefw_package OR "${cubefw_package}" STREQUAL "")
+            if(IOC_USE_LOCAL_DRIVERS)
+                set(cubefw_package "auto")
+            else()
+                set(cubefw_package ${IOC_CUBEFW_PACKAGE})
+            endif()
+        endif()
+
+        # ------------------------------------------------------------------
+        # Шаг B: интеграция FreeRTOS из .ioc.
+        # Если в YAML явно задан use_freertos=false — .ioc игнорируется.
+        # ------------------------------------------------------------------
+        if(IOC_USE_FREERTOS)
+            # YAML-override: пользователь может явно отключить FreeRTOS
+            if(NOT DEFINED use_freertos OR "${use_freertos}" STREQUAL "")
+                set(use_freertos true)
             endif()
 
-            # Автоопределение порта FreeRTOS на основе семейства MCU!
-            # (CubeMX обычно использует Heap_4 по умолчанию для динамической памяти)
-            if(NOT DEFINED freertos_components OR "${freertos_components}" STREQUAL "")
-                if(mcu MATCHES "^STM32(F1|F2|L1)")
-                    set(freertos_components "ARM_CM3" "Heap::4")
-                elseif(mcu MATCHES "^STM32(F3|F4|G4|L4)")
-                    set(freertos_components "ARM_CM4F" "Heap::4")
-                elseif(mcu MATCHES "^STM32(F0|G0|L0)")
-                    set(freertos_components "ARM_CM0" "Heap::4")
-                elseif(mcu MATCHES "^STM32(F7|H7)")
-                    set(freertos_components "ARM_CM7" "Heap::4")
-                else()
-                    # Безопасный фолбек
-                    set(freertos_components "ARM_CM4F" "Heap::4")
+            if(use_freertos)
+                if(NOT DEFINED freertos_version OR "${freertos_version}" STREQUAL "")
+                    set(freertos_version "cube")
+                endif()
+
+                # cmsis_rtos_api: YAML имеет приоритет над .ioc
+                if(NOT DEFINED cmsis_rtos_api OR "${cmsis_rtos_api}" STREQUAL "")
+                    set(cmsis_rtos_api ${IOC_CMSIS_RTOS_API})
+                endif()
+
+                # freertos_components: YAML имеет приоритет; автоопределение если не задано
+                if(NOT DEFINED freertos_components OR "${freertos_components}" STREQUAL "")
+                    if(mcu MATCHES "^STM32(F1|F2|L1)")
+                        set(freertos_components "ARM_CM3" "Heap::4")
+                    elseif(mcu MATCHES "^STM32(F3|F4|G4|L4)")
+                        set(freertos_components "ARM_CM4F" "Heap::4")
+                    elseif(mcu MATCHES "^STM32(F0|G0|L0)")
+                        set(freertos_components "ARM_CM0" "Heap::4")
+                    elseif(mcu MATCHES "^STM32(F7|H7)")
+                        set(freertos_components "ARM_CM7" "Heap::4")
+                    else()
+                        set(freertos_components "ARM_CM4F" "Heap::4")
+                    endif()
                 endif()
             endif()
         endif()
 
         # =======================================================
-        # Красивый табличный вывод распарсенных параметров
+        # Итоговая таблица: значения + источник [yml]/[ioc]/[auto]
         # =======================================================
-        message(STATUS "Параметры .ioc файла успешно применены:")
-        message(STATUS "  MCU:        ${mcu}")
-        message(STATUS "  Проект:     ${project_name}")
-        message(STATUS "  CubeFW:     ${cubefw_package}")
-        message(STATUS "  Heap Size:  ${heap_size} байт")
-        message(STATUS "  Stack Size: ${stack_size} байт")
+        # Сохраняем «сырые» значения YAML для определения источника.
+        # После блока override-логики (патч задачи 4) переменные уже итоговые,
+        # а YAML_RAW_* — то, что было явно задано пользователем в .yml.
+        set(_yml_raw_mcu            "${_YAML_mcu}")
+        set(_yml_raw_project_name   "${_YAML_project_name}")
+        set(_yml_raw_heap_size      "${_YAML_heap_size}")
+        set(_yml_raw_stack_size     "${_YAML_stack_size}")
+        set(_yml_raw_cubefw         "${_YAML_cubefw_package}")
+        set(_yml_raw_freertos       "${_YAML_use_freertos}")
+        set(_yml_raw_rtos_api       "${_YAML_cmsis_rtos_api}")
+        set(_yml_raw_freertos_comp  "${_YAML_freertos_components}")
+
+        _stm32_yml_src("${_yml_raw_mcu}"          "${IOC_MCU}"           "${mcu}"            _src_mcu)
+        _stm32_yml_src("${_yml_raw_project_name}" "${IOC_PROJECT_NAME}"  "${project_name}"   _src_proj)
+        _stm32_yml_src("${_yml_raw_heap_size}"    "${IOC_HEAP_SIZE}"     "${heap_size}"      _src_heap)
+        _stm32_yml_src("${_yml_raw_stack_size}"   "${IOC_STACK_SIZE}"    "${stack_size}"     _src_stack)
+        _stm32_yml_src("${_yml_raw_cubefw}"       "${IOC_CUBEFW_PACKAGE}" "${cubefw_package}" _src_cube)
+
+        message(STATUS "Итоговые параметры проекта (источник: [yml]=конфиг / [ioc]=CubeMX / [auto]=авто):")
+        message(STATUS "  MCU:        ${mcu}  ${_src_mcu}")
+        message(STATUS "  Проект:     ${project_name}  ${_src_proj}")
+        message(STATUS "  CubeFW:     ${cubefw_package}  ${_src_cube}")
+        message(STATUS "  Heap Size:  ${heap_size} байт  ${_src_heap}")
+        message(STATUS "  Stack Size: ${stack_size} байт  ${_src_stack}")
         if(use_freertos)
-            string(REPLACE ";" ", " FREERTOS_COMPONENTS_STR "${freertos_components}")
-            message(STATUS "  FreeRTOS:   Включен (API: ${cmsis_rtos_api}, Компоненты: ${FREERTOS_COMPONENTS_STR})")
+            _stm32_yml_src("${_yml_raw_rtos_api}"      "${IOC_CMSIS_RTOS_API}" "${cmsis_rtos_api}"     _src_api)
+            _stm32_yml_src("${_yml_raw_freertos_comp}" ""                      "${freertos_components}" _src_fc)
+            string(REPLACE ";" ", " _freertos_comp_str "${freertos_components}")
+            if("${_yml_raw_freertos}" STREQUAL "false")
+                message(STATUS "  FreeRTOS:   ОТКЛЮЧЕН (переопределено в .yml)  [yml]")
+            else()
+                message(STATUS "  FreeRTOS:   Включен  ${_src_freertos_flag}")
+                message(STATUS "    API:      ${cmsis_rtos_api}  ${_src_api}")
+                message(STATUS "    Порт:     ${_freertos_comp_str}  ${_src_fc}")
+            endif()
+        else()
+            message(STATUS "  FreeRTOS:   Отключен")
         endif()
 else()
         message(STATUS "Режим ручной конфигурации (ioc_file не указан).")
@@ -182,7 +277,17 @@ else()
     set(validate_linker_script ${validate_linker_script} PARENT_SCOPE)
     set(verbose_build ${verbose_build} PARENT_SCOPE)
     set(log_target_properties ${log_target_properties} PARENT_SCOPE)
-    set(crc_enable ${crc_enable} PARENT_SCOPE)
+    # Нормализуем перед пробросом: гарантируем TRUE/FALSE независимо от кэша.
+    if(DEFINED crc_enable)
+        string(TOUPPER "${crc_enable}" _crc_upper)
+    else()
+        set(_crc_upper "FALSE")
+    endif()
+    if(_crc_upper STREQUAL "TRUE" OR _crc_upper STREQUAL "ON" OR _crc_upper STREQUAL "1" OR _crc_upper STREQUAL "YES")
+        set(crc_enable TRUE PARENT_SCOPE)
+    else()
+        set(crc_enable FALSE PARENT_SCOPE)
+    endif()
     set(crc_section_name ${crc_section_name} PARENT_SCOPE)
     set(crc_algorithm ${crc_algorithm} PARENT_SCOPE)
     set(cppcheck_enable ${cppcheck_enable} PARENT_SCOPE)

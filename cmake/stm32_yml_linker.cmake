@@ -16,10 +16,34 @@ function(stm32_yml_setup_linker_script TARGET_NAME)
     # =======================================================================
     if(linker_script STREQUAL "auto")
         message(STATUS "Генерация скрипта компоновщика из шаблона...")
-        string(REGEX REPLACE "..$" "XX" MCU_TYPE_GENERIC "${MCU_TYPE}")
-        set(TEMPLATE_FILE_PATH "${CMAKE_SOURCE_DIR}/STM32${MCU_TYPE_GENERIC}_FLASH.ld.in")
 
-        if(EXISTS ${TEMPLATE_FILE_PATH})
+        # MCU_TYPE из stm32_get_chip_info возвращает обобщённый тип "H723xx"
+        # (нужен для макроса компилятора STM32H723xx), но не подходит для поиска
+        # шаблона. Извлекаем конкретные 6 символов типа напрямую из MCU-строки.
+        # Пример: "STM32H723VGT6" -> substr(5,6) -> "H723VG"
+        string(SUBSTRING "${MCU}" 5 6 _mcu_type_concrete)
+
+        # Ищем шаблон по трём вариантам имени — от точного к общему:
+        #   1. STM32H723VG_FLASH.ld.in  — точное совпадение
+        #   2. STM32H723XG_FLASH.ld.in  — корпус (5й символ) заменён на X (стиль CubeMX)
+        #   3. STM32H723XX_FLASH.ld.in  — оба последних символа XX (широкий фолбек)
+
+        # Вариант 1: точное имя
+        set(TEMPLATE_FILE_PATH "${CMAKE_SOURCE_DIR}/STM32${_mcu_type_concrete}_FLASH.ld.in")
+
+        if(NOT EXISTS "${TEMPLATE_FILE_PATH}")
+            # Вариант 2: заменяем 5й символ (тип корпуса: V/Z/A/R...) на X
+            string(REGEX REPLACE "^(....).(.)$" "\\1X\\2" _mcu_x_pkg "${_mcu_type_concrete}")
+            set(TEMPLATE_FILE_PATH "${CMAKE_SOURCE_DIR}/STM32${_mcu_x_pkg}_FLASH.ld.in")
+        endif()
+
+        if(NOT EXISTS "${TEMPLATE_FILE_PATH}")
+            # Вариант 3: оба последних символа -> XX
+            string(REGEX REPLACE "..$" "XX" _mcu_xx "${_mcu_type_concrete}")
+            set(TEMPLATE_FILE_PATH "${CMAKE_SOURCE_DIR}/STM32${_mcu_xx}_FLASH.ld.in")
+        endif()
+
+        if(EXISTS "${TEMPLATE_FILE_PATH}")
             message(STATUS "Найден локальный шаблон: ${TEMPLATE_FILE_PATH}")
 
             # Нормализуем размеры памяти
@@ -38,8 +62,8 @@ function(stm32_yml_setup_linker_script TARGET_NAME)
                 message(STATUS "Not using READONLY in linker script (GCC < 11.0)")
             endif()
 
-            # Генерируем скрипт
-            set(LOCAL_LINKER_SCRIPT_PATH "${CMAKE_BINARY_DIR}/STM32${MCU_TYPE}_FLASH.ld")
+            # Генерируем скрипт — имя файла берём из конкретного типа MCU, не из MCU_TYPE
+            set(LOCAL_LINKER_SCRIPT_PATH "${CMAKE_BINARY_DIR}/STM32${_mcu_type_concrete}_FLASH.ld")
             configure_file(${TEMPLATE_FILE_PATH} ${LOCAL_LINKER_SCRIPT_PATH} @ONLY)
         else()
             message(STATUS "Локальный шаблон не найден. Будет использован стандартный скрипт компоновщика от stm32-cmake.")

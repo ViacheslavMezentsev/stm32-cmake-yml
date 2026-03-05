@@ -1,8 +1,8 @@
 # STM32 CMake YML Framework
 
-[![Version](https://img.shields.io/badge/version-0.6.0-blue.svg)](https://github.com/yourname/yourrepo/releases)
+[![Version](https://img.shields.io/badge/version-0.8.0-blue.svg)](https://github.com/yourname/yourrepo/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Refactored by AI](https://img.shields.io/badge/AI_Assisted-Gemini-blue.svg)](https://gemini.google.com/)
+[![Refactored by AI](https://img.shields.io/badge/AI_Assisted-Claude-blueviolet.svg)](https://claude.ai/)
 
 **`stm32-cmake-yml`** — это фреймворк для системы сборки CMake, предназначенный для кардинального упрощения разработки проектов под микроконтроллеры STM32. Он является высокоуровневой "оберткой" над популярным набором скриптов(https://github.com/ObKo/stm32-cmake), заменяя сложное конфигурирование `CMakeLists.txt` на один простой и читаемый файл — `stm32_config.yml`.
 
@@ -86,11 +86,11 @@ my-project/
     stm32_yml_setup_project(${PROJECT_NAME})
     ```
 
-3. Создайте файл **`stm32_config.yml`** и настройте его под ваш проект. Для детального описания опций обратитесь к Руководству пользователя.
+3. Создайте файл **`stm32_config.yml`** и настройте его под ваш проект. Для детального описания опций обратитесь к [Руководству пользователя](docs/user_manual.md).
 
 ## Документация
 
-Краткое руководство по параметрам файла конфигурации находится в(docs/user_manual.md).
+* [Руководство пользователя](docs/user_manual.md) — полное описание всех параметров `stm32_config.yml`, режимов работы, настройки CRC, флагов компилятора и диагностики.
 
 ## 🤖 Работа с AI-ассистентами (Agent Skills)
 
@@ -107,9 +107,9 @@ my-project/
 
 ### Как использовать промпты (Примеры)
 
-При общении с AI в чате или редакторе, явно указывайте ему, какой навык использовать. 
+При общении с AI в чате или редакторе, явно указывайте ему, какой навык использовать.
 
-**В умных IDE (Cursor, Windsurf):** 
+**В умных IDE (Cursor, Windsurf):**
 Вы можете использовать упоминания файлов (например, `@skills/stm32-module-creator/SKILL.md`) прямо в чате.
 
 **Примеры запросов к AI:**
@@ -129,7 +129,8 @@ my-project/
 Явное указание на эти файлы сэкономит вам массу времени и предотвратит "галлюцинации" нейросетей, пытающихся применить общие практики CMake к вашей оптимизированной архитектуре.
 
 ## 🤖 Благодарности
-Архитектура модулей CMake (`Target-Centric Design`) и рефакторинг кодовой базы были спроектированы и реализованы совместно с ИИ-ассистентом (Google Gemini).
+
+Архитектура модулей CMake (`Target-Centric Design`) и рефакторинг кодовой базы были спроектированы и реализованы совместно с ИИ-ассистентами (Google Gemini, Anthropic Claude).
 
 ## Лицензия
 

@@ -5,12 +5,10 @@ cmake_minimum_required(VERSION 3.19)
 # ==============================================================================
 
 # Определяем текущую версию фреймворка.
-set(STM32_CMAKE_YML_VERSION "0.7.0")
+set(STM32_CMAKE_YML_VERSION "0.8")
 
-# 1. Подключаем базовые утилиты.
-include(${CMAKE_CURRENT_LIST_DIR}/stm32_yml_utils.cmake)
-
-# 2. Подключаем функциональные модули фреймворка.
+# Подключаем функциональные модули фреймворка.
+include(${CMAKE_CURRENT_LIST_DIR}/cmake/stm32_yml_utils.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/stm32_yml_config.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/stm32_yml_sources.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/stm32_yml_frameworks.cmake)
@@ -41,10 +39,51 @@ function(stm32_yml_setup_project TARGET_NAME)
     stm32_get_chip_info(${MCU} FAMILY MCU_FAMILY TYPE MCU_TYPE)
     target_compile_definitions(${TARGET_NAME} PRIVATE STM32${MCU_TYPE})
 
-    # 2. Настройка базовых флагов компилятора и include-директорий из YAML.
+    # 2. Настройка флагов компилятора и include-директорий из YAML.
+
+    # --- Нормализация всех списков флагов ---
+    # compile_options/*: разбивка по пробелам + автодобавление "-"
+    stm32_yml_normalize_flags(compile_options)
+    stm32_yml_normalize_flags(compile_options_c)
+    stm32_yml_normalize_flags(compile_options_cxx)
+    stm32_yml_normalize_flags(link_options)
+    # compile_definitions/*: только разбивка по пробелам, "-D" добавляет CMake сам
+    stm32_yml_normalize_flags(compile_definitions     NO_AUTO_DASH)
+    stm32_yml_normalize_flags(compile_definitions_c   NO_AUTO_DASH)
+    stm32_yml_normalize_flags(compile_definitions_cxx NO_AUTO_DASH)
+
+    # --- Общие флаги (для всех языков) — обратная совместимость ---
     target_include_directories(${TARGET_NAME} PRIVATE ${include_directories})
     target_compile_definitions(${TARGET_NAME} PRIVATE ${compile_definitions})
     target_compile_options(${TARGET_NAME} PRIVATE ${compile_options})
+
+    # --- Флаги только для C ---
+    if(compile_options_c)
+        target_compile_options(${TARGET_NAME} PRIVATE
+            $<$<COMPILE_LANGUAGE:C>:${compile_options_c}>)
+        string(REPLACE ";" " " _c_opts_str "${compile_options_c}")
+        message(STATUS "Флаги только для C:   ${_c_opts_str}")
+    endif()
+    if(compile_definitions_c)
+        target_compile_definitions(${TARGET_NAME} PRIVATE
+            $<$<COMPILE_LANGUAGE:C>:${compile_definitions_c}>)
+        string(REPLACE ";" " " _c_defs_str "${compile_definitions_c}")
+        message(STATUS "Defines только для C: ${_c_defs_str}")
+    endif()
+
+    # --- Флаги только для C++ ---
+    if(compile_options_cxx)
+        target_compile_options(${TARGET_NAME} PRIVATE
+            $<$<COMPILE_LANGUAGE:CXX>:${compile_options_cxx}>)
+        string(REPLACE ";" " " _cxx_opts_str "${compile_options_cxx}")
+        message(STATUS "Флаги только для C++: ${_cxx_opts_str}")
+    endif()
+    if(compile_definitions_cxx)
+        target_compile_definitions(${TARGET_NAME} PRIVATE
+            $<$<COMPILE_LANGUAGE:CXX>:${compile_definitions_cxx}>)
+        string(REPLACE ";" " " _cxx_defs_str "${compile_definitions_cxx}")
+        message(STATUS "Defines только для C++: ${_cxx_defs_str}")
+    endif()
 
     # 2.5 Контроль качества кода (Cppcheck, и т.д.).
     stm32_yml_setup_code_quality(${TARGET_NAME})
@@ -54,6 +93,7 @@ function(stm32_yml_setup_project TARGET_NAME)
         target_link_options(${TARGET_NAME} PRIVATE LINKER:-Map=${TARGET_NAME}.map)
     endif()
     target_link_options(${TARGET_NAME} PRIVATE ${link_options})
+    # link_options уже нормализованы выше вместе с compile_options
     foreach(directive IN LISTS linker_directives)
         target_link_options(${TARGET_NAME} PRIVATE "LINKER:${directive}")
     endforeach()
