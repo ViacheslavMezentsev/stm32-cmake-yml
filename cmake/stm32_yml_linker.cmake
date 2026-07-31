@@ -11,6 +11,15 @@ function(stm32_yml_setup_linker_script TARGET_NAME)
 
     stm32_yml_ensure_default_value(linker_script "auto")
 
+    # Формируем упорядоченный список папок поиска шаблона/скрипта.
+    # linker_script_dir проверяется первым, затем корень проекта.
+    set(_search_dirs "")
+    if(DEFINED linker_script_dir AND NOT linker_script_dir STREQUAL "")
+        set(_search_dirs "${CMAKE_SOURCE_DIR}/${linker_script_dir}")
+        message(STATUS "Папка поиска скрипта компоновщика: ${_search_dirs}")
+    endif()
+    list(APPEND _search_dirs "${CMAKE_SOURCE_DIR}")
+
     # =======================================================================
     # 1. ОПРЕДЕЛЕНИЕ И ПОДКЛЮЧЕНИЕ СКРИПТА
     # =======================================================================
@@ -20,28 +29,40 @@ function(stm32_yml_setup_linker_script TARGET_NAME)
         # MCU_TYPE из stm32_get_chip_info возвращает обобщённый тип "H723xx"
         # (нужен для макроса компилятора STM32H723xx), но не подходит для поиска
         # шаблона. Извлекаем конкретные 6 символов типа напрямую из MCU-строки.
-        # Пример: "STM32H723VGT6" -> substr(5,6) -> "H723VG"
+        # Пример: "STM32H723VGT6" -> substr(5,6) -> "H723VG", "STM32G474RET" -> "G474RE"
         string(SUBSTRING "${MCU}" 5 6 _mcu_type_concrete)
 
-        # Ищем шаблон по трём вариантам имени — от точного к общему:
-        #   1. STM32H723VG_FLASH.ld.in  — точное совпадение
-        #   2. STM32H723XG_FLASH.ld.in  — корпус (5й символ) заменён на X (стиль CubeMX)
-        #   3. STM32H723XX_FLASH.ld.in  — оба последних символа XX (широкий фолбек)
+        # Подготавливаем все варианты суффиксов имени шаблона.
+        # Вариант 2: корпус (5й символ) заменён на X — стиль CubeMX для H7.
+        string(REGEX REPLACE "^(....).(.)$" "\\1X\\2" _mcu_x_pkg "${_mcu_type_concrete}")
+        # Вариант 3: оба последних символа -> XX (верхний регистр, широкий фолбек).
+        string(REGEX REPLACE "..$" "XX" _mcu_xx "${_mcu_type_concrete}")
+        # Вариант 4: оба последних символа -> xx (нижний регистр — стиль CubeMX для G4/F4).
+        string(REGEX REPLACE "..$" "xx" _mcu_xx_lower "${_mcu_type_concrete}")
 
-        # Вариант 1: точное имя
-        set(TEMPLATE_FILE_PATH "${CMAKE_SOURCE_DIR}/STM32${_mcu_type_concrete}_FLASH.ld.in")
-
-        if(NOT EXISTS "${TEMPLATE_FILE_PATH}")
-            # Вариант 2: заменяем 5й символ (тип корпуса: V/Z/A/R...) на X
-            string(REGEX REPLACE "^(....).(.)$" "\\1X\\2" _mcu_x_pkg "${_mcu_type_concrete}")
-            set(TEMPLATE_FILE_PATH "${CMAKE_SOURCE_DIR}/STM32${_mcu_x_pkg}_FLASH.ld.in")
-        endif()
-
-        if(NOT EXISTS "${TEMPLATE_FILE_PATH}")
-            # Вариант 3: оба последних символа -> XX
-            string(REGEX REPLACE "..$" "XX" _mcu_xx "${_mcu_type_concrete}")
-            set(TEMPLATE_FILE_PATH "${CMAKE_SOURCE_DIR}/STM32${_mcu_xx}_FLASH.ld.in")
-        endif()
+        # Ищем шаблон по четырём вариантам имени в каждой папке из _search_dirs.
+        # Порядок приоритета: linker_script_dir, затем корень проекта.
+        #   1. STM32G474RE_FLASH.ld.in  — точное совпадение.
+        #   2. STM32G474XE_FLASH.ld.in  — корпус заменён на X (стиль CubeMX H7).
+        #   3. STM32G474XX_FLASH.ld.in  — оба символа XX (верхний регистр).
+        #   4. STM32G474xx_FLASH.ld.in  — оба символа xx (нижний регистр, стиль CubeMX G4/F4).
+        set(TEMPLATE_FILE_PATH "")
+        foreach(_search_dir IN LISTS _search_dirs)
+            foreach(_suffix IN ITEMS
+                "${_mcu_type_concrete}"
+                "${_mcu_x_pkg}"
+                "${_mcu_xx}"
+                "${_mcu_xx_lower}")
+                set(_candidate "${_search_dir}/STM32${_suffix}_FLASH.ld.in")
+                if(EXISTS "${_candidate}")
+                    set(TEMPLATE_FILE_PATH "${_candidate}")
+                    break()
+                endif()
+            endforeach()
+            if(TEMPLATE_FILE_PATH)
+                break()
+            endif()
+        endforeach()
 
         if(EXISTS "${TEMPLATE_FILE_PATH}")
             message(STATUS "Найден локальный шаблон: ${TEMPLATE_FILE_PATH}")
@@ -103,13 +124,22 @@ function(stm32_yml_setup_linker_script TARGET_NAME)
             endif()
         endif()
 
-        set(LOCAL_LINKER_SCRIPT_PATH "${CMAKE_CURRENT_SOURCE_DIR}/${linker_script}")
+        # Ищем явно указанный скрипт в linker_script_dir, затем в корне проекта.
+        set(LOCAL_LINKER_SCRIPT_PATH "")
+        foreach(_search_dir IN LISTS _search_dirs)
+            if(EXISTS "${_search_dir}/${linker_script}")
+                set(LOCAL_LINKER_SCRIPT_PATH "${_search_dir}/${linker_script}")
+                break()
+            endif()
+        endforeach()
 
-        if(EXISTS ${LOCAL_LINKER_SCRIPT_PATH})
+        if(LOCAL_LINKER_SCRIPT_PATH)
             message(STATUS "Использование пользовательского скрипта компоновщика: ${LOCAL_LINKER_SCRIPT_PATH}")
             stm32_add_linker_script(${TARGET_NAME} PRIVATE ${LOCAL_LINKER_SCRIPT_PATH})
         else()
-            message(FATAL_ERROR "Указанный скрипт компоновщика не найден: ${LOCAL_LINKER_SCRIPT_PATH}")
+            message(FATAL_ERROR
+                "Указанный скрипт компоновщика не найден: '${linker_script}'\n"
+                "Папки поиска: ${_search_dirs}")
         endif()
     endif()
 

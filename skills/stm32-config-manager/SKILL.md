@@ -125,7 +125,39 @@ cmsis_rtos_api: "v2"  # Обертка CMSIS-RTOS API v2
 
 **Примечание:** Если `ioc_file` содержит FreeRTOS, но вы хотите его отключить — явно укажите `use_freertos: false` в YAML. Значение из YAML имеет приоритет над `.ioc`.
 
-### 6. Настройки компиляции
+### 6. Backend сборки и Arduino Core STM32
+
+| Параметр | Тип | По умолчанию | Описание |
+| --- | --- | --- | --- |
+| `toolchain_backend` | String | `"stm32-cmake"` | `"stm32-cmake"` или `"arduino"` |
+
+При `toolchain_backend: arduino` секция `arduino:` становится обязательной:
+
+| Параметр | Тип | По умолчанию | Описание |
+| --- | --- | --- | --- |
+| `arduino.core_path` | String | - | Путь к Arduino_Core_STM32 от корня проекта |
+| `arduino.core_cmake_dir` | String | `"Arduino/Core"` | Папка с CMakeLists.txt ядра Arduino |
+| `arduino.mcu_target` | String | - | Значение MCU_TARGET для variant (например `G474`) |
+| `arduino.use_core_main` | Bool | `false` | Подключать ли Arduino main() |
+| `arduino.libraries` | List | - | Стандартные библиотеки из `<core_path>/libraries/` |
+| `arduino.custom_libraries` | List | - | Кастомные библиотеки (пути от корня проекта) |
+
+Доступные стандартные библиотеки Arduino Core STM32:
+`SrcWrapper`, `Core` (через `core_cmake_dir`), `EEPROM`, `IWatchdog`, `Wire`,
+`SPI`, `Servo`, `SoftwareSerial`, `USBDevice`, `CMSIS_DSP`, `VirtIO`.
+
+```yaml
+toolchain_backend: arduino
+
+arduino:
+  core_path: "modules/Arduino_Core_STM32"
+  mcu_target: "G474"
+  use_core_main: false
+  libraries: [SrcWrapper, EEPROM, IWatchdog, Wire]
+  custom_libraries: ["cli"]
+```
+
+### 6a. Настройки компиляции
 
 | Параметр | Тип | Описание |
 | --- | --- | --- |
@@ -249,7 +281,41 @@ verbose_build: false           # true для просмотра команд к�
 
 ## Примеры использования
 
-### Пример 1: Включение FreeRTOS
+### Пример 1: Переход на Arduino Core STM32
+
+**Запрос:** "Настрой проект для работы с Arduino Core STM32 для платы на G474"
+
+```yaml
+toolchain_backend: arduino
+
+arduino:
+  core_path: "modules/Arduino_Core_STM32"
+  core_cmake_dir: "Arduino/Core"
+  mcu_target: "G474"
+  use_core_main: false
+  libraries:
+    - SrcWrapper
+    - EEPROM
+    - IWatchdog
+    - Wire
+
+compile_definitions:
+  - STM32G474xx
+  - ARDUINO_GENERIC_G474CEUX
+  - USE_HAL_DRIVER
+  - USE_FULL_LL_DRIVER
+
+compile_options:
+  - "-mthumb -mcpu=cortex-m4 -mfloat-abi=hard -mfpu=fpv4-sp-d16"
+  - fdata-sections
+  - ffunction-sections
+
+compile_options_cxx:
+  - fno-exceptions
+  - fno-rtti
+```
+
+### Пример 2: Включение FreeRTOS
 
 **Запрос:** "Включи FreeRTOS с 4-й схемой памяти для ядра Cortex-M4F"
 
@@ -261,7 +327,7 @@ freertos_components:
   - "Timers"
 ```
 
-### Пример 2: Отключение FreeRTOS из .ioc
+### Пример 3: Отключение FreeRTOS из .ioc
 
 **Запрос:** "В .ioc включён FreeRTOS, но я хочу его отключить"
 
@@ -270,7 +336,7 @@ ioc_file: "project.ioc"
 use_freertos: false   # YAML имеет приоритет над .ioc
 ```
 
-### Пример 3: Добавление LL-драйверов
+### Пример 4: Добавление LL-драйверов
 
 **Запрос:** "Добавь поддержку LL-драйверов для USART"
 
@@ -281,7 +347,7 @@ hal_components:
   - "LL_USART"  # Префикс LL_ добавит USE_FULL_LL_DRIVER
 ```
 
-### Пример 4: Раздельные флаги для C и C++
+### Пример 5: Раздельные флаги для C и C++
 
 **Запрос:** "Добавь `-fno-exceptions` и `-fno-rtti` только для C++, и `-Wstrict-prototypes` только для C"
 
@@ -294,7 +360,7 @@ compile_options_cxx:
   - fno-rtti
 ```
 
-### Пример 5: Настройка CRC для проверки прошивки
+### Пример 6: Настройка CRC для проверки прошивки
 
 **Запрос:** "Включи расчёт CRC32 для проверки целостности прошивки"
 
@@ -314,7 +380,7 @@ crc_algorithm: "STM32_HW_DEFAULT"
 } >FLASH
 ```
 
-### Пример 6: Переход на локальные драйверы
+### Пример 7: Переход на локальные драйверы
 
 **Запрос:** "Используй локальные драйверы из папки Drivers"
 
@@ -331,7 +397,7 @@ Project/
 cubefw_package: "auto"  # Автоматически найдёт локальные драйверы
 ```
 
-### Пример 7: Отладка проблем сборки
+### Пример 8: Отладка проблем сборки
 
 **Запрос:** "Помоги разобраться, какие флаги компиляции используются"
 
@@ -351,6 +417,8 @@ verbose_build: true           # Покажет команды компилято
 | `Файл hal_conf.h не найден` | Путь не в `include_directories` | Добавьте `"Core/Inc"` в `include_directories` |
 | `section .bss will not fit in region RAM` | `.bss` и `.data` в одном регионе, который переполнен | Переместите `.bss` в другой RAM-регион в `.ld.in` |
 | `Локальный шаблон не найден` | Имя `.ld.in` не совпадает ни с одним вариантом поиска | Переименуйте в `STM32{FAMILY}XX_FLASH.ld.in` или укажите `linker_script: "path/to/script.ld"` |
+| `[arduino] Папка Arduino Core STM32 не найдена` | `arduino.core_path` указывает на несуществующую папку | Проверьте симлинк `modules/Arduino_Core_STM32` в CI или путь в yml |
+| `[arduino] Библиотека 'X' не найдена` | Библиотека отсутствует в данной версии Arduino Core | Проверьте имя в `arduino.libraries` и наличие `CMakeLists.txt` в папке библиотеки |
 | `CRC не рассчитывается` | Нет Python 3 в системе | Установите Python 3 или отключите `crc_enable` |
 | `crc_enable: false` не отключает CRC | Устаревший CMake кэш | Выполните clean reconfigure: удалите папку `build` и пересоберите |
 
@@ -372,7 +440,8 @@ cmake --build build
 
 ## Примечания
 
-1. **Приоритет настроек:** YAML конфиг > IOC файл > значения по умолчанию
+1. **Приоритет настроек:** YAML конфиг > IOC файл > значения по умолчанию (только для backend stm32-cmake).
+1a. **Arduino backend:** `ioc_file` игнорируется, HAL/CMSIS не подключаются через stm32-cmake.
 2. **Локальные драйверы:** При `cubefw_package: "auto"` сначала ищутся в `Drivers/`, затем в глобальном репозитории
 3. **Многоядерные MCU:** Для STM32H7/WB обязательно укажите `mcu_core`
 4. **Newlib-nano:** Рекомендуется для MCU с Flash < 256 КБ, но может требовать дополнительной настройки для `printf` с float

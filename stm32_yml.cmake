@@ -5,7 +5,11 @@ cmake_minimum_required(VERSION 3.19)
 # ==============================================================================
 
 # Определяем текущую версию фреймворка.
-set(STM32_CMAKE_YML_VERSION "0.8")
+set(STM32_CMAKE_YML_VERSION "0.9")
+
+# ==============================================================================
+# 2. Уточнение сообщения о несовпадении версий в stm32_yml_config.cmake.
+# ==============================================================================
 
 # Подключаем функциональные модули фреймворка.
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/stm32_yml_utils.cmake)
@@ -16,6 +20,8 @@ include(${CMAKE_CURRENT_LIST_DIR}/cmake/stm32_yml_linker.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/stm32_yml_diagnostics.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/stm32_yml_postbuild.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/stm32_yml_code_quality.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/cmake/stm32_yml_profiles.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/cmake/stm32_yml_arduino.cmake)
 
 # ==============================================================================
 #      ОСНОВНАЯ ФУНКЦИЯ НАСТРОЙКИ ЦЕЛИ СБОРКИ
@@ -25,6 +31,12 @@ include(${CMAKE_CURRENT_LIST_DIR}/cmake/stm32_yml_code_quality.cmake)
 function(stm32_yml_setup_project TARGET_NAME)
 
     # 1. Базовая инициализация и опции CMake.
+
+    # Устанавливаем backend сборки в начале функции — значение используется
+    # далее в нескольких местах: при вызове stm32_get_chip_info, при выборе
+    # фреймворка и при настройке линкера.
+    stm32_yml_ensure_default_value(toolchain_backend "stm32-cmake")
+
     stm32_yml_ensure_default_value(verbose_build "false")
     if(verbose_build)
         message(STATUS "Включен подробный вывод команд сборки (CMAKE_VERBOSE_MAKEFILE=ON).")
@@ -35,9 +47,15 @@ function(stm32_yml_setup_project TARGET_NAME)
 
     add_executable(${TARGET_NAME})
 
-    # Определяем тип микроконтроллера для макросов.
-    stm32_get_chip_info(${MCU} FAMILY MCU_FAMILY TYPE MCU_TYPE)
-    target_compile_definitions(${TARGET_NAME} PRIVATE STM32${MCU_TYPE})
+    # Определяем тип микроконтроллера для макросов компилятора.
+    # stm32_get_chip_info доступна только при backend stm32-cmake —
+    # она является частью stm32_gcc.cmake toolchain.
+    # При Arduino backend макрос STM32${MCU_TYPE} задаётся пользователем
+    # явно через compile_definitions в stm32_config.yml.
+    if(NOT toolchain_backend STREQUAL "arduino")
+        stm32_get_chip_info(${MCU} FAMILY MCU_FAMILY TYPE MCU_TYPE)
+        target_compile_definitions(${TARGET_NAME} PRIVATE STM32${MCU_TYPE})
+    endif()
 
     # 2. Настройка флагов компилятора и include-директорий из YAML.
 
@@ -101,8 +119,13 @@ function(stm32_yml_setup_project TARGET_NAME)
     # 3. Подключение исходных файлов и папок.
     stm32_yml_setup_sources(${TARGET_NAME})
 
-    # 4. Подключение драйверов и ОС (CMSIS, HAL, FreeRTOS, Newlib).
-    stm32_yml_setup_frameworks(${TARGET_NAME})
+    # 4. Настраиваем backend сборки: stm32-cmake (по умолчанию) или arduino.
+    if(toolchain_backend STREQUAL "arduino")
+        stm32_yml_setup_arduino(${TARGET_NAME})
+    else()
+        # Настраиваем фреймворки (HAL, CMSIS, FreeRTOS).
+        stm32_yml_setup_frameworks(${TARGET_NAME})
+    endif()
 
     # 5. Настройка скрипта компоновщика (.ld).
     stm32_yml_setup_linker_script(${TARGET_NAME})

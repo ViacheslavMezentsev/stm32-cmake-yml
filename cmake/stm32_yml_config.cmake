@@ -37,12 +37,26 @@ function(stm32_yml_prepare_project_data OUT_PROJECT_NAME_VAR OUT_LANGUAGES_VAR)
             if(stm32_cmake_yml_version VERSION_GREATER STM32_CMAKE_YML_VERSION)
                 message(WARNING "Версия фреймворка (${STM32_CMAKE_YML_VERSION}) старше, чем требуется конфигом (${stm32_cmake_yml_version}). Возможны ошибки.")
             elseif(stm32_cmake_yml_version VERSION_LESS STM32_CMAKE_YML_VERSION)
-                message(WARNING "Версия фреймворка (${STM32_CMAKE_YML_VERSION}) новее, чем указано в конфиге (${stm32_cmake_yml_version}). Рекомендуется обновить stm32_cmake_yml_version.")
+                message(WARNING
+                    "Версия фреймворка (${STM32_CMAKE_YML_VERSION}) новее, чем указано в конфиге "
+                    "(${stm32_cmake_yml_version}). Рекомендуется обновить stm32_cmake_yml_version. "
+                    "Что нового в 0.9: профили сборки (profiles:), Arduino Core STM32 backend "
+                    "(toolchain_backend: arduino), cmake-overrides (-DSTM32_YML_OVERRIDE_*). "
+                    "Все изменения обратно совместимы — существующий yml работает без правок.")
             endif()
         endif()
     else()
     endif()
     # -------------------------------------------------------------------------
+
+    # Применяем профиль сборки и точечные cmake-overrides.
+    # Вызов до ioc-логики — профиль может переопределить ioc_file и mcu.
+    if(STM32_YML_PROFILE STREQUAL "list")
+        stm32_yml_list_profiles()
+        message(FATAL_ERROR "Передайте -DSTM32_YML_PROFILE=<имя> для выбора профиля.")
+    else()
+        stm32_yml_apply_profile("${CONFIG_FILE_PATH}")
+    endif()
 
     # Сохраняем значения, явно заданные пользователем в .yml, до того как
     # override-логика и ensure_default_value могут их изменить.
@@ -293,6 +307,24 @@ else()
     set(cppcheck_enable ${cppcheck_enable} PARENT_SCOPE)
     set(cppcheck_args ${cppcheck_args} PARENT_SCOPE)
     set(cppcheck_ignores ${cppcheck_ignores} PARENT_SCOPE)
+    # Проброс переменных профилей — динамические ключи уже пробрасываются
+    # через YAML_PARSED_KEYS ниже, явный проброс не требуется.
+    set(STM32_YML_PROFILE "${STM32_YML_PROFILE}" PARENT_SCOPE)
+    # Параметры toolchain backend.
+    set(toolchain_backend ${toolchain_backend} PARENT_SCOPE)
+    # Параметр папки поиска скрипта компоновщика.
+    set(linker_script_dir ${linker_script_dir} PARENT_SCOPE)
+    # Параметры секции arduino: — пробрасываются как arduino_<param>.
+    set(arduino_core_path       ${arduino_core_path}       PARENT_SCOPE)
+    set(arduino_core_cmake_dir  ${arduino_core_cmake_dir}  PARENT_SCOPE)
+    set(arduino_mcu_target      ${arduino_mcu_target}      PARENT_SCOPE)
+    set(arduino_use_core_main   ${arduino_use_core_main}   PARENT_SCOPE)
+    set(arduino_libraries       ${arduino_libraries}       PARENT_SCOPE)
+    set(arduino_custom_libraries ${arduino_custom_libraries} PARENT_SCOPE)
+
+# ==============================================================================
+# 4. Изменения в stm32_yml.cmake: ветвление по toolchain_backend
+# ==============================================================================
 
     # 2. АВТОМАТИЧЕСКИЙ ПРОБРОС ДИНАМИЧЕСКИХ ПАРАМЕТРОВ ИЗ YAML
     # Любой новый ключ (в том числе вложенный), добавленный в yaml, автоматически
