@@ -20,6 +20,7 @@ function(stm32_yml_prepare_project_data OUT_PROJECT_NAME_VAR OUT_LANGUAGES_VAR)
     message(STATUS "Framework : ${STM32_CMAKE_YML_VERSION}")
 
     stm32_yml_ensure_default_value(stm32_cmake_yml_version_check "true")
+
     if(stm32_cmake_yml_version_check)
         if(NOT DEFINED stm32_cmake_yml_version OR "${stm32_cmake_yml_version}" STREQUAL "")
             message(STATUS "Config    : (stm32_cmake_yml_version не указан в ${PROJECT_CONFIG_FILE})")
@@ -45,7 +46,6 @@ function(stm32_yml_prepare_project_data OUT_PROJECT_NAME_VAR OUT_LANGUAGES_VAR)
                     "Все изменения обратно совместимы — существующий yml работает без правок.")
             endif()
         endif()
-    else()
     endif()
     # -------------------------------------------------------------------------
 
@@ -69,7 +69,7 @@ function(stm32_yml_prepare_project_data OUT_PROJECT_NAME_VAR OUT_LANGUAGES_VAR)
     set(_YAML_use_freertos       "${use_freertos}")
     set(_YAML_cmsis_rtos_api     "${cmsis_rtos_api}")
     set(_YAML_freertos_components "${freertos_components}")
-    stm32_yml_ensure_default_value(ioc_file "")
+
     # Хелпер: определяет и возвращает метку источника значения переменной.
     # yml_raw  — значение, пришедшее из YAML (до override-логики)
     # ioc_raw  — значение, пришедшее из .ioc
@@ -85,12 +85,21 @@ function(stm32_yml_prepare_project_data OUT_PROJECT_NAME_VAR OUT_LANGUAGES_VAR)
         endif()
     endmacro()
 
-# Обрабатываем IOC или устанавливаем значения по умолчанию
+    if(toolchain_backend STREQUAL "arduino")
+        # В режиме Arduino игнорируем IOC-файл, принудительно направляя скрипт в ветку else()
+        set(ioc_file "")
+    else()
+        stm32_yml_ensure_default_value(ioc_file "")
+    endif()
+
+    # Обрабатываем IOC или устанавливаем значения по умолчанию.
     if(ioc_file)
+
         message(STATUS "Обнаружена настройка 'ioc_file'. Чтение данных из: ${ioc_file} ...")
+
         set(IOC_FILE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/${ioc_file}")
 
-        # Вызываем парсер для .ioc файла
+        # Вызываем парсер для .ioc файла.
         stm32_yml_parse_ioc_file(${IOC_FILE_PATH} "IOC_")
 
         # ------------------------------------------------------------------
@@ -195,10 +204,12 @@ function(stm32_yml_prepare_project_data OUT_PROJECT_NAME_VAR OUT_LANGUAGES_VAR)
         message(STATUS "  CubeFW:     ${cubefw_package}  ${_src_cube}")
         message(STATUS "  Heap Size:  ${heap_size} байт  ${_src_heap}")
         message(STATUS "  Stack Size: ${stack_size} байт  ${_src_stack}")
+
         if(use_freertos)
             _stm32_yml_src("${_yml_raw_rtos_api}"      "${IOC_CMSIS_RTOS_API}" "${cmsis_rtos_api}"     _src_api)
             _stm32_yml_src("${_yml_raw_freertos_comp}" ""                      "${freertos_components}" _src_fc)
             string(REPLACE ";" ", " _freertos_comp_str "${freertos_components}")
+
             if("${_yml_raw_freertos}" STREQUAL "false")
                 message(STATUS "  FreeRTOS:   ОТКЛЮЧЕН (переопределено в .yml)  [yml]")
             else()
@@ -209,23 +220,39 @@ function(stm32_yml_prepare_project_data OUT_PROJECT_NAME_VAR OUT_LANGUAGES_VAR)
         else()
             message(STATUS "  FreeRTOS:   Отключен")
         endif()
-else()
-        message(STATUS "Режим ручной конфигурации (ioc_file не указан).")
+
+    else()
+        if(NOT toolchain_backend STREQUAL "arduino")
+            message(STATUS "Режим ручной конфигурации (ioc_file не указан).")
+        endif()
         stm32_yml_ensure_default_value(project_name "auto")
-        stm32_yml_ensure_default_value(use_cmsis "true")
-        stm32_yml_ensure_default_value(use_hal "true")
         stm32_yml_ensure_default_value(heap_size "512")
         stm32_yml_ensure_default_value(stack_size "1024")
-        stm32_yml_ensure_default_value(use_freertos "false")
+
+        if(NOT toolchain_backend STREQUAL "arduino")
+            stm32_yml_ensure_default_value(use_cmsis "true")
+            stm32_yml_ensure_default_value(use_hal "true")
+            stm32_yml_ensure_default_value(use_freertos "false")
+        endif()
     endif()
 
     # Значения по умолчанию для пропущенных параметров
     stm32_yml_ensure_default_value(linker_script "auto")
     stm32_yml_ensure_default_value(use_newlib_nano "false")
-    stm32_yml_ensure_default_value(mcu_core "")
+
+    if(NOT toolchain_backend STREQUAL "arduino")
+        stm32_yml_ensure_default_value(mcu_core "")
+    endif()
+
     stm32_yml_ensure_default_value(crc_enable "false")
-    stm32_yml_ensure_default_value(crc_section_name ".checksum")
-    stm32_yml_ensure_default_value(crc_algorithm "STM32_HW_DEFAULT")
+
+    # Нормализуем значение в булево для проверки прямо здесь
+    string(TOUPPER "${crc_enable}" _crc_check)
+    if(_crc_check STREQUAL "TRUE" OR _crc_check STREQUAL "ON" OR _crc_check STREQUAL "1" OR _crc_check STREQUAL "YES")
+        stm32_yml_ensure_default_value(crc_section_name ".checksum")
+        stm32_yml_ensure_default_value(crc_algorithm "STM32_HW_DEFAULT")
+    endif()
+
     # --- Значения по умолчанию для Cppcheck ---
     if(NOT DEFINED cppcheck_ignores OR "${cppcheck_ignores}" STREQUAL "")
         set(cppcheck_ignores "STM32Cube/Repository" "Drivers" "Middlewares")
@@ -321,10 +348,6 @@ else()
     set(arduino_use_core_main   ${arduino_use_core_main}   PARENT_SCOPE)
     set(arduino_libraries       ${arduino_libraries}       PARENT_SCOPE)
     set(arduino_custom_libraries ${arduino_custom_libraries} PARENT_SCOPE)
-
-# ==============================================================================
-# 4. Изменения в stm32_yml.cmake: ветвление по toolchain_backend
-# ==============================================================================
 
     # 2. АВТОМАТИЧЕСКИЙ ПРОБРОС ДИНАМИЧЕСКИХ ПАРАМЕТРОВ ИЗ YAML
     # Любой новый ключ (в том числе вложенный), добавленный в yaml, автоматически

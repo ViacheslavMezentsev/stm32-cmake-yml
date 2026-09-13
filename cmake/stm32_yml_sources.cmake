@@ -10,14 +10,18 @@
 function(stm32_yml_setup_sources TARGET_NAME)
     set(LOCAL_PROJECT_SOURCES "")
 
-    # Конструируем имена файлов, которые мы будем искать
-    string(TOLOWER ${MCU_FAMILY} MCU_FAMILY_LOWER)
-    string(TOLOWER ${MCU_TYPE} MCU_TYPE_LOWER)
+    # Конструируем имена системных файлов для их перехвата (только при stm32-cmake backend).
+    # При Arduino backend MCU_FAMILY и MCU_TYPE не определены — stm32_get_chip_info
+    # не вызывается. Системный и startup файлы при Arduino backend компилируются
+    # внутри Arduino/Core и не требуют перехвата.
+    if(NOT toolchain_backend STREQUAL "arduino")
+        string(TOLOWER ${MCU_FAMILY} MCU_FAMILY_LOWER)
+        string(TOLOWER ${MCU_TYPE} MCU_TYPE_LOWER)
+        set(SYSTEM_FILENAME_TARGET "system_stm32${MCU_FAMILY_LOWER}xx.c")
+        set(STARTUP_FILENAME_PATTERN "startup_stm32${MCU_TYPE_LOWER}.*\\.s")
+    endif()
 
-    set(SYSTEM_FILENAME_TARGET "system_stm32${MCU_FAMILY_LOWER}xx.c")
-    set(STARTUP_FILENAME_PATTERN "startup_stm32${MCU_TYPE_LOWER}.*\\.s")
-
-    # Перебираем список 'sources' из YAML-конфига
+    # Перебираем список 'sources' из YAML-конфига.
     foreach(src_item IN LISTS sources)
         set(full_path "${CMAKE_CURRENT_SOURCE_DIR}/${src_item}")
         get_filename_component(filename ${src_item} NAME)
@@ -25,8 +29,9 @@ function(stm32_yml_setup_sources TARGET_NAME)
 
         set(is_special_file FALSE)
 
-        # Проверка на особые системные файлы (только если HAL/CMSIS включены)
-        if(use_hal OR use_cmsis)
+        # Проверка на особые системные файлы.
+        # Только при stm32-cmake backend и только если HAL/CMSIS включены.
+        if(NOT toolchain_backend STREQUAL "arduino" AND (use_hal OR use_cmsis))
             if(filename_lower STREQUAL SYSTEM_FILENAME_TARGET)
                 if(mcu_core)
                     set(CMSIS_${MCU_FAMILY}_${mcu_core}_SYSTEM ${full_path} PARENT_SCOPE)

@@ -188,17 +188,23 @@ function(stm32_yml_setup_frameworks TARGET_NAME)
         target_link_libraries(${TARGET_NAME} PRIVATE ${LOCAL_FREERTOS_TARGETS})
     endif()
 
-    # =======================================================================
-    # 5. СИСТЕМНЫЕ БИБЛИОТЕКИ C/C++ (Newlib)
-    # =======================================================================
-    if(use_newlib_nano)
-        target_link_libraries(${TARGET_NAME} PRIVATE STM32::Nano)
-    endif()
+    endfunction()
 
-    if(system_library STREQUAL "NoSys")
-        target_link_libraries(${TARGET_NAME} PRIVATE STM32::NoSys)
-    elseif(system_library STREQUAL "Semihosting")
-        target_link_libraries(${TARGET_NAME} PRIVATE STM32::Semihosting)
-    endif()
+    # ==============================================================================
+    # @brief Настраивает системные библиотеки (C-runtime) для цели сборки.
+    # Вынесено в отдельную функцию, так как применяется для всех бэкендов.
+    # ==============================================================================
+    function(stm32_yml_setup_system_libraries TARGET_NAME)
+        # =======================================================================
+        # СИСТЕМНЫЕ БИБЛИОТЕКИ C/C++ (Newlib, NoSys, Semihosting)
+        # =======================================================================
+        if(use_newlib_nano)
+            target_link_libraries(${TARGET_NAME} PRIVATE STM32::Nano)
+        endif()
 
-endfunction()
+        if(system_library STREQUAL "NoSys")
+            target_link_libraries(${TARGET_NAME} PRIVATE STM32::NoSys)
+        elseif(system_library STREQUAL "Semihosting")
+            target_link_libraries(${TARGET_NAME} PRIVATE STM32::Semihosting)
+        endif()
+    endfunction()

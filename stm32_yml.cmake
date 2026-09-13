@@ -5,11 +5,7 @@ cmake_minimum_required(VERSION 3.19)
 # ==============================================================================
 
 # Определяем текущую версию фреймворка.
-set(STM32_CMAKE_YML_VERSION "0.9")
-
-# ==============================================================================
-# 2. Уточнение сообщения о несовпадении версий в stm32_yml_config.cmake.
-# ==============================================================================
+set(STM32_CMAKE_YML_VERSION "0.9.1")
 
 # Подключаем функциональные модули фреймворка.
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/stm32_yml_utils.cmake)
@@ -126,6 +122,9 @@ function(stm32_yml_setup_project TARGET_NAME)
         # Настраиваем фреймворки (HAL, CMSIS, FreeRTOS).
         stm32_yml_setup_frameworks(${TARGET_NAME})
     endif()
+
+    # Настраиваем системные библиотеки (Newlib Nano, NoSys, Semihosting).
+    stm32_yml_setup_system_libraries(${TARGET_NAME})
 
     # 5. Настройка скрипта компоновщика (.ld).
     stm32_yml_setup_linker_script(${TARGET_NAME})

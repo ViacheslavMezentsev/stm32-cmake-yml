@@ -377,6 +377,7 @@ function(stm32_yml_normalize_flags LIST_VAR)
 
     set(${LIST_VAR} "${_result}" PARENT_SCOPE)
 endfunction()
+
 function(stm32_yml_ensure_default_value VAR_NAME DEFAULT_VALUE)
     # Проверяем, что переменная НЕ определена ИЛИ она определена, но является пустой строкой.
     # Это надежный способ покрыть оба случая: отсутствие ключа в YAML и ключ с пустым значением.

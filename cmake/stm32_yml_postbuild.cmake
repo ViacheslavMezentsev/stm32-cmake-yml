@@ -31,30 +31,61 @@ function(stm32_yml_setup_postbuild TARGET_NAME)
         # По умолчанию считаем, что внедрение возможно
         set(CRC_POSSIBLE TRUE)
 
-        # 1. Проверяем наличие Python
-        find_package(Python3 COMPONENTS Interpreter QUIET)
-        if(NOT Python3_FOUND)
-            message(WARNING " Интерпретатор Python3 не найден. Расчет CRC отключен.")
-            set(CRC_POSSIBLE FALSE)
+        # ЗАЩИТА: Получаем эталонный размер FLASH (нужно для защиты от гигантских файлов)
+        stm32_yml_ensure_default_value(flash_size "auto")
+
+        if(NOT "${flash_size}" STREQUAL "auto" AND NOT "${flash_size}" STREQUAL "")
+            # 1. Явно задано пользователем в stm32_config.yml
+            set(EXPECTED_FLASH_SIZE_STR "${flash_size}")
+        else()
+            if(NOT toolchain_backend STREQUAL "arduino")
+                # 2. Бэкенд stm32-cmake: берем из внутренней базы данных тулчейна
+                stm32_get_memory_info(CHIP ${mcu} FLASH SIZE EXPECTED_FLASH_SIZE_STR)
+            else()
+                # 3. Бэкенд arduino: парсим размер прямо из скрипта компоновщика (.ld)
+                set(EXPECTED_FLASH_SIZE_STR "")
+                if(LINKER_SCRIPT_PATH AND EXISTS "${LINKER_SCRIPT_PATH}")
+                    file(STRINGS "${LINKER_SCRIPT_PATH}" _ld_lines)
+                    foreach(_line IN LISTS _ld_lines)
+                        # Ищем строку вида: FLASH (rx) : ORIGIN = 0x8000000, LENGTH = 512K
+                        if(_line MATCHES "FLASH.*LENGTH[ \t]*=[ \t]*([0-9]+[KkMmGg]?)")
+                            set(EXPECTED_FLASH_SIZE_STR "${CMAKE_MATCH_1}")
+                            break()
+                        endif()
+                    endforeach()
+                endif()
+
+                if("${EXPECTED_FLASH_SIZE_STR}" STREQUAL "")
+                    message(WARNING " Расчет CRC отключен. Не удалось автоматически определить размер FLASH из ${LINKER_SCRIPT_PATH}. Задайте 'flash_size' в stm32_config.yml.")
+                    set(CRC_POSSIBLE FALSE)
+                endif()
+            endif()
         endif()
 
-        # 2. Проверяем наличие objcopy
-        if(NOT CMAKE_OBJCOPY)
-            message(WARNING " Утилита objcopy не найдена. Расчет CRC отключен.")
-            set(CRC_POSSIBLE FALSE)
-        endif()
+        if(CRC_POSSIBLE)
+            # 1. Проверяем наличие Python
+            find_package(Python3 COMPONENTS Interpreter QUIET)
+            if(NOT Python3_FOUND)
+                message(WARNING " Интерпретатор Python3 не найден. Расчет CRC отключен.")
+                set(CRC_POSSIBLE FALSE)
+            endif()
 
-        # 3. Проверяем наличие скрипта (используем путь к фреймворку)
-        set(CRC_SCRIPT_PATH "${STM32_YML_FRAMEWORK_DIR}/scripts/stm32_crc.py")
-        if(NOT EXISTS ${CRC_SCRIPT_PATH})
-            message(WARNING " Скрипт расчета не найден по пути: ${CRC_SCRIPT_PATH}. Расчет CRC отключен.")
-            set(CRC_POSSIBLE FALSE)
+            # 2. Проверяем наличие objcopy
+            if(NOT CMAKE_OBJCOPY)
+                message(WARNING " Утилита objcopy не найдена. Расчет CRC отключен.")
+                set(CRC_POSSIBLE FALSE)
+            endif()
+
+            # 3. Проверяем наличие скрипта (используем путь относительно текущего cmake-файла)
+            set(CRC_SCRIPT_PATH "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../scripts/stm32_crc.py")
+            if(NOT EXISTS ${CRC_SCRIPT_PATH})
+                message(WARNING " Скрипт расчета не найден по пути: ${CRC_SCRIPT_PATH}. Расчет CRC отключен.")
+                set(CRC_POSSIBLE FALSE)
+            endif()
         endif()
 
         # 4. Настраиваем Custom Command, если все проверки пройдены
         if(CRC_POSSIBLE)
-            # ЗАЩИТА: Получаем эталонный размер FLASH.
-            stm32_get_memory_info(CHIP ${mcu} FLASH SIZE EXPECTED_FLASH_SIZE_STR)
             string(TOUPPER "${EXPECTED_FLASH_SIZE_STR}" EXPECTED_FLASH_SIZE_UPPER)
 
             if(EXPECTED_FLASH_SIZE_UPPER MATCHES "K$")
