@@ -55,8 +55,18 @@ function(stm32_yml_setup_sources TARGET_NAME)
         # Стандартная обработка остальных файлов
         if(NOT is_special_file)
             if(IS_DIRECTORY ${full_path})
-                # Подключение директории как модуля (CMakeLists.txt внутри обязателен)
-                add_subdirectory(${src_item})
+                # Подключение директории как модуля (CMakeLists.txt внутри обязателен).
+                # Для каталога вне дерева проекта (например "../shared") CMake
+                # требует явного указания бинарной директории, иначе конфигурация
+                # завершается ошибкой. Имя формируем из относительного пути,
+                # заменяя разделители, чтобы исключить коллизии одноимённых папок.
+                file(RELATIVE_PATH _src_rel "${CMAKE_CURRENT_SOURCE_DIR}" "${full_path}")
+                if(_src_rel MATCHES "^\\.\\.")
+                    string(REGEX REPLACE "[^A-Za-z0-9_]" "_" _src_bin_name "${src_item}")
+                    add_subdirectory("${full_path}" "${CMAKE_BINARY_DIR}/external_${_src_bin_name}")
+                else()
+                    add_subdirectory(${src_item})
+                endif()
             elseif(EXISTS ${full_path})
                 # Добавление одиночного файла
                 list(APPEND LOCAL_PROJECT_SOURCES ${full_path})

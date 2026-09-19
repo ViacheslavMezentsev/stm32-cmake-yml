@@ -206,6 +206,17 @@ function(stm32_yml_prepare_project_data OUT_PROJECT_NAME_VAR OUT_LANGUAGES_VAR)
         message(STATUS "  Stack Size: ${stack_size} байт  ${_src_stack}")
 
         if(use_freertos)
+            # Источник самого флага use_freertos определяем явно: булевы значения
+            # из yml ("true") и из .ioc ("TRUE") различаются регистром, поэтому
+            # обобщённый хелпер _stm32_yml_src здесь дал бы ложный [auto].
+            if(NOT "${_yml_raw_freertos}" STREQUAL "")
+                set(_src_freertos_flag "[yml]")
+            elseif(IOC_USE_FREERTOS)
+                set(_src_freertos_flag "[ioc]")
+            else()
+                set(_src_freertos_flag "[auto]")
+            endif()
+
             _stm32_yml_src("${_yml_raw_rtos_api}"      "${IOC_CMSIS_RTOS_API}" "${cmsis_rtos_api}"     _src_api)
             _stm32_yml_src("${_yml_raw_freertos_comp}" ""                      "${freertos_components}" _src_fc)
             string(REPLACE ";" ", " _freertos_comp_str "${freertos_components}")
@@ -266,7 +277,9 @@ function(stm32_yml_prepare_project_data OUT_PROJECT_NAME_VAR OUT_LANGUAGES_VAR)
 
     set(MCU ${mcu} CACHE STRING "Target STM32 microcontroller")
 
-    if(${project_name} STREQUAL "auto")
+    # Сравнение без разыменования: пустое значение project_name (например, когда
+    # .ioc не содержит ProjectManager.ProjectName) сломало бы синтаксис if().
+    if(project_name STREQUAL "auto")
         get_filename_component(LOCAL_PROJECT_NAME ${CMAKE_SOURCE_DIR} NAME)
     else()
         set(LOCAL_PROJECT_NAME ${project_name})

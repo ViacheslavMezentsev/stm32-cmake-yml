@@ -54,27 +54,6 @@
 #   — позволяет вынести профили в отдельный файл при их разрастании.
 # ==============================================================================
 
-# Список параметров, поддерживающих семантику _append для списков.
-set(_STM32_YML_LIST_PARAMS
-    compile_definitions
-    compile_options
-    compile_options_c
-    compile_options_cxx
-    compile_definitions_c
-    compile_definitions_cxx
-    sources
-    include_directories
-    hal_components
-    freertos_components
-    linker_directives
-    link_options
-    link_libraries
-    custom_libraries
-    build_artifacts
-    cppcheck_ignores
-    cppcheck_args
-)
-
 # ==============================================================================
 # @brief Применяет именованный профиль и точечные cmake-overrides к текущим
 #        переменным конфигурации.
@@ -144,6 +123,11 @@ function(stm32_yml_apply_profile CONFIG_FILE_PATH)
                 set(_pval "${${_pfx}_${_key}}")
 
                 # Семантика ЗАМЕНЫ: профиль перекрывает базовое значение.
+                # Значение записывается и в локальную область: set(... PARENT_SCOPE)
+                # не меняет переменную здесь, а цикл обработки _append ниже читает
+                # её именно отсюда. Без локальной копии дополнение приклеилось бы
+                # к исходному списку из yml, а не к списку, заданному профилем.
+                set(${_key} "${_pval}")
                 set(${_key} "${_pval}" PARENT_SCOPE)
                 message(STATUS "  [профиль] ${_key} = ${_pval}")
             endforeach()
@@ -202,10 +186,16 @@ function(stm32_yml_list_profiles)
 
     if(DEFINED YAML_PARSED_KEYS)
         foreach(_k IN LISTS YAML_PARSED_KEYS)
-            if(_k MATCHES "^profiles_([^_]+)_mcu$")
+            # Имя профиля — первый сегмент после "profiles_".
+            # Привязка к ключу mcu недопустима: профиль может не задавать mcu
+            # (например, при Arduino backend, где MCU определяет variant ядра).
+            # Ограничение: имя профиля не должно содержать символ "_", иначе
+            # оно будет усечено до первого подчёркивания.
+            if(_k MATCHES "^profiles_([^_]+)_")
                 list(APPEND _found_profiles "${CMAKE_MATCH_1}")
             endif()
         endforeach()
+        list(REMOVE_DUPLICATES _found_profiles)
     endif()
 
     if(_found_profiles)

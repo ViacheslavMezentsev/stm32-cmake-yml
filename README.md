@@ -1,6 +1,6 @@
 # STM32 CMake YML Framework
 
-[![Version](https://img.shields.io/badge/version-0.9.1-blue.svg)](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/releases)
+[![Version](https://img.shields.io/badge/version-0.9.2-blue.svg)](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Changelog](https://img.shields.io/badge/changelog-CHANGELOG.md-informational.svg)](CHANGELOG.md)
 
@@ -30,7 +30,7 @@
 определятся автоматически.
 
 ```yaml
-stm32_cmake_yml_version: "0.9.1"
+stm32_cmake_yml_version: "0.9.2"
 ioc_file: "my_project.ioc"
 build_artifacts: [ bin, hex, map ]
 crc_enable: true
@@ -41,7 +41,7 @@ crc_enable: true
 Для legacy-проектов или нестандартных конфигураций все параметры задаются явно.
 
 ```yaml
-stm32_cmake_yml_version: "0.9.1"
+stm32_cmake_yml_version: "0.9.2"
 mcu: STM32F411CEU6
 heap_size: 512
 stack_size: 1K
@@ -57,7 +57,7 @@ freertos_components: [ ARM_CM4F, "Heap::4" ]
 что отличается между ревизиями.
 
 ```yaml
-stm32_cmake_yml_version: "0.9.1"
+stm32_cmake_yml_version: "0.9.2"
 
 # Общие настройки для всех ревизий.
 hal_components: [ GPIO, UART, DMA, CRC ]
@@ -94,7 +94,7 @@ cmake -DSTM32_YML_PROFILE=G474 -B build/G474 -S .
 профилей, генерации скрипта компоновщика, расчёта CRC, артефактов и нормализации флагов.
 
 ```yaml
-stm32_cmake_yml_version: "0.9.1"
+stm32_cmake_yml_version: "0.9.2"
 toolchain_backend: arduino
 mcu: STM32G474RET6  # Требуется для автоматической генерации скрипта компоновщика и CRC.
 

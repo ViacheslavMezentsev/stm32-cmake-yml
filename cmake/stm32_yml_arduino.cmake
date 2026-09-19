@@ -171,7 +171,10 @@ function(stm32_yml_setup_arduino TARGET_NAME)
 
             if(EXISTS "${_custom_lib_dir}/CMakeLists.txt")
                 message(STATUS "Подключение кастомной библиотеки: ${_custom_lib}")
-                get_filename_component(_custom_lib_name "${_custom_lib}" NAME)
+                # Имя бинарной директории формируем из всего относительного пути,
+                # а не из последнего сегмента: пути "Arduino/libraries/Cli" и
+                # "Components/Cli" дали бы одинаковое имя и конфликт в CMake.
+                string(REGEX REPLACE "[^A-Za-z0-9_]" "_" _custom_lib_name "${_custom_lib}")
                 add_subdirectory("${_custom_lib_dir}"
                     "${CMAKE_BINARY_DIR}/arduino_custom_${_custom_lib_name}")
             else()

@@ -193,6 +193,8 @@ function(stm32_yml_setup_frameworks TARGET_NAME)
     # ==============================================================================
     # @brief Настраивает системные библиотеки (C-runtime) для цели сборки.
     # Вынесено в отдельную функцию, так как применяется для всех бэкендов.
+    #
+    # @param TARGET_NAME  Имя основного cmake-таргета проекта.
     # ==============================================================================
     function(stm32_yml_setup_system_libraries TARGET_NAME)
         # =======================================================================
@@ -202,9 +204,11 @@ function(stm32_yml_setup_frameworks TARGET_NAME)
             target_link_libraries(${TARGET_NAME} PRIVATE STM32::Nano)
         endif()
 
-        if(system_library STREQUAL "NoSys")
+        # Сравнение через кавычки: параметр может быть не задан в stm32_config.yml,
+        # и тогда без кавычек CMake сравнивал бы само имя переменной.
+        if("${system_library}" STREQUAL "NoSys")
             target_link_libraries(${TARGET_NAME} PRIVATE STM32::NoSys)
-        elseif(system_library STREQUAL "Semihosting")
+        elseif("${system_library}" STREQUAL "Semihosting")
             target_link_libraries(${TARGET_NAME} PRIVATE STM32::Semihosting)
         endif()
     endfunction()

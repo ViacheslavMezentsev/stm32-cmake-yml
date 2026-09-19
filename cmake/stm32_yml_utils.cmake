@@ -5,9 +5,6 @@
 #
 # @param IOC_FILE_PATH - Путь к .ioc файлу.
 # @param PREFIX        - Префикс для всех создаваемых переменных (например, "IOC_").
-#
-# ==============================================================================
-#      ФУНКЦИЯ ДЛЯ РАЗБОРА .ioc ФАЙЛА STM32CUBEMX
 # ==============================================================================
 function(stm32_yml_parse_ioc_file IOC_FILE_PATH PREFIX)
     if(NOT EXISTS ${IOC_FILE_PATH})
@@ -16,13 +13,17 @@ function(stm32_yml_parse_ioc_file IOC_FILE_PATH PREFIX)
 
     file(STRINGS ${IOC_FILE_PATH} IOC_LINES)
 
-    # Устанавливаем значения по умолчанию для опциональных компонентов
-    set(${PREFIX}USE_FREERTOS FALSE PARENT_SCOPE)
-    set(${PREFIX}CMSIS_RTOS_API "none" PARENT_SCOPE)
-    set(${PREFIX}USE_CUSTOMER_FW_PATH FALSE PARENT_SCOPE)
-    set(${PREFIX}CUSTOMER_FW_FAMILY   ""    PARENT_SCOPE)
-    set(${PREFIX}CUSTOMER_FW_VERSION  ""    PARENT_SCOPE)
-    set(${PREFIX}CUSTOMER_FW_PATH     ""    PARENT_SCOPE)
+    # Значения по умолчанию для опциональных компонентов.
+    # Накапливаются в локальных переменных: set(... PARENT_SCOPE) не меняет
+    # переменную в текущей области, поэтому постобработка после цикла не
+    # увидела бы значений, записанных внутри него.
+    set(_use_freertos         FALSE)
+    set(_cmsis_rtos_api       "none")
+    set(_use_customer_fw_path FALSE)
+    set(_customer_fw_family   "")
+    set(_customer_fw_version  "")
+    set(_customer_fw_path     "")
+    set(_cubefw_package       "")
 
     foreach(line IN LISTS IOC_LINES)
         # Ищем строки формата "ключ=значение"
@@ -39,11 +40,11 @@ function(stm32_yml_parse_ioc_file IOC_FILE_PATH PREFIX)
                 set(${PREFIX}MCU ${val} PARENT_SCOPE)
 
             elseif(key STREQUAL "ProjectManager.DefaultFWLocation")
-                # false — пользователь выбрал нестандартный путь к пакету
+                # false — пользователь выбрал нестандартный путь к пакету.
                 if(val STREQUAL "false")
-                    set(${PREFIX}USE_CUSTOMER_FW_PATH TRUE PARENT_SCOPE)
+                    set(_use_customer_fw_path TRUE)
                 else()
-                    set(${PREFIX}USE_CUSTOMER_FW_PATH FALSE PARENT_SCOPE)
+                    set(_use_customer_fw_path FALSE)
                 endif()
 
             elseif(key STREQUAL "ProjectManager.CustomerFirmwarePackage")
@@ -51,18 +52,17 @@ function(stm32_yml_parse_ioc_file IOC_FILE_PATH PREFIX)
                 # Извлекаем семейство и версию из имени последней компоненты пути.
                 string(REGEX MATCH "STM32Cube_FW_([A-Za-z0-9]+)_(V[0-9]+\\.[0-9]+\\.[0-9]+)" _customer_match "${val}")
                 if(_customer_match)
-                    set(${PREFIX}CUSTOMER_FW_FAMILY  "${CMAKE_MATCH_1}" PARENT_SCOPE)
-                    set(${PREFIX}CUSTOMER_FW_VERSION "${CMAKE_MATCH_2}" PARENT_SCOPE)
-                    # Сохраняем сам путь (нормализуем разделители)
-                    string(REPLACE "\\" "/" _customer_path "${val}")
-                    set(${PREFIX}CUSTOMER_FW_PATH "${_customer_path}" PARENT_SCOPE)
+                    set(_customer_fw_family  "${CMAKE_MATCH_1}")
+                    set(_customer_fw_version "${CMAKE_MATCH_2}")
+                    # Сохраняем сам путь (нормализуем разделители).
+                    string(REPLACE "\\" "/" _customer_fw_path "${val}")
                 endif()
 
             elseif(key STREQUAL "ProjectManager.FirmwarePackage")
                 # Из "STM32Cube FW_F4 V1.28.2" извлекаем "V1.28.2".
                 # Используется только когда DefaultFWLocation=true (значение по умолчанию).
                 string(REGEX MATCH "V[0-9]+\\.[0-9]+\\.[0-9]+" fw_version "${val}")
-                set(${PREFIX}CUBEFW_PACKAGE ${fw_version} PARENT_SCOPE)
+                set(_cubefw_package "${fw_version}")
 
             elseif(key STREQUAL "ProjectManager.ProjectName")
                 set(${PREFIX}PROJECT_NAME ${val} PARENT_SCOPE)
@@ -77,34 +77,44 @@ function(stm32_yml_parse_ioc_file IOC_FILE_PATH PREFIX)
                 set(${PREFIX}STACK_SIZE ${stack_bytes} PARENT_SCOPE)
 
             elseif(key STREQUAL "ProjectManager.LibraryCopy")
-                # Значение '0' означает полное локальное копирование
-                # Значение '1' означает необходимое локальное копирование
+                # Значение '0' означает полное локальное копирование.
+                # Значение '1' означает необходимое локальное копирование.
                 if(val STREQUAL "0" OR val STREQUAL "1")
                     set(${PREFIX}USE_LOCAL_DRIVERS TRUE PARENT_SCOPE)
                 else()
                     set(${PREFIX}USE_LOCAL_DRIVERS FALSE PARENT_SCOPE)
-    # После перебора всех строк выбираем финальную версию пакета.
-    # Если пользователь выбрал нестандартный путь и он содержит валидное имя папки —
-    # используем CustomerFirmwarePackage; иначе оставляем FirmwarePackage.
-    if(${PREFIX}USE_CUSTOMER_FW_PATH AND NOT "${${PREFIX}CUSTOMER_FW_VERSION}" STREQUAL "")
-        set(${PREFIX}CUBEFW_PACKAGE "${${PREFIX}CUSTOMER_FW_VERSION}" PARENT_SCOPE)
-        message(STATUS "Используется CustomerFirmwarePackage: семейство=${${PREFIX}CUSTOMER_FW_FAMILY}, версия=${${PREFIX}CUSTOMER_FW_VERSION}")
-        message(STATUS "  Путь: ${${PREFIX}CUSTOMER_FW_PATH}")
-    endif()
                 endif()
 
-            # Детектирование FreeRTOS.
-            elseif(val STREQUAL "FREERTOS")
-                # Если какой-либо IP-блок установлен в FREERTOS.
-                set(${PREFIX}USE_FREERTOS TRUE PARENT_SCOPE)
+                        # Детектирование FreeRTOS.
+                        elseif(val STREQUAL "FREERTOS")
+                            # Если какой-либо IP-блок установлен в FREERTOS.
+                            set(_use_freertos TRUE)
 
-            elseif(key MATCHES "VP_FREERTOS_VS_CMSIS_V([12])")
-                # Извлекаем версию CMSIS-RTOS (v1 или v2).
-                set(${PREFIX}CMSIS_RTOS_API "v${CMAKE_MATCH_1}" PARENT_SCOPE)
-            endif()
-        endif()
-    endforeach()
-endfunction()
+                        elseif(key MATCHES "VP_FREERTOS_VS_CMSIS_V([12])")
+                            # Извлекаем версию CMSIS-RTOS (v1 или v2).
+                            set(_cmsis_rtos_api "v${CMAKE_MATCH_1}")
+                        endif()
+                    endif()
+                endforeach()
+
+                # После перебора всех строк выбираем финальную версию пакета.
+                # Если пользователь выбрал нестандартный путь и он содержит валидное имя
+                # папки — используем CustomerFirmwarePackage, иначе оставляем FirmwarePackage.
+                if(_use_customer_fw_path AND NOT "${_customer_fw_version}" STREQUAL "")
+                    set(_cubefw_package "${_customer_fw_version}")
+                    message(STATUS "Используется CustomerFirmwarePackage: семейство=${_customer_fw_family}, версия=${_customer_fw_version}")
+                    message(STATUS "  Путь: ${_customer_fw_path}")
+                endif()
+
+                # Экспортируем накопленные значения в область вызывающего кода.
+                set(${PREFIX}USE_FREERTOS         "${_use_freertos}"         PARENT_SCOPE)
+                set(${PREFIX}CMSIS_RTOS_API       "${_cmsis_rtos_api}"       PARENT_SCOPE)
+                set(${PREFIX}USE_CUSTOMER_FW_PATH "${_use_customer_fw_path}" PARENT_SCOPE)
+                set(${PREFIX}CUSTOMER_FW_FAMILY   "${_customer_fw_family}"   PARENT_SCOPE)
+                set(${PREFIX}CUSTOMER_FW_VERSION  "${_customer_fw_version}"  PARENT_SCOPE)
+                set(${PREFIX}CUSTOMER_FW_PATH     "${_customer_fw_path}"     PARENT_SCOPE)
+                set(${PREFIX}CUBEFW_PACKAGE       "${_cubefw_package}"       PARENT_SCOPE)
+            endfunction()
 
 # ==============================================================================
 #      ВСПОМОГАТЕЛЬНАЯ ФУНКЦИЯ ДЛЯ РЕКУРСИВНОГО ПАРСИНГА JSON
@@ -313,15 +323,6 @@ function(stm32_yml_find_latest_stm32_cube_fw MCU_FAMILY CUBE_REPO_PATH RESULT_VA
 endfunction()
 
 # ==============================================================================
-#      ФУНКЦИЯ ДЛЯ УСТАНОВКИ ЗНАЧЕНИЯ ПО УМОЛЧАНИЮ
-# ==============================================================================
-# Проверяет, была ли переменная с именем VAR_NAME определена и непуста.
-# Если она не определена или пуста, устанавливает для нее значение по умолчанию.
-#
-# @param VAR_NAME       - Имя переменной, которую нужно проверить.
-# @param DEFAULT_VALUE  - Значение, которое нужно установить по умолчанию.
-#
-# ==============================================================================
 #      ФУНКЦИЯ НОРМАЛИЗАЦИИ СПИСКА ФЛАГОВ КОМПИЛЯТОРА / ЛИНКЕРА
 # ==============================================================================
 # Принимает имя переменной, содержащей список флагов, и нормализует его на месте:
@@ -338,6 +339,14 @@ endfunction()
 #        - флаги, уже начинающиеся с "-" или "--"
 #        - генераторные выражения CMake: $<...>
 #        - пустые строки
+#        - токен, являющийся значением предыдущего флага (см. пункт 3)
+#
+#   3. Распознаёт флаги, у которых значение передаётся отдельным токеном,
+#      и оставляет это значение без изменений.
+#      "--param max-inline-insns-single=500"
+#          ->  "--param"  "max-inline-insns-single=500"
+#      Без этой проверки значение получило бы ведущий дефис
+#      ("-max-inline-insns-single=500") и компилятор отверг бы опцию.
 #
 # @param LIST_VAR  Имя переменной (список). Результат записывается обратно
 #                  в переменную с тем же именем в PARENT_SCOPE.
@@ -352,23 +361,66 @@ function(stm32_yml_normalize_flags LIST_VAR)
         set(_auto_dash FALSE)
     endif()
 
+    # Опции GCC и ld, принимающие значение отдельным токеном.
+    # Следующий за такой опцией токен передаётся как есть: он является
+    # значением, а не самостоятельным флагом.
+    set(_flags_with_arg
+        "--param"
+        "-include"
+        "-imacros"
+        "-isystem"
+        "-iquote"
+        "-idirafter"
+        "-x"
+        "-Xlinker"
+        "-Xpreprocessor"
+        "-Xassembler"
+        "-u"
+        "-T"
+        "-MT"
+        "-MF"
+        "-MQ"
+        "-aux-info"
+        "-specs"
+        "-D"
+        "-U"
+        "-I"
+        "-L")
+
     set(_input "${${LIST_VAR}}")
     set(_result "")
+
+    # Признак того, что предыдущий обработанный токен ожидает значение.
+    # Состояние сохраняется между элементами списка: флаг и его значение
+    # могут быть записаны как одной строкой, так и двумя отдельными.
+    set(_prev_takes_arg FALSE)
 
     foreach(_item IN LISTS _input)
         # Шаг 1: разбиваем элемент по пробелам на части.
         string(REPLACE " " ";" _parts "${_item}")
 
         foreach(_flag IN LISTS _parts)
-            # Пропускаем пустые части (двойные пробелы и т.п.)
+            # Пропускаем пустые части (двойные пробелы и т.п.).
             if(_flag STREQUAL "")
                 continue()
             endif()
 
-            # Шаг 2: добавляем дефис если нужно (только в режиме auto_dash).
-            # Не трогаем: уже начинается с "-", генераторные выражения "$<...>"
+            # Шаг 2: значение предыдущей опции переносим без изменений.
+            if(_prev_takes_arg)
+                list(APPEND _result "${_flag}")
+                set(_prev_takes_arg FALSE)
+                continue()
+            endif()
+
+            # Шаг 3: добавляем дефис если нужно (только в режиме auto_dash).
+            # Не трогаем: уже начинается с "-", генераторные выражения "$<...>".
             if(_auto_dash AND NOT _flag MATCHES "^-" AND NOT _flag MATCHES "^\\$<")
                 set(_flag "-${_flag}")
+            endif()
+
+            # Шаг 4: запоминаем, что следующий токен будет значением опции.
+            if(_flag IN_LIST _flags_with_arg)
+                set(_prev_takes_arg TRUE)
             endif()
 
             list(APPEND _result "${_flag}")
@@ -378,6 +430,15 @@ function(stm32_yml_normalize_flags LIST_VAR)
     set(${LIST_VAR} "${_result}" PARENT_SCOPE)
 endfunction()
 
+# ==============================================================================
+#      ФУНКЦИЯ ДЛЯ УСТАНОВКИ ЗНАЧЕНИЯ ПО УМОЛЧАНИЮ
+# ==============================================================================
+# Проверяет, была ли переменная с именем VAR_NAME определена и непуста.
+# Если она не определена или пуста, устанавливает для неё значение по умолчанию.
+#
+# @param VAR_NAME       - Имя переменной, которую нужно проверить.
+# @param DEFAULT_VALUE  - Значение, которое нужно установить по умолчанию.
+# ==============================================================================
 function(stm32_yml_ensure_default_value VAR_NAME DEFAULT_VALUE)
     # Проверяем, что переменная НЕ определена ИЛИ она определена, но является пустой строкой.
     # Это надежный способ покрыть оба случая: отсутствие ключа в YAML и ключ с пустым значением.
@@ -387,6 +448,14 @@ function(stm32_yml_ensure_default_value VAR_NAME DEFAULT_VALUE)
     endif()
 endfunction()
 
+# ==============================================================================
+#      ФОЛБЕК-ОПРЕДЕЛЕНИЕ ЦЕЛИ STM32::Semihosting
+# ==============================================================================
+# Оба штатных toolchain-файла (stm32_gcc.cmake из stm32-cmake и кастомный
+# gcc-arm-none-eabi.cmake) уже определяют эту цель. Определение здесь —
+# страховка для проектов с собственным toolchain, где её может не быть.
+# Проверка if(NOT TARGET) гарантирует отсутствие конфликта.
+# ==============================================================================
 if(NOT (TARGET STM32::Semihosting))
     add_library(STM32::Semihosting INTERFACE IMPORTED)
     target_link_options(STM32::Semihosting INTERFACE -lrdimon $<$<C_COMPILER_ID:GNU>:--specs=rdimon.specs>)

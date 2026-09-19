@@ -109,8 +109,17 @@ function(stm32_yml_run_diagnostics TARGET_NAME)
             # Получаем эталонный размер RAM от stm32-cmake (например, "64K")
             stm32_get_memory_info(CHIP ${mcu} RAM SIZE EXPECTED_RAM_SIZE_STR)
 
-            string(REGEX REPLACE "K$" " * 1024" EXPECTED_RAM_SIZE_EXPR "${EXPECTED_RAM_SIZE_STR}")
-            math(EXPR EXPECTED_RAM_SIZE_BYTES "${EXPECTED_RAM_SIZE_EXPR}")
+            # Приводим эталонный размер к байтам. stm32-cmake возвращает строки
+            # вида "64K", "320K" или "1M": суффикс M встречается у H7 и F7,
+            # и без его обработки math(EXPR) упал бы на выражении "1M".
+            string(TOUPPER "${EXPECTED_RAM_SIZE_STR}" _expected_ram_upper)
+            if(_expected_ram_upper MATCHES "^([0-9]+)K$")
+                math(EXPR EXPECTED_RAM_SIZE_BYTES "${CMAKE_MATCH_1} * 1024")
+            elseif(_expected_ram_upper MATCHES "^([0-9]+)M$")
+                math(EXPR EXPECTED_RAM_SIZE_BYTES "${CMAKE_MATCH_1} * 1024 * 1024")
+            else()
+                set(EXPECTED_RAM_SIZE_BYTES "${_expected_ram_upper}")
+            endif()
 
             set(ACTUAL_RAM_SIZE_BYTES 0)
             set(_ram_sections_found "")
@@ -151,10 +160,10 @@ function(stm32_yml_run_diagnostics TARGET_NAME)
                 set(ACTUAL_RAM_SIZE_BYTES ${EXPECTED_RAM_SIZE_BYTES})
             endif()
 
-            math(EXPR _expected_bytes "${EXPECTED_RAM_SIZE_EXPR}")
-            if(ACTUAL_RAM_SIZE_BYTES EQUAL _expected_bytes)
+            # EXPECTED_RAM_SIZE_BYTES уже вычислен выше из того же выражения.
+            if(ACTUAL_RAM_SIZE_BYTES EQUAL EXPECTED_RAM_SIZE_BYTES)
                 set(_rel "==")
-            elseif(ACTUAL_RAM_SIZE_BYTES LESS _expected_bytes)
+            elseif(ACTUAL_RAM_SIZE_BYTES LESS EXPECTED_RAM_SIZE_BYTES)
                 set(_rel "<")
             else()
                 set(_rel ">")
