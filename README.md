@@ -4,6 +4,8 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Changelog](https://img.shields.io/badge/changelog-CHANGELOG.md-informational.svg)](CHANGELOG.md)
 
+[Дорожная карта / Roadmap](TODO.md)
+
 **`stm32-cmake-yml`** — фреймворк для системы сборки CMake, предназначенный для упрощения разработки проектов под микроконтроллеры STM32. Является высокоуровневой обёрткой над [stm32-cmake](https://github.com/ObKo/stm32-cmake), заменяя сложное конфигурирование `CMakeLists.txt` на один читаемый файл — `stm32_config.yml`.
 
 ## Философия и возможности

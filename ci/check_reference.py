@@ -61,6 +61,7 @@ def main():
         pages += list((base / "errata").glob("*.md"))
         pages += [base / "index.md", base / "maintenance.md"]
     pages += [ROOT / "skills/stm32-config-manager/SKILL.md"]
+    pages += [ROOT / "TODO.md"]
     for page in pages:
         for target in re.findall(r"\]\(([^)]+)\)", page.read_text(encoding="utf-8")):
             link_exists(page, target)
