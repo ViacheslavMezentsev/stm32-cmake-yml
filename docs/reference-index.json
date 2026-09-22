@@ -1,0 +1,1005 @@
+{
+  "schema_version": 1,
+  "framework_version": "0.9.2",
+  "baseline_commit": "f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0",
+  "test_commit": "6a90675",
+  "fixes": [
+    {
+      "commit": "858013a7f31a674a91149ea3a68a5200498d92cc",
+      "branch": "codex/configure-profile-fixes",
+      "status": "prepared-not-merged-at-audit",
+      "errata": [
+        "E001",
+        "E002"
+      ]
+    }
+  ],
+  "options": [
+    {
+      "key": "stm32_cmake_yml_version",
+      "requirement": "CFG-STM32-CMAKE-YML-VERSION",
+      "type": "string",
+      "since": null,
+      "verified_in": "0.9.2",
+      "source": "cmake/stm32_yml_config.cmake",
+      "pages": {
+        "ru": "docs/ru/reference/0.9.2/project.md#stm32-cmake-yml-version",
+        "en": "docs/en/reference/0.9.2/project.md#stm32-cmake-yml-version"
+      },
+      "tests": [],
+      "errata": []
+    },
+    {
+      "key": "stm32_cmake_yml_version_check",
+      "requirement": "CFG-STM32-CMAKE-YML-VERSION-CHECK",
+      "type": "boolean",
+      "since": null,
+      "verified_in": "0.9.2",
+      "source": "cmake/stm32_yml_config.cmake",
+      "pages": {
+        "ru": "docs/ru/reference/0.9.2/project.md#stm32-cmake-yml-version-check",
+        "en": "docs/en/reference/0.9.2/project.md#stm32-cmake-yml-version-check"
+      },
+      "tests": [],
+      "errata": []
+    },
+    {
+      "key": "toolchain_backend",
+      "requirement": "CFG-TOOLCHAIN-BACKEND",
+      "type": "string: stm32-cmake / arduino",
+      "since": null,
+      "verified_in": "0.9.2",
+      "source": "cmake/stm32_yml_config.cmake",
+      "pages": {
+        "ru": "docs/ru/reference/0.9.2/project.md#toolchain-backend",
+        "en": "docs/en/reference/0.9.2/project.md#toolchain-backend"
+      },
+      "tests": [
+        "configure.arduino-defaults",
+        "configure.baremetal-no-cube"
+      ],
+      "errata": []
+    },
+    {
+      "key": "ioc_file",
+      "requirement": "CFG-IOC-FILE",
+      "type": "string: relative path",
+      "since": null,
+      "verified_in": "0.9.2",
+      "source": "cmake/stm32_yml_config.cmake",
+      "pages": {
+        "ru": "docs/ru/reference/0.9.2/project.md#ioc-file",
+        "en": "docs/en/reference/0.9.2/project.md#ioc-file"
+      },
+      "tests": [
+        "configure.ioc-bluepill-defaults",
+        "configure.yaml-over-ioc",
+        "configure.missing-ioc"
+      ],
+      "errata": []
+    },
+    {
+      "key": "project_name",
+      "requirement": "CFG-PROJECT-NAME",
+      "type": "string",
+      "since": null,
+      "verified_in": "0.9.2",
+      "source": "cmake/stm32_yml_config.cmake",
+      "pages": {
+        "ru": "docs/ru/reference/0.9.2/project.md#project-name",
+        "en": "docs/en/reference/0.9.2/project.md#project-name"
+      },
+      "tests": [
+        "configure.ioc-bluepill-defaults",
+        "configure.yaml-over-ioc"
+      ],
+      "errata": []
+    },
+    {
+      "key": "mcu",
+      "requirement": "CFG-MCU",
+      "type": "string: STM32 part name",
+      "since": null,
+      "verified_in": "0.9.2",
+      "source": "cmake/stm32_yml_config.cmake",
+      "pages": {
+        "ru": "docs/ru/reference/0.9.2/project.md#mcu",
+        "en": "docs/en/reference/0.9.2/project.md#mcu"
+      },
+      "tests": [
+        "configure.yaml-over-ioc",
+        "configure.bluepill"
+      ],
+      "errata": [
+        "E001"
+      ]
+    },
+    {
+      "key": "mcu_core",
+      "requirement": "CFG-MCU-CORE",
+      "type": "string: upstream core identifier",
+      "since": null,
+      "verified_in": "0.9.2",
+      "source": "cmake/stm32_yml_config.cmake",
+      "pages": {
+        "ru": "docs/ru/reference/0.9.2/project.md#mcu-core",
+        "en": "docs/en/reference/0.9.2/project.md#mcu-core"
+      },
+      "tests": [],
+      "errata": []
+    },
+    {
+      "key": "languages",
+      "requirement": "CFG-LANGUAGES",
+      "type": "list of CMake languages",
+      "since": null,
+      "verified_in": "0.9.2",
+      "source": "cmake/stm32_yml_config.cmake",
+      "pages": {
+        "ru": "docs/ru/reference/0.9.2/project.md#languages",
+        "en": "docs/en/reference/0.9.2/project.md#languages"
+      },
+      "tests": [
+        "configure.defaults-blackpill",
+        "configure.ioc-bluepill-defaults"
+      ],
+      "errata": []
+    },
+    {
+      "key": "sources",
+      "requirement": "CFG-SOURCES",
+      "type": "list of relative paths",
+      "since": null,
+      "verified_in": "0.9.2",
+      "source": "cmake/stm32_yml_sources.cmake",
+      "pages": {
+        "ru": "docs/ru/reference/0.9.2/sources.md#sources",
+        "en": "docs/en/reference/0.9.2/sources.md#sources"
+      },
+      "tests": [
+        "configure.profile-append",
+        "configure.profile-replace-and-append",
+        "configure.reconfigure-profile-lists"
+      ],
+      "errata": []
+    },
+    {
+      "key": "include_directories",
+      "requirement": "CFG-INCLUDE-DIRECTORIES",
+      "type": "list of paths",
+      "since": null,
+      "verified_in": "0.9.2",
+      "source": "stm32_yml.cmake",
+      "pages": {
+        "ru": "docs/ru/reference/0.9.2/sources.md#include-directories",
+        "en": "docs/en/reference/0.9.2/sources.md#include-directories"
+      },
+      "tests": [
+        "configure.defaults-blackpill",
+        "configure.baremetal-empty-list"
+      ],
+      "errata": []
+    },
+    {
+      "key": "custom_libraries",
+      "requirement": "CFG-CUSTOM-LIBRARIES",
+      "type": "list of relative file paths",
+      "since": null,
+      "verified_in": "0.9.2",
+      "source": "stm32_yml.cmake",
+      "pages": {
+        "ru": "docs/ru/reference/0.9.2/sources.md#custom-libraries",
+        "en": "docs/en/reference/0.9.2/sources.md#custom-libraries"
+      },
+      "tests": [],
+      "errata": []
+    },
+    {
+      "key": "link_libraries",
+      "requirement": "CFG-LINK-LIBRARIES",
+      "type": "list of targets or library names",
+      "since": null,
+      "verified_in": "0.9.2",
+      "source": "stm32_yml.cmake",
+      "pages": {
+        "ru": "docs/ru/reference/0.9.2/sources.md#link-libraries",
+        "en": "docs/en/reference/0.9.2/sources.md#link-libraries"
+      },
+      "tests": [
+        "configure.arduino-defaults"
+      ],
+      "errata": []
+    },
+    {
+      "key": "c_standard",
+      "requirement": "CFG-C-STANDARD",
+      "type": "integer: CMake C_STANDARD",
+      "since": null,
+      "verified_in": "0.9.2",
+      "source": "cmake/stm32_yml_config.cmake",
+      "pages": {
+        "ru": "docs/ru/reference/0.9.2/compiler.md#c-standard",
+        "en": "docs/en/reference/0.9.2/compiler.md#c-standard"
+      },
+      "tests": [
+        "configure.defaults-blackpill"
+      ],
+      "errata": []
+    },
+    {
+      "key": "cpp_standard",
+      "requirement": "CFG-CPP-STANDARD",
+      "type": "integer: CMake CXX_STANDARD",
+      "since": null,
+      "verified_in": "0.9.2",
+      "source": "cmake/stm32_yml_config.cmake",
+      "pages": {
+        "ru": "docs/ru/reference/0.9.2/compiler.md#cpp-standard",
+        "en": "docs/en/reference/0.9.2/compiler.md#cpp-standard"
+      },
+      "tests": [
+        "configure.defaults-blackpill"
+      ],
+      "errata": []
+    },
+    {
+      "key": "compile_options",
+      "requirement": "CFG-COMPILE-OPTIONS",
+      "type": "list of flag strings",
+      "since": null,
+      "verified_in": "0.9.2",
+      "source": "stm32_yml.cmake",
+      "pages": {
+        "ru": "docs/ru/reference/0.9.2/compiler.md#compile-options",
+        "en": "docs/en/reference/0.9.2/compiler.md#compile-options"
+      },
+      "tests": [
+        "configure.defaults-blackpill"
+      ],
+      "errata": []
+    },
+    {
+      "key": "compile_definitions",
+      "requirement": "CFG-COMPILE-DEFINITIONS",
+      "type": "list of definition strings",
+      "since": null,
+      "verified_in": "0.9.2",
+      "source": "stm32_yml.cmake",
+      "pages": {
+        "ru": "docs/ru/reference/0.9.2/compiler.md#compile-definitions",
+        "en": "docs/en/reference/0.9.2/compiler.md#compile-definitions"
+      },
+      "tests": [
+        "configure.defaults-blackpill",
+        "configure.baremetal-empty-list"
+      ],
+      "errata": []
+    },
+    {
+      "key": "compile_options_c",
+      "requirement": "CFG-COMPILE-OPTIONS-C",
+      "type": "list of flag strings",
+      "since": null,
+      "verified_in": "0.9.2",
+      "source": "stm32_yml.cmake",
+      "pages": {
+        "ru": "docs/ru/reference/0.9.2/compiler.md#compile-options-c",
+        "en": "docs/en/reference/0.9.2/compiler.md#compile-options-c"
+      },
+      "tests": [
+        "configure.defaults-blackpill"
+      ],
+      "errata": []
+    },
+    {
+      "key": "compile_definitions_c",
+      "requirement": "CFG-COMPILE-DEFINITIONS-C",
+      "type": "list of definition strings",
+      "since": null,
+      "verified_in": "0.9.2",
+      "source": "stm32_yml.cmake",
+      "pages": {
+        "ru": "docs/ru/reference/0.9.2/compiler.md#compile-definitions-c",
+        "en": "docs/en/reference/0.9.2/compiler.md#compile-definitions-c"
+      },
+      "tests": [
+        "configure.defaults-blackpill"
+      ],
+      "errata": []
+    },
+    {
+      "key": "compile_options_cxx",
+      "requirement": "CFG-COMPILE-OPTIONS-CXX",
+      "type": "list of flag strings",
+      "since": null,
+      "verified_in": "0.9.2",
+      "source": "stm32_yml.cmake",
+      "pages": {
+        "ru": "docs/ru/reference/0.9.2/compiler.md#compile-options-cxx",
+        "en": "docs/en/reference/0.9.2/compiler.md#compile-options-cxx"
+      },
+      "tests": [
+        "configure.defaults-blackpill"
+      ],
+      "errata": []
+    },
+    {
+      "key": "compile_definitions_cxx",
+      "requirement": "CFG-COMPILE-DEFINITIONS-CXX",
+      "type": "list of definition strings",
+      "since": null,
+      "verified_in": "0.9.2",
+      "source": "stm32_yml.cmake",
+      "pages": {
+        "ru": "docs/ru/reference/0.9.2/compiler.md#compile-definitions-cxx",
+        "en": "docs/en/reference/0.9.2/compiler.md#compile-definitions-cxx"
+      },
+      "tests": [
+        "configure.defaults-blackpill"
+      ],
+      "errata": []
+    },
+    {
+      "key": "use_cmsis",
+      "requirement": "CFG-USE-CMSIS",
+      "type": "boolean",
+      "since": null,
+      "verified_in": "0.9.2",
+      "source": "cmake/stm32_yml_frameworks.cmake",
+      "pages": {
+        "ru": "docs/ru/reference/0.9.2/frameworks.md#use-cmsis",
+        "en": "docs/en/reference/0.9.2/frameworks.md#use-cmsis"
+      },
+      "tests": [
+        "configure.ioc-baremetal-zero",
+        "configure.baremetal-no-cube"
+      ],
+      "errata": []
+    },
+    {
+      "key": "use_hal",
+      "requirement": "CFG-USE-HAL",
+      "type": "boolean",
+      "since": null,
+      "verified_in": "0.9.2",
+      "source": "cmake/stm32_yml_frameworks.cmake",
+      "pages": {
+        "ru": "docs/ru/reference/0.9.2/frameworks.md#use-hal",
+        "en": "docs/en/reference/0.9.2/frameworks.md#use-hal"
+      },
+      "tests": [
+        "configure.hal-requires-cmsis",
+        "configure.defaults-blackpill"
+      ],
+      "errata": []
+    },
+    {
+      "key": "cubefw_package",
+      "requirement": "CFG-CUBEFW-PACKAGE",
+      "type": "string: auto / Vx.y.z",
+      "since": null,
+      "verified_in": "0.9.2",
+      "source": "cmake/stm32_yml_frameworks.cmake",
+      "pages": {
+        "ru": "docs/ru/reference/0.9.2/frameworks.md#cubefw-package",
+        "en": "docs/en/reference/0.9.2/frameworks.md#cubefw-package"
+      },
+      "tests": [
+        "configure.ioc-bluepill-defaults",
+        "configure.baremetal-no-cube"
+      ],
+      "errata": []
+    },
+    {
+      "key": "hal_components",
+      "requirement": "CFG-HAL-COMPONENTS",
+      "type": "list of upstream components",
+      "since": null,
+      "verified_in": "0.9.2",
+      "source": "cmake/stm32_yml_frameworks.cmake",
+      "pages": {
+        "ru": "docs/ru/reference/0.9.2/frameworks.md#hal-components",
+        "en": "docs/en/reference/0.9.2/frameworks.md#hal-components"
+      },
+      "tests": [
+        "configure.defaults-blackpill",
+        "configure.bluepill"
+      ],
+      "errata": []
+    },
+    {
+      "key": "use_freertos",
+      "requirement": "CFG-USE-FREERTOS",
+      "type": "boolean",
+      "since": null,
+      "verified_in": "0.9.2",
+      "source": "cmake/stm32_yml_frameworks.cmake",
+      "pages": {
+        "ru": "docs/ru/reference/0.9.2/frameworks.md#use-freertos",
+        "en": "docs/en/reference/0.9.2/frameworks.md#use-freertos"
+      },
+      "tests": [
+        "configure.baremetal-no-cube"
+      ],
+      "errata": []
+    },
+    {
+      "key": "freertos_version",
+      "requirement": "CFG-FREERTOS-VERSION",
+      "type": "string: cube / external namespace",
+      "since": null,
+      "verified_in": "0.9.2",
+      "source": "cmake/stm32_yml_frameworks.cmake",
+      "pages": {
+        "ru": "docs/ru/reference/0.9.2/frameworks.md#freertos-version",
+        "en": "docs/en/reference/0.9.2/frameworks.md#freertos-version"
+      },
+      "tests": [],
+      "errata": []
+    },
+    {
+      "key": "freertos_components",
+      "requirement": "CFG-FREERTOS-COMPONENTS",
+      "type": "list of upstream components",
+      "since": null,
+      "verified_in": "0.9.2",
+      "source": "cmake/stm32_yml_frameworks.cmake",
+      "pages": {
+        "ru": "docs/ru/reference/0.9.2/frameworks.md#freertos-components",
+        "en": "docs/en/reference/0.9.2/frameworks.md#freertos-components"
+      },
+      "tests": [],
+      "errata": []
+    },
+    {
+      "key": "cmsis_rtos_api",
+      "requirement": "CFG-CMSIS-RTOS-API",
+      "type": "string: none / v1 / v2",
+      "since": null,
+      "verified_in": "0.9.2",
+      "source": "cmake/stm32_yml_frameworks.cmake",
+      "pages": {
+        "ru": "docs/ru/reference/0.9.2/frameworks.md#cmsis-rtos-api",
+        "en": "docs/en/reference/0.9.2/frameworks.md#cmsis-rtos-api"
+      },
+      "tests": [],
+      "errata": []
+    },
+    {
+      "key": "heap_size",
+      "requirement": "CFG-HEAP-SIZE",
+      "type": "integer bytes / string with K or M",
+      "since": null,
+      "verified_in": "0.9.2",
+      "source": "cmake/stm32_yml_linker.cmake",
+      "pages": {
+        "ru": "docs/ru/reference/0.9.2/linker.md#heap-size",
+        "en": "docs/en/reference/0.9.2/linker.md#heap-size"
+      },
+      "tests": [
+        "configure.linker-template",
+        "configure.baremetal-no-cube",
+        "configure.empty-and-null-defaults"
+      ],
+      "errata": [
+        "E001",
+        "E003"
+      ]
+    },
+    {
+      "key": "stack_size",
+      "requirement": "CFG-STACK-SIZE",
+      "type": "integer bytes / string with K or M",
+      "since": null,
+      "verified_in": "0.9.2",
+      "source": "cmake/stm32_yml_linker.cmake",
+      "pages": {
+        "ru": "docs/ru/reference/0.9.2/linker.md#stack-size",
+        "en": "docs/en/reference/0.9.2/linker.md#stack-size"
+      },
+      "tests": [
+        "configure.linker-template",
+        "configure.baremetal-no-cube",
+        "configure.empty-and-null-defaults"
+      ],
+      "errata": [
+        "E001",
+        "E003"
+      ]
+    },
+    {
+      "key": "linker_script",
+      "requirement": "CFG-LINKER-SCRIPT",
+      "type": "string: auto / relative .ld path",
+      "since": null,
+      "verified_in": "0.9.2",
+      "source": "cmake/stm32_yml_linker.cmake",
+      "pages": {
+        "ru": "docs/ru/reference/0.9.2/linker.md#linker-script",
+        "en": "docs/en/reference/0.9.2/linker.md#linker-script"
+      },
+      "tests": [
+        "configure.linker-template",
+        "configure.explicit-linker",
+        "configure.missing-linker"
+      ],
+      "errata": []
+    },
+    {
+      "key": "linker_script_dir",
+      "requirement": "CFG-LINKER-SCRIPT-DIR",
+      "type": "string: relative directory",
+      "since": null,
+      "verified_in": "0.9.2",
+      "source": "cmake/stm32_yml_linker.cmake",
+      "pages": {
+        "ru": "docs/ru/reference/0.9.2/linker.md#linker-script-dir",
+        "en": "docs/en/reference/0.9.2/linker.md#linker-script-dir"
+      },
+      "tests": [
+        "configure.linker-template",
+        "configure.explicit-linker"
+      ],
+      "errata": []
+    },
+    {
+      "key": "link_options",
+      "requirement": "CFG-LINK-OPTIONS",
+      "type": "list of flag strings",
+      "since": null,
+      "verified_in": "0.9.2",
+      "source": "stm32_yml.cmake",
+      "pages": {
+        "ru": "docs/ru/reference/0.9.2/linker.md#link-options",
+        "en": "docs/en/reference/0.9.2/linker.md#link-options"
+      },
+      "tests": [],
+      "errata": []
+    },
+    {
+      "key": "linker_directives",
+      "requirement": "CFG-LINKER-DIRECTIVES",
+      "type": "list of linker arguments",
+      "since": null,
+      "verified_in": "0.9.2",
+      "source": "stm32_yml.cmake",
+      "pages": {
+        "ru": "docs/ru/reference/0.9.2/linker.md#linker-directives",
+        "en": "docs/en/reference/0.9.2/linker.md#linker-directives"
+      },
+      "tests": [],
+      "errata": []
+    },
+    {
+      "key": "use_newlib_nano",
+      "requirement": "CFG-USE-NEWLIB-NANO",
+      "type": "boolean",
+      "since": null,
+      "verified_in": "0.9.2",
+      "source": "cmake/stm32_yml_frameworks.cmake",
+      "pages": {
+        "ru": "docs/ru/reference/0.9.2/linker.md#use-newlib-nano",
+        "en": "docs/en/reference/0.9.2/linker.md#use-newlib-nano"
+      },
+      "tests": [],
+      "errata": []
+    },
+    {
+      "key": "system_library",
+      "requirement": "CFG-SYSTEM-LIBRARY",
+      "type": "string: NoSys / Semihosting",
+      "since": null,
+      "verified_in": "0.9.2",
+      "source": "cmake/stm32_yml_frameworks.cmake",
+      "pages": {
+        "ru": "docs/ru/reference/0.9.2/linker.md#system-library",
+        "en": "docs/en/reference/0.9.2/linker.md#system-library"
+      },
+      "tests": [
+        "configure.defaults-blackpill"
+      ],
+      "errata": []
+    },
+    {
+      "key": "profiles",
+      "requirement": "CFG-PROFILES",
+      "type": "mapping: name -> option mapping",
+      "since": null,
+      "verified_in": "0.9.2",
+      "source": "cmake/stm32_yml_profiles.cmake",
+      "pages": {
+        "ru": "docs/ru/reference/0.9.2/profiles.md#profiles",
+        "en": "docs/en/reference/0.9.2/profiles.md#profiles"
+      },
+      "tests": [
+        "configure.profile-replace-and-append",
+        "configure.unknown-profile-warning",
+        "configure.reconfigure-profile-lists"
+      ],
+      "errata": [
+        "E005"
+      ]
+    },
+    {
+      "key": "profiles_file",
+      "requirement": "CFG-PROFILES-FILE",
+      "type": "string: relative YAML path",
+      "since": null,
+      "verified_in": "0.9.2",
+      "source": "cmake/stm32_yml_profiles.cmake",
+      "pages": {
+        "ru": "docs/ru/reference/0.9.2/profiles.md#profiles-file",
+        "en": "docs/en/reference/0.9.2/profiles.md#profiles-file"
+      },
+      "tests": [
+        "configure.external-profile"
+      ],
+      "errata": [
+        "E002"
+      ]
+    },
+    {
+      "key": "arduino.core_path",
+      "requirement": "CFG-ARDUINO-CORE-PATH",
+      "type": "string: relative directory",
+      "since": null,
+      "verified_in": "0.9.2",
+      "source": "cmake/stm32_yml_arduino.cmake",
+      "pages": {
+        "ru": "docs/ru/reference/0.9.2/arduino.md#arduino-core-path",
+        "en": "docs/en/reference/0.9.2/arduino.md#arduino-core-path"
+      },
+      "tests": [
+        "configure.arduino-defaults",
+        "configure.arduino-missing-core"
+      ],
+      "errata": []
+    },
+    {
+      "key": "arduino.core_cmake_dir",
+      "requirement": "CFG-ARDUINO-CORE-CMAKE-DIR",
+      "type": "string: relative directory",
+      "since": null,
+      "verified_in": "0.9.2",
+      "source": "cmake/stm32_yml_arduino.cmake",
+      "pages": {
+        "ru": "docs/ru/reference/0.9.2/arduino.md#arduino-core-cmake-dir",
+        "en": "docs/en/reference/0.9.2/arduino.md#arduino-core-cmake-dir"
+      },
+      "tests": [
+        "configure.arduino-defaults"
+      ],
+      "errata": []
+    },
+    {
+      "key": "arduino.mcu_target",
+      "requirement": "CFG-ARDUINO-MCU-TARGET",
+      "type": "string",
+      "since": null,
+      "verified_in": "0.9.2",
+      "source": "cmake/stm32_yml_arduino.cmake",
+      "pages": {
+        "ru": "docs/ru/reference/0.9.2/arduino.md#arduino-mcu-target",
+        "en": "docs/en/reference/0.9.2/arduino.md#arduino-mcu-target"
+      },
+      "tests": [
+        "configure.arduino-profile"
+      ],
+      "errata": []
+    },
+    {
+      "key": "arduino.use_core_main",
+      "requirement": "CFG-ARDUINO-USE-CORE-MAIN",
+      "type": "boolean",
+      "since": null,
+      "verified_in": "0.9.2",
+      "source": "cmake/stm32_yml_arduino.cmake",
+      "pages": {
+        "ru": "docs/ru/reference/0.9.2/arduino.md#arduino-use-core-main",
+        "en": "docs/en/reference/0.9.2/arduino.md#arduino-use-core-main"
+      },
+      "tests": [
+        "configure.arduino-defaults"
+      ],
+      "errata": []
+    },
+    {
+      "key": "arduino.libraries",
+      "requirement": "CFG-ARDUINO-LIBRARIES",
+      "type": "list of library directory names",
+      "since": null,
+      "verified_in": "0.9.2",
+      "source": "cmake/stm32_yml_arduino.cmake",
+      "pages": {
+        "ru": "docs/ru/reference/0.9.2/arduino.md#arduino-libraries",
+        "en": "docs/en/reference/0.9.2/arduino.md#arduino-libraries"
+      },
+      "tests": [],
+      "errata": []
+    },
+    {
+      "key": "arduino.custom_libraries",
+      "requirement": "CFG-ARDUINO-CUSTOM-LIBRARIES",
+      "type": "list of relative directories",
+      "since": null,
+      "verified_in": "0.9.2",
+      "source": "cmake/stm32_yml_arduino.cmake",
+      "pages": {
+        "ru": "docs/ru/reference/0.9.2/arduino.md#arduino-custom-libraries",
+        "en": "docs/en/reference/0.9.2/arduino.md#arduino-custom-libraries"
+      },
+      "tests": [
+        "configure.arduino-profile"
+      ],
+      "errata": []
+    },
+    {
+      "key": "build_artifacts",
+      "requirement": "CFG-BUILD-ARTIFACTS",
+      "type": "list: bin / hex / map / lss",
+      "since": null,
+      "verified_in": "0.9.2",
+      "source": "cmake/stm32_yml_postbuild.cmake",
+      "pages": {
+        "ru": "docs/ru/reference/0.9.2/postbuild.md#build-artifacts",
+        "en": "docs/en/reference/0.9.2/postbuild.md#build-artifacts"
+      },
+      "tests": [],
+      "errata": []
+    },
+    {
+      "key": "crc_enable",
+      "requirement": "CFG-CRC-ENABLE",
+      "type": "boolean",
+      "since": null,
+      "verified_in": "0.9.2",
+      "source": "cmake/stm32_yml_postbuild.cmake",
+      "pages": {
+        "ru": "docs/ru/reference/0.9.2/postbuild.md#crc-enable",
+        "en": "docs/en/reference/0.9.2/postbuild.md#crc-enable"
+      },
+      "tests": [
+        "configure.crc-command-generation",
+        "configure.defaults-blackpill"
+      ],
+      "errata": [
+        "E006"
+      ]
+    },
+    {
+      "key": "crc_section_name",
+      "requirement": "CFG-CRC-SECTION-NAME",
+      "type": "string: section name",
+      "since": null,
+      "verified_in": "0.9.2",
+      "source": "cmake/stm32_yml_postbuild.cmake",
+      "pages": {
+        "ru": "docs/ru/reference/0.9.2/postbuild.md#crc-section-name",
+        "en": "docs/en/reference/0.9.2/postbuild.md#crc-section-name"
+      },
+      "tests": [
+        "configure.crc-command-generation"
+      ],
+      "errata": []
+    },
+    {
+      "key": "crc_algorithm",
+      "requirement": "CFG-CRC-ALGORITHM",
+      "type": "string: STM32_HW_DEFAULT",
+      "since": null,
+      "verified_in": "0.9.2",
+      "source": "cmake/stm32_yml_postbuild.cmake",
+      "pages": {
+        "ru": "docs/ru/reference/0.9.2/postbuild.md#crc-algorithm",
+        "en": "docs/en/reference/0.9.2/postbuild.md#crc-algorithm"
+      },
+      "tests": [],
+      "errata": [
+        "E004"
+      ]
+    },
+    {
+      "key": "flash_size",
+      "requirement": "CFG-FLASH-SIZE",
+      "type": "integer bytes / string K or M / auto",
+      "since": null,
+      "verified_in": "0.9.2",
+      "source": "cmake/stm32_yml_postbuild.cmake",
+      "pages": {
+        "ru": "docs/ru/reference/0.9.2/postbuild.md#flash-size",
+        "en": "docs/en/reference/0.9.2/postbuild.md#flash-size"
+      },
+      "tests": [
+        "configure.crc-command-generation"
+      ],
+      "errata": [
+        "E006"
+      ]
+    },
+    {
+      "key": "validate_linker_script",
+      "requirement": "CFG-VALIDATE-LINKER-SCRIPT",
+      "type": "boolean",
+      "since": null,
+      "verified_in": "0.9.2",
+      "source": "cmake/stm32_yml_diagnostics.cmake",
+      "pages": {
+        "ru": "docs/ru/reference/0.9.2/diagnostics.md#validate-linker-script",
+        "en": "docs/en/reference/0.9.2/diagnostics.md#validate-linker-script"
+      },
+      "tests": [
+        "configure.linker-template"
+      ],
+      "errata": []
+    },
+    {
+      "key": "log_target_properties",
+      "requirement": "CFG-LOG-TARGET-PROPERTIES",
+      "type": "boolean",
+      "since": null,
+      "verified_in": "0.9.2",
+      "source": "cmake/stm32_yml_diagnostics.cmake",
+      "pages": {
+        "ru": "docs/ru/reference/0.9.2/diagnostics.md#log-target-properties",
+        "en": "docs/en/reference/0.9.2/diagnostics.md#log-target-properties"
+      },
+      "tests": [],
+      "errata": []
+    },
+    {
+      "key": "verbose_build",
+      "requirement": "CFG-VERBOSE-BUILD",
+      "type": "boolean",
+      "since": null,
+      "verified_in": "0.9.2",
+      "source": "stm32_yml.cmake",
+      "pages": {
+        "ru": "docs/ru/reference/0.9.2/diagnostics.md#verbose-build",
+        "en": "docs/en/reference/0.9.2/diagnostics.md#verbose-build"
+      },
+      "tests": [],
+      "errata": []
+    },
+    {
+      "key": "cppcheck_enable",
+      "requirement": "CFG-CPPCHECK-ENABLE",
+      "type": "boolean",
+      "since": null,
+      "verified_in": "0.9.2",
+      "source": "cmake/stm32_yml_code_quality.cmake",
+      "pages": {
+        "ru": "docs/ru/reference/0.9.2/diagnostics.md#cppcheck-enable",
+        "en": "docs/en/reference/0.9.2/diagnostics.md#cppcheck-enable"
+      },
+      "tests": [],
+      "errata": []
+    },
+    {
+      "key": "cppcheck_args",
+      "requirement": "CFG-CPPCHECK-ARGS",
+      "type": "list of arguments",
+      "since": null,
+      "verified_in": "0.9.2",
+      "source": "cmake/stm32_yml_code_quality.cmake",
+      "pages": {
+        "ru": "docs/ru/reference/0.9.2/diagnostics.md#cppcheck-args",
+        "en": "docs/en/reference/0.9.2/diagnostics.md#cppcheck-args"
+      },
+      "tests": [],
+      "errata": []
+    },
+    {
+      "key": "cppcheck_ignores",
+      "requirement": "CFG-CPPCHECK-IGNORES",
+      "type": "list of path fragments",
+      "since": null,
+      "verified_in": "0.9.2",
+      "source": "cmake/stm32_yml_code_quality.cmake",
+      "pages": {
+        "ru": "docs/ru/reference/0.9.2/diagnostics.md#cppcheck-ignores",
+        "en": "docs/en/reference/0.9.2/diagnostics.md#cppcheck-ignores"
+      },
+      "tests": [],
+      "errata": []
+    }
+  ],
+  "errata": [
+    {
+      "id": "E001",
+      "options": [
+        "mcu",
+        "heap_size",
+        "stack_size"
+      ],
+      "pages": {
+        "ru": "docs/ru/errata/E001.md",
+        "en": "docs/en/errata/E001.md"
+      },
+      "evidence": "reproduced",
+      "status": "fix-prepared-not-merged-at-audit",
+      "fixed_commit": "858013a7f31a674a91149ea3a68a5200498d92cc",
+      "fixed_release": null
+    },
+    {
+      "id": "E002",
+      "options": [
+        "profiles_file"
+      ],
+      "pages": {
+        "ru": "docs/ru/errata/E002.md",
+        "en": "docs/en/errata/E002.md"
+      },
+      "evidence": "reproduced",
+      "status": "fix-prepared-not-merged-at-audit",
+      "fixed_commit": "858013a7f31a674a91149ea3a68a5200498d92cc",
+      "fixed_release": null
+    },
+    {
+      "id": "E003",
+      "options": [
+        "heap_size",
+        "stack_size"
+      ],
+      "pages": {
+        "ru": "docs/ru/errata/E003.md",
+        "en": "docs/en/errata/E003.md"
+      },
+      "evidence": "reproduced",
+      "status": "open",
+      "fixed_commit": null,
+      "fixed_release": null
+    },
+    {
+      "id": "E004",
+      "options": [
+        "crc_algorithm"
+      ],
+      "pages": {
+        "ru": "docs/ru/errata/E004.md",
+        "en": "docs/en/errata/E004.md"
+      },
+      "evidence": "source-confirmed",
+      "status": "open",
+      "fixed_commit": null,
+      "fixed_release": null
+    },
+    {
+      "id": "E005",
+      "options": [
+        "profiles"
+      ],
+      "pages": {
+        "ru": "docs/ru/errata/E005.md",
+        "en": "docs/en/errata/E005.md"
+      },
+      "evidence": "reproduced",
+      "status": "open",
+      "fixed_commit": null,
+      "fixed_release": null
+    },
+    {
+      "id": "E006",
+      "options": [
+        "crc_enable",
+        "flash_size"
+      ],
+      "pages": {
+        "ru": "docs/ru/errata/E006.md",
+        "en": "docs/en/errata/E006.md"
+      },
+      "evidence": "reproduced",
+      "status": "open",
+      "fixed_commit": null,
+      "fixed_release": null
+    }
+  ],
+  "audit_date": "2026-09-22",
+  "controls": [
+    "PROJECT_CONFIG_FILE",
+    "STM32_YML_PROFILE",
+    "STM32_YML_OVERRIDE_<param>",
+    "CMAKE_USER_HOME",
+    "CMAKE_TOOLCHAIN_FILE",
+    "STM32_TOOLCHAIN_PATH"
+  ]
+}
