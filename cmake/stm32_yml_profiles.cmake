@@ -182,6 +182,16 @@ endfunction()
 #        Вызывается при передаче -DSTM32_YML_PROFILE=list.
 # ==============================================================================
 function(stm32_yml_list_profiles)
+    # Ветка list вызывается до apply_profile, поэтому внешний файл ещё не прочитан.
+    # Используем тот же источник профилей, что и при выборе конкретного профиля.
+    if(DEFINED profiles_file AND NOT "${profiles_file}" STREQUAL "")
+        set(_profiles_src_path "${CMAKE_SOURCE_DIR}/${profiles_file}")
+        if(EXISTS "${_profiles_src_path}")
+            stm32_yml_parse_config("${_profiles_src_path}")
+        else()
+            message(WARNING "Файл профилей не найден: ${_profiles_src_path}")
+        endif()
+    endif()
     set(_found_profiles "")
 
     if(DEFINED YAML_PARSED_KEYS)

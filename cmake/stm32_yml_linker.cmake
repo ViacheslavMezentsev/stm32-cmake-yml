@@ -71,8 +71,10 @@ function(stm32_yml_setup_linker_script TARGET_NAME)
             stm32_yml_normalize_memory(heap_size)
             stm32_yml_normalize_memory(stack_size)
 
-            set(HEAP_SIZE ${heap_size} CACHE STRING "Required amount of heap")
-            set(STACK_SIZE ${stack_size} CACHE STRING "Required amount of stack")
+            # Обновляем производные значения и при повторном Configure:
+            # профиль и STM32_YML_OVERRIDE_* уже применены к heap_size/stack_size.
+            set(HEAP_SIZE ${heap_size} CACHE STRING "Required amount of heap" FORCE)
+            set(STACK_SIZE ${stack_size} CACHE STRING "Required amount of stack" FORCE)
 
             # Проверяем версию GCC и задаём USE_READONLY
             if(CMAKE_C_COMPILER_VERSION VERSION_GREATER_EQUAL 11.0)

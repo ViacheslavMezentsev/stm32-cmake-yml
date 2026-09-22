@@ -109,9 +109,9 @@ package or the resulting image bytes. Ubuntu snapshots are not required.
 
 ## Framework configuration tests
 
-[tests/cases.json](../../tests/cases.json) defines 33 scenarios, run with each of
-the three GCC and two CMake versions from the lockfile: **198 case executions**.
-Two scenarios perform three consecutive configurations in the same build tree.
+[tests/cases.json](../../tests/cases.json) defines 36 scenarios, run with each of
+the three GCC and two CMake versions from the lockfile: **216 case executions**.
+Four scenarios perform three consecutive configurations in the same build tree.
 
 | Area | Checks |
 | --- | --- |
@@ -121,6 +121,7 @@ Two scenarios perform three consecutive configurations in the same build tree.
 | Bare metal | No CMSIS/HAL/FreeRTOS, unavailable Cube repository, explicit CPU flags and local linker template |
 | YAML values | Unquoted scalars, `false`, zero heap, null/empty defaults, empty list replacement and append |
 | Reconfiguration | Profile source/definition replacement and reset, persistent overrides and explicit cache removal with `-U` |
+| Profile regressions | External profile listing, generated heap/stack updates, MCU and compiler defines after switching profiles |
 | Language flags | Normalization and isolation of C and C++ flags/definitions in `compile_commands.json` |
 | Linker | Explicit `.ld`, template discovery in `linker_script_dir`, heap/stack substitutions, READONLY and checksum section preservation |
 | CRC | Presence/absence of the generated post-build command, section and Flash-size arguments |
@@ -145,10 +146,15 @@ reuse it and verify every step. Omitting a `-D` argument does not remove it from
 CMakeCache: use `-USTM32_YML_OVERRIDE_stack_size` to remove an override, or
 `-DSTM32_YML_PROFILE=` to return to the base configuration.
 
-Three defects reproduced during this stage are reserved for the following fix
-PR: external profile listing, heap/stack template values after profile changes,
-and stale MCU/defines when switching chips. The passing suite here does not
-claim coverage of those behaviors.
+Regression cases also check external profile listing and changing memory sizes
+or MCU in the same build tree. `MCU`, `HEAP_SIZE` and `STACK_SIZE` are derived
+cache entries and now follow the resolved configuration on every configure
+(`HEAP_SIZE`/`STACK_SIZE` when generating a local template). To override them,
+use the configuration inputs `-DSTM32_YML_OVERRIDE_mcu=...`,
+`-DSTM32_YML_OVERRIDE_heap_size=...`, `-DSTM32_YML_OVERRIDE_stack_size=...`.
+Direct `-DMCU`, `-DHEAP_SIZE` or `-DSTACK_SIZE` values no longer take precedence
+over the resolved YAML configuration. Changing the compiler/toolchain still
+requires a separate build directory.
 
 ### F1 fixture provenance and future simulation
 
