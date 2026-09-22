@@ -1,0 +1,1 @@
+This directory intentionally has no CMakeLists.txt for a negative configure test.

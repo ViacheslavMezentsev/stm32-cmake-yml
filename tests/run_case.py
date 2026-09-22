@@ -77,6 +77,20 @@ def verify(case, build, source):
                 require(token in command, f"{filename}: missing {token}")
             for token in absent:
                 require(token not in command, f"{filename}: leaked {token}")
+    for check in case.get("command_checks", []):
+        command = command_for(source / check["file"])
+        for token in check.get("present", []):
+            require(token in command, f"{check['file']}: missing {token}")
+        for token in check.get("absent", []):
+            require(token not in command, f"{check['file']}: leaked {token}")
+        for directory in check.get("includes", []):
+            token = "-I" + str(source / directory)
+            require(token in command, f"{check['file']}: missing include {directory}")
+        if "target" in check:
+            require("-o" in command, f"{check['file']}: missing object output")
+            output = command[command.index("-o") + 1]
+            require(f"CMakeFiles/{check['target']}.dir/" in output,
+                    f"{check['file']}: unexpected owning target: {output}")
     if "arduino_definitions" in case:
         # Check propagation through Arduino::Definitions into both wrappers.
         for path in (source / "modules/Arduino_Core_STM32/cores/arduino/wiring_digital.c",

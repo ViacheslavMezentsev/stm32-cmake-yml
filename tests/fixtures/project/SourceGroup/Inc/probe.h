@@ -1,0 +1,1 @@
+#define SOURCE_GROUP_VALUE 1
