@@ -39,6 +39,13 @@
 - [ ] Поддерживать карточки, тесты и errata согласованными при изменении поведения.
   Это постоянное правило сопровождения, а не разовая проверка полноты покрытия.
 
+- [ ] Сократить README и вынести подключение/сценарии в RU/EN-документацию;
+  показывать статусы CI и проверяемый численный объём набора — подготовлено в `codex/readme-navigation`.
+- [ ] Поэтапно пересмотреть навыки: сначала `stm32-simple-sources` (источники и
+  флаги языков), затем `stm32-module-creator` (зависимости и флаги библиотек),
+  затем `stm32-build-helper` (раздельные стадии диагностики). Для каждого
+  утверждения указывать существующий тест или сначала добавлять необходимую проверку.
+
 ### 5. Расширение проверок — после стабилизации Configure
 
 - [ ] Текущий PR: три регрессии для `Rev`/`RevB`, пустого override и сброса
@@ -99,6 +106,13 @@ keep defect details in errata.
 - [x] Roadmap — [PR #5](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/pull/5).
 - [ ] Keep cards, tests and errata aligned as behavior changes. This is an ongoing
   maintenance rule, not a one-time claim of complete coverage.
+
+- [ ] Shorten README and move setup/scenarios to RU/EN docs; show CI status and
+  validated suite counts — prepared in `codex/readme-navigation`.
+- [ ] Review skills incrementally: `stm32-simple-sources` (sources/language flags),
+  then `stm32-module-creator` (library dependencies/flags), then `stm32-build-helper`
+  (phase-specific diagnostics). Tie each claim to an existing test or add the
+  required check before claiming verified behavior.
 
 ### 5. Further checks — after Configure stabilizes
 
