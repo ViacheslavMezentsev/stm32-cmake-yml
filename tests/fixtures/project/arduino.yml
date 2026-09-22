@@ -1,0 +1,21 @@
+stm32_cmake_yml_version: 0.9.2
+project_name: arduino_probe
+toolchain_backend: arduino
+mcu: STM32F411CE
+languages: [C, CXX, ASM]
+sources: [main.c, helper.cpp]
+compile_definitions: [STM32F411xE, ARDUINO_BASE=1]
+compile_options: [mcpu=cortex-m4, mthumb]
+linker_script_dir: linker
+arduino:
+  core_path: modules/Arduino_Core_STM32
+  mcu_target: F411
+  use_core_main: false
+  custom_libraries: [libraries/probe]
+link_libraries: [Arduino::Core, Arduino::Probe]
+profiles:
+  custom:
+    compile_definitions_append: [ARDUINO_PROFILE=1]
+    arduino:
+      mcu_target: F411_CUSTOM
+    stack_size: 2K

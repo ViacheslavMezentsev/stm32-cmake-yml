@@ -1,2 +1,4 @@
 # Scripts copied into Linux containers must retain Unix line endings on Windows.
 ci/** text eol=lf
+tests/** text eol=lf
+.github/workflows/** text eol=lf
