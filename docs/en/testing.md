@@ -109,9 +109,9 @@ package or the resulting image bytes. Ubuntu snapshots are not required.
 
 ## Framework configuration tests
 
-[tests/cases.json](../../tests/cases.json) defines 36 scenarios, run with each of
-the three GCC and two CMake versions from the lockfile: **216 case executions**.
-Four scenarios perform three consecutive configurations in the same build tree.
+[tests/cases.json](../../tests/cases.json) defines 39 scenarios, run with each of
+the three GCC and two CMake versions from the lockfile: **234 case executions**.
+Seven scenarios perform three consecutive configurations in the same build tree.
 
 | Area | Checks |
 | --- | --- |
@@ -217,3 +217,12 @@ To add a scenario, extend `tests/cases.json` and, if needed, the fixture files.
 Keep assertions about externally observable results; do not copy framework
 logic into the tests. Add a regression case before changing that behavior in
 a later PR. Existing test names should remain unique.
+
+### Profile boundaries and empty overrides
+
+Three additional multi-step scenarios check isolation of valid `Rev`/`RevB` names
+through sources, definitions and linker sizes; a nonempty override returning to
+the profile value with `-DSTM32_YML_OVERRIDE_stack_size=`; and resetting/reapplying
+an external profile without stale definitions. An empty override is ignored,
+not interpreted as zero. Underscores in profile names remain outside the contract.
+Framework code was not changed for these checks.

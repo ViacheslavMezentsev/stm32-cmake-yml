@@ -4,7 +4,7 @@
 
 ## Русский
 
-Состояние на 2026-09-22. Ниже работа сгруппирована в пять этапов; этапы могут
+Состояние на 2026-09-23. Ниже работа сгруппирована в пять этапов; этапы могут
 выполняться параллельно. Это план, а не обещание сроков или поддерживаемых функций.
 Приоритет — Configure/Generate и совместимость существующих проектов.
 
@@ -23,15 +23,13 @@
 - [x] Расширение до 33 сценариев: профили, IOC, bare metal без CMSIS, Arduino,
   linker templates, генерация CRC-команд и повторный Configure — [PR #3](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/pull/3).
 
-### 3. Исправления конфигурации — следующий PR
+### 3. Исправления конфигурации — слито
 
-- [ ] Слить подготовленные исправления в `codex/configure-profile-fixes`
-  (коммит `858013a`): обновление MCU и heap/stack при повторной настройке,
-  вывод профилей из внешнего файла; см. [E001](docs/ru/errata/E001.md) и [E002](docs/ru/errata/E002.md).
-- [ ] Проверить в GitHub расширенный набор из 36 сценариев для шести пар GCC/CMake.
-  Локально 216 запусков уже прошли; статус GitHub проверяется отдельно.
-- [ ] При слиянии обновить errata RU/EN и индекс, описать совместимость прямых
-  `-DMCU`/`-DHEAP_SIZE`/`-DSTACK_SIZE` с `STM32_YML_OVERRIDE_*`.
+- [x] Исправления MCU, heap/stack и внешнего list слиты в [PR #6](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/pull/6).
+- [x] GitHub: Configure tests и Documentation reference прошли на `48d8248`;
+  набор содержит 36 сценариев / 216 запусков.
+- [ ] Обновить статусы E001/E002 и индекс после слияния — подготовлено в текущем PR.
+  Совместимость `STM32_YML_OVERRIDE_*` описана в документации тестирования и errata.
 
 ### 4. Эталон поведения и документация — параллельно
 
@@ -43,6 +41,8 @@
 
 ### 5. Расширение проверок — после стабилизации Configure
 
+- [ ] Текущий PR: три регрессии для `Rev`/`RevB`, пустого override и сброса
+  внешнего профиля; 39 сценариев / 234 запуска.
 - [ ] По индексу выбрать следующие пробелы покрытия: отсутствующие/пустые значения,
   приоритеты и ошибки входных данных. Каждый новый контракт — отдельный сценарий.
 - [ ] Отдельными PR разобрать [E004 и E006](docs/ru/errata/index.md):
@@ -65,7 +65,7 @@
 
 ## English
 
-Status as of 2026-09-22. Work is grouped into five stages, which may overlap.
+Status as of 2026-09-23. Work is grouped into five stages, which may overlap.
 The priority is Configure/Generate and compatibility with existing consumers.
 This roadmap does not promise delivery dates or unsupported features.
 
@@ -84,15 +84,13 @@ keep defect details in errata.
 - [x] Expand to 33 scenarios: profiles, IOC, bare metal without CMSIS, Arduino,
   linker templates, CRC command generation and repeated Configure — [PR #3](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/pull/3).
 
-### 3. Configuration fixes — next PR
+### 3. Configuration fixes — merged
 
-- [ ] Merge prepared `codex/configure-profile-fixes` (`858013a`): refresh MCU and
-  heap/stack on reconfiguration and list external profiles; see
-  [E001](docs/en/errata/E001.md) and [E002](docs/en/errata/E002.md).
-- [ ] Verify 36 scenarios across six GCC/CMake pairs in GitHub. All 216 local runs
-  passed; the GitHub result must be checked separately.
-- [ ] On merge, update RU/EN errata and the index; explain compatibility of direct
-  `-DMCU`/`-DHEAP_SIZE`/`-DSTACK_SIZE` with `STM32_YML_OVERRIDE_*`.
+- [x] MCU, heap/stack and external listing fixes merged in [PR #6](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/pull/6).
+- [x] GitHub Configure tests and Documentation reference passed on `48d8248`;
+  36 scenarios / 216 executions.
+- [ ] Update E001/E002 statuses and the index after merge — prepared in this PR.
+  `STM32_YML_OVERRIDE_*` compatibility is documented in testing and errata.
 
 ### 4. Behavior contract and documentation — in parallel
 
@@ -104,6 +102,8 @@ keep defect details in errata.
 
 ### 5. Further checks — after Configure stabilizes
 
+- [ ] Current PR: three regressions for `Rev`/`RevB`, an empty override and
+  external profile reset; 39 scenarios / 234 executions.
 - [ ] Use the index to prioritize coverage gaps: missing/empty values, precedence
   and invalid input. Give each new contract a dedicated scenario.
 - [ ] Address [E004 and E006](docs/en/errata/index.md) in separate PRs:

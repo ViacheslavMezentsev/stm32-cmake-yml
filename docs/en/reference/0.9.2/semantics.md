@@ -7,8 +7,8 @@
 This reference records version 0.9.2 as implemented in commit
 `f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0`. This identifies the audited code;
 it does not assert that a release tag exists. Audit date: 2026-09-22.
-PR #3 added tests without changing framework modules. The locally prepared fix
-commit `858013a7f31a674a91149ea3a68a5200498d92cc` was not merged at audit time.
+Status on 2026-09-23: E001/E002 fixes (`858013a`) merged in [PR #6](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/pull/6),
+merge `5711ec6`. The reference baseline is unchanged; a fixed release is not established.
 The version string alone cannot distinguish these states: inspect the commit.
 
 Cards describe supported intent and observed baseline behavior. Errata separately

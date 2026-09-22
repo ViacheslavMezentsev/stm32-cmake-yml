@@ -21,7 +21,7 @@ profiles:
 
 [Реализация 0.9.2](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_profiles.cmake) · [Index](index.md)
 
-**Проверки (частичное покрытие):** `configure.profile-replace-and-append`, `configure.unknown-profile-warning`, `configure.reconfigure-profile-lists`. [Test manifest](../../../../tests/cases.json).
+**Проверки (частичное покрытие):** `configure.profile-replace-and-append`, `configure.unknown-profile-warning`, `configure.reconfigure-profile-lists`, `configure.reconfigure-profile-name-boundaries`. [Test manifest](../../../../tests/cases.json).
 
 **Errata:** [E005](../../errata/E005.md).
 
@@ -40,6 +40,6 @@ profiles_file: profiles.yml
 
 [Реализация 0.9.2](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_profiles.cmake) · [Index](index.md)
 
-**Проверки (частичное покрытие):** `configure.external-profile`, `configure.external-list-profiles`. [Test manifest](../../../../tests/cases.json).
+**Проверки (частичное покрытие):** `configure.external-profile`, `configure.external-list-profiles`, `configure.reconfigure-external-profile-reset`. [Test manifest](../../../../tests/cases.json).
 
 **Errata:** [E002](../../errata/E002.md).

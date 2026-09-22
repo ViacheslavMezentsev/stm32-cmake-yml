@@ -38,7 +38,7 @@ stack_size: 1K
 
 [0.9.2 implementation](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_linker.cmake) · [Index](index.md)
 
-**Checks (partial coverage):** `configure.linker-template`, `configure.baremetal-no-cube`, `configure.empty-and-null-defaults`, `configure.reconfigure-memory`. [Test manifest](../../../../tests/cases.json).
+**Checks (partial coverage):** `configure.linker-template`, `configure.baremetal-no-cube`, `configure.empty-and-null-defaults`, `configure.reconfigure-memory`, `configure.reconfigure-profile-name-boundaries`, `configure.reconfigure-empty-override`. [Test manifest](../../../../tests/cases.json).
 
 **Errata:** [E001](../../errata/E001.md), [E003](../../errata/E003.md).
 
