@@ -4,7 +4,10 @@
 
 | Task | Destination |
 | --- | --- |
-| Connect the framework | [Getting started in README (Russian)](../../README.md#начало-работы) |
+| Connect the framework | [Getting started](getting-started.md) |
+| Choose IOC, profiles or Arduino | [Short scenarios](scenarios.md) |
+| Understand VS Code and bare metal | [Development](development.md) |
+| Explore structure and skill plans | [Repository](repository.md) |
 | Find a usage scenario | [Existing user manual (Russian)](../user_manual.md) |
 | Look up an option | [Reference 0.9.2: alphabetical and topic indexes](reference/0.9.2/index.md) |
 | Understand precedence and cache | [Semantics](reference/0.9.2/semantics.md) |

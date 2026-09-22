@@ -226,3 +226,6 @@ the profile value with `-DSTM32_YML_OVERRIDE_stack_size=`; and resetting/reapply
 an external profile without stale definitions. An empty override is ignored,
 not interpreted as zero. Underscores in profile names remain outside the contract.
 Framework code was not changed for these checks.
+
+The VS Code cache-deletion workflow and bare-metal startup responsibilities
+are described in [development](development.md).
