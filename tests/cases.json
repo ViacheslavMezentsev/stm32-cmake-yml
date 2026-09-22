@@ -116,5 +116,100 @@
     "backend": "arduino",
     "args": ["-DSTM32_YML_OVERRIDE_arduino_core_path=missing-core"],
     "error": "Папка Arduino Core STM32 не найдена"
+  },
+  {
+    "name": "ioc-bluepill-defaults",
+    "args": ["-DPROJECT_CONFIG_FILE=ioc.yml"],
+    "observed": {"MCU": "STM32F103C8T", "PROJECT_NAME": "bluepill_hsi", "heap_size": "512", "stack_size": "1024", "cubefw_package": "V1.8.7"},
+    "properties": {"LINK_LIBRARIES": ["HAL::STM32::F1::GPIO", "CMSIS::STM32::F103C8"]}
+  },
+  {
+    "name": "yaml-over-ioc",
+    "args": ["-DPROJECT_CONFIG_FILE=ioc-values.yml"],
+    "observed": {"MCU": "STM32F103C8T6", "PROJECT_NAME": "yaml_bluepill", "heap_size": "768", "stack_size": "1536", "use_hal": "FALSE"},
+    "absent_properties": {"COMPILE_DEFINITIONS": ["USE_HAL_DRIVER"]}
+  },
+  {
+    "name": "profile-over-ioc",
+    "args": ["-DPROJECT_CONFIG_FILE=ioc.yml", "-DSTM32_YML_PROFILE=sized"],
+    "observed": {"heap_size": "1K", "stack_size": "2K"}
+  },
+  {
+    "name": "override-over-yaml-profile-ioc",
+    "args": ["-DPROJECT_CONFIG_FILE=ioc-values.yml", "-DSTM32_YML_PROFILE=sized", "-DSTM32_YML_OVERRIDE_stack_size=4096"],
+    "observed": {"heap_size": "1K", "stack_size": "4096", "MCU": "STM32F103C8T6"}
+  },
+  {
+    "name": "ioc-baremetal-zero",
+    "args": ["-DPROJECT_CONFIG_FILE=ioc.yml", "-DSTM32_YML_PROFILE=bare"],
+    "env": {"CMAKE_USER_HOME": "/no-cube-repository"},
+    "observed": {"use_cmsis": "FALSE", "use_hal": "FALSE", "heap_size": "0"},
+    "no_st_dependencies": true,
+    "linker": {"file": "STM32F103C8_FLASH.ld", "heap": 0, "stack": 1024}
+  },
+  {
+    "name": "baremetal-no-cube",
+    "args": ["-DPROJECT_CONFIG_FILE=baremetal.yml"],
+    "env": {"CMAKE_USER_HOME": "/no-cube-repository"},
+    "observed": {"MCU": "STM32F103C8T6", "use_cmsis": "FALSE", "use_hal": "FALSE", "use_freertos": "FALSE", "heap_size": "0", "crc_enable": "FALSE"},
+    "no_st_dependencies": true,
+    "crc_command": false,
+    "linker": {"file": "STM32F103C8_FLASH.ld", "heap": 0, "stack": 1024}
+  },
+  {
+    "name": "baremetal-empty-list",
+    "args": ["-DPROJECT_CONFIG_FILE=baremetal.yml", "-DSTM32_YML_PROFILE=empty"],
+    "observed": {"include_directories": ""},
+    "absent_properties": {"COMPILE_DEFINITIONS": ["BAREMETAL=1"]},
+    "no_st_dependencies": true
+  },
+  {
+    "name": "baremetal-empty-append",
+    "args": ["-DPROJECT_CONFIG_FILE=baremetal.yml", "-DSTM32_YML_PROFILE=emptyappend"],
+    "properties": {"COMPILE_DEFINITIONS": ["BAREMETAL=1"]},
+    "no_st_dependencies": true
+  },
+  {
+    "name": "baremetal-clear-then-append",
+    "args": ["-DPROJECT_CONFIG_FILE=baremetal.yml", "-DSTM32_YML_PROFILE=replaceappend"],
+    "properties": {"COMPILE_DEFINITIONS": ["ONLY_APPEND=1"]},
+    "absent_properties": {"COMPILE_DEFINITIONS": ["BAREMETAL=1"]},
+    "no_st_dependencies": true
+  },
+  {
+    "name": "empty-and-null-defaults",
+    "args": ["-DPROJECT_CONFIG_FILE=empty-values.yml"],
+    "observed": {"heap_size": "512", "stack_size": "1024"},
+    "linker": {"file": "STM32F103C8_FLASH.ld", "heap": 512, "stack": 1024},
+    "no_st_dependencies": true
+  },
+  {
+    "name": "missing-ioc",
+    "args": ["-DPROJECT_CONFIG_FILE=ioc.yml", "-DSTM32_YML_OVERRIDE_ioc_file=missing.ioc"],
+    "error": "Указанный .ioc файл не найден"
+  },
+  {
+    "name": "reconfigure-profile-lists",
+    "steps": [
+      {"args": ["-DSTM32_YML_PROFILE=append"], "sources": ["main.c", "helper.cpp", "extra.c"], "properties": {"COMPILE_DEFINITIONS": ["BASE=1", "APPENDED=1"]}},
+      {"args": ["-DSTM32_YML_PROFILE=replace"], "sources": ["main.c", "extra.c"], "properties": {"COMPILE_DEFINITIONS": ["REPLACED=1", "AFTER_REPLACE=1"]}, "absent_properties": {"COMPILE_DEFINITIONS": ["BASE=1", "APPENDED=1"]}},
+      {"args": ["-DSTM32_YML_PROFILE="], "sources": ["main.c", "helper.cpp"], "properties": {"COMPILE_DEFINITIONS": ["BASE=1"]}, "absent_properties": {"COMPILE_DEFINITIONS": ["APPENDED=1", "REPLACED=1", "AFTER_REPLACE=1"]}}
+    ]
+  },
+  {
+    "name": "reconfigure-override-cache",
+    "args": ["-DPROJECT_CONFIG_FILE=ioc-values.yml", "-DSTM32_YML_PROFILE=sized"],
+    "steps": [
+      {"args": ["-DSTM32_YML_OVERRIDE_stack_size=4096"], "observed": {"stack_size": "4096"}},
+      {"observed": {"stack_size": "4096"}},
+      {"args": ["-USTM32_YML_OVERRIDE_stack_size"], "observed": {"stack_size": "2K"}}
+    ]
+  },
+  {
+    "name": "override-false-and-zero",
+    "args": ["-DPROJECT_CONFIG_FILE=ioc-values.yml", "-DSTM32_YML_PROFILE=zero", "-DSTM32_YML_OVERRIDE_use_cmsis=false", "-DSTM32_YML_OVERRIDE_heap_size=0"],
+    "observed": {"use_cmsis": "false", "heap_size": "0"},
+    "no_st_dependencies": true,
+    "linker": {"file": "STM32F103C8_FLASH.ld", "heap": 0, "stack": 1536}
   }
 ]

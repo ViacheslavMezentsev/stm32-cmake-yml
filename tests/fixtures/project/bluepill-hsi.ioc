@@ -1,0 +1,19 @@
+# Reduced parser fixture derived from demo-stm32-cmake/stm32f1xx/03-blink.
+# Not a complete CubeMX project. Clock fields express HSI without PLL;
+# configuration tests do not generate or execute SystemClock_Config.
+Mcu.CPN=STM32F103C8T6
+Mcu.Family=STM32F1
+Mcu.Name=STM32F103C(8-B)Tx
+Mcu.UserName=STM32F103C8Tx
+ProjectManager.DeviceId=STM32F103C8Tx
+ProjectManager.ProjectName=bluepill_hsi
+ProjectManager.DefaultFWLocation=true
+ProjectManager.FirmwarePackage=STM32Cube FW_F1 V1.8.7
+ProjectManager.LibraryCopy=2
+ProjectManager.HeapSize=0x200
+ProjectManager.StackSize=0x400
+RCC.SYSCLKSource=RCC_SYSCLKSOURCE_HSI
+RCC.SYSCLKFreq_VALUE=8000000
+RCC.HCLKFreq_Value=8000000
+RCC.APB1Freq_Value=8000000
+RCC.APB2Freq_Value=8000000

@@ -1,0 +1,16 @@
+stm32_cmake_yml_version: 0.9.2
+ioc_file: bluepill-hsi.ioc
+languages: [C, ASM]
+sources: [main.c]
+include_directories: [include]
+hal_components: [GPIO]
+profiles:
+  sized:
+    heap_size: 1K
+    stack_size: 2K
+  bare:
+    use_cmsis: false
+    use_hal: false
+    linker_script_dir: linker
+    heap_size: 0
+    compile_options: [mcpu=cortex-m3, mthumb]

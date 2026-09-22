@@ -39,7 +39,7 @@ def verify(case, build, source):
     if "link_options_contain" in case:
         require(case["link_options_contain"] in observed("LINK_OPTIONS"), "Explicit linker script not linked")
     if "linker" in case:
-        linker = build / "STM32F411CE_FLASH.ld"
+        linker = build / case["linker"].get("file", "STM32F411CE_FLASH.ld")
         require(linker.is_file(), "Template was not generated")
         content = linker.read_text(encoding="utf-8")
         for token in (f"_Min_Heap_Size = {case['linker']['heap']};",
@@ -57,6 +57,10 @@ def verify(case, build, source):
                 require(token in ninja, f"CRC command missing {token!r}")
 
     commands = json.loads((build / "compile_commands.json").read_text(encoding="utf-8"))
+    if case.get("no_st_dependencies"):
+        for value in (observed("LINK_LIBRARIES"), json.dumps(commands), ninja):
+            for token in ("CMSIS::", "HAL::", "FreeRTOS::", "/Drivers/", "USE_HAL_DRIVER"):
+                require(token not in value, f"Bare-metal configuration unexpectedly uses {token}")
 
     def command_for(path):
         matches = [entry["command"] for entry in commands if Path(entry["file"]) == path]
@@ -93,7 +97,7 @@ def main():
     cases = json.loads((tests / "cases.json").read_text(encoding="utf-8"))
     case = next(c for c in cases if c["name"] == args.case)
     args.work_dir.mkdir(parents=True, exist_ok=True)
-    # Every invocation gets a fresh source and build tree; retain both for diagnosis.
+    # Cases are isolated; steps within one case deliberately reuse the same cache.
     run = Path(tempfile.mkdtemp(prefix=f"{args.case}-", dir=args.work_dir)).resolve()
     source, build = run / "source", run / "build"
     shutil.copytree(tests / "fixtures/project", source)
@@ -111,26 +115,40 @@ def main():
                f"-DSTM32_YML_FRAMEWORK_DIR={args.framework.resolve()}",
                f"-DCMAKE_TOOLCHAIN_FILE={toolchain}", "-DCMAKE_BUILD_TYPE=Debug",
                "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON", *config_args, *case.get("args", [])]
-    log_path = run / "configure.log"
-    print(f"Case: {args.case}\nLog: {log_path}", flush=True)
-    with log_path.open("w", encoding="utf-8") as log:
-        log.write(shlex.join(command) + "\n\n")
-        log.flush()
-        result = subprocess.run(command, stdout=log, stderr=subprocess.STDOUT, timeout=100)
-    output = log_path.read_text(encoding="utf-8")
-    normalized = " ".join(output.split())
-    try:
-        if "error" in case:
-            require(result.returncode != 0, "Invalid configuration unexpectedly succeeded")
-            require(case["error"] in normalized, f"Failure had wrong cause: expected {case['error']!r}")
-        else:
-            require(result.returncode == 0, f"CMake returned {result.returncode}")
-            verify(case, build, source)
-        for message in case.get("log_contains", []):
-            require(message in normalized, f"Missing diagnostic {message!r}")
-    except AssertionError:
-        print(output, flush=True)
-        raise
+    env = dict(os.environ, **case.get("env", {}))
+    for index, step in enumerate(case.get("steps", [{}]), start=1):
+        expectation = dict(case, **step)
+        step_command = command + step.get("args", [])
+        # Preserve outputs for every step, including intermediate generated .ld.
+        report = run / f"step-{index}"
+        report.mkdir()
+        log_path = report / "configure.log"
+        print(f"Case: {args.case}, step {index}\nLog: {log_path}", flush=True)
+        with log_path.open("w", encoding="utf-8") as log:
+            log.write(shlex.join(step_command) + "\n\n")
+            log.flush()
+            result = subprocess.run(step_command, env=env, stdout=log, stderr=subprocess.STDOUT, timeout=100)
+        for filename in ("CMakeCache.txt", "build.ninja", "compile_commands.json"):
+            if (build / filename).is_file():
+                shutil.copy2(build / filename, report)
+        for linker in build.glob("*.ld"):
+            shutil.copy2(linker, report)
+        if (build / "observed").is_dir():
+            shutil.copytree(build / "observed", report / "observed")
+        output = log_path.read_text(encoding="utf-8")
+        normalized = " ".join(output.split())
+        try:
+            if "error" in expectation:
+                require(result.returncode != 0, "Invalid configuration unexpectedly succeeded")
+                require(expectation["error"] in normalized, f"Failure had wrong cause: expected {expectation['error']!r}")
+            else:
+                require(result.returncode == 0, f"CMake returned {result.returncode}")
+                verify(expectation, build, source)
+            for message in expectation.get("log_contains", []):
+                require(message in normalized, f"Missing diagnostic {message!r}")
+        except AssertionError:
+            print(output, flush=True)
+            raise
     print(f"PASS {args.case}")
 
 
