@@ -1,0 +1,43 @@
+name: CI environment
+
+on:
+  pull_request:
+    paths:
+      - ci/**
+      - .github/workflows/environment.yml
+      - .gitattributes
+  push:
+    branches: [main]
+    paths:
+      - ci/**
+      - .github/workflows/environment.yml
+      - .gitattributes
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: environment-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  environment:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Build pinned environment and check compiler combinations
+        run: docker build --platform linux/amd64 --progress plain -f ci/docker/Dockerfile -t stm32-yml-ci:check .
+      - name: Verify without network access
+        run: docker run --rm --network none stm32-yml-ci:check
+      - name: Verify explicit version selection
+        run: |
+          docker run --rm --network none -e GCC_VERSION=13.3.1-1.1 -e CMAKE_VERSION=3.19.8 stm32-yml-ci:check cmake --version
+          docker run --rm --network none -e GCC_VERSION=15.2.1-1.1 stm32-yml-ci:check arm-none-eabi-gcc --version
+      - name: Reject unsupported version selection
+        run: |
+          if docker run --rm --network none -e GCC_VERSION=unknown stm32-yml-ci:check true; then
+            echo 'Unsupported toolchain was accepted'
+            exit 1
+          fi

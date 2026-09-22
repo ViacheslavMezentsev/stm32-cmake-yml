@@ -27,6 +27,10 @@ project_config.local.yml
 *.swp
 *.swo
 
+# Python tooling
+__pycache__/
+*.pyc
+
 # OS-specific files
 .DS_Store
 Thumbs.db
