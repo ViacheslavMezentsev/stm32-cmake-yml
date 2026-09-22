@@ -9,7 +9,7 @@ Shared rules: [semantics](semantics.md). Baseline: `f8ef5200fc7a4a96d6f3fe9111af
 
 `CFG-HEAP-SIZE` · **Type:** integer bytes / string with K or M · **Default:** IOC / 512 manually
 
-Size substituted into a local .ld.in. Use 0, integer bytes, or integer uppercase K/M. The IOC branch reads a HEX field; incomplete IOC files need explicit values. A ready .ld is not rewritten; the default stm32-cmake linker is not given these values through this branch. Fractions do not work. Baseline 0.9.2 keeps stale cache values on reconfigure.
+Size substituted into a local .ld.in. Use 0, integer bytes, or integer uppercase K/M. The IOC branch reads a HEX field; incomplete IOC files need explicit values. A ready .ld is not rewritten; the default stm32-cmake linker is not given these values through this branch. Fractional sizes are outside the supported contract (E003). Baseline 0.9.2 keeps stale cache values on reconfigure.
 
 **Omission and emptiness:** see [shared rules](semantics.md#empty-values); exceptions are stated above. Profiles/overrides apply before defaults. Backend/path restrictions are stated in the description.
 
@@ -19,7 +19,7 @@ heap_size: 1K
 
 [0.9.2 implementation](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_linker.cmake) · [Index](index.md)
 
-**Checks (partial coverage):** `configure.linker-template`, `configure.baremetal-no-cube`, `configure.empty-and-null-defaults`. [Test manifest](../../../../tests/cases.json).
+**Checks (partial coverage):** `configure.linker-template`, `configure.baremetal-no-cube`, `configure.empty-and-null-defaults`, `configure.reconfigure-memory`. [Test manifest](../../../../tests/cases.json).
 
 **Errata:** [E001](../../errata/E001.md), [E003](../../errata/E003.md).
 
@@ -28,7 +28,7 @@ heap_size: 1K
 
 `CFG-STACK-SIZE` · **Type:** integer bytes / string with K or M · **Default:** IOC / 1024 manually
 
-Size substituted into a local .ld.in. Use 0, integer bytes, or integer uppercase K/M. The IOC branch reads a HEX field; incomplete IOC files need explicit values. A ready .ld is not rewritten; the default stm32-cmake linker is not given these values through this branch. Fractions do not work. Baseline 0.9.2 keeps stale cache values on reconfigure.
+Size substituted into a local .ld.in. Use 0, integer bytes, or integer uppercase K/M. The IOC branch reads a HEX field; incomplete IOC files need explicit values. A ready .ld is not rewritten; the default stm32-cmake linker is not given these values through this branch. Fractional sizes are outside the supported contract (E003). Baseline 0.9.2 keeps stale cache values on reconfigure.
 
 **Omission and emptiness:** see [shared rules](semantics.md#empty-values); exceptions are stated above. Profiles/overrides apply before defaults. Backend/path restrictions are stated in the description.
 
@@ -38,7 +38,7 @@ stack_size: 1K
 
 [0.9.2 implementation](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_linker.cmake) · [Index](index.md)
 
-**Checks (partial coverage):** `configure.linker-template`, `configure.baremetal-no-cube`, `configure.empty-and-null-defaults`. [Test manifest](../../../../tests/cases.json).
+**Checks (partial coverage):** `configure.linker-template`, `configure.baremetal-no-cube`, `configure.empty-and-null-defaults`, `configure.reconfigure-memory`. [Test manifest](../../../../tests/cases.json).
 
 **Errata:** [E001](../../errata/E001.md), [E003](../../errata/E003.md).
 

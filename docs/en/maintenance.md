@@ -62,3 +62,11 @@ rather than mixing them with confirmed errata.
 keys/IDs, references to existing tests and reciprocal errata mappings. It does
 not check external networking or prove semantic correctness. New examples,
 defect claims and contract changes require separate behavioral verification.
+
+## Establishing expected behavior
+
+Do not infer promised support from a single example, regex or failure. Compare
+the user contract, implementation and function purpose first. When intent is
+ambiguous, ask the author before declaring a defect or changing behavior.
+Unsupported input does not imply a bug. `closed-by-design` preserves a previously
+misclassified entry for stable links; it does not imply a released fix.

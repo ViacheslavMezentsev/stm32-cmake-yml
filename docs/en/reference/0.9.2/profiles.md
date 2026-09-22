@@ -9,7 +9,7 @@ Shared rules: [semantics](semantics.md). Baseline: `f8ef5200fc7a4a96d6f3fe9111af
 
 `CFG-PROFILES` · **Type:** mapping: name -> option mapping · **Default:** {}
 
-Named sets selected by -DSTM32_YML_PROFILE=name. A key replaces its base value; _append extends the already replaced list. Nested keys flatten with underscores. Unknown profiles warn and continue with base configuration. Use letters/digits without _ or regex metacharacters for portable names.
+Named sets selected by -DSTM32_YML_PROFILE=name. A key replaces its base value; _append extends the already replaced list. Nested keys flatten with underscores. Unknown profiles warn and continue with base configuration. Underscores are not allowed in profile names, including due to Arduino build-path restrictions. Use ASCII letters/digits and avoid regex metacharacters. This does not restrict YAML key names or generated directory names.
 
 **Omission and emptiness:** see [shared rules](semantics.md#empty-values); exceptions are stated above. Profiles/overrides apply before defaults. Backend/path restrictions are stated in the description.
 
@@ -40,6 +40,6 @@ profiles_file: profiles.yml
 
 [0.9.2 implementation](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_profiles.cmake) · [Index](index.md)
 
-**Checks (partial coverage):** `configure.external-profile`. [Test manifest](../../../../tests/cases.json).
+**Checks (partial coverage):** `configure.external-profile`, `configure.external-list-profiles`. [Test manifest](../../../../tests/cases.json).
 
 **Errata:** [E002](../../errata/E002.md).

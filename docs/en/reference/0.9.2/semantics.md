@@ -56,7 +56,7 @@ key may be exported and ignored; Configure success does not detect every typo.
 key. Objects flatten using `_`: `arduino: {core_path: ...}` becomes
 `arduino_core_path`. Avoid nested/flat key collisions. Prefer lists of scalars.
 
-Use letters/digits in profile names. `_` breaks baseline listing (E005), while
+Use ASCII letters/digits in profile names. `_` is outside the contract (E005), while
 regex characters may alter selection because names are interpolated into a regex.
 Flag strings are split on spaces and become CMake lists. Arbitrary shell quoting,
 space escaping or semicolon escaping is not promised.

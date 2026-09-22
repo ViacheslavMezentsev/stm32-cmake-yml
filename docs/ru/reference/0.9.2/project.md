@@ -104,7 +104,7 @@ mcu: STM32F103C8T6
 
 [Реализация 0.9.2](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_config.cmake) · [Index](index.md)
 
-**Проверки (частичное покрытие):** `configure.yaml-over-ioc`, `configure.bluepill`. [Test manifest](../../../../tests/cases.json).
+**Проверки (частичное покрытие):** `configure.yaml-over-ioc`, `configure.bluepill`, `configure.reconfigure-mcu`. [Test manifest](../../../../tests/cases.json).
 
 **Errata:** [E001](../../errata/E001.md).
 
