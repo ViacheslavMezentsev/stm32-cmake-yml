@@ -13,5 +13,10 @@ foreach(INDEX RANGE ${LAST_CASE})
         COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/run_case.py"
             --case "${CASE_NAME}" --cmake "${CMAKE_COMMAND}"
             --framework "${FRAMEWORK_DIR}" --work-dir "${CMAKE_CURRENT_BINARY_DIR}/cases")
-    set_tests_properties("configure.${CASE_NAME}" PROPERTIES TIMEOUT 120 LABELS configure)
+    string(JSON STEP_COUNT ERROR_VARIABLE NO_STEPS LENGTH "${CASES}" ${INDEX} steps)
+    if(NO_STEPS)
+        set(STEP_COUNT 1)
+    endif()
+    math(EXPR CASE_TIMEOUT "120 * ${STEP_COUNT}")
+    set_tests_properties("configure.${CASE_NAME}" PROPERTIES TIMEOUT ${CASE_TIMEOUT} LABELS configure)
 endforeach()

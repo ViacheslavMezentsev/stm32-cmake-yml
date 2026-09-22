@@ -1,0 +1,13 @@
+stm32_cmake_yml_version: 0.9.2
+project_name: null_probe
+mcu: STM32F103C8T6
+languages: [C, ASM]
+sources: [main.c]
+use_cmsis: false
+use_hal: false
+heap_size:
+stack_size: null
+compile_definitions: []
+include_directories: []
+linker_script_dir: linker
+compile_options: [mcpu=cortex-m3, mthumb]

@@ -109,13 +109,18 @@ package or the resulting image bytes. Ubuntu snapshots are not required.
 
 ## Framework configuration tests
 
-[tests/cases.json](../../tests/cases.json) defines 19 scenarios, run with each of
-the three GCC and two CMake versions from the lockfile: **114 case executions**.
+[tests/cases.json](../../tests/cases.json) defines 33 scenarios, run with each of
+the three GCC and two CMake versions from the lockfile: **198 case executions**.
+Two scenarios perform three consecutive configurations in the same build tree.
 
 | Area | Checks |
 | --- | --- |
 | Defaults and dependencies | F411 (BlackPill) and F103 (BluePill), actual CMSIS/HAL targets, default heap/stack, C/C++ standards |
 | Profiles on the same MCU | List replacement, append, replacement followed by append, sources, external profiles, scalar override priority |
+| IOC and YAML precedence | STM32F103C8T6, IOC-derived defaults, YAML/profile/override precedence, missing IOC |
+| Bare metal | No CMSIS/HAL/FreeRTOS, unavailable Cube repository, explicit CPU flags and local linker template |
+| YAML values | Unquoted scalars, `false`, zero heap, null/empty defaults, empty list replacement and append |
+| Reconfiguration | Profile source/definition replacement and reset, persistent overrides and explicit cache removal with `-U` |
 | Language flags | Normalization and isolation of C and C++ flags/definitions in `compile_commands.json` |
 | Linker | Explicit `.ld`, template discovery in `linker_script_dir`, heap/stack substitutions, READONLY and checksum section preservation |
 | CRC | Presence/absence of the generated post-build command, section and Flash-size arguments |
@@ -135,8 +140,35 @@ database files, and matching configuration or target properties. Negative cases
 require both failure and a specific diagnostic, so an unrelated compiler failure
 cannot count as success. Current compatibility behavior is preserved: an unknown
 profile warns and continues; `STM32_YML_PROFILE=list` prints names and exits with
-an error. External profile listing and switching profiles in an existing build
-tree are not covered yet; every case deliberately starts with a fresh cache.
+an error. Each case starts with a fresh cache; multi-step cases deliberately
+reuse it and verify every step. Omitting a `-D` argument does not remove it from
+CMakeCache: use `-USTM32_YML_OVERRIDE_stack_size` to remove an override, or
+`-DSTM32_YML_PROFILE=` to return to the base configuration.
+
+Three defects reproduced during this stage are reserved for the following fix
+PR: external profile listing, heap/stack template values after profile changes,
+and stale MCU/defines when switching chips. The passing suite here does not
+claim coverage of those behaviors.
+
+### F1 fixture provenance and future simulation
+
+The reduced [bluepill-hsi.ioc](../../tests/fixtures/project/bluepill-hsi.ioc)
+uses the ProjectManager keys found in the author's
+[03-blink example](https://github.com/ViacheslavMezentsev/demo-stm32-cmake/blob/0eaf00af7378ba93d74205d60fc98493b6632f2a/stm32f1xx/03-blink/03-blink.ioc).
+That example uses `STM32F103C8Tx` (the parser strips the trailing `x`); the test
+YAML also exercises the full `STM32F103C8T6` name. The source example uses
+HSE/PLL at 72 MHz. The reduced fixture instead declares HSI at 8 MHz and no PLL
+selection, and uses Cube F1 1.8.7 from the environment lockfile. It is not a
+complete CubeMX project and has not been regenerated in CubeMX. This tests
+configuration parsing, not clocks: the framework does not generate or execute
+`SystemClock_Config`. Later firmware fixtures must explicitly implement HSI
+with PLL disabled and verify that in the simulator.
+
+The author's `stm32f1xx/02-semihosting/.vscode/tasks.json` launches QEMU with
+`-semihosting`; retain that option when designing the later semihosting tests.
+These examples are references, not dependencies downloaded by this suite.
+YAML scalars such as MCU names, paths and `1K` remain unquoted. Quote values
+when YAML syntax or preserving a string type requires it.
 
 Run the full matrix from the repository root after building the image above.
 PowerShell (also works in the VS Code terminal):
@@ -167,8 +199,9 @@ Use a separate `single` directory for each tool pair. The `cd` form is compatibl
 with CMake 3.19. No root `CMakeLists.txt` or consumer-facing presets are added;
 the test entry point is `tests/`.
 
-The matrix writes `summary.json`, CTest logs and per-case `configure.log`, source
-copies, generated files and observed properties under the output directory.
+The matrix writes `summary.json`, CTest logs, source copies and generated files.
+Each case has `step-N/configure.log` and snapshots of the cache, Ninja file,
+compilation database, linker scripts and observed properties for every step.
 Repeated runs retain separate case directories for diagnosis; they consume disk
 space until you remove the generated output. GitHub uploads selected diagnostic
 files as `configure-diagnostics` for 14 days, including when tests fail. Core

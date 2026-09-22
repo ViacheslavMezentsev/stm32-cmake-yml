@@ -41,7 +41,8 @@ jobs:
             build/configure-tests/*/configure-tests.log
             build/configure-tests/*/ctest.log
             build/configure-tests/*/Testing/Temporary/*.log
-            build/configure-tests/*/cases/*/configure.log
+            build/configure-tests/*/cases/*/step-*/*
+            build/configure-tests/*/cases/*/step-*/observed/*.txt
             build/configure-tests/*/cases/*/build/CMakeCache.txt
             build/configure-tests/*/cases/*/build/build.ninja
             build/configure-tests/*/cases/*/build/compile_commands.json
