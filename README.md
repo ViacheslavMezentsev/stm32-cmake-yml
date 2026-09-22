@@ -4,6 +4,8 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Changelog](https://img.shields.io/badge/changelog-CHANGELOG.md-informational.svg)](CHANGELOG.md)
 
+[Дорожная карта / Roadmap](TODO.md)
+
 **`stm32-cmake-yml`** — фреймворк для системы сборки CMake, предназначенный для упрощения разработки проектов под микроконтроллеры STM32. Является высокоуровневой обёрткой над [stm32-cmake](https://github.com/ObKo/stm32-cmake), заменяя сложное конфигурирование `CMakeLists.txt` на один читаемый файл — `stm32_config.yml`.
 
 ## Философия и возможности
@@ -240,8 +242,10 @@ stm32_yml_setup_project(${PROJECT_NAME})
 
 ## Документация
 
-- [Руководство пользователя](docs/user_manual.md) — все параметры `stm32_config.yml`,
-  режимы работы, профили, CRC, Arduino backend, диагностика.
+- **Навигация по документации: [Русский](docs/ru/index.md) · [English](docs/en/index.md).**
+- [Руководство пользователя](docs/user_manual.md) — сценарии использования.
+- Справочник опций 0.9.2: [Русский](docs/ru/reference/0.9.2/index.md) · [English](docs/en/reference/0.9.2/index.md).
+- Известные отклонения и обходы (errata): [Русский](docs/ru/errata/index.md) · [English](docs/en/errata/index.md).
 - [История изменений](CHANGELOG.md)
 - Окружение тестирования: [Русский](docs/ru/testing.md) · [English](docs/en/testing.md).
 
