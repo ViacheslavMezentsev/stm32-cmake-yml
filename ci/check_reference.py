@@ -66,8 +66,9 @@ def main():
         pages += list((base / "reference").rglob("*.md"))
         pages += list((base / "errata").glob("*.md"))
         pages += [base / "index.md", base / "maintenance.md"]
-        pages += [base / name for name in ("getting-started.md", "scenarios.md", "development.md", "repository.md")]
+        pages += [base / name for name in ("getting-started.md", "scenarios.md", "development.md", "repository.md", "simple-sources.md")]
     pages += [ROOT / "skills/stm32-config-manager/SKILL.md"]
+    pages += [ROOT / "skills/stm32-simple-sources/SKILL.md"]
     pages += [ROOT / "TODO.md"]
     pages += [ROOT / "README.md"]
     for page in pages:

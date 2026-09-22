@@ -53,7 +53,7 @@ compile_options: [Wall]
 
 [0.9.2 implementation](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/stm32_yml.cmake) · [Index](index.md)
 
-**Checks (partial coverage):** `configure.defaults-blackpill`. [Test manifest](../../../../tests/cases.json).
+**Checks (partial coverage):** `configure.defaults-blackpill`, `configure.source-directory-target`. [Test manifest](../../../../tests/cases.json).
 
 <a id="compile-definitions"></a>
 ## `compile_definitions`
@@ -70,7 +70,7 @@ compile_definitions: [FEATURE=1]
 
 [0.9.2 implementation](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/stm32_yml.cmake) · [Index](index.md)
 
-**Checks (partial coverage):** `configure.defaults-blackpill`, `configure.baremetal-empty-list`. [Test manifest](../../../../tests/cases.json).
+**Checks (partial coverage):** `configure.defaults-blackpill`, `configure.baremetal-empty-list`, `configure.source-directory-target`. [Test manifest](../../../../tests/cases.json).
 
 <a id="compile-options-c"></a>
 ## `compile_options_c`
@@ -87,7 +87,7 @@ compile_options_c: [Wstrict-prototypes]
 
 [0.9.2 implementation](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/stm32_yml.cmake) · [Index](index.md)
 
-**Checks (partial coverage):** `configure.defaults-blackpill`. [Test manifest](../../../../tests/cases.json).
+**Checks (partial coverage):** `configure.defaults-blackpill`, `configure.source-directory-target`. [Test manifest](../../../../tests/cases.json).
 
 <a id="compile-definitions-c"></a>
 ## `compile_definitions_c`
@@ -104,7 +104,7 @@ compile_definitions_c: [FEATURE=1]
 
 [0.9.2 implementation](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/stm32_yml.cmake) · [Index](index.md)
 
-**Checks (partial coverage):** `configure.defaults-blackpill`. [Test manifest](../../../../tests/cases.json).
+**Checks (partial coverage):** `configure.defaults-blackpill`, `configure.source-directory-target`. [Test manifest](../../../../tests/cases.json).
 
 <a id="compile-options-cxx"></a>
 ## `compile_options_cxx`
@@ -121,7 +121,7 @@ compile_options_cxx: [fno-exceptions]
 
 [0.9.2 implementation](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/stm32_yml.cmake) · [Index](index.md)
 
-**Checks (partial coverage):** `configure.defaults-blackpill`. [Test manifest](../../../../tests/cases.json).
+**Checks (partial coverage):** `configure.defaults-blackpill`, `configure.source-directory-target`. [Test manifest](../../../../tests/cases.json).
 
 <a id="compile-definitions-cxx"></a>
 ## `compile_definitions_cxx`
@@ -138,4 +138,4 @@ compile_definitions_cxx: [FEATURE=1]
 
 [0.9.2 implementation](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/stm32_yml.cmake) · [Index](index.md)
 
-**Checks (partial coverage):** `configure.defaults-blackpill`. [Test manifest](../../../../tests/cases.json).
+**Checks (partial coverage):** `configure.defaults-blackpill`, `configure.source-directory-target`. [Test manifest](../../../../tests/cases.json).

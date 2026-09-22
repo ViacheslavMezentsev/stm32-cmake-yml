@@ -44,13 +44,13 @@ stm32-cmake-yml/
 ## Навыки агентов
 
 - [stm32-config-manager](../../skills/stm32-config-manager/SKILL.md): YAML, reference и errata.
-- [stm32-simple-sources](../../skills/stm32-simple-sources/SKILL.md): следующий кандидат на пересмотр по наблюдаемым командам компиляции.
+- [stm32-simple-sources](../../skills/stm32-simple-sources/SKILL.md): обновлён по наблюдаемым командам компиляции; [руководство](simple-sources.md).
 - [stm32-module-creator](../../skills/stm32-module-creator/SKILL.md): нужны отдельные сценарии зависимостей и передачи флагов библиотекам.
 - [stm32-build-helper](../../skills/stm32-build-helper/SKILL.md): разделить диагностику Configure, компиляции, линковки и исполнения.
 
 Передавайте SKILL.md ассистенту способом, который поддерживает ваш инструмент.
 Инструкция сама по себе не гарантирует совместимость инструмента или правильность
-кода. Кроме config-manager, эти навыки ещё не согласованы с новым справочником.
+кода. Config-manager и simple-sources согласованы со справочником; остальные навыки ещё требуют пересмотра.
 Обновлять их будем постепенно по подтверждённому поведению: Configure-тесты не
 доказывают совместимость ABI, успешную линковку или отсутствие HardFault.
 [Дорожная карта](../../TODO.md).

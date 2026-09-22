@@ -109,8 +109,8 @@ package or the resulting image bytes. Ubuntu snapshots are not required.
 
 ## Framework configuration tests
 
-[tests/cases.json](../../tests/cases.json) defines 39 scenarios, run with each of
-the three GCC and two CMake versions from the lockfile: **234 case executions**.
+[tests/cases.json](../../tests/cases.json) defines 42 scenarios, run with each of
+the three GCC and two CMake versions from the lockfile: **252 case executions**.
 Seven scenarios perform three consecutive configurations in the same build tree.
 
 | Area | Checks |
@@ -229,3 +229,10 @@ Framework code was not changed for these checks.
 
 The VS Code cache-deletion workflow and bare-metal startup responsibilities
 are described in [development](development.md).
+
+### Source integration
+
+Three new cases check a source directory with CMakeLists, shared target ownership
+of nested C/C++ and root C, include paths and language-specific flags in
+compile_commands.json. A missing file warns; a directory without CMakeLists fails
+Configure. [Guide and coverage limits](simple-sources.md).

@@ -28,7 +28,7 @@
 - [x] Исправления MCU, heap/stack и внешнего list слиты в [PR #6](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/pull/6).
 - [x] GitHub: Configure tests и Documentation reference прошли на `48d8248`;
   набор содержит 36 сценариев / 216 запусков.
-- [ ] Обновить статусы E001/E002 и индекс после слияния — подготовлено в текущем PR.
+- [x] Статусы E001/E002 и индекс обновлены в [PR #7](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/pull/7).
   Совместимость `STM32_YML_OVERRIDE_*` описана в документации тестирования и errata.
 
 ### 4. Эталон поведения и документация — параллельно
@@ -39,8 +39,8 @@
 - [ ] Поддерживать карточки, тесты и errata согласованными при изменении поведения.
   Это постоянное правило сопровождения, а не разовая проверка полноты покрытия.
 
-- [ ] Сократить README и вынести подключение/сценарии в RU/EN-документацию;
-  показывать статусы CI и проверяемый численный объём набора — подготовлено в `codex/readme-navigation`.
+- [x] Сократить README и вынести подключение/сценарии в RU/EN-документацию;
+  показывать статусы CI и проверяемый численный объём набора — слито в [PR #8](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/pull/8).
 - [ ] Поэтапно пересмотреть навыки: сначала `stm32-simple-sources` (источники и
   флаги языков), затем `stm32-module-creator` (зависимости и флаги библиотек),
   затем `stm32-build-helper` (раздельные стадии диагностики). Для каждого
@@ -48,8 +48,10 @@
 
 ### 5. Расширение проверок — после стабилизации Configure
 
-- [ ] Текущий PR: три регрессии для `Rev`/`RevB`, пустого override и сброса
-  внешнего профиля; 39 сценариев / 234 запуска.
+- [x] Регрессии `Rev`/`RevB`, пустого override и сброса внешнего профиля слиты
+  в [PR #7](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/pull/7): 39 сценариев / 234 запуска.
+- [ ] Текущий PR: навык simple-sources и три проверки подключения исходников;
+  42 сценария / 252 запуска.
 - [ ] По индексу выбрать следующие пробелы покрытия: отсутствующие/пустые значения,
   приоритеты и ошибки входных данных. Каждый новый контракт — отдельный сценарий.
 - [ ] Отдельными PR разобрать [E004 и E006](docs/ru/errata/index.md):
@@ -96,7 +98,7 @@ keep defect details in errata.
 - [x] MCU, heap/stack and external listing fixes merged in [PR #6](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/pull/6).
 - [x] GitHub Configure tests and Documentation reference passed on `48d8248`;
   36 scenarios / 216 executions.
-- [ ] Update E001/E002 statuses and the index after merge — prepared in this PR.
+- [x] E001/E002 statuses and index updated in [PR #7](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/pull/7).
   `STM32_YML_OVERRIDE_*` compatibility is documented in testing and errata.
 
 ### 4. Behavior contract and documentation — in parallel
@@ -107,8 +109,8 @@ keep defect details in errata.
 - [ ] Keep cards, tests and errata aligned as behavior changes. This is an ongoing
   maintenance rule, not a one-time claim of complete coverage.
 
-- [ ] Shorten README and move setup/scenarios to RU/EN docs; show CI status and
-  validated suite counts — prepared in `codex/readme-navigation`.
+- [x] Shorten README and move setup/scenarios to RU/EN docs; show CI status and
+  validated suite counts — merged in [PR #8](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/pull/8).
 - [ ] Review skills incrementally: `stm32-simple-sources` (sources/language flags),
   then `stm32-module-creator` (library dependencies/flags), then `stm32-build-helper`
   (phase-specific diagnostics). Tie each claim to an existing test or add the
@@ -116,8 +118,10 @@ keep defect details in errata.
 
 ### 5. Further checks — after Configure stabilizes
 
-- [ ] Current PR: three regressions for `Rev`/`RevB`, an empty override and
-  external profile reset; 39 scenarios / 234 executions.
+- [x] `Rev`/`RevB`, empty override and external profile reset regressions merged
+  in [PR #7](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/pull/7): 39 scenarios / 234 executions.
+- [ ] Current PR: simple-sources skill and three source integration checks;
+  42 scenarios / 252 executions.
 - [ ] Use the index to prioritize coverage gaps: missing/empty values, precedence
   and invalid input. Give each new contract a dedicated scenario.
 - [ ] Address [E004 and E006](docs/en/errata/index.md) in separate PRs:
