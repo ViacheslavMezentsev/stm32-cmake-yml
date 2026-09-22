@@ -243,6 +243,7 @@ stm32_yml_setup_project(${PROJECT_NAME})
 - [Руководство пользователя](docs/user_manual.md) — все параметры `stm32_config.yml`,
   режимы работы, профили, CRC, Arduino backend, диагностика.
 - [История изменений](CHANGELOG.md)
+- Окружение тестирования: [Русский](docs/ru/testing.md) · [English](docs/en/testing.md).
 
 ## Работа с AI-ассистентами
 
