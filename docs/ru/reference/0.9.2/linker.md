@@ -9,7 +9,7 @@
 
 `CFG-HEAP-SIZE` · **Тип:** integer bytes / string with K or M · **Default:** IOC / 512 manually
 
-Размер для подстановки в локальный .ld.in. Поддерживаются 0, целые байты, целые K/M в верхнем регистре. В IOC-ветке берётся HEX-поле; неполный IOC требует явного значения. Готовый .ld не переписывается; стандартный linker stm32-cmake не получает эти значения через эту ветку. Дроби фактически не работают. При повторном Configure исходная 0.9.2 сохраняет прежнее значение кэша.
+Размер для подстановки в локальный .ld.in. Поддерживаются 0, целые байты, целые K/M в верхнем регистре. В IOC-ветке берётся HEX-поле; неполный IOC требует явного значения. Готовый .ld не переписывается; стандартный linker stm32-cmake не получает эти значения через эту ветку. Дробные размеры не поддерживаются по контракту (E003). При повторном Configure исходная 0.9.2 сохраняет прежнее значение кэша.
 
 **Пропуск и пустота:** см. [общие правила](semantics.md#empty-values); исключения указаны выше. Профиль/override применяется до выбора defaults. Ограничения backend и путей указаны в описании.
 
@@ -19,7 +19,7 @@ heap_size: 1K
 
 [Реализация 0.9.2](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_linker.cmake) · [Index](index.md)
 
-**Проверки (частичное покрытие):** `configure.linker-template`, `configure.baremetal-no-cube`, `configure.empty-and-null-defaults`. [Test manifest](../../../../tests/cases.json).
+**Проверки (частичное покрытие):** `configure.linker-template`, `configure.baremetal-no-cube`, `configure.empty-and-null-defaults`, `configure.reconfigure-memory`. [Test manifest](../../../../tests/cases.json).
 
 **Errata:** [E001](../../errata/E001.md), [E003](../../errata/E003.md).
 
@@ -28,7 +28,7 @@ heap_size: 1K
 
 `CFG-STACK-SIZE` · **Тип:** integer bytes / string with K or M · **Default:** IOC / 1024 manually
 
-Размер для подстановки в локальный .ld.in. Поддерживаются 0, целые байты, целые K/M в верхнем регистре. В IOC-ветке берётся HEX-поле; неполный IOC требует явного значения. Готовый .ld не переписывается; стандартный linker stm32-cmake не получает эти значения через эту ветку. Дроби фактически не работают. При повторном Configure исходная 0.9.2 сохраняет прежнее значение кэша.
+Размер для подстановки в локальный .ld.in. Поддерживаются 0, целые байты, целые K/M в верхнем регистре. В IOC-ветке берётся HEX-поле; неполный IOC требует явного значения. Готовый .ld не переписывается; стандартный linker stm32-cmake не получает эти значения через эту ветку. Дробные размеры не поддерживаются по контракту (E003). При повторном Configure исходная 0.9.2 сохраняет прежнее значение кэша.
 
 **Пропуск и пустота:** см. [общие правила](semantics.md#empty-values); исключения указаны выше. Профиль/override применяется до выбора defaults. Ограничения backend и путей указаны в описании.
 
@@ -38,7 +38,7 @@ stack_size: 1K
 
 [Реализация 0.9.2](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_linker.cmake) · [Index](index.md)
 
-**Проверки (частичное покрытие):** `configure.linker-template`, `configure.baremetal-no-cube`, `configure.empty-and-null-defaults`. [Test manifest](../../../../tests/cases.json).
+**Проверки (частичное покрытие):** `configure.linker-template`, `configure.baremetal-no-cube`, `configure.empty-and-null-defaults`, `configure.reconfigure-memory`. [Test manifest](../../../../tests/cases.json).
 
 **Errata:** [E001](../../errata/E001.md), [E003](../../errata/E003.md).
 

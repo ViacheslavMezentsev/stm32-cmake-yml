@@ -189,11 +189,35 @@
     "error": "Указанный .ioc файл не найден"
   },
   {
+    "name": "external-list-profiles",
+    "args": ["-DPROJECT_CONFIG_FILE=external.yml", "-DSTM32_YML_PROFILE=list"],
+    "error": "Передайте -DSTM32_YML_PROFILE=<имя>",
+    "log_contains": ["- external"]
+  },
+  {
     "name": "reconfigure-profile-lists",
     "steps": [
       {"args": ["-DSTM32_YML_PROFILE=append"], "sources": ["main.c", "helper.cpp", "extra.c"], "properties": {"COMPILE_DEFINITIONS": ["BASE=1", "APPENDED=1"]}},
       {"args": ["-DSTM32_YML_PROFILE=replace"], "sources": ["main.c", "extra.c"], "properties": {"COMPILE_DEFINITIONS": ["REPLACED=1", "AFTER_REPLACE=1"]}, "absent_properties": {"COMPILE_DEFINITIONS": ["BASE=1", "APPENDED=1"]}},
       {"args": ["-DSTM32_YML_PROFILE="], "sources": ["main.c", "helper.cpp"], "properties": {"COMPILE_DEFINITIONS": ["BASE=1"]}, "absent_properties": {"COMPILE_DEFINITIONS": ["APPENDED=1", "REPLACED=1", "AFTER_REPLACE=1"]}}
+    ]
+  },
+  {
+    "name": "reconfigure-memory",
+    "args": ["-DPROJECT_CONFIG_FILE=baremetal.yml"],
+    "no_st_dependencies": true,
+    "steps": [
+      {"args": ["-DSTM32_YML_PROFILE=sized"], "linker": {"file": "STM32F103C8_FLASH.ld", "heap": 512, "stack": 2048}},
+      {"args": ["-DSTM32_YML_PROFILE="], "linker": {"file": "STM32F103C8_FLASH.ld", "heap": 0, "stack": 1024}},
+      {"args": ["-DSTM32_YML_PROFILE=sized"], "linker": {"file": "STM32F103C8_FLASH.ld", "heap": 512, "stack": 2048}}
+    ]
+  },
+  {
+    "name": "reconfigure-mcu",
+    "steps": [
+      {"args": ["-DSTM32_YML_PROFILE="], "observed": {"MCU": "STM32F411CE"}},
+      {"args": ["-DSTM32_YML_PROFILE=bluepill"], "observed": {"MCU": "STM32F103C8"}, "properties": {"COMPILE_DEFINITIONS": ["STM32F103xB"]}},
+      {"args": ["-DSTM32_YML_PROFILE="], "observed": {"MCU": "STM32F411CE"}, "properties": {"COMPILE_DEFINITIONS": ["STM32F411xE"]}, "absent_properties": {"COMPILE_DEFINITIONS": ["STM32F103xB"]}}
     ]
   },
   {

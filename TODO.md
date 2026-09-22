@@ -35,9 +35,9 @@
 
 ### 4. Эталон поведения и документация — параллельно
 
-- [ ] Слить `codex/configuration-reference` (`5f47d66`): навигация RU/EN,
-  55 карточек опций 0.9.2, шесть errata, индекс покрытия, CI и обновлённый навык.
-  По сообщению владельца, проверка и слияние находятся в процессе.
+- [x] Справочник, навигация RU/EN, индекс покрытия, CI и навык —
+  [PR #4](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/pull/4).
+- [x] Дорожная карта — [PR #5](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/pull/5).
 - [ ] Поддерживать карточки, тесты и errata согласованными при изменении поведения.
   Это постоянное правило сопровождения, а не разовая проверка полноты покрытия.
 
@@ -45,9 +45,13 @@
 
 - [ ] По индексу выбрать следующие пробелы покрытия: отсутствующие/пустые значения,
   приоритеты и ошибки входных данных. Каждый новый контракт — отдельный сценарий.
-- [ ] Отдельными PR разобрать [E003–E006](docs/ru/errata/index.md): размеры,
-  имена профилей, выбор алгоритма CRC и обработка ошибок CRC.
+- [ ] Отдельными PR разобрать [E004 и E006](docs/ru/errata/index.md):
+  выбор алгоритма CRC и обработку ошибок CRC.
   Для каждого исправления сначала зафиксировать ожидаемое поведение и регрессию.
+- [x] Уточнить контракт с автором: E003/E005 закрыты как ограничения по замыслу.
+  Дробные K/M и `_` в именах профилей не поддерживаются; расширение не планируется.
+- [ ] Перед подготовкой и сборкой тестовых прошивок уведомить автора и дождаться
+  его уточнений по сценариям и заведомо рабочим примерам. До этого — Configure/Generate.
 - [ ] Подготовить отдельное окружение эмуляции: сборка QEMU 11 из закреплённых
   исходников и закреплённая версия Renode. Проверить доступность версий при реализации.
 - [ ] Добавить минимальные прошивки: semihosting, bare metal и blink на HSI без PLL.
@@ -92,9 +96,9 @@ keep defect details in errata.
 
 ### 4. Behavior contract and documentation — in parallel
 
-- [ ] Merge `codex/configuration-reference` (`5f47d66`): RU/EN navigation,
-  55 option cards for 0.9.2, six errata, coverage index, CI and updated skill.
-  The owner reports that testing and merging are in progress.
+- [x] Reference, RU/EN navigation, coverage index, CI and skill —
+  [PR #4](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/pull/4).
+- [x] Roadmap — [PR #5](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/pull/5).
 - [ ] Keep cards, tests and errata aligned as behavior changes. This is an ongoing
   maintenance rule, not a one-time claim of complete coverage.
 
@@ -102,9 +106,13 @@ keep defect details in errata.
 
 - [ ] Use the index to prioritize coverage gaps: missing/empty values, precedence
   and invalid input. Give each new contract a dedicated scenario.
-- [ ] Address [E003–E006](docs/en/errata/index.md) in separate PRs: sizes, profile
-  names, CRC algorithm selection and CRC error handling. Establish expected
+- [ ] Address [E004 and E006](docs/en/errata/index.md) in separate PRs:
+  CRC algorithm selection and CRC error handling. Establish expected
   behavior and a regression before each fix.
+- [x] Clarify the contract with the author: E003/E005 are closed by design.
+  Fractional K/M and `_` in profile names are unsupported; expansion is not planned.
+- [ ] Before preparing or building test firmware, notify the author and wait for
+  scenario guidance and known-working examples. Until then, stay with Configure/Generate.
 - [ ] Prepare a separate emulation environment: QEMU 11 built from pinned sources
   and a pinned Renode version. Verify version availability at implementation time.
 - [ ] Add minimal firmware: semihosting, bare metal and blink using HSI without

@@ -275,7 +275,9 @@ function(stm32_yml_prepare_project_data OUT_PROJECT_NAME_VAR OUT_LANGUAGES_VAR)
     set(CMAKE_C_STANDARD ${c_standard} PARENT_SCOPE)
     set(CMAKE_CXX_STANDARD ${cpp_standard} PARENT_SCOPE)
 
-    set(MCU ${mcu} CACHE STRING "Target STM32 microcontroller")
+    # Это производное значение конфигурации, а не независимый override.
+    # Без FORCE смена профиля оставляет в кэше MCU от предыдущей настройки.
+    set(MCU ${mcu} CACHE STRING "Target STM32 microcontroller" FORCE)
 
     # Сравнение без разыменования: пустое значение project_name (например, когда
     # .ioc не содержит ProjectManager.ProjectName) сломало бы синтаксис if().

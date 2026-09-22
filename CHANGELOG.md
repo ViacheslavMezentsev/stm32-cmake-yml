@@ -5,6 +5,20 @@
 
 ---
 
+## [Unreleased]
+
+### Исправлено / Fixed
+
+- При смене профиля в одной build-папке обновляются MCU и размеры heap/stack
+  локального linker template; старые производные значения больше не остаются в
+  CMakeCache. Для явных overrides используются `STM32_YML_OVERRIDE_mcu`,
+  `STM32_YML_OVERRIDE_heap_size` и `STM32_YML_OVERRIDE_stack_size`.
+  Switching profiles now refreshes derived MCU and local linker-template memory
+  values. Direct `MCU`/`HEAP_SIZE`/`STACK_SIZE` cache overrides are superseded by
+  the resolved configuration; use the `STM32_YML_OVERRIDE_*` inputs instead.
+- `STM32_YML_PROFILE=list` читает `profiles_file` так же, как выбор профиля.
+  Profile listing now reads the external profile file as profile selection does.
+
 ## [0.9.2] - 2026-09-19
 
 ### Исправлено
