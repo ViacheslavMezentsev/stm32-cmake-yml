@@ -25,3 +25,11 @@ profiles:
   sized:
     heap_size: 512
     stack_size: 2K
+  Rev:
+    stack_size: 2K
+    compile_definitions: [REV=1]
+    sources: [main.c]
+  RevB:
+    stack_size: 4K
+    compile_definitions: [REVB=1]
+    sources: [main.c, extra.c]
