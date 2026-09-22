@@ -19,7 +19,7 @@ sources: [main.c, helper.cpp]
 
 [0.9.2 implementation](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_sources.cmake) · [Index](index.md)
 
-**Checks (partial coverage):** `configure.profile-append`, `configure.profile-replace-and-append`, `configure.reconfigure-profile-lists`. [Test manifest](../../../../tests/cases.json).
+**Checks (partial coverage):** `configure.profile-append`, `configure.profile-replace-and-append`, `configure.reconfigure-profile-lists`, `configure.source-directory-target`, `configure.source-missing-warning`, `configure.source-directory-requires-cmake`. [Test manifest](../../../../tests/cases.json).
 
 <a id="include-directories"></a>
 ## `include_directories`

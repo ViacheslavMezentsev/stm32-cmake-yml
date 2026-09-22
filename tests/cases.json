@@ -264,5 +264,93 @@
       {"args": ["-DSTM32_YML_PROFILE="], "observed": {"stack_size": "1024"}, "properties": {"COMPILE_DEFINITIONS": ["BASE=1"]}, "absent_properties": {"COMPILE_DEFINITIONS": ["EXTERNAL=1"]}},
       {"args": ["-DSTM32_YML_PROFILE=external"], "observed": {"stack_size": "4096"}, "properties": {"COMPILE_DEFINITIONS": ["BASE=1", "EXTERNAL=1"]}}
     ]
+  },
+  {
+    "name": "source-directory-target",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=source-group.yml"
+    ],
+    "no_st_dependencies": true,
+    "sources": [
+      "SourceGroup/Src/probe.c",
+      "SourceGroup/Src/probe.cpp",
+      "main.c"
+    ],
+    "command_checks": [
+      {
+        "file": "main.c",
+        "target": "source_group_probe",
+        "includes": [
+          "SourceGroup/Inc"
+        ],
+        "present": [
+          "-Wall",
+          "-DCOMMON_SOURCE=1",
+          "-Wstrict-prototypes",
+          "-DC_SOURCE=1"
+        ],
+        "absent": [
+          "-fno-exceptions",
+          "-DCXX_SOURCE=1"
+        ]
+      },
+      {
+        "file": "SourceGroup/Src/probe.c",
+        "target": "source_group_probe",
+        "includes": [
+          "SourceGroup/Inc"
+        ],
+        "present": [
+          "-Wall",
+          "-DCOMMON_SOURCE=1",
+          "-Wstrict-prototypes",
+          "-DC_SOURCE=1"
+        ],
+        "absent": [
+          "-fno-exceptions",
+          "-DCXX_SOURCE=1"
+        ]
+      },
+      {
+        "file": "SourceGroup/Src/probe.cpp",
+        "target": "source_group_probe",
+        "includes": [
+          "SourceGroup/Inc"
+        ],
+        "present": [
+          "-Wall",
+          "-DCOMMON_SOURCE=1",
+          "-fno-exceptions",
+          "-DCXX_SOURCE=1"
+        ],
+        "absent": [
+          "-Wstrict-prototypes",
+          "-DC_SOURCE=1"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "source-missing-warning",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=source-group.yml",
+      "-DSTM32_YML_PROFILE=missing"
+    ],
+    "log_contains": [
+      "Источник 'absent.c' не найден и будет проигнорирован."
+    ],
+    "sources": [
+      "SourceGroup/Src/probe.c",
+      "SourceGroup/Src/probe.cpp",
+      "main.c"
+    ]
+  },
+  {
+    "name": "source-directory-requires-cmake",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=source-group.yml",
+      "-DSTM32_YML_PROFILE=nodirectorycmake"
+    ],
+    "error": "does not contain a CMakeLists.txt file"
   }
 ]
