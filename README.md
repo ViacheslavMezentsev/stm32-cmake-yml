@@ -240,8 +240,10 @@ stm32_yml_setup_project(${PROJECT_NAME})
 
 ## Документация
 
-- [Руководство пользователя](docs/user_manual.md) — все параметры `stm32_config.yml`,
-  режимы работы, профили, CRC, Arduino backend, диагностика.
+- **Навигация по документации: [Русский](docs/ru/index.md) · [English](docs/en/index.md).**
+- [Руководство пользователя](docs/user_manual.md) — сценарии использования.
+- Справочник опций 0.9.2: [Русский](docs/ru/reference/0.9.2/index.md) · [English](docs/en/reference/0.9.2/index.md).
+- Известные отклонения и обходы (errata): [Русский](docs/ru/errata/index.md) · [English](docs/en/errata/index.md).
 - [История изменений](CHANGELOG.md)
 - Окружение тестирования: [Русский](docs/ru/testing.md) · [English](docs/en/testing.md).
 
