@@ -11,6 +11,7 @@
 | Find a defect and workaround | [Errata](errata/index.md) |
 | Run checks | [Testing](testing.md) |
 | Compare versions | [Changelog](../../CHANGELOG.md) |
+| Find planned work and status | [RU/EN roadmap](../../TODO.md) |
 | Work with an AI agent | [stm32-config-manager](../../skills/stm32-config-manager/SKILL.md) |
 
 Option cards describe purpose, types, defaults, limits, implementation, checks
