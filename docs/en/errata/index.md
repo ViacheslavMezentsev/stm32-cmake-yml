@@ -2,12 +2,12 @@
 
 [Documentation](../index.md) → Errata · [Русский](../../ru/errata/index.md)
 
-Applies to baseline `f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0`. Status audited 2026-09-22. Fixed in a prepared commit does not mean merged or released. Entries remain after fixes.
+Applies to baseline `f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0`. Status audited 2026-09-23. Fixed in a prepared commit does not mean merged or released. Entries remain after fixes.
 
 | ID | Deviation | Status |
 | --- | --- | --- |
-| [E001](E001.md) | Derived values remain stale in cache | Fix prepared, not merged |
-| [E002](E002.md) | list does not read external profiles | Fix prepared, not merged |
+| [E001](E001.md) | Derived values remain stale in cache | [PR #6](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/pull/6), merged; release unknown |
+| [E002](E002.md) | list does not read external profiles | [PR #6](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/pull/6), merged; release unknown |
 | [E003](E003.md) | Integer sizes only | Closed: by design |
 | [E004](E004.md) | crc_algorithm does not select an algorithm | Open |
 | [E005](E005.md) | Profile names without `_` | Closed: by design |

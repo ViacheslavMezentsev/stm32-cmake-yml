@@ -235,5 +235,34 @@
     "observed": {"use_cmsis": "false", "heap_size": "0"},
     "no_st_dependencies": true,
     "linker": {"file": "STM32F103C8_FLASH.ld", "heap": 0, "stack": 1536}
+  },
+  {
+    "name": "reconfigure-profile-name-boundaries",
+    "args": ["-DPROJECT_CONFIG_FILE=baremetal.yml"],
+    "no_st_dependencies": true,
+    "steps": [
+      {"args": ["-DSTM32_YML_PROFILE=Rev"], "sources": ["main.c"], "properties": {"COMPILE_DEFINITIONS": ["REV=1"]}, "absent_properties": {"COMPILE_DEFINITIONS": ["REVB=1", "BAREMETAL=1"]}, "linker": {"file": "STM32F103C8_FLASH.ld", "heap": 0, "stack": 2048}},
+      {"args": ["-DSTM32_YML_PROFILE=RevB"], "sources": ["main.c", "extra.c"], "properties": {"COMPILE_DEFINITIONS": ["REVB=1"]}, "absent_properties": {"COMPILE_DEFINITIONS": ["REV=1", "BAREMETAL=1"]}, "linker": {"file": "STM32F103C8_FLASH.ld", "heap": 0, "stack": 4096}},
+      {"args": ["-DSTM32_YML_PROFILE=Rev"], "sources": ["main.c"], "properties": {"COMPILE_DEFINITIONS": ["REV=1"]}, "absent_properties": {"COMPILE_DEFINITIONS": ["REVB=1", "BAREMETAL=1"]}, "linker": {"file": "STM32F103C8_FLASH.ld", "heap": 0, "stack": 2048}}
+    ]
+  },
+  {
+    "name": "reconfigure-empty-override",
+    "args": ["-DPROJECT_CONFIG_FILE=baremetal.yml", "-DSTM32_YML_PROFILE=sized"],
+    "no_st_dependencies": true,
+    "steps": [
+      {"args": ["-DSTM32_YML_OVERRIDE_stack_size=4096"], "linker": {"file": "STM32F103C8_FLASH.ld", "heap": 512, "stack": 4096}},
+      {"args": ["-DSTM32_YML_OVERRIDE_stack_size="], "linker": {"file": "STM32F103C8_FLASH.ld", "heap": 512, "stack": 2048}},
+      {"linker": {"file": "STM32F103C8_FLASH.ld", "heap": 512, "stack": 2048}}
+    ]
+  },
+  {
+    "name": "reconfigure-external-profile-reset",
+    "args": ["-DPROJECT_CONFIG_FILE=external.yml"],
+    "steps": [
+      {"args": ["-DSTM32_YML_PROFILE=external"], "observed": {"stack_size": "4096"}, "properties": {"COMPILE_DEFINITIONS": ["BASE=1", "EXTERNAL=1"]}},
+      {"args": ["-DSTM32_YML_PROFILE="], "observed": {"stack_size": "1024"}, "properties": {"COMPILE_DEFINITIONS": ["BASE=1"]}, "absent_properties": {"COMPILE_DEFINITIONS": ["EXTERNAL=1"]}},
+      {"args": ["-DSTM32_YML_PROFILE=external"], "observed": {"stack_size": "4096"}, "properties": {"COMPILE_DEFINITIONS": ["BASE=1", "EXTERNAL=1"]}}
+    ]
   }
 ]
