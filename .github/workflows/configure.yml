@@ -1,0 +1,52 @@
+name: Configure tests
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: configure-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  configure:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Build test environment
+        run: docker build --platform linux/amd64 --progress plain -f ci/docker/Dockerfile -t stm32-yml-ci:check .
+      - name: Configure with all GCC and CMake versions offline
+        run: |
+          mkdir -p build/configure-tests
+          docker run --rm --network none \
+            --user "$(id -u):$(id -g)" \
+            --mount "type=bind,source=$PWD,target=/workspace,readonly" \
+            --mount "type=bind,source=$PWD/build/configure-tests,target=/results" \
+            stm32-yml-ci:check python3 /workspace/ci/run_configure_tests.py --output /results
+      - name: Upload configure diagnostics
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: configure-diagnostics
+          retention-days: 14
+          if-no-files-found: warn
+          path: |
+            build/configure-tests/summary.json
+            build/configure-tests/*/configure-tests.log
+            build/configure-tests/*/ctest.log
+            build/configure-tests/*/Testing/Temporary/*.log
+            build/configure-tests/*/cases/*/configure.log
+            build/configure-tests/*/cases/*/build/CMakeCache.txt
+            build/configure-tests/*/cases/*/build/build.ninja
+            build/configure-tests/*/cases/*/build/compile_commands.json
+            build/configure-tests/*/cases/*/build/observed/*.txt
+            build/configure-tests/*/cases/*/build/*.ld
+            build/configure-tests/*/cases/*/build/CMakeFiles/CMakeConfigureLog.yaml
+            build/configure-tests/*/cases/*/build/CMakeFiles/CMakeOutput.log
+            build/configure-tests/*/cases/*/build/CMakeFiles/CMakeError.log

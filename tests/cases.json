@@ -1,0 +1,120 @@
+[
+  {
+    "name": "defaults-blackpill",
+    "observed": {"MCU": "STM32F411CE", "heap_size": "512", "stack_size": "1024", "crc_enable": "FALSE", "CMAKE_C_STANDARD": "11", "CMAKE_CXX_STANDARD": "17"},
+    "properties": {"COMPILE_DEFINITIONS": ["BASE=1", "STM32F411xE", "USE_HAL_DRIVER"], "LINK_LIBRARIES": ["HAL::STM32::F4::GPIO", "CMSIS::STM32::F411CE", "STM32::NoSys"]},
+    "sources": ["main.c", "helper.cpp"],
+    "language_flags": true,
+    "crc_command": false
+  },
+  {
+    "name": "profile-append",
+    "args": ["-DSTM32_YML_PROFILE=append"],
+    "observed": {"MCU": "STM32F411CE", "stack_size": "2K"},
+    "properties": {"COMPILE_DEFINITIONS": ["BASE=1", "APPENDED=1"]},
+    "sources": ["main.c", "helper.cpp", "extra.c"]
+  },
+  {
+    "name": "profile-replace-and-append",
+    "args": ["-DSTM32_YML_PROFILE=replace"],
+    "properties": {"COMPILE_DEFINITIONS": ["REPLACED=1", "AFTER_REPLACE=1"]},
+    "absent_properties": {"COMPILE_DEFINITIONS": ["BASE=1"]},
+    "sources": ["main.c", "extra.c"]
+  },
+  {
+    "name": "override-over-profile",
+    "args": ["-DSTM32_YML_PROFILE=append", "-DSTM32_YML_OVERRIDE_stack_size=4096"],
+    "observed": {"stack_size": "4096"},
+    "properties": {"COMPILE_DEFINITIONS": ["BASE=1", "APPENDED=1"]}
+  },
+  {
+    "name": "external-profile",
+    "args": ["-DPROJECT_CONFIG_FILE=external.yml", "-DSTM32_YML_PROFILE=external"],
+    "observed": {"PROJECT_NAME": "external_probe", "stack_size": "4096", "use_hal": "FALSE"},
+    "properties": {"COMPILE_DEFINITIONS": ["BASE=1", "EXTERNAL=1"]},
+    "absent_properties": {"COMPILE_DEFINITIONS": ["USE_HAL_DRIVER"]},
+    "sources": ["main.c"]
+  },
+  {
+    "name": "linker-template",
+    "args": ["-DSTM32_YML_PROFILE=template"],
+    "linker": {"heap": 1024, "stack": 2048}
+  },
+  {
+    "name": "explicit-linker",
+    "args": ["-DSTM32_YML_OVERRIDE_linker_script=custom.ld", "-DSTM32_YML_OVERRIDE_linker_script_dir=linker"],
+    "link_options_contain": "linker/custom.ld"
+  },
+  {
+    "name": "crc-command-generation",
+    "args": ["-DSTM32_YML_PROFILE=crc"],
+    "observed": {"crc_enable": "TRUE"},
+    "linker": {"heap": 512, "stack": 1024},
+    "crc_command": true
+  },
+  {
+    "name": "bluepill",
+    "args": ["-DSTM32_YML_PROFILE=bluepill"],
+    "observed": {"MCU": "STM32F103C8"},
+    "properties": {"COMPILE_DEFINITIONS": ["STM32F103xB"], "LINK_LIBRARIES": ["HAL::STM32::F1::GPIO", "CMSIS::STM32::F103C8"]}
+  },
+  {
+    "name": "arduino-defaults",
+    "backend": "arduino",
+    "observed": {"toolchain_backend": "arduino", "MCU_TARGET": "F411", "USE_CORE_MAIN": "FALSE"},
+    "properties": {"LINK_LIBRARIES": ["Arduino::Core", "Arduino::Probe"]},
+    "linker": {"heap": 512, "stack": 1024},
+    "arduino_definitions": ["ARDUINO_BASE=1"]
+  },
+  {
+    "name": "arduino-profile",
+    "backend": "arduino",
+    "args": ["-DSTM32_YML_PROFILE=custom"],
+    "observed": {"MCU_TARGET": "F411_CUSTOM", "USE_CORE_MAIN": "FALSE"},
+    "linker": {"heap": 512, "stack": 2048},
+    "arduino_definitions": ["ARDUINO_BASE=1", "ARDUINO_PROFILE=1"]
+  },
+  {
+    "name": "unknown-profile-warning",
+    "args": ["-DSTM32_YML_PROFILE=unknown"],
+    "log_contains": ["Профиль 'unknown' не найден"],
+    "properties": {"COMPILE_DEFINITIONS": ["BASE=1"]}
+  },
+  {
+    "name": "list-profiles",
+    "args": ["-DSTM32_YML_PROFILE=list"],
+    "error": "Передайте -DSTM32_YML_PROFILE=<имя>",
+    "log_contains": ["- append", "- replace", "- template", "- crc", "- bluepill"]
+  },
+  {
+    "name": "missing-config",
+    "args": ["-DPROJECT_CONFIG_FILE=does-not-exist.yml"],
+    "error": "Файл конфигурации не найден"
+  },
+  {
+    "name": "malformed-yaml",
+    "args": ["-DPROJECT_CONFIG_FILE=malformed.yml"],
+    "error": "Ошибка при конвертации"
+  },
+  {
+    "name": "missing-linker",
+    "args": ["-DSTM32_YML_OVERRIDE_linker_script=missing.ld"],
+    "error": "Указанный скрипт компоновщика не найден"
+  },
+  {
+    "name": "hal-requires-cmsis",
+    "args": ["-DSTM32_YML_OVERRIDE_use_cmsis=false"],
+    "error": "use_hal: true требует use_cmsis: true"
+  },
+  {
+    "name": "invalid-memory-size",
+    "args": ["-DSTM32_YML_PROFILE=template", "-DSTM32_YML_OVERRIDE_stack_size=invalid"],
+    "error": "Недопустимый формат размера памяти"
+  },
+  {
+    "name": "arduino-missing-core",
+    "backend": "arduino",
+    "args": ["-DSTM32_YML_OVERRIDE_arduino_core_path=missing-core"],
+    "error": "Папка Arduino Core STM32 не найдена"
+  }
+]
