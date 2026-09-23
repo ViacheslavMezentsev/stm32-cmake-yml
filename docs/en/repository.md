@@ -17,13 +17,13 @@ manual remains at [docs/user_manual.md](../user_manual.md).
 | --- | --- |
 | [stm32-config-manager](../../skills/stm32-config-manager/SKILL.md) | YAML configuration guided by the shared reference and errata |
 | [stm32-simple-sources](../../skills/stm32-simple-sources/SKILL.md) | Source integration verified through compile commands; [guide](simple-sources.md) |
-| [stm32-module-creator](../../skills/stm32-module-creator/SKILL.md) | Consumer library modules; needs dedicated dependency/flag propagation scenarios |
+| [stm32-module-creator](../../skills/stm32-module-creator/SKILL.md) | Consumer libraries verified through dependency/flag scenarios; [guide](modules.md) |
 | [stm32-build-helper](../../skills/stm32-build-helper/SKILL.md) | Diagnostics; separate Configure, compile, link and runtime evidence |
 
 Pass the relevant SKILL.md to an assistant using the mechanism supported by your
 tool. Reading instructions does not guarantee tool compatibility or correct code.
-Config-manager and simple-sources are aligned with the reference; the remaining
-skills still need review. Update them incrementally using demonstrated behavior; current Configure
+Config-manager, simple-sources and module-creator are aligned with the reference;
+build-helper still needs review. Update them incrementally using demonstrated behavior; current Configure
 tests do not establish ABI compatibility, successful linking or runtime correctness.
 See the [roadmap](../../TODO.md) and [maintenance rules](maintenance.md).
 

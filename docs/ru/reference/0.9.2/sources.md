@@ -19,7 +19,7 @@ sources: [main.c, helper.cpp]
 
 [Реализация 0.9.2](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_sources.cmake) · [Index](index.md)
 
-**Проверки (частичное покрытие):** `configure.profile-append`, `configure.profile-replace-and-append`, `configure.reconfigure-profile-lists`, `configure.source-directory-target`, `configure.source-missing-warning`, `configure.source-directory-requires-cmake`. [Test manifest](../../../../tests/cases.json).
+**Проверки (частичное покрытие):** `configure.profile-append`, `configure.profile-replace-and-append`, `configure.reconfigure-profile-lists`, `configure.source-directory-target`, `configure.source-missing-warning`, `configure.source-directory-requires-cmake`, `configure.module-explicit-link`, `configure.module-not-auto-linked`, `configure.module-missing-target`. [Test manifest](../../../../tests/cases.json).
 
 <a id="include-directories"></a>
 ## `include_directories`
@@ -70,4 +70,4 @@ link_libraries: [Arduino::Core, Arduino::Probe]
 
 [Реализация 0.9.2](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/stm32_yml.cmake) · [Index](index.md)
 
-**Проверки (частичное покрытие):** `configure.arduino-defaults`. [Test manifest](../../../../tests/cases.json).
+**Проверки (частичное покрытие):** `configure.arduino-defaults`, `configure.module-explicit-link`, `configure.module-not-auto-linked`, `configure.module-missing-target`. [Test manifest](../../../../tests/cases.json).

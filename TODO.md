@@ -54,7 +54,10 @@ PR больше не требуются; старые ссылки остают�
   в [PR #7](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/pull/7): 39 сценариев / 234 запуска.
 - [x] Навык simple-sources и три проверки подключения исходников слиты в main
   (`8e7411b`); 42 сценария / 252 запуска, CI main прошёл.
-- [ ] Следующая ветка: stm32-module-creator и конфигурационные проверки библиотек.
+- [x] Процесс без PR слит: `main` на `12cdd56`, проверки CI успешны.
+- [ ] Текущая ветка `codex/module-creator-skill`: навык и три проверки библиотек;
+  45 сценариев / 270 запусков.
+- [ ] Следующая ветка: stm32-build-helper и границы диагностических рекомендаций.
 - [ ] По индексу выбрать следующие пробелы покрытия: отсутствующие/пустые значения,
   приоритеты и ошибки входных данных. Каждый новый контракт — отдельный сценарий.
 - [ ] Отдельными PR разобрать [E004 и E006](docs/ru/errata/index.md):
@@ -127,7 +130,10 @@ keep defect details in errata.
   in [PR #7](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/pull/7): 39 scenarios / 234 executions.
 - [x] Simple-sources skill and three source integration checks merged into main
   (`8e7411b`); 42 scenarios / 252 executions, main CI passed.
-- [ ] Next branch: stm32-module-creator and library configuration checks.
+- [x] Branch workflow without PRs merged: main `12cdd56`, CI successful.
+- [ ] Current branch `codex/module-creator-skill`: skill and three library checks;
+  45 scenarios / 270 executions.
+- [ ] Next branch: stm32-build-helper and limits of diagnostic guidance.
 - [ ] Use the index to prioritize coverage gaps: missing/empty values, precedence
   and invalid input. Give each new contract a dedicated scenario.
 - [ ] Address [E004 and E006](docs/en/errata/index.md) in separate PRs:
