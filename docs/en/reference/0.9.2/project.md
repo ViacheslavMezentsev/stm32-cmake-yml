@@ -11,7 +11,7 @@ Shared rules: [semantics](semantics.md). Baseline: `f8ef5200fc7a4a96d6f3fe9111af
 
 Version the YAML targets. Set it explicitly; it does not select framework code. Missing/mismatched versions produce warnings, not a configuration prohibition.
 
-**Omission and emptiness:** see [shared rules](semantics.md#empty-values); exceptions are stated above. Profiles/overrides apply before defaults. Backend/path restrictions are stated in the description.
+**Processing order:** version comparison runs immediately after YAML loading, **before** profiles and `STM32_YML_OVERRIDE_*`. Changing these two options through a profile/override cannot change diagnostics already emitted. Set them at the YAML root. Missing or empty versions warn when checking is enabled; configuration continues. An omitted or empty switch defaults to `true` (the empty switch is not separately tested).
 
 ```yaml
 stm32_cmake_yml_version: 0.9.2
@@ -19,7 +19,7 @@ stm32_cmake_yml_version: 0.9.2
 
 [0.9.2 implementation](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_config.cmake) · [Index](index.md)
 
-**Checks (partial coverage):** no automated check of this contract. [Test manifest](../../../../tests/cases.json).
+**Checks (partial coverage):** `configure.version-equal`, `configure.version-missing`, `configure.version-empty`, `configure.version-older`, `configure.version-newer`, `configure.version-disabled`, `configure.version-before-profile`, `configure.version-before-override`. [Test manifest](../../../../tests/cases.json).
 
 <a id="stm32-cmake-yml-version-check"></a>
 ## `stm32_cmake_yml_version_check`
@@ -28,7 +28,7 @@ stm32_cmake_yml_version: 0.9.2
 
 Enables configuration-version warnings. false disables comparison; the framework banner remains.
 
-**Omission and emptiness:** see [shared rules](semantics.md#empty-values); exceptions are stated above. Profiles/overrides apply before defaults. Backend/path restrictions are stated in the description.
+**Processing order:** version comparison runs immediately after YAML loading, **before** profiles and `STM32_YML_OVERRIDE_*`. Changing these two options through a profile/override cannot change diagnostics already emitted. Set them at the YAML root. Missing or empty versions warn when checking is enabled; configuration continues. An omitted or empty switch defaults to `true` (the empty switch is not separately tested).
 
 ```yaml
 stm32_cmake_yml_version_check: true
@@ -36,7 +36,7 @@ stm32_cmake_yml_version_check: true
 
 [0.9.2 implementation](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_config.cmake) · [Index](index.md)
 
-**Checks (partial coverage):** no automated check of this contract. [Test manifest](../../../../tests/cases.json).
+**Checks (partial coverage):** `configure.version-equal`, `configure.version-missing`, `configure.version-empty`, `configure.version-older`, `configure.version-newer`, `configure.version-disabled`, `configure.version-before-profile`, `configure.version-before-override`. [Test manifest](../../../../tests/cases.json).
 
 <a id="toolchain-backend"></a>
 ## `toolchain_backend`

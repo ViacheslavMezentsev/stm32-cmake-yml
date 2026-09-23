@@ -1,0 +1,17 @@
+# Configure-only version diagnostic fixture.
+stm32_cmake_yml_version: 0.9.1
+project_name: baremetal_probe
+mcu: STM32F103C8T6
+languages: [C, ASM]
+sources: [main.c]
+use_cmsis: false
+use_hal: false
+use_freertos: false
+use_newlib_nano: false
+crc_enable: false
+heap_size: 0
+stack_size: 1K
+linker_script_dir: linker
+compile_options: [mcpu=cortex-m3, mthumb]
+compile_definitions: [BAREMETAL=1]
+include_directories: []

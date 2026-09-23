@@ -43,7 +43,7 @@ PR больше не требуются; старые ссылки остают�
 
 - [x] Сократить README и вынести подключение/сценарии в RU/EN-документацию;
   показывать статусы CI и проверяемый численный объём набора — слито в [PR #8](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/pull/8).
-- [ ] Поэтапно пересмотреть навыки: сначала `stm32-simple-sources` (источники и
+- [x] Поэтапно пересмотреть навыки: сначала `stm32-simple-sources` (источники и
   флаги языков), затем `stm32-module-creator` (зависимости и флаги библиотек),
   затем `stm32-build-helper` (раздельные стадии диагностики). Для каждого
   утверждения указывать существующий тест или сначала добавлять необходимую проверку.
@@ -57,13 +57,15 @@ PR больше не требуются; старые ссылки остают�
 - [x] Процесс без PR слит: `main` на `12cdd56`, проверки CI успешны.
 - [x] `codex/module-creator-skill` слита в main (`7b197ce`): навык и три проверки
   библиотек; 45 сценариев / 270 запусков.
-- [ ] Текущая ветка `codex/build-helper-skill`: диагностика по стадиям и три
-  конфигурационных сценария; 48 сценариев / 288 запусков.
+- [x] `codex/build-helper-skill` слита в main (`c92d786`), CI успешен:
+  диагностика по стадиям; 48 сценариев / 288 запусков.
+- [ ] Текущая ветка `codex/configure-version-contract`: восемь проверок
+  диагностики версии YAML; 56 сценариев / 336 запусков.
 - [ ] Следующий шаг согласовать по пробелам покрытия; к прошивкам переходить
   только после уточнений автора, как указано ниже.
 - [ ] По индексу выбрать следующие пробелы покрытия: отсутствующие/пустые значения,
   приоритеты и ошибки входных данных. Каждый новый контракт — отдельный сценарий.
-- [ ] Отдельными PR разобрать [E004 и E006](docs/ru/errata/index.md):
+- [ ] В отдельных ветках разобрать [E004 и E006](docs/ru/errata/index.md):
   выбор алгоритма CRC и обработку ошибок CRC.
   Для каждого исправления сначала зафиксировать ожидаемое поведение и регрессию.
 - [x] Уточнить контракт с автором: E003/E005 закрыты как ограничения по замыслу.
@@ -122,7 +124,7 @@ keep defect details in errata.
 
 - [x] Shorten README and move setup/scenarios to RU/EN docs; show CI status and
   validated suite counts — merged in [PR #8](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/pull/8).
-- [ ] Review skills incrementally: `stm32-simple-sources` (sources/language flags),
+- [x] Review skills incrementally: `stm32-simple-sources` (sources/language flags),
   then `stm32-module-creator` (library dependencies/flags), then `stm32-build-helper`
   (phase-specific diagnostics). Tie each claim to an existing test or add the
   required check before claiming verified behavior.
@@ -136,13 +138,15 @@ keep defect details in errata.
 - [x] Branch workflow without PRs merged: main `12cdd56`, CI successful.
 - [x] `codex/module-creator-skill` merged into main (`7b197ce`): skill and three
   library checks; 45 scenarios / 270 executions.
-- [ ] Current branch `codex/build-helper-skill`: phase-specific diagnostics and
-  three configure cases; 48 scenarios / 288 executions.
+- [x] `codex/build-helper-skill` merged into main (`c92d786`), CI passed:
+  phase-specific diagnostics; 48 scenarios / 288 executions.
+- [ ] Current branch `codex/configure-version-contract`: eight YAML version
+  diagnostic cases; 56 scenarios / 336 executions.
 - [ ] Agree the next coverage priority; defer firmware work until the author
   supplies scenario guidance as required below.
 - [ ] Use the index to prioritize coverage gaps: missing/empty values, precedence
   and invalid input. Give each new contract a dedicated scenario.
-- [ ] Address [E004 and E006](docs/en/errata/index.md) in separate PRs:
+- [ ] Address [E004 and E006](docs/en/errata/index.md) in separate branches:
   CRC algorithm selection and CRC error handling. Establish expected
   behavior and a regression before each fix.
 - [x] Clarify the contract with the author: E003/E005 are closed by design.

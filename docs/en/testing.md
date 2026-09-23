@@ -108,8 +108,8 @@ package or the resulting image bytes. Ubuntu snapshots are not required.
 
 ## Framework configuration tests
 
-[tests/cases.json](../../tests/cases.json) defines 48 scenarios, run with each of
-the three GCC and two CMake versions from the lockfile: **288 case executions**.
+[tests/cases.json](../../tests/cases.json) defines 56 scenarios, run with each of
+the three GCC and two CMake versions from the lockfile: **336 case executions**.
 Eight scenarios perform three consecutive configurations in the same build tree.
 
 | Area | Checks |
@@ -250,3 +250,7 @@ compile properties and INTERFACE settings without running the linker. [Guide](mo
 Three cases check log_target_properties/validate_linker_script toggling in one
 cache, nonfatal RAM mismatch, a warning for unrecognized RAM and a missing
 hal_conf error. [Diagnostic limits](troubleshooting.md).
+
+### YAML version diagnostics
+
+Eight `version-*` cases cover matching, missing, empty, older and newer versions, disabling comparison at the YAML root, and comparison before profiles/overrides. Every case must complete Configure/Generate successfully; warnings are not failures. This checks 0.9.2 diagnostics, not compatibility with future configuration versions. No firmware is built.
