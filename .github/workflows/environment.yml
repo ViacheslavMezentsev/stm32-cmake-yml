@@ -1,13 +1,8 @@
 name: CI environment
 
 on:
-  pull_request:
-    paths:
-      - ci/**
-      - .github/workflows/environment.yml
-      - .gitattributes
   push:
-    branches: [main]
+    branches: [main, 'codex/**']
     paths:
       - ci/**
       - .github/workflows/environment.yml
