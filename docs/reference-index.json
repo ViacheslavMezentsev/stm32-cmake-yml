@@ -2,7 +2,7 @@
   "schema_version": 1,
   "framework_version": "0.9.2",
   "baseline_commit": "f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0",
-  "test_commit": "136fd43d436c5d8f0c89cb07c10ed805519eedf6",
+  "test_commit": "322bb84504d5a2fd6d4316c3f52918b96009eeed",
   "fixes": [
     {
       "commit": "858013a7f31a674a91149ea3a68a5200498d92cc",
@@ -185,7 +185,8 @@
       },
       "tests": [
         "configure.defaults-blackpill",
-        "configure.baremetal-empty-list"
+        "configure.baremetal-empty-list",
+        "configure.diagnostics-missing-hal-conf"
       ],
       "errata": []
     },
@@ -391,7 +392,8 @@
       },
       "tests": [
         "configure.hal-requires-cmsis",
-        "configure.defaults-blackpill"
+        "configure.defaults-blackpill",
+        "configure.diagnostics-missing-hal-conf"
       ],
       "errata": []
     },
@@ -857,7 +859,9 @@
         "en": "docs/en/reference/0.9.2/diagnostics.md#validate-linker-script"
       },
       "tests": [
-        "configure.linker-template"
+        "configure.linker-template",
+        "configure.diagnostics-toggle",
+        "configure.diagnostics-unrecognized-ram"
       ],
       "errata": []
     },
@@ -872,7 +876,9 @@
         "ru": "docs/ru/reference/0.9.2/diagnostics.md#log-target-properties",
         "en": "docs/en/reference/0.9.2/diagnostics.md#log-target-properties"
       },
-      "tests": [],
+      "tests": [
+        "configure.diagnostics-toggle"
+      ],
       "errata": []
     },
     {

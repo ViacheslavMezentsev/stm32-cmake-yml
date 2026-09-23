@@ -381,5 +381,24 @@
     "args": ["-DPROJECT_CONFIG_FILE=module.yml", "-DSTM32_YML_PROFILE=missing"],
     "error": "Probe::Missing",
     "log_contains": ["target was not found"]
+  },
+  {
+    "name": "diagnostics-toggle",
+    "args": ["-DPROJECT_CONFIG_FILE=baremetal.yml", "-DSTM32_YML_OVERRIDE_linker_script=linker/custom.ld"],
+    "steps": [
+      {"args": ["-DSTM32_YML_OVERRIDE_log_target_properties=true", "-DSTM32_YML_OVERRIDE_validate_linker_script=true"], "log_contains": ["Отладочная информация для финальной цели 'baremetal_probe'", "COMPILE_DEFINITIONS", "Соотношение : 128K > 20K"]},
+      {"args": ["-DSTM32_YML_OVERRIDE_log_target_properties=false", "-DSTM32_YML_OVERRIDE_validate_linker_script=false"], "log_absent": ["Отладочная информация для финальной цели 'baremetal_probe'", "Выполнение проверки скрипта компоновщика", "Соотношение"]},
+      {"args": ["-DSTM32_YML_OVERRIDE_log_target_properties=true", "-DSTM32_YML_OVERRIDE_validate_linker_script=true"], "log_contains": ["Отладочная информация для финальной цели 'baremetal_probe'", "Соотношение : 128K > 20K"]}
+    ]
+  },
+  {
+    "name": "diagnostics-unrecognized-ram",
+    "args": ["-DPROJECT_CONFIG_FILE=baremetal.yml", "-DSTM32_YML_OVERRIDE_linker_script=linker/diagnostic-no-ram.ld"],
+    "log_contains": ["Не найдено ни одной RAM-секции", "Проверка размера пропущена."]
+  },
+  {
+    "name": "diagnostics-missing-hal-conf",
+    "args": ["-DSTM32_YML_OVERRIDE_include_directories=SourceGroup/Inc"],
+    "error": "Файл конфигурации HAL 'stm32f4xx_hal_conf.h' не найден"
   }
 ]

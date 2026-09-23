@@ -19,7 +19,7 @@ validate_linker_script: true
 
 [0.9.2 implementation](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_diagnostics.cmake) · [Index](index.md)
 
-**Checks (partial coverage):** `configure.linker-template`. [Test manifest](../../../../tests/cases.json).
+**Checks (partial coverage):** `configure.linker-template`, `configure.diagnostics-toggle`, `configure.diagnostics-unrecognized-ram`. [Test manifest](../../../../tests/cases.json).
 
 <a id="log-target-properties"></a>
 ## `log_target_properties`
@@ -36,7 +36,7 @@ log_target_properties: false
 
 [0.9.2 implementation](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_diagnostics.cmake) · [Index](index.md)
 
-**Checks (partial coverage):** no automated check of this contract. [Test manifest](../../../../tests/cases.json).
+**Checks (partial coverage):** `configure.diagnostics-toggle`. [Test manifest](../../../../tests/cases.json).
 
 <a id="verbose-build"></a>
 ## `verbose_build`

@@ -36,7 +36,7 @@ include_directories: [include]
 
 [Реализация 0.9.2](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/stm32_yml.cmake) · [Index](index.md)
 
-**Проверки (частичное покрытие):** `configure.defaults-blackpill`, `configure.baremetal-empty-list`. [Test manifest](../../../../tests/cases.json).
+**Проверки (частичное покрытие):** `configure.defaults-blackpill`, `configure.baremetal-empty-list`, `configure.diagnostics-missing-hal-conf`. [Test manifest](../../../../tests/cases.json).
 
 <a id="custom-libraries"></a>
 ## `custom_libraries`

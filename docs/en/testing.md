@@ -108,9 +108,9 @@ package or the resulting image bytes. Ubuntu snapshots are not required.
 
 ## Framework configuration tests
 
-[tests/cases.json](../../tests/cases.json) defines 45 scenarios, run with each of
-the three GCC and two CMake versions from the lockfile: **270 case executions**.
-Seven scenarios perform three consecutive configurations in the same build tree.
+[tests/cases.json](../../tests/cases.json) defines 48 scenarios, run with each of
+the three GCC and two CMake versions from the lockfile: **288 case executions**.
+Eight scenarios perform three consecutive configurations in the same build tree.
 
 | Area | Checks |
 | --- | --- |
@@ -244,3 +244,9 @@ Since 2026-09-24, checks run without PRs on pushes to working branches
 Three scenarios cover explicit STATIC-library linkage, no automatic linkage from
 sources alone, and an unknown ALIAS error. They inspect C/C++ commands, PUBLIC/PRIVATE
 compile properties and INTERFACE settings without running the linker. [Guide](modules.md).
+
+### Diagnostics
+
+Three cases check log_target_properties/validate_linker_script toggling in one
+cache, nonfatal RAM mismatch, a warning for unrecognized RAM and a missing
+hal_conf error. [Diagnostic limits](troubleshooting.md).
