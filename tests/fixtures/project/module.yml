@@ -1,0 +1,20 @@
+stm32_cmake_yml_version: 0.9.2
+project_name: module_probe
+mcu: STM32F103C8T6
+languages: [C, CXX, ASM]
+c_standard: 11
+cpp_standard: 17
+sources: [main.c, Module]
+use_cmsis: false
+use_hal: false
+use_freertos: false
+use_newlib_nano: false
+linker_script_dir: linker
+compile_definitions: [APP_ONLY=1]
+compile_options: [Wconversion]
+link_libraries: [Probe::Module, Probe::Settings]
+profiles:
+  unlinked:
+    link_libraries: [Probe::Settings]
+  missing:
+    link_libraries: [Probe::Missing, Probe::Settings]

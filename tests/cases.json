@@ -352,5 +352,34 @@
       "-DSTM32_YML_PROFILE=nodirectorycmake"
     ],
     "error": "does not contain a CMakeLists.txt file"
+  },
+  {
+    "name": "module-explicit-link",
+    "args": ["-DPROJECT_CONFIG_FILE=module.yml"],
+    "sources": ["main.c"],
+    "no_st_dependencies": true,
+    "properties": {"LINK_LIBRARIES": ["Probe::Module", "Probe::Settings"]},
+    "command_checks": [
+      {"file": "main.c", "target": "module_probe", "present": ["-DAPP_ONLY=1", "-DMODULE_PUBLIC=1", "-DSHARED_SETTING=1", "-Wconversion", "-Wstrict-prototypes", "-mcpu=cortex-m3", "-mthumb", "-std=gnu11"], "absent": ["-DMODULE_PRIVATE=1", "-fno-exceptions"], "includes": ["Module/Inc"]},
+      {"file": "Module/Src/module.c", "target": "probe_module", "present": ["-DMODULE_PUBLIC=1", "-DMODULE_PRIVATE=1", "-DSHARED_SETTING=1", "-mcpu=cortex-m3", "-mthumb", "-Wstrict-prototypes", "-std=gnu11"], "absent": ["-DAPP_ONLY=1", "-Wconversion", "-fno-exceptions"], "includes": ["Module/Inc"]},
+      {"file": "Module/Src/module.cpp", "target": "probe_module", "present": ["-DMODULE_PUBLIC=1", "-DMODULE_PRIVATE=1", "-DSHARED_SETTING=1", "-mcpu=cortex-m3", "-mthumb", "-fno-exceptions", "-std=gnu++17"], "absent": ["-DAPP_ONLY=1", "-Wconversion", "-Wstrict-prototypes"], "includes": ["Module/Inc"]}
+    ]
+  },
+  {
+    "name": "module-not-auto-linked",
+    "args": ["-DPROJECT_CONFIG_FILE=module.yml", "-DSTM32_YML_PROFILE=unlinked"],
+    "sources": ["main.c"],
+    "absent_properties": {"LINK_LIBRARIES": ["Probe::Module"]},
+    "command_checks": [
+      {"file": "main.c", "target": "module_probe", "present": ["-DAPP_ONLY=1", "-DSHARED_SETTING=1", "-Wconversion", "-Wstrict-prototypes", "-mcpu=cortex-m3", "-mthumb", "-std=gnu11"], "absent": ["-DMODULE_PRIVATE=1", "-fno-exceptions", "-DMODULE_PUBLIC=1"], "absent_includes": ["Module/Inc"]},
+      {"file": "Module/Src/module.c", "target": "probe_module", "present": ["-DMODULE_PUBLIC=1", "-DMODULE_PRIVATE=1", "-DSHARED_SETTING=1", "-mcpu=cortex-m3", "-mthumb", "-Wstrict-prototypes", "-std=gnu11"], "absent": ["-DAPP_ONLY=1", "-Wconversion", "-fno-exceptions"], "includes": ["Module/Inc"]},
+      {"file": "Module/Src/module.cpp", "target": "probe_module", "present": ["-DMODULE_PUBLIC=1", "-DMODULE_PRIVATE=1", "-DSHARED_SETTING=1", "-mcpu=cortex-m3", "-mthumb", "-fno-exceptions", "-std=gnu++17"], "absent": ["-DAPP_ONLY=1", "-Wconversion", "-Wstrict-prototypes"], "includes": ["Module/Inc"]}
+    ]
+  },
+  {
+    "name": "module-missing-target",
+    "args": ["-DPROJECT_CONFIG_FILE=module.yml", "-DSTM32_YML_PROFILE=missing"],
+    "error": "Probe::Missing",
+    "log_contains": ["target was not found"]
   }
 ]

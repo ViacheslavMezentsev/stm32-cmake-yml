@@ -86,6 +86,9 @@ def verify(case, build, source):
         for directory in check.get("includes", []):
             token = "-I" + str(source / directory)
             require(token in command, f"{check['file']}: missing include {directory}")
+        for directory in check.get("absent_includes", []):
+            token = "-I" + str(source / directory)
+            require(token not in command, f"{check['file']}: leaked include {directory}")
         if "target" in check:
             require("-o" in command, f"{check['file']}: missing object output")
             output = command[command.index("-o") + 1]
