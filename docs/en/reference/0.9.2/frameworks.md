@@ -36,7 +36,7 @@ use_hal: true
 
 [0.9.2 implementation](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_frameworks.cmake) · [Index](index.md)
 
-**Checks (partial coverage):** `configure.hal-requires-cmsis`, `configure.defaults-blackpill`. [Test manifest](../../../../tests/cases.json).
+**Checks (partial coverage):** `configure.hal-requires-cmsis`, `configure.defaults-blackpill`, `configure.diagnostics-missing-hal-conf`. [Test manifest](../../../../tests/cases.json).
 
 <a id="cubefw-package"></a>
 ## `cubefw_package`

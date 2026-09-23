@@ -8,6 +8,7 @@
 | Choose IOC, profiles or Arduino | [Short scenarios](scenarios.md) |
 | Add files to the main target | [Sources and language flags](simple-sources.md) |
 | Create a standalone library | [Modules and dependencies](modules.md) |
+| Investigate an error or warning | [Phase-specific troubleshooting](troubleshooting.md) |
 | Understand VS Code and bare metal | [Development](development.md) |
 | Explore structure and skill plans | [Repository](repository.md) |
 | Find a usage scenario | [Existing user manual (Russian)](../user_manual.md) |

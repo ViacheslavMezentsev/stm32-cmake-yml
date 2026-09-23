@@ -55,9 +55,12 @@ PR больше не требуются; старые ссылки остают�
 - [x] Навык simple-sources и три проверки подключения исходников слиты в main
   (`8e7411b`); 42 сценария / 252 запуска, CI main прошёл.
 - [x] Процесс без PR слит: `main` на `12cdd56`, проверки CI успешны.
-- [ ] Текущая ветка `codex/module-creator-skill`: навык и три проверки библиотек;
-  45 сценариев / 270 запусков.
-- [ ] Следующая ветка: stm32-build-helper и границы диагностических рекомендаций.
+- [x] `codex/module-creator-skill` слита в main (`7b197ce`): навык и три проверки
+  библиотек; 45 сценариев / 270 запусков.
+- [ ] Текущая ветка `codex/build-helper-skill`: диагностика по стадиям и три
+  конфигурационных сценария; 48 сценариев / 288 запусков.
+- [ ] Следующий шаг согласовать по пробелам покрытия; к прошивкам переходить
+  только после уточнений автора, как указано ниже.
 - [ ] По индексу выбрать следующие пробелы покрытия: отсутствующие/пустые значения,
   приоритеты и ошибки входных данных. Каждый новый контракт — отдельный сценарий.
 - [ ] Отдельными PR разобрать [E004 и E006](docs/ru/errata/index.md):
@@ -131,9 +134,12 @@ keep defect details in errata.
 - [x] Simple-sources skill and three source integration checks merged into main
   (`8e7411b`); 42 scenarios / 252 executions, main CI passed.
 - [x] Branch workflow without PRs merged: main `12cdd56`, CI successful.
-- [ ] Current branch `codex/module-creator-skill`: skill and three library checks;
-  45 scenarios / 270 executions.
-- [ ] Next branch: stm32-build-helper and limits of diagnostic guidance.
+- [x] `codex/module-creator-skill` merged into main (`7b197ce`): skill and three
+  library checks; 45 scenarios / 270 executions.
+- [ ] Current branch `codex/build-helper-skill`: phase-specific diagnostics and
+  three configure cases; 48 scenarios / 288 executions.
+- [ ] Agree the next coverage priority; defer firmware work until the author
+  supplies scenario guidance as required below.
 - [ ] Use the index to prioritize coverage gaps: missing/empty values, precedence
   and invalid input. Give each new contract a dedicated scenario.
 - [ ] Address [E004 and E006](docs/en/errata/index.md) in separate PRs:
