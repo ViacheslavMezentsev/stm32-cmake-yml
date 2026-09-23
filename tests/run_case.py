@@ -163,6 +163,8 @@ def main():
                 verify(expectation, build, source)
             for message in expectation.get("log_contains", []):
                 require(message in normalized, f"Missing diagnostic {message!r}")
+            for message in expectation.get("log_absent", []):
+                require(message not in normalized, f"Unexpected diagnostic {message!r}")
         except AssertionError:
             print(output, flush=True)
             raise
