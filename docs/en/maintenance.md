@@ -75,3 +75,17 @@ README shows validated suite size, not passed tests. When changing
 `tests/cases.json` or the locked tool matrix, update `configure-counts`: the
 validator checks scenarios, tool pairs and their product. Separate badges show
 workflow status on main.
+
+## Branches without pull requests
+
+From 2026-09-24, create `codex/<task>` from current main. After local validation,
+push the branch: Configure and documentation checks run on push; environment
+checks run when their paths change. Match CI results to the branch's latest
+commit. Update main and merge the tested branch with git merge, resolving
+conflicts and rerunning affected checks if the resulting code changes. Push
+main; its CI verifies the merge result.
+
+No PR is required. Do not force push or treat old-commit results as validation
+of new changes. Record branch, commit and status in TODO; preserve historical
+PR links. If fetch/push is unavailable, an API check does not update local refs:
+synchronization is still required before merging.

@@ -4,13 +4,15 @@
 
 ## Русский
 
-Состояние на 2026-09-23. Ниже работа сгруппирована в пять этапов; этапы могут
+Состояние на 2026-09-24. Ниже работа сгруппирована в пять этапов; этапы могут
 выполняться параллельно. Это план, а не обещание сроков или поддерживаемых функций.
 Приоритет — Configure/Generate и совместимость существующих проектов.
+Новый порядок: рабочая ветка → локальные проверки → push и CI → merge в main.
+PR больше не требуются; старые ссылки остаются историей. [Порядок работы](docs/ru/maintenance.md).
 
 `[x]` означает слито, `[ ]` — ещё не завершено. Подготовленный коммит и успешные
 локальные проверки не означают слияния или выпуска. Обновляйте статусы и ссылки
-на PR вместе с выполнением работы; подробности дефектов храните в errata.
+на коммиты/ветки вместе с выполнением работы; подробности дефектов храните в errata.
 
 ### 1. Воспроизводимое окружение
 
@@ -50,8 +52,9 @@
 
 - [x] Регрессии `Rev`/`RevB`, пустого override и сброса внешнего профиля слиты
   в [PR #7](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/pull/7): 39 сценариев / 234 запуска.
-- [ ] Текущий PR: навык simple-sources и три проверки подключения исходников;
-  42 сценария / 252 запуска.
+- [x] Навык simple-sources и три проверки подключения исходников слиты в main
+  (`8e7411b`); 42 сценария / 252 запуска, CI main прошёл.
+- [ ] Следующая ветка: stm32-module-creator и конфигурационные проверки библиотек.
 - [ ] По индексу выбрать следующие пробелы покрытия: отсутствующие/пустые значения,
   приоритеты и ошибки входных данных. Каждый новый контракт — отдельный сценарий.
 - [ ] Отдельными PR разобрать [E004 и E006](docs/ru/errata/index.md):
@@ -74,12 +77,14 @@
 
 ## English
 
-Status as of 2026-09-23. Work is grouped into five stages, which may overlap.
+Status as of 2026-09-24. Work is grouped into five stages, which may overlap.
 The priority is Configure/Generate and compatibility with existing consumers.
+New workflow: working branch → local checks → push and CI → merge into main.
+PRs are no longer required; old links remain historical. [Workflow](docs/en/maintenance.md).
 This roadmap does not promise delivery dates or unsupported features.
 
 `[x]` means merged; `[ ]` means incomplete. A prepared commit or a passing local
-run does not mean merged or released. Update statuses and PR links as work lands;
+run does not mean merged or released. Update statuses and commit/branch links as work lands;
 keep defect details in errata.
 
 ### 1. Reproducible environment
@@ -120,8 +125,9 @@ keep defect details in errata.
 
 - [x] `Rev`/`RevB`, empty override and external profile reset regressions merged
   in [PR #7](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/pull/7): 39 scenarios / 234 executions.
-- [ ] Current PR: simple-sources skill and three source integration checks;
-  42 scenarios / 252 executions.
+- [x] Simple-sources skill and three source integration checks merged into main
+  (`8e7411b`); 42 scenarios / 252 executions, main CI passed.
+- [ ] Next branch: stm32-module-creator and library configuration checks.
 - [ ] Use the index to prioritize coverage gaps: missing/empty values, precedence
   and invalid input. Give each new contract a dedicated scenario.
 - [ ] Address [E004 and E006](docs/en/errata/index.md) in separate PRs:

@@ -1,9 +1,8 @@
 name: Configure tests
 
 on:
-  pull_request:
   push:
-    branches: [main]
+    branches: [main, 'codex/**']
   workflow_dispatch:
 
 permissions:

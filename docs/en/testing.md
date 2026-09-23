@@ -94,11 +94,10 @@ terminal. Interactive debugging and VS Code launch configurations come later.
 ## Updates and CI
 
 The environment workflow builds the image and verifies it without network access.
-The separate `Configure tests` workflow runs on every pull request, pushes to
-`main`, and manual dispatch. It builds the image once and tests all six tool pairs
+The separate `Configure tests` workflow runs on pushes to `main` and `codex/**`, and manual dispatch. It builds the image once and tests all six tool pairs
 in one job, continuing after a failing pair. Neither workflow publishes images
 or builds firmware. Keeping this check unconditional also makes it suitable as
-a required PR check without path-filtered runs remaining pending.
+a check on every branch push rather than only selected file changes.
 
 Update versions and hashes together in the lockfile, review upstream sources,
 then rebuild and verify. When changing Ubuntu, also update the Dockerfile digest
@@ -216,7 +215,7 @@ symlinks and dependency source trees are excluded from this artifact.
 To add a scenario, extend `tests/cases.json` and, if needed, the fixture files.
 Keep assertions about externally observable results; do not copy framework
 logic into the tests. Add a regression case before changing that behavior in
-a later PR. Existing test names should remain unique.
+a later change. Existing test names should remain unique.
 
 ### Profile boundaries and empty overrides
 
@@ -236,3 +235,6 @@ Three new cases check a source directory with CMakeLists, shared target ownershi
 of nested C/C++ and root C, include paths and language-specific flags in
 compile_commands.json. A missing file warns; a directory without CMakeLists fails
 Configure. [Guide and coverage limits](simple-sources.md).
+
+Since 2026-09-24, checks run without PRs on pushes to working branches
+`codex/**` and main. [Merge workflow](maintenance.md).
