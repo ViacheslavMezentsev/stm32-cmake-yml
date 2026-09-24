@@ -70,8 +70,10 @@ PR больше не требуются; старые ссылки остают�
   external отложено по решению автора от 2026-09-25.
 - [x] `codex/configure-mcu-families` слита в main (`477fe95`):
   F0/F3/F7/G4; 84 сценария / 504 запуска.
-- [ ] Текущая ветка `codex/configure-system-libraries`: пять проверок
-  системных библиотек и параметров линковки; 89 сценариев / 534 запуска.
+- [x] `codex/configure-system-libraries` слита в main (`ae25a70`):
+  системные библиотеки и параметры линковки; 89 сценариев / 534 запуска.
+- [ ] Текущая ветка `codex/configure-cppcheck`: пять конфигурационных
+  сценариев Cppcheck; 94 сценария / 564 запуска.
 - [ ] Следующий шаг согласовать по пробелам покрытия; к прошивкам переходить
   только после уточнений автора, как указано ниже.
 - [ ] По индексу выбрать следующие пробелы покрытия: отсутствующие/пустые значения,
@@ -162,8 +164,10 @@ keep defect details in errata.
   The author deferred the external fix on 2026-09-25.
 - [x] `codex/configure-mcu-families` merged into main (`477fe95`):
   F0/F3/F7/G4; 84 scenarios / 504 executions.
-- [ ] Current branch `codex/configure-system-libraries`: five system library
-  and linker option checks; 89 scenarios / 534 executions.
+- [x] `codex/configure-system-libraries` merged into main (`ae25a70`):
+  system libraries and linker options; 89 scenarios / 534 executions.
+- [ ] Current branch `codex/configure-cppcheck`: five Cppcheck configuration
+  cases; 94 scenarios / 564 executions.
 - [ ] Agree the next coverage priority; defer firmware work until the author
   supplies scenario guidance as required below.
 - [ ] Use the index to prioritize coverage gaps: missing/empty values, precedence

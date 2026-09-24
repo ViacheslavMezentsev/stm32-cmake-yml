@@ -108,9 +108,9 @@ package or the resulting image bytes. Ubuntu snapshots are not required.
 
 ## Framework configuration tests
 
-[tests/cases.json](../../tests/cases.json) defines 89 scenarios, run with each of
-the three GCC and two CMake versions from the lockfile: **534 case executions**.
-Ten scenarios perform three consecutive configurations in the same build tree.
+[tests/cases.json](../../tests/cases.json) defines 94 scenarios, run with each of
+the three GCC and two CMake versions from the lockfile: **564 case executions**.
+Eleven scenarios perform three consecutive configurations in the same build tree.
 
 | Area | Checks |
 | --- | --- |
@@ -297,3 +297,13 @@ Five `system-*` cases check NoSys + Nano, Semihosting + Nano, both settings disa
 `link_options: [nostartfiles, "-Wl,--cref"]` becomes driver options `-nostartfiles` and `-Wl,--cref`; `linker_directives: [--print-memory-usage]` uses LINKER to generate `-Wl,--print-memory-usage`. These three flags must not appear in compile_commands.json. The test project has one executable, so the checker requires exactly one LINK_FLAGS line. It checks the current Ninja generator, not every CMake generator format.
 
 The fixture uses bare metal without CMSIS/HAL. Specs are supplied by the pinned xPack/upstream; tests do not invoke the linker or establish syscall, printf/float or semihosting execution behavior. Preparing real test firmware remains a separate step requiring scenario guidance.
+
+### Cppcheck configuration
+
+Five `cppcheck-*` cases check C_CPPCHECK/CXX_CPPCHECK values and the `--cppcheck=` Ninja rule: defaults, custom arguments and exclusions, empty-list fallback, unavailable executable, and enabled → disabled → enabled with different settings while reusing the cache.
+
+Positive cases explicitly set CPPCHECK_EXECUTABLE to `/usr/bin/false`, a test command path, **not an analyzer**. Configure/Generate does not execute it. These cases check integration generation, not real Cppcheck discovery in PATH, execution, version compatibility, suppression parsing by the analyzer or analysis results. The unavailable case uses normal find_program in the pinned image without Cppcheck and requires a warning with successful Generate.
+
+Nonempty cppcheck_args replace default arguments. Nonempty cppcheck_ignores replace default exclusions; `Vendor SDK`, containing a space, remains one CMake property argument. Empty lists restore defaults rather than removing all arguments/exclusions. Exact values are asserted for both languages. No firmware is compiled and no static analysis is executed.
+
+CMake 3.19 stores the command in `CMakeFiles/rules.ninja`, while 3.28 stores it in `build.ninja`; the check considers both files.

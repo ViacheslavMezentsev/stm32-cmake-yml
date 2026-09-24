@@ -70,7 +70,7 @@ cppcheck_enable: false
 
 [Реализация 0.9.2](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_code_quality.cmake) · [Index](index.md)
 
-**Проверки (частичное покрытие):** нет автоматической проверки этого контракта. [Test manifest](../../../../tests/cases.json).
+**Проверки (частичное покрытие):** `configure.cppcheck-defaults`, `configure.cppcheck-custom`, `configure.cppcheck-empty-fallback`, `configure.cppcheck-unavailable`, `configure.cppcheck-reconfigure`. [Test manifest](../../../../tests/cases.json).
 
 <a id="cppcheck-args"></a>
 ## `cppcheck_args`
@@ -87,7 +87,7 @@ cppcheck_args: [--enable=warning]
 
 [Реализация 0.9.2](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_code_quality.cmake) · [Index](index.md)
 
-**Проверки (частичное покрытие):** нет автоматической проверки этого контракта. [Test manifest](../../../../tests/cases.json).
+**Проверки (частичное покрытие):** `configure.cppcheck-defaults`, `configure.cppcheck-custom`, `configure.cppcheck-empty-fallback`, `configure.cppcheck-reconfigure`. [Test manifest](../../../../tests/cases.json).
 
 <a id="cppcheck-ignores"></a>
 ## `cppcheck_ignores`
@@ -104,4 +104,4 @@ cppcheck_ignores: [Drivers]
 
 [Реализация 0.9.2](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_code_quality.cmake) · [Index](index.md)
 
-**Проверки (частичное покрытие):** нет автоматической проверки этого контракта. [Test manifest](../../../../tests/cases.json).
+**Проверки (частичное покрытие):** `configure.cppcheck-defaults`, `configure.cppcheck-custom`, `configure.cppcheck-empty-fallback`, `configure.cppcheck-reconfigure`. [Test manifest](../../../../tests/cases.json).

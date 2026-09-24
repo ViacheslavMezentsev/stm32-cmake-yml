@@ -2,7 +2,7 @@
   "schema_version": 1,
   "framework_version": "0.9.2",
   "baseline_commit": "f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0",
-  "test_commit": "89e9e4a6cd8caba0522b4634cda7e718bf29c531",
+  "test_commit": "bd3cc3a057a44f8ec31938c27c0058caff0036dc",
   "fixes": [
     {
       "commit": "858013a7f31a674a91149ea3a68a5200498d92cc",
@@ -1026,7 +1026,13 @@
         "ru": "docs/ru/reference/0.9.2/diagnostics.md#cppcheck-enable",
         "en": "docs/en/reference/0.9.2/diagnostics.md#cppcheck-enable"
       },
-      "tests": [],
+      "tests": [
+        "configure.cppcheck-defaults",
+        "configure.cppcheck-custom",
+        "configure.cppcheck-empty-fallback",
+        "configure.cppcheck-unavailable",
+        "configure.cppcheck-reconfigure"
+      ],
       "errata": []
     },
     {
@@ -1040,7 +1046,12 @@
         "ru": "docs/ru/reference/0.9.2/diagnostics.md#cppcheck-args",
         "en": "docs/en/reference/0.9.2/diagnostics.md#cppcheck-args"
       },
-      "tests": [],
+      "tests": [
+        "configure.cppcheck-defaults",
+        "configure.cppcheck-custom",
+        "configure.cppcheck-empty-fallback",
+        "configure.cppcheck-reconfigure"
+      ],
       "errata": []
     },
     {
@@ -1054,7 +1065,12 @@
         "ru": "docs/ru/reference/0.9.2/diagnostics.md#cppcheck-ignores",
         "en": "docs/en/reference/0.9.2/diagnostics.md#cppcheck-ignores"
       },
-      "tests": [],
+      "tests": [
+        "configure.cppcheck-defaults",
+        "configure.cppcheck-custom",
+        "configure.cppcheck-empty-fallback",
+        "configure.cppcheck-reconfigure"
+      ],
       "errata": []
     }
   ],
