@@ -108,9 +108,9 @@ package or the resulting image bytes. Ubuntu snapshots are not required.
 
 ## Framework configuration tests
 
-[tests/cases.json](../../tests/cases.json) defines 84 scenarios, run with each of
-the three GCC and two CMake versions from the lockfile: **504 case executions**.
-Nine scenarios perform three consecutive configurations in the same build tree.
+[tests/cases.json](../../tests/cases.json) defines 89 scenarios, run with each of
+the three GCC and two CMake versions from the lockfile: **534 case executions**.
+Ten scenarios perform three consecutive configurations in the same build tree.
 
 | Area | Checks |
 | --- | --- |
@@ -289,3 +289,11 @@ Ten cases check real imported targets and cortex-m0/m4/m7 flags in compile_comma
 F0, F7 and G4 MCUs follow local demos `stm32f0xx/03-blink`, `stm32f7xx/03-blink` and `stm32g4xx/03-blink`; F3 uses a synthetic F303VC case. Reduced IOC fixtures add FreeRTOS/v1 markers. Full demo IOC files are not copied; the HSI field does not generate a clock implementation. Minimal HAL headers are for configuration only.
 
 CubeF0/F3/F7 are pinned by commit in the lockfile; CubeG4 was already pinned. Only CMSIS device/HAL submodules are initialized, plus FreeRTOS for F0. Selected F3/F7 packages contain FreeRTOS in the parent repository. BSP and unrelated submodules are not initialized. The parent repository is still downloaded in full; this is selective submodule initialization, not sparse checkout.
+
+### System libraries and linker options
+
+Five `system-*` cases check NoSys + Nano, Semihosting + Nano, both settings disabled, custom link_options/linker_directives, and profile transitions NoSys → Semihosting → no system library. Assertions cover direct target dependencies, transitive specs in generated Ninja LINK_FLAGS, and removal of stale flags after repeated Configure.
+
+`link_options: [nostartfiles, "-Wl,--cref"]` becomes driver options `-nostartfiles` and `-Wl,--cref`; `linker_directives: [--print-memory-usage]` uses LINKER to generate `-Wl,--print-memory-usage`. These three flags must not appear in compile_commands.json. The test project has one executable, so the checker requires exactly one LINK_FLAGS line. It checks the current Ninja generator, not every CMake generator format.
+
+The fixture uses bare metal without CMSIS/HAL. Specs are supplied by the pinned xPack/upstream; tests do not invoke the linker or establish syscall, printf/float or semihosting execution behavior. Preparing real test firmware remains a separate step requiring scenario guidance.

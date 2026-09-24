@@ -2,7 +2,7 @@
   "schema_version": 1,
   "framework_version": "0.9.2",
   "baseline_commit": "f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0",
-  "test_commit": "d4ab2d09a749223ab61019ec78dcd83cd5cbf6f1",
+  "test_commit": "89e9e4a6cd8caba0522b4634cda7e718bf29c531",
   "fixes": [
     {
       "commit": "858013a7f31a674a91149ea3a68a5200498d92cc",
@@ -688,7 +688,9 @@
         "ru": "docs/ru/reference/0.9.2/linker.md#link-options",
         "en": "docs/en/reference/0.9.2/linker.md#link-options"
       },
-      "tests": [],
+      "tests": [
+        "configure.system-link-options"
+      ],
       "errata": []
     },
     {
@@ -702,7 +704,9 @@
         "ru": "docs/ru/reference/0.9.2/linker.md#linker-directives",
         "en": "docs/en/reference/0.9.2/linker.md#linker-directives"
       },
-      "tests": [],
+      "tests": [
+        "configure.system-link-options"
+      ],
       "errata": []
     },
     {
@@ -716,7 +720,12 @@
         "ru": "docs/ru/reference/0.9.2/linker.md#use-newlib-nano",
         "en": "docs/en/reference/0.9.2/linker.md#use-newlib-nano"
       },
-      "tests": [],
+      "tests": [
+        "configure.system-nosys-nano",
+        "configure.system-semihost-nano",
+        "configure.system-disabled",
+        "configure.system-reconfigure"
+      ],
       "errata": []
     },
     {
@@ -731,7 +740,11 @@
         "en": "docs/en/reference/0.9.2/linker.md#system-library"
       },
       "tests": [
-        "configure.defaults-blackpill"
+        "configure.defaults-blackpill",
+        "configure.system-nosys-nano",
+        "configure.system-semihost-nano",
+        "configure.system-disabled",
+        "configure.system-reconfigure"
       ],
       "errata": []
     },
