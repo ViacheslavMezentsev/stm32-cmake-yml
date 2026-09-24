@@ -50,6 +50,11 @@ def verify(case, build, source):
         require(str(linker) in observed("LINK_OPTIONS"), "Generated linker script not linked")
 
     ninja = (build / "build.ninja").read_text(encoding="utf-8")
+    if "cppcheck_rules" in case:
+        rules = (build / "CMakeFiles/rules.ninja").read_text(encoding="utf-8")
+        require(("--cppcheck=" in (rules + ninja)) == case["cppcheck_rules"],
+                "Incorrect Cppcheck rule presence")
+
     if "generated_link_flags" in case:
         # These fixtures have one executable; inspect generated flags, not the
         # CMake LINK_OPTIONS property alone (which omits transitive options).

@@ -1516,5 +1516,117 @@
         ]
       }
     ]
+  },
+  {
+    "name": "cppcheck-defaults",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=cppcheck.yml",
+      "-DCPPCHECK_EXECUTABLE=/usr/bin/false"
+    ],
+    "observed": {
+      "C_CPPCHECK": "/usr/bin/false;--enable=warning,performance,portability,style;--inline-suppr;--suppress=missingInclude;--suppress=unmatchedSuppression;--suppress=*:*STM32Cube/Repository/*;--suppress=*:*Drivers/*;--suppress=*:*Middlewares/*",
+      "CXX_CPPCHECK": "/usr/bin/false;--enable=warning,performance,portability,style;--inline-suppr;--suppress=missingInclude;--suppress=unmatchedSuppression;--suppress=*:*STM32Cube/Repository/*;--suppress=*:*Drivers/*;--suppress=*:*Middlewares/*"
+    },
+    "cppcheck_rules": true,
+    "log_contains": [
+      "Статический анализ (Cppcheck) активирован"
+    ]
+  },
+  {
+    "name": "cppcheck-custom",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=cppcheck.yml",
+      "-DCPPCHECK_EXECUTABLE=/usr/bin/false",
+      "-DSTM32_YML_PROFILE=custom"
+    ],
+    "observed": {
+      "C_CPPCHECK": "/usr/bin/false;--enable=warning;--error-exitcode=2;--suppress=*:*Vendor SDK/*",
+      "CXX_CPPCHECK": "/usr/bin/false;--enable=warning;--error-exitcode=2;--suppress=*:*Vendor SDK/*"
+    },
+    "cppcheck_rules": true,
+    "log_contains": [
+      "Статический анализ (Cppcheck) активирован"
+    ]
+  },
+  {
+    "name": "cppcheck-empty-fallback",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=cppcheck.yml",
+      "-DCPPCHECK_EXECUTABLE=/usr/bin/false",
+      "-DSTM32_YML_PROFILE=empty"
+    ],
+    "observed": {
+      "C_CPPCHECK": "/usr/bin/false;--enable=warning,performance,portability,style;--inline-suppr;--suppress=missingInclude;--suppress=unmatchedSuppression;--suppress=*:*STM32Cube/Repository/*;--suppress=*:*Drivers/*;--suppress=*:*Middlewares/*",
+      "CXX_CPPCHECK": "/usr/bin/false;--enable=warning,performance,portability,style;--inline-suppr;--suppress=missingInclude;--suppress=unmatchedSuppression;--suppress=*:*STM32Cube/Repository/*;--suppress=*:*Drivers/*;--suppress=*:*Middlewares/*"
+    },
+    "cppcheck_rules": true,
+    "log_contains": [
+      "Статический анализ (Cppcheck) активирован"
+    ]
+  },
+  {
+    "name": "cppcheck-unavailable",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=cppcheck.yml"
+    ],
+    "observed": {
+      "C_CPPCHECK": "VALUE-NOTFOUND",
+      "CXX_CPPCHECK": "VALUE-NOTFOUND"
+    },
+    "cppcheck_rules": false,
+    "log_absent": [
+      "Статический анализ (Cppcheck) активирован"
+    ],
+    "log_contains": [
+      "Параметр 'cppcheck_enable' установлен, но утилита не найдена!"
+    ]
+  },
+  {
+    "name": "cppcheck-reconfigure",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=cppcheck.yml",
+      "-DCPPCHECK_EXECUTABLE=/usr/bin/false"
+    ],
+    "steps": [
+      {
+        "args": [
+          "-DSTM32_YML_PROFILE="
+        ],
+        "observed": {
+          "C_CPPCHECK": "/usr/bin/false;--enable=warning,performance,portability,style;--inline-suppr;--suppress=missingInclude;--suppress=unmatchedSuppression;--suppress=*:*STM32Cube/Repository/*;--suppress=*:*Drivers/*;--suppress=*:*Middlewares/*",
+          "CXX_CPPCHECK": "/usr/bin/false;--enable=warning,performance,portability,style;--inline-suppr;--suppress=missingInclude;--suppress=unmatchedSuppression;--suppress=*:*STM32Cube/Repository/*;--suppress=*:*Drivers/*;--suppress=*:*Middlewares/*"
+        },
+        "cppcheck_rules": true,
+        "log_contains": [
+          "Статический анализ (Cppcheck) активирован"
+        ]
+      },
+      {
+        "args": [
+          "-DSTM32_YML_PROFILE=disabled"
+        ],
+        "observed": {
+          "C_CPPCHECK": "VALUE-NOTFOUND",
+          "CXX_CPPCHECK": "VALUE-NOTFOUND"
+        },
+        "cppcheck_rules": false,
+        "log_absent": [
+          "Статический анализ (Cppcheck) активирован"
+        ]
+      },
+      {
+        "args": [
+          "-DSTM32_YML_PROFILE=custom"
+        ],
+        "observed": {
+          "C_CPPCHECK": "/usr/bin/false;--enable=warning;--error-exitcode=2;--suppress=*:*Vendor SDK/*",
+          "CXX_CPPCHECK": "/usr/bin/false;--enable=warning;--error-exitcode=2;--suppress=*:*Vendor SDK/*"
+        },
+        "cppcheck_rules": true,
+        "log_contains": [
+          "Статический анализ (Cppcheck) активирован"
+        ]
+      }
+    ]
   }
 ]
