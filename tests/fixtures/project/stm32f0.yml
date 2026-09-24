@@ -1,0 +1,21 @@
+# Configure-only F030R8 scenario, matching the MCU in demo stm32f0xx/03-blink.
+stm32_cmake_yml_version: 0.9.2
+project_name: stm32f0_probe
+mcu: STM32F030R8
+languages: [C, ASM]
+sources: [main.c]
+include_directories: [include]
+use_cmsis: true
+use_hal: true
+hal_components: [GPIO]
+cubefw_package: V1.11.6
+profiles:
+  ll:
+    hal_components: [LL_GPIO]
+  bare:
+    use_cmsis: false
+    use_hal: false
+    use_freertos: false
+    compile_options: [mcpu=cortex-m0, mthumb]
+  rtos:
+    ioc_file: stm32f0-rtos.ioc

@@ -1,0 +1,12 @@
+# Synthetic parser fixture: F030R8 from demo stm32f0xx/03-blink,
+# plus FreeRTOS/v1 markers. No CubeMX code or clock setup is generated.
+ProjectManager.DeviceId=STM32F030R8Tx
+ProjectManager.ProjectName=stm32f0_ioc_probe
+ProjectManager.DefaultFWLocation=true
+ProjectManager.FirmwarePackage=STM32Cube FW_F0 V1.11.6
+ProjectManager.LibraryCopy=2
+ProjectManager.HeapSize=0x200
+ProjectManager.StackSize=0x400
+Mcu.IP0=FREERTOS
+VP_FREERTOS_VS_CMSIS_V1.Mode=CMSIS_V1
+RCC.SYSCLKSource=RCC_SYSCLKSOURCE_HSI

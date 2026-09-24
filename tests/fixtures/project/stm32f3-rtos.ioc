@@ -1,0 +1,8 @@
+# Reduced synthetic parser fixture; no CubeMX code or clock setup generated.
+ProjectManager.DeviceId=STM32F303VC
+ProjectManager.DefaultFWLocation=true
+ProjectManager.FirmwarePackage=STM32Cube FW_F3 V1.11.5
+ProjectManager.LibraryCopy=2
+Mcu.IP0=FREERTOS
+VP_FREERTOS_VS_CMSIS_V1.Mode=CMSIS_V1
+RCC.SYSCLKSource=RCC_SYSCLKSOURCE_HSI
