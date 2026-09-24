@@ -104,7 +104,9 @@ freertos_version: cube
 
 [0.9.2 implementation](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_frameworks.cmake) · [Index](index.md)
 
-**Checks (partial coverage):** `configure.freertos-defaults`, `configure.freertos-gcs-v2`, `configure.freertos-demo-heap2`, `configure.freertos-ioc-f4-v2`, `configure.freertos-ioc-f1-v1`, `configure.freertos-ioc-empty-fallback`. [Test manifest](../../../../tests/cases.json).
+**Checks (partial coverage):** `configure.freertos-defaults`, `configure.freertos-gcs-v2`, `configure.freertos-demo-heap2`, `configure.freertos-ioc-f4-v2`, `configure.freertos-ioc-f1-v1`, `configure.freertos-ioc-empty-fallback`, `configure.freertos-external-cmake-known-failure`, `configure.freertos-external-env-known-failure`. [Test manifest](../../../../tests/cases.json).
+
+**Deviation:** [E007](../../errata/E007.md) — with the pinned standard upstream, external fails Generate even with a valid FREERTOS_PATH. Tests reproduce the known failure rather than demonstrate support.
 
 <a id="freertos-components"></a>
 ## `freertos_components`

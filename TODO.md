@@ -63,8 +63,11 @@ PR больше не требуются; старые ссылки остают�
   56 сценариев / 336 запусков.
 - [x] Компоненты FreeRTOS и CMSIS-RTOS слиты в main (`8663c51`), CI успешен:
   65 сценариев / 390 запусков.
-- [ ] Текущая ветка `codex/configure-freertos-ioc`: семь проверок IOC,
+- [ ] Ветка `codex/configure-freertos-ioc` (CI прошёл, ожидает слияния): семь проверок IOC,
   приоритетов и повторной настройки; 72 сценария / 432 запуска.
+- [ ] Текущая ветка `codex/freertos-external-errata` поверх IOC-ветки: две
+  регрессии известной ошибки E007; 74 сценария / 444 запуска. Исправление
+  external отложено по решению автора от 2026-09-25.
 - [ ] Следующий шаг согласовать по пробелам покрытия; к прошивкам переходить
   только после уточнений автора, как указано ниже.
 - [ ] По индексу выбрать следующие пробелы покрытия: отсутствующие/пустые значения,
@@ -148,8 +151,11 @@ keep defect details in errata.
   56 scenarios / 336 executions.
 - [x] FreeRTOS and CMSIS-RTOS components merged into main (`8663c51`), CI passed:
   65 scenarios / 390 executions.
-- [ ] Current branch `codex/configure-freertos-ioc`: seven IOC, precedence
+- [ ] Branch `codex/configure-freertos-ioc` (CI passed, awaiting merge): seven IOC, precedence
   and reconfiguration cases; 72 scenarios / 432 executions.
+- [ ] Current branch `codex/freertos-external-errata`, based on the IOC branch:
+  two known-failure E007 regressions; 74 scenarios / 444 executions.
+  The author deferred the external fix on 2026-09-25.
 - [ ] Agree the next coverage priority; defer firmware work until the author
   supplies scenario guidance as required below.
 - [ ] Use the index to prioritize coverage gaps: missing/empty values, precedence
