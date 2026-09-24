@@ -108,8 +108,8 @@ package or the resulting image bytes. Ubuntu snapshots are not required.
 
 ## Framework configuration tests
 
-[tests/cases.json](../../tests/cases.json) defines 56 scenarios, run with each of
-the three GCC and two CMake versions from the lockfile: **336 case executions**.
+[tests/cases.json](../../tests/cases.json) defines 65 scenarios, run with each of
+the three GCC and two CMake versions from the lockfile: **390 case executions**.
 Eight scenarios perform three consecutive configurations in the same build tree.
 
 | Area | Checks |
@@ -254,3 +254,11 @@ hal_conf error. [Diagnostic limits](troubleshooting.md).
 ### YAML version diagnostics
 
 Eight `version-*` cases cover matching, missing, empty, older and newer versions, disabling comparison at the YAML root, and comparison before profiles/overrides. Every case must complete Configure/Generate successfully; warnings are not failures. This checks 0.9.2 diagnostics, not compatibility with future configuration versions. No firmware is built.
+
+### STM32Cube FreeRTOS
+
+Nine `freertos-*` cases use the real pinned CubeF4 and stm32-cmake packages in the container. Minimal YAML checks ARM_CM4F, Heap::4/Heap::2, Timers, EventGroups, StreamBuffer, and no wrapper / CMSIS-RTOS v1 / v2 through LINK_LIBRARIES and successful Ninja generation. The `gcs` profile reflects settings from the author's supplied `mcu_gcs_web_board`; `demo` reflects `demo-stm32-cmake/stm32f4xx/ethernet-rndis-nicokorn`. Both source projects were inspected read-only; their networking sources are neither copied nor built.
+
+Separate cases cover no port, multiple ports and an unknown component. Disabled FreeRTOS must ignore even an invalid component list. `freertos-required-package` blocks find_package with `CMAKE_DISABLE_FIND_PACKAGE_FreeRTOS=TRUE` and expects the required dependency to fail; this is a controlled unavailable-package simulation, not a physically damaged Cube installation.
+
+Without IOC, default `freertos_version` is checked through the selected Cube target namespace; omitting `cmsis_rtos_api` adds no wrapper. External FreeRTOS and IOC inference are not covered by this group. The fixture deliberately has no FreeRTOSConfig.h: Configure/Generate does not validate its contents or prove scheduler, interrupt-handler, heap or firmware correctness. Building requires application settings and an agreed scenario.

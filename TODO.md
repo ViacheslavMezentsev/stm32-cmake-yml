@@ -59,8 +59,10 @@ PR больше не требуются; старые ссылки остают�
   библиотек; 45 сценариев / 270 запусков.
 - [x] `codex/build-helper-skill` слита в main (`c92d786`), CI успешен:
   диагностика по стадиям; 48 сценариев / 288 запусков.
-- [ ] Текущая ветка `codex/configure-version-contract`: восемь проверок
-  диагностики версии YAML; 56 сценариев / 336 запусков.
+- [x] Проверки версии YAML слиты в main (`9bc165f`), CI успешен:
+  56 сценариев / 336 запусков.
+- [ ] Текущая ветка `codex/configure-freertos-contract`: девять проверок
+  компонентов FreeRTOS и CMSIS-RTOS; 65 сценариев / 390 запусков.
 - [ ] Следующий шаг согласовать по пробелам покрытия; к прошивкам переходить
   только после уточнений автора, как указано ниже.
 - [ ] По индексу выбрать следующие пробелы покрытия: отсутствующие/пустые значения,
@@ -140,8 +142,10 @@ keep defect details in errata.
   library checks; 45 scenarios / 270 executions.
 - [x] `codex/build-helper-skill` merged into main (`c92d786`), CI passed:
   phase-specific diagnostics; 48 scenarios / 288 executions.
-- [ ] Current branch `codex/configure-version-contract`: eight YAML version
-  diagnostic cases; 56 scenarios / 336 executions.
+- [x] YAML version checks merged into main (`9bc165f`), CI passed:
+  56 scenarios / 336 executions.
+- [ ] Current branch `codex/configure-freertos-contract`: nine FreeRTOS and
+  CMSIS-RTOS component cases; 65 scenarios / 390 executions.
 - [ ] Agree the next coverage priority; defer firmware work until the author
   supplies scenario guidance as required below.
 - [ ] Use the index to prioritize coverage gaps: missing/empty values, precedence

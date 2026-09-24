@@ -2,7 +2,7 @@
   "schema_version": 1,
   "framework_version": "0.9.2",
   "baseline_commit": "f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0",
-  "test_commit": "d9a1c625d34632b902cf8f79de607e410895d0a4",
+  "test_commit": "8b8fd1e7e102e484ce4beed625c5d6100659ea64",
   "fixes": [
     {
       "commit": "858013a7f31a674a91149ea3a68a5200498d92cc",
@@ -461,7 +461,10 @@
         "en": "docs/en/reference/0.9.2/frameworks.md#use-freertos"
       },
       "tests": [
-        "configure.baremetal-no-cube"
+        "configure.baremetal-no-cube",
+        "configure.freertos-defaults",
+        "configure.freertos-disabled",
+        "configure.freertos-required-package"
       ],
       "errata": []
     },
@@ -476,7 +479,11 @@
         "ru": "docs/ru/reference/0.9.2/frameworks.md#freertos-version",
         "en": "docs/en/reference/0.9.2/frameworks.md#freertos-version"
       },
-      "tests": [],
+      "tests": [
+        "configure.freertos-defaults",
+        "configure.freertos-gcs-v2",
+        "configure.freertos-demo-heap2"
+      ],
       "errata": []
     },
     {
@@ -490,7 +497,13 @@
         "ru": "docs/ru/reference/0.9.2/frameworks.md#freertos-components",
         "en": "docs/en/reference/0.9.2/frameworks.md#freertos-components"
       },
-      "tests": [],
+      "tests": [
+        "configure.freertos-defaults",
+        "configure.freertos-demo-heap2",
+        "configure.freertos-no-port",
+        "configure.freertos-multiple-ports",
+        "configure.freertos-missing-component"
+      ],
       "errata": []
     },
     {
@@ -504,7 +517,13 @@
         "ru": "docs/ru/reference/0.9.2/frameworks.md#cmsis-rtos-api",
         "en": "docs/en/reference/0.9.2/frameworks.md#cmsis-rtos-api"
       },
-      "tests": [],
+      "tests": [
+        "configure.freertos-defaults",
+        "configure.freertos-gcs-v2",
+        "configure.freertos-demo-heap2",
+        "configure.freertos-v1",
+        "configure.freertos-disabled"
+      ],
       "errata": []
     },
     {
