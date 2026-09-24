@@ -108,8 +108,8 @@ package or the resulting image bytes. Ubuntu snapshots are not required.
 
 ## Framework configuration tests
 
-[tests/cases.json](../../tests/cases.json) defines 72 scenarios, run with each of
-the three GCC and two CMake versions from the lockfile: **432 case executions**.
+[tests/cases.json](../../tests/cases.json) defines 74 scenarios, run with each of
+the three GCC and two CMake versions from the lockfile: **444 case executions**.
 Nine scenarios perform three consecutive configurations in the same build tree.
 
 | Area | Checks |
@@ -270,3 +270,7 @@ Seven `freertos-ioc-*` cases extend the manual configuration group above. Reduce
 YAML and profiles can replace components with Heap::2 and the API with none. Empty use_freertos, freertos_version, cmsis_rtos_api and component lists fall back to IOC/automatic values. An override of false suppresses IOC activation. `freertos-ioc-reconfigure` checks enabled → disabled by profile → enabled across Configure runs sharing a cache; it supplements the usual clean-cache reconfiguration workflow.
 
 Assertions cover exported values, direct target dependencies and successful Generate. Other families, external FreeRTOS, port/core compatibility, task execution and clock setup are not tested. No firmware is built.
+
+### Known external FreeRTOS failure
+
+Two `freertos-external-*-known-failure` tests reproduce [E007](errata/E007.md) with FREERTOS_PATH passed through CMake or the environment. Passing means the expected Generate failure occurred. External mode remains unfixed and has no positive integration test.

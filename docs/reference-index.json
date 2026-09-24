@@ -2,7 +2,7 @@
   "schema_version": 1,
   "framework_version": "0.9.2",
   "baseline_commit": "f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0",
-  "test_commit": "5852bfd89d78e4f52059801808a55c4595ed8af1",
+  "test_commit": "48db91d612860d6ed82aec08d8f41723210c7927",
   "fixes": [
     {
       "commit": "858013a7f31a674a91149ea3a68a5200498d92cc",
@@ -499,9 +499,13 @@
         "configure.freertos-demo-heap2",
         "configure.freertos-ioc-f4-v2",
         "configure.freertos-ioc-f1-v1",
-        "configure.freertos-ioc-empty-fallback"
+        "configure.freertos-ioc-empty-fallback",
+        "configure.freertos-external-cmake-known-failure",
+        "configure.freertos-external-env-known-failure"
       ],
-      "errata": []
+      "errata": [
+        "E007"
+      ]
     },
     {
       "key": "freertos_components",
@@ -1095,6 +1099,20 @@
       "pages": {
         "ru": "docs/ru/errata/E006.md",
         "en": "docs/en/errata/E006.md"
+      },
+      "evidence": "reproduced",
+      "status": "open",
+      "fixed_commit": null,
+      "fixed_release": null
+    },
+    {
+      "id": "E007",
+      "options": [
+        "freertos_version"
+      ],
+      "pages": {
+        "ru": "docs/ru/errata/E007.md",
+        "en": "docs/en/errata/E007.md"
       },
       "evidence": "reproduced",
       "status": "open",
