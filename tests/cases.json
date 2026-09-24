@@ -535,5 +535,174 @@
       "Config : 0.9.3",
       "Возможны ошибки."
     ]
+  },
+  {
+    "name": "freertos-defaults",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=freertos.yml"
+    ],
+    "observed": {
+      "use_freertos": "TRUE"
+    },
+    "properties": {
+      "LINK_LIBRARIES": [
+        "FreeRTOS::STM32::F4::ARM_CM4F",
+        "FreeRTOS::STM32::F4::Heap::4",
+        "FreeRTOS::STM32::F4::Timers",
+        "FreeRTOS::STM32::F4::EventGroups",
+        "FreeRTOS::STM32::F4::StreamBuffer"
+      ]
+    },
+    "absent_properties": {
+      "LINK_LIBRARIES": [
+        "CMSIS::STM32::F4::RTOS",
+        "CMSIS::STM32::F4::RTOS_V2"
+      ]
+    },
+    "log_contains": [
+      "Используется порт FreeRTOS: ARM_CM4F"
+    ]
+  },
+  {
+    "name": "freertos-gcs-v2",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=freertos.yml",
+      "-DSTM32_YML_PROFILE=gcs"
+    ],
+    "observed": {
+      "use_freertos": "TRUE"
+    },
+    "properties": {
+      "LINK_LIBRARIES": [
+        "FreeRTOS::STM32::F4::ARM_CM4F",
+        "FreeRTOS::STM32::F4::Heap::4",
+        "FreeRTOS::STM32::F4::Timers",
+        "FreeRTOS::STM32::F4::EventGroups",
+        "FreeRTOS::STM32::F4::StreamBuffer",
+        "CMSIS::STM32::F4::RTOS_V2"
+      ]
+    },
+    "absent_properties": {
+      "LINK_LIBRARIES": [
+        "CMSIS::STM32::F4::RTOS"
+      ]
+    },
+    "log_contains": [
+      "Используется порт FreeRTOS: ARM_CM4F"
+    ]
+  },
+  {
+    "name": "freertos-demo-heap2",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=freertos.yml",
+      "-DSTM32_YML_PROFILE=demo"
+    ],
+    "observed": {
+      "use_freertos": "TRUE"
+    },
+    "properties": {
+      "LINK_LIBRARIES": [
+        "FreeRTOS::STM32::F4::ARM_CM4F",
+        "FreeRTOS::STM32::F4::Heap::2",
+        "FreeRTOS::STM32::F4::Timers",
+        "FreeRTOS::STM32::F4::EventGroups",
+        "FreeRTOS::STM32::F4::StreamBuffer",
+        "CMSIS::STM32::F4::RTOS_V2"
+      ]
+    },
+    "absent_properties": {
+      "LINK_LIBRARIES": [
+        "FreeRTOS::STM32::F4::Heap::4",
+        "CMSIS::STM32::F4::RTOS"
+      ]
+    },
+    "log_contains": [
+      "Используется порт FreeRTOS: ARM_CM4F"
+    ]
+  },
+  {
+    "name": "freertos-v1",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=freertos.yml",
+      "-DSTM32_YML_PROFILE=legacy"
+    ],
+    "observed": {
+      "use_freertos": "TRUE"
+    },
+    "properties": {
+      "LINK_LIBRARIES": [
+        "FreeRTOS::STM32::F4::ARM_CM4F",
+        "FreeRTOS::STM32::F4::Heap::4",
+        "FreeRTOS::STM32::F4::Timers",
+        "FreeRTOS::STM32::F4::EventGroups",
+        "FreeRTOS::STM32::F4::StreamBuffer",
+        "CMSIS::STM32::F4::RTOS"
+      ]
+    },
+    "absent_properties": {
+      "LINK_LIBRARIES": [
+        "CMSIS::STM32::F4::RTOS_V2"
+      ]
+    },
+    "log_contains": [
+      "Используется порт FreeRTOS: ARM_CM4F"
+    ]
+  },
+  {
+    "name": "freertos-no-port",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=freertos.yml",
+      "-DSTM32_YML_PROFILE=noport"
+    ],
+    "error": "В 'freertos_components' не найден порт"
+  },
+  {
+    "name": "freertos-multiple-ports",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=freertos.yml",
+      "-DSTM32_YML_PROFILE=twoports"
+    ],
+    "error": "Найдено несколько портов FreeRTOS"
+  },
+  {
+    "name": "freertos-missing-component",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=freertos.yml",
+      "-DSTM32_YML_PROFILE=missing"
+    ],
+    "error": "FreeRTOS::STM32::F4::MissingComponent"
+  },
+  {
+    "name": "freertos-disabled",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=freertos.yml",
+      "-DSTM32_YML_PROFILE=disabled"
+    ],
+    "observed": {
+      "use_freertos": "FALSE"
+    },
+    "absent_properties": {
+      "LINK_LIBRARIES": [
+        "FreeRTOS::STM32::F4::ARM_CM4F",
+        "FreeRTOS::STM32::F4::Heap::4",
+        "FreeRTOS::STM32::F4::Timers",
+        "FreeRTOS::STM32::F4::EventGroups",
+        "FreeRTOS::STM32::F4::StreamBuffer",
+        "CMSIS::STM32::F4::RTOS",
+        "CMSIS::STM32::F4::RTOS_V2"
+      ]
+    },
+    "log_absent": [
+      "Автоматическое подключение FreeRTOS включено.",
+      "Найдено несколько портов FreeRTOS"
+    ]
+  },
+  {
+    "name": "freertos-required-package",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=freertos.yml",
+      "-DCMAKE_DISABLE_FIND_PACKAGE_FreeRTOS=TRUE"
+    ],
+    "error": "A REQUIRED package cannot be disabled."
   }
 ]
