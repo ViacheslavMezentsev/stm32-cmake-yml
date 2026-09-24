@@ -87,7 +87,7 @@ use_freertos: false
 
 [Реализация 0.9.2](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_frameworks.cmake) · [Index](index.md)
 
-**Проверки (частичное покрытие):** `configure.baremetal-no-cube`, `configure.freertos-defaults`, `configure.freertos-disabled`, `configure.freertos-required-package`. [Test manifest](../../../../tests/cases.json).
+**Проверки (частичное покрытие):** `configure.baremetal-no-cube`, `configure.freertos-defaults`, `configure.freertos-disabled`, `configure.freertos-required-package`, `configure.freertos-ioc-f4-v2`, `configure.freertos-ioc-f1-v1`, `configure.freertos-ioc-profile-precedence`, `configure.freertos-ioc-yaml-precedence`, `configure.freertos-ioc-empty-fallback`, `configure.freertos-ioc-override-disable`, `configure.freertos-ioc-reconfigure`. [Test manifest](../../../../tests/cases.json).
 
 <a id="freertos-version"></a>
 ## `freertos_version`
@@ -104,7 +104,7 @@ freertos_version: cube
 
 [Реализация 0.9.2](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_frameworks.cmake) · [Index](index.md)
 
-**Проверки (частичное покрытие):** `configure.freertos-defaults`, `configure.freertos-gcs-v2`, `configure.freertos-demo-heap2`. [Test manifest](../../../../tests/cases.json).
+**Проверки (частичное покрытие):** `configure.freertos-defaults`, `configure.freertos-gcs-v2`, `configure.freertos-demo-heap2`, `configure.freertos-ioc-f4-v2`, `configure.freertos-ioc-f1-v1`, `configure.freertos-ioc-empty-fallback`. [Test manifest](../../../../tests/cases.json).
 
 <a id="freertos-components"></a>
 ## `freertos_components`
@@ -121,7 +121,7 @@ freertos_components: [ARM_CM3, Heap::4]
 
 [Реализация 0.9.2](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_frameworks.cmake) · [Index](index.md)
 
-**Проверки (частичное покрытие):** `configure.freertos-defaults`, `configure.freertos-demo-heap2`, `configure.freertos-no-port`, `configure.freertos-multiple-ports`, `configure.freertos-missing-component`. [Test manifest](../../../../tests/cases.json).
+**Проверки (частичное покрытие):** `configure.freertos-defaults`, `configure.freertos-demo-heap2`, `configure.freertos-no-port`, `configure.freertos-multiple-ports`, `configure.freertos-missing-component`, `configure.freertos-ioc-f4-v2`, `configure.freertos-ioc-f1-v1`, `configure.freertos-ioc-profile-precedence`, `configure.freertos-ioc-yaml-precedence`, `configure.freertos-ioc-empty-fallback`, `configure.freertos-ioc-override-disable`, `configure.freertos-ioc-reconfigure`. [Test manifest](../../../../tests/cases.json).
 
 <a id="cmsis-rtos-api"></a>
 ## `cmsis_rtos_api`
@@ -138,4 +138,4 @@ cmsis_rtos_api: none
 
 [Реализация 0.9.2](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_frameworks.cmake) · [Index](index.md)
 
-**Проверки (частичное покрытие):** `configure.freertos-defaults`, `configure.freertos-gcs-v2`, `configure.freertos-demo-heap2`, `configure.freertos-v1`, `configure.freertos-disabled`. [Test manifest](../../../../tests/cases.json).
+**Проверки (частичное покрытие):** `configure.freertos-defaults`, `configure.freertos-gcs-v2`, `configure.freertos-demo-heap2`, `configure.freertos-v1`, `configure.freertos-disabled`, `configure.freertos-ioc-f4-v2`, `configure.freertos-ioc-f1-v1`, `configure.freertos-ioc-profile-precedence`, `configure.freertos-ioc-yaml-precedence`, `configure.freertos-ioc-empty-fallback`, `configure.freertos-ioc-override-disable`, `configure.freertos-ioc-reconfigure`. [Test manifest](../../../../tests/cases.json).

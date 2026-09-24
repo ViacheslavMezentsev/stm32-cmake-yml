@@ -1,0 +1,14 @@
+stm32_cmake_yml_version: 0.9.2
+ioc_file: freertos-f4.ioc
+languages: [C, ASM]
+sources: [main.c]
+use_cmsis: true
+use_hal: false
+profiles:
+  bluepill:
+    ioc_file: freertos-f1.ioc
+  native:
+    cmsis_rtos_api: none
+    freertos_components: [ARM_CM4F, Heap::2]
+  disabled:
+    use_freertos: false
