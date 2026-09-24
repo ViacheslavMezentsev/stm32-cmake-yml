@@ -19,7 +19,7 @@ use_cmsis: false
 
 [Реализация 0.9.2](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_frameworks.cmake) · [Index](index.md)
 
-**Проверки (частичное покрытие):** `configure.ioc-baremetal-zero`, `configure.baremetal-no-cube`. [Test manifest](../../../../tests/cases.json).
+**Проверки (частичное покрытие):** `configure.ioc-baremetal-zero`, `configure.baremetal-no-cube`, `configure.stm32f0-cmsis-hal`, `configure.stm32f3-cmsis-hal`, `configure.stm32f7-cmsis-hal`, `configure.stm32g4-cmsis-hal`, `configure.stm32f0-bare`. [Test manifest](../../../../tests/cases.json).
 
 <a id="use-hal"></a>
 ## `use_hal`
@@ -36,7 +36,7 @@ use_hal: true
 
 [Реализация 0.9.2](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_frameworks.cmake) · [Index](index.md)
 
-**Проверки (частичное покрытие):** `configure.hal-requires-cmsis`, `configure.defaults-blackpill`, `configure.diagnostics-missing-hal-conf`. [Test manifest](../../../../tests/cases.json).
+**Проверки (частичное покрытие):** `configure.hal-requires-cmsis`, `configure.defaults-blackpill`, `configure.diagnostics-missing-hal-conf`, `configure.stm32f0-cmsis-hal`, `configure.stm32f3-cmsis-hal`, `configure.stm32f7-cmsis-hal`, `configure.stm32g4-cmsis-hal`, `configure.stm32f0-bare`. [Test manifest](../../../../tests/cases.json).
 
 <a id="cubefw-package"></a>
 ## `cubefw_package`
@@ -53,7 +53,7 @@ cubefw_package: V1.8.7
 
 [Реализация 0.9.2](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_frameworks.cmake) · [Index](index.md)
 
-**Проверки (частичное покрытие):** `configure.ioc-bluepill-defaults`, `configure.baremetal-no-cube`. [Test manifest](../../../../tests/cases.json).
+**Проверки (частичное покрытие):** `configure.ioc-bluepill-defaults`, `configure.baremetal-no-cube`, `configure.stm32f0-cmsis-hal`, `configure.stm32f3-cmsis-hal`, `configure.stm32f7-cmsis-hal`, `configure.stm32g4-cmsis-hal`. [Test manifest](../../../../tests/cases.json).
 
 <a id="hal-components"></a>
 ## `hal_components`
@@ -70,7 +70,7 @@ hal_components: [GPIO]
 
 [Реализация 0.9.2](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_frameworks.cmake) · [Index](index.md)
 
-**Проверки (частичное покрытие):** `configure.defaults-blackpill`, `configure.bluepill`. [Test manifest](../../../../tests/cases.json).
+**Проверки (частичное покрытие):** `configure.defaults-blackpill`, `configure.bluepill`, `configure.stm32f0-cmsis-hal`, `configure.stm32f3-cmsis-hal`, `configure.stm32f7-cmsis-hal`, `configure.stm32g4-cmsis-hal`, `configure.stm32f0-ll-profile`. [Test manifest](../../../../tests/cases.json).
 
 <a id="use-freertos"></a>
 ## `use_freertos`
@@ -123,7 +123,7 @@ freertos_components: [ARM_CM3, Heap::4]
 
 [Реализация 0.9.2](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_frameworks.cmake) · [Index](index.md)
 
-**Проверки (частичное покрытие):** `configure.freertos-defaults`, `configure.freertos-demo-heap2`, `configure.freertos-no-port`, `configure.freertos-multiple-ports`, `configure.freertos-missing-component`, `configure.freertos-ioc-f4-v2`, `configure.freertos-ioc-f1-v1`, `configure.freertos-ioc-profile-precedence`, `configure.freertos-ioc-yaml-precedence`, `configure.freertos-ioc-empty-fallback`, `configure.freertos-ioc-override-disable`, `configure.freertos-ioc-reconfigure`. [Test manifest](../../../../tests/cases.json).
+**Проверки (частичное покрытие):** `configure.freertos-defaults`, `configure.freertos-demo-heap2`, `configure.freertos-no-port`, `configure.freertos-multiple-ports`, `configure.freertos-missing-component`, `configure.freertos-ioc-f4-v2`, `configure.freertos-ioc-f1-v1`, `configure.freertos-ioc-profile-precedence`, `configure.freertos-ioc-yaml-precedence`, `configure.freertos-ioc-empty-fallback`, `configure.freertos-ioc-override-disable`, `configure.freertos-ioc-reconfigure`, `configure.stm32f0-ioc-freertos`, `configure.stm32f3-ioc-freertos`, `configure.stm32f7-ioc-freertos`, `configure.stm32g4-ioc-freertos`. [Test manifest](../../../../tests/cases.json).
 
 <a id="cmsis-rtos-api"></a>
 ## `cmsis_rtos_api`
@@ -140,4 +140,4 @@ cmsis_rtos_api: none
 
 [Реализация 0.9.2](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_frameworks.cmake) · [Index](index.md)
 
-**Проверки (частичное покрытие):** `configure.freertos-defaults`, `configure.freertos-gcs-v2`, `configure.freertos-demo-heap2`, `configure.freertos-v1`, `configure.freertos-disabled`, `configure.freertos-ioc-f4-v2`, `configure.freertos-ioc-f1-v1`, `configure.freertos-ioc-profile-precedence`, `configure.freertos-ioc-yaml-precedence`, `configure.freertos-ioc-empty-fallback`, `configure.freertos-ioc-override-disable`, `configure.freertos-ioc-reconfigure`. [Test manifest](../../../../tests/cases.json).
+**Проверки (частичное покрытие):** `configure.freertos-defaults`, `configure.freertos-gcs-v2`, `configure.freertos-demo-heap2`, `configure.freertos-v1`, `configure.freertos-disabled`, `configure.freertos-ioc-f4-v2`, `configure.freertos-ioc-f1-v1`, `configure.freertos-ioc-profile-precedence`, `configure.freertos-ioc-yaml-precedence`, `configure.freertos-ioc-empty-fallback`, `configure.freertos-ioc-override-disable`, `configure.freertos-ioc-reconfigure`, `configure.stm32f0-ioc-freertos`, `configure.stm32f3-ioc-freertos`, `configure.stm32f7-ioc-freertos`, `configure.stm32g4-ioc-freertos`. [Test manifest](../../../../tests/cases.json).

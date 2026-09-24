@@ -953,5 +953,309 @@
     "env": {
       "FREERTOS_PATH": "/opt/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3/Middlewares/Third_Party/FreeRTOS"
     }
+  },
+  {
+    "name": "stm32f0-cmsis-hal",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=stm32f0.yml"
+    ],
+    "observed": {
+      "MCU": "STM32F030R8",
+      "cubefw_package": "V1.11.6"
+    },
+    "properties": {
+      "LINK_LIBRARIES": [
+        "CMSIS::STM32::F030R8",
+        "HAL::STM32::F0::GPIO"
+      ],
+      "COMPILE_DEFINITIONS": [
+        "STM32F030x8",
+        "USE_HAL_DRIVER"
+      ]
+    },
+    "command_checks": [
+      {
+        "file": "main.c",
+        "present": [
+          "-mcpu=cortex-m0",
+          "-mthumb"
+        ],
+        "absent": [
+          "-mcpu=cortex-m3",
+          "-mcpu=cortex-m4",
+          "-mfpu=fpv4-sp-d16"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "stm32f0-ll-profile",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=stm32f0.yml",
+      "-DSTM32_YML_PROFILE=ll"
+    ],
+    "properties": {
+      "LINK_LIBRARIES": [
+        "HAL::STM32::F0::LL_GPIO"
+      ],
+      "COMPILE_DEFINITIONS": [
+        "USE_FULL_LL_DRIVER"
+      ]
+    },
+    "absent_properties": {
+      "LINK_LIBRARIES": [
+        "HAL::STM32::F0::GPIO"
+      ]
+    },
+    "command_checks": [
+      {
+        "file": "main.c",
+        "present": [
+          "-mcpu=cortex-m0",
+          "-mthumb"
+        ],
+        "absent": [
+          "-mcpu=cortex-m3",
+          "-mcpu=cortex-m4",
+          "-mfpu=fpv4-sp-d16"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "stm32f0-bare",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=stm32f0.yml",
+      "-DSTM32_YML_PROFILE=bare"
+    ],
+    "observed": {
+      "use_cmsis": "FALSE",
+      "use_hal": "FALSE",
+      "use_freertos": "FALSE"
+    },
+    "no_st_dependencies": true,
+    "command_checks": [
+      {
+        "file": "main.c",
+        "present": [
+          "-mcpu=cortex-m0",
+          "-mthumb"
+        ],
+        "absent": [
+          "-mcpu=cortex-m3",
+          "-mcpu=cortex-m4",
+          "-mfpu=fpv4-sp-d16"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "stm32f0-ioc-freertos",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=stm32f0.yml",
+      "-DSTM32_YML_PROFILE=rtos"
+    ],
+    "observed": {
+      "freertos_components": "ARM_CM0;Heap::4",
+      "cmsis_rtos_api": "v1",
+      "use_freertos": "true"
+    },
+    "properties": {
+      "LINK_LIBRARIES": [
+        "FreeRTOS::STM32::F0::ARM_CM0",
+        "FreeRTOS::STM32::F0::Heap::4",
+        "CMSIS::STM32::F0::RTOS"
+      ]
+    },
+    "absent_properties": {
+      "LINK_LIBRARIES": [
+        "CMSIS::STM32::F0::RTOS_V2"
+      ]
+    },
+    "command_checks": [
+      {
+        "file": "main.c",
+        "present": [
+          "-mcpu=cortex-m0",
+          "-mthumb"
+        ],
+        "absent": [
+          "-mcpu=cortex-m3",
+          "-mcpu=cortex-m4",
+          "-mfpu=fpv4-sp-d16"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "stm32f3-cmsis-hal",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=stm32f3.yml"
+    ],
+    "observed": {
+      "MCU": "STM32F303VC",
+      "cubefw_package": "V1.11.5"
+    },
+    "properties": {
+      "LINK_LIBRARIES": [
+        "CMSIS::STM32::F303VC",
+        "HAL::STM32::F3::GPIO"
+      ],
+      "COMPILE_DEFINITIONS": [
+        "STM32F303xC",
+        "USE_HAL_DRIVER"
+      ]
+    },
+    "command_checks": [
+      {
+        "file": "main.c",
+        "present": [
+          "-mcpu=cortex-m4",
+          "-mthumb"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "stm32f3-ioc-freertos",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=stm32f3.yml",
+      "-DSTM32_YML_PROFILE=rtos"
+    ],
+    "observed": {
+      "freertos_components": "ARM_CM4F;Heap::4",
+      "cmsis_rtos_api": "v1",
+      "use_freertos": "true"
+    },
+    "properties": {
+      "LINK_LIBRARIES": [
+        "FreeRTOS::STM32::F3::ARM_CM4F",
+        "FreeRTOS::STM32::F3::Heap::4",
+        "CMSIS::STM32::F3::RTOS"
+      ]
+    },
+    "command_checks": [
+      {
+        "file": "main.c",
+        "present": [
+          "-mcpu=cortex-m4",
+          "-mthumb"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "stm32f7-cmsis-hal",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=stm32f7.yml"
+    ],
+    "observed": {
+      "MCU": "STM32F746NG",
+      "cubefw_package": "V1.17.3"
+    },
+    "properties": {
+      "LINK_LIBRARIES": [
+        "CMSIS::STM32::F746NG",
+        "HAL::STM32::F7::GPIO"
+      ],
+      "COMPILE_DEFINITIONS": [
+        "STM32F746xx",
+        "USE_HAL_DRIVER"
+      ]
+    },
+    "command_checks": [
+      {
+        "file": "main.c",
+        "present": [
+          "-mcpu=cortex-m7",
+          "-mthumb"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "stm32f7-ioc-freertos",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=stm32f7.yml",
+      "-DSTM32_YML_PROFILE=rtos"
+    ],
+    "observed": {
+      "freertos_components": "ARM_CM7;Heap::4",
+      "cmsis_rtos_api": "v1",
+      "use_freertos": "true"
+    },
+    "properties": {
+      "LINK_LIBRARIES": [
+        "FreeRTOS::STM32::F7::ARM_CM7",
+        "FreeRTOS::STM32::F7::Heap::4",
+        "CMSIS::STM32::F7::RTOS"
+      ]
+    },
+    "command_checks": [
+      {
+        "file": "main.c",
+        "present": [
+          "-mcpu=cortex-m7",
+          "-mthumb"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "stm32g4-cmsis-hal",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=stm32g4.yml"
+    ],
+    "observed": {
+      "MCU": "STM32G431CB",
+      "cubefw_package": "V1.6.3"
+    },
+    "properties": {
+      "LINK_LIBRARIES": [
+        "CMSIS::STM32::G431CB",
+        "HAL::STM32::G4::GPIO"
+      ],
+      "COMPILE_DEFINITIONS": [
+        "STM32G431xx",
+        "USE_HAL_DRIVER"
+      ]
+    },
+    "command_checks": [
+      {
+        "file": "main.c",
+        "present": [
+          "-mcpu=cortex-m4",
+          "-mthumb"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "stm32g4-ioc-freertos",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=stm32g4.yml",
+      "-DSTM32_YML_PROFILE=rtos"
+    ],
+    "observed": {
+      "freertos_components": "ARM_CM4F;Heap::4",
+      "cmsis_rtos_api": "v1",
+      "use_freertos": "true"
+    },
+    "properties": {
+      "LINK_LIBRARIES": [
+        "FreeRTOS::STM32::G4::ARM_CM4F",
+        "FreeRTOS::STM32::G4::Heap::4",
+        "CMSIS::STM32::G4::RTOS"
+      ]
+    },
+    "command_checks": [
+      {
+        "file": "main.c",
+        "present": [
+          "-mcpu=cortex-m4",
+          "-mthumb"
+        ]
+      }
+    ]
   }
 ]

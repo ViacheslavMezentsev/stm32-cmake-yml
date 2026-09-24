@@ -141,6 +141,53 @@
         "Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal.h",
         "Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h"
       ]
+    },
+    {
+      "name": "CubeF0-1.11.6",
+      "url": "https://github.com/STMicroelectronics/STM32CubeF0.git",
+      "commit": "fe8158da86d94d295048faca799261947e40db83",
+      "destination": "/opt/STM32Cube/Repository/STM32Cube_FW_F0_V1.11.6",
+      "submodules": [
+        "Drivers/CMSIS/Device/ST/STM32F0xx",
+        "Drivers/STM32F0xx_HAL_Driver",
+        "Middlewares/Third_Party/FreeRTOS"
+      ],
+      "required_files": [
+        "Drivers/CMSIS/Device/ST/STM32F0xx/Include/stm32f0xx.h",
+        "Drivers/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal.h",
+        "Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h",
+        "Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM0/port.c"
+      ]
+    },
+    {
+      "name": "CubeF3-1.11.5",
+      "url": "https://github.com/STMicroelectronics/STM32CubeF3.git",
+      "commit": "8d9115fc51dd84a08864add769e1cba6f95b8857",
+      "destination": "/opt/STM32Cube/Repository/STM32Cube_FW_F3_V1.11.5",
+      "submodules": [
+        "Drivers/CMSIS/Device/ST/STM32F3xx",
+        "Drivers/STM32F3xx_HAL_Driver"
+      ],
+      "required_files": [
+        "Drivers/CMSIS/Device/ST/STM32F3xx/Include/stm32f3xx.h",
+        "Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal.h",
+        "Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h"
+      ]
+    },
+    {
+      "name": "CubeF7-1.17.3",
+      "url": "https://github.com/STMicroelectronics/STM32CubeF7.git",
+      "commit": "e3855a61704b5c1748fde32b85318bbc181133e8",
+      "destination": "/opt/STM32Cube/Repository/STM32Cube_FW_F7_V1.17.3",
+      "submodules": [
+        "Drivers/CMSIS/Device/ST/STM32F7xx",
+        "Drivers/STM32F7xx_HAL_Driver"
+      ],
+      "required_files": [
+        "Drivers/CMSIS/Device/ST/STM32F7xx/Include/stm32f7xx.h",
+        "Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal.h",
+        "Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h"
+      ]
     }
   ]
 }
