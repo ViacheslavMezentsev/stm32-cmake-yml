@@ -1,0 +1,12 @@
+# Reduced parser fixture, not a complete CubeMX project or clock implementation.
+# F4 RTOS markers follow the read-only mcu_gcs_web_board example.
+ProjectManager.DeviceId=STM32F411CEUx
+ProjectManager.ProjectName=freertos_ioc_probe
+ProjectManager.DefaultFWLocation=true
+ProjectManager.FirmwarePackage=STM32Cube FW_F4 V1.28.3
+ProjectManager.LibraryCopy=2
+ProjectManager.HeapSize=0x200
+ProjectManager.StackSize=0x400
+Mcu.IP0=FREERTOS
+VP_FREERTOS_VS_CMSIS_V2.Mode=CMSIS_V2
+RCC.SYSCLKSource=RCC_SYSCLKSOURCE_HSI

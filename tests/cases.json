@@ -704,5 +704,221 @@
       "-DCMAKE_DISABLE_FIND_PACKAGE_FreeRTOS=TRUE"
     ],
     "error": "A REQUIRED package cannot be disabled."
+  },
+  {
+    "name": "freertos-ioc-f4-v2",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=freertos-ioc.yml"
+    ],
+    "observed": {
+      "use_freertos": "true",
+      "freertos_version": "cube",
+      "freertos_components": "ARM_CM4F;Heap::4",
+      "cmsis_rtos_api": "v2"
+    },
+    "properties": {
+      "LINK_LIBRARIES": [
+        "FreeRTOS::STM32::F4::ARM_CM4F",
+        "FreeRTOS::STM32::F4::Heap::4",
+        "CMSIS::STM32::F4::RTOS_V2"
+      ]
+    },
+    "absent_properties": {
+      "LINK_LIBRARIES": [
+        "CMSIS::STM32::F4::RTOS"
+      ]
+    }
+  },
+  {
+    "name": "freertos-ioc-f1-v1",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=freertos-ioc.yml",
+      "-DSTM32_YML_PROFILE=bluepill"
+    ],
+    "observed": {
+      "use_freertos": "true",
+      "freertos_version": "cube",
+      "freertos_components": "ARM_CM3;Heap::4",
+      "cmsis_rtos_api": "v1"
+    },
+    "properties": {
+      "LINK_LIBRARIES": [
+        "FreeRTOS::STM32::F1::ARM_CM3",
+        "FreeRTOS::STM32::F1::Heap::4",
+        "CMSIS::STM32::F1::RTOS"
+      ]
+    },
+    "absent_properties": {
+      "LINK_LIBRARIES": [
+        "CMSIS::STM32::F1::RTOS_V2"
+      ]
+    }
+  },
+  {
+    "name": "freertos-ioc-profile-precedence",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=freertos-ioc.yml",
+      "-DSTM32_YML_PROFILE=native"
+    ],
+    "observed": {
+      "use_freertos": "true",
+      "freertos_version": "cube",
+      "freertos_components": "ARM_CM4F;Heap::2",
+      "cmsis_rtos_api": "none"
+    },
+    "properties": {
+      "LINK_LIBRARIES": [
+        "FreeRTOS::STM32::F4::ARM_CM4F",
+        "FreeRTOS::STM32::F4::Heap::2"
+      ]
+    },
+    "absent_properties": {
+      "LINK_LIBRARIES": [
+        "CMSIS::STM32::F4::RTOS",
+        "CMSIS::STM32::F4::RTOS_V2",
+        "FreeRTOS::STM32::F4::Heap::4"
+      ]
+    }
+  },
+  {
+    "name": "freertos-ioc-yaml-precedence",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=freertos-ioc-explicit.yml"
+    ],
+    "observed": {
+      "use_freertos": "true",
+      "freertos_version": "cube",
+      "freertos_components": "ARM_CM4F;Heap::2",
+      "cmsis_rtos_api": "none"
+    },
+    "properties": {
+      "LINK_LIBRARIES": [
+        "FreeRTOS::STM32::F4::ARM_CM4F",
+        "FreeRTOS::STM32::F4::Heap::2"
+      ]
+    },
+    "absent_properties": {
+      "LINK_LIBRARIES": [
+        "CMSIS::STM32::F4::RTOS",
+        "CMSIS::STM32::F4::RTOS_V2",
+        "FreeRTOS::STM32::F4::Heap::4"
+      ]
+    }
+  },
+  {
+    "name": "freertos-ioc-empty-fallback",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=freertos-ioc-empty.yml"
+    ],
+    "observed": {
+      "use_freertos": "true",
+      "freertos_version": "cube",
+      "freertos_components": "ARM_CM4F;Heap::4",
+      "cmsis_rtos_api": "v2"
+    },
+    "properties": {
+      "LINK_LIBRARIES": [
+        "FreeRTOS::STM32::F4::ARM_CM4F",
+        "FreeRTOS::STM32::F4::Heap::4",
+        "CMSIS::STM32::F4::RTOS_V2"
+      ]
+    },
+    "absent_properties": {
+      "LINK_LIBRARIES": [
+        "CMSIS::STM32::F4::RTOS"
+      ]
+    }
+  },
+  {
+    "name": "freertos-ioc-override-disable",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=freertos-ioc.yml",
+      "-DSTM32_YML_OVERRIDE_use_freertos=false"
+    ],
+    "observed": {
+      "use_freertos": "false"
+    },
+    "absent_properties": {
+      "LINK_LIBRARIES": [
+        "FreeRTOS::STM32::F4::ARM_CM4F",
+        "FreeRTOS::STM32::F4::Heap::4",
+        "CMSIS::STM32::F4::RTOS_V2"
+      ]
+    },
+    "log_absent": [
+      "Автоматическое подключение FreeRTOS включено."
+    ]
+  },
+  {
+    "name": "freertos-ioc-reconfigure",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=freertos-ioc.yml"
+    ],
+    "steps": [
+      {
+        "args": [
+          "-DSTM32_YML_PROFILE="
+        ],
+        "observed": {
+          "use_freertos": "true",
+          "freertos_version": "cube",
+          "freertos_components": "ARM_CM4F;Heap::4",
+          "cmsis_rtos_api": "v2"
+        },
+        "properties": {
+          "LINK_LIBRARIES": [
+            "FreeRTOS::STM32::F4::ARM_CM4F",
+            "FreeRTOS::STM32::F4::Heap::4",
+            "CMSIS::STM32::F4::RTOS_V2"
+          ]
+        },
+        "absent_properties": {
+          "LINK_LIBRARIES": [
+            "CMSIS::STM32::F4::RTOS"
+          ]
+        }
+      },
+      {
+        "args": [
+          "-DSTM32_YML_PROFILE=disabled"
+        ],
+        "observed": {
+          "use_freertos": "FALSE"
+        },
+        "absent_properties": {
+          "LINK_LIBRARIES": [
+            "FreeRTOS::STM32::F4::ARM_CM4F",
+            "FreeRTOS::STM32::F4::Heap::4",
+            "CMSIS::STM32::F4::RTOS_V2"
+          ]
+        },
+        "log_absent": [
+          "Автоматическое подключение FreeRTOS включено."
+        ]
+      },
+      {
+        "args": [
+          "-DSTM32_YML_PROFILE="
+        ],
+        "observed": {
+          "use_freertos": "true",
+          "freertos_version": "cube",
+          "freertos_components": "ARM_CM4F;Heap::4",
+          "cmsis_rtos_api": "v2"
+        },
+        "properties": {
+          "LINK_LIBRARIES": [
+            "FreeRTOS::STM32::F4::ARM_CM4F",
+            "FreeRTOS::STM32::F4::Heap::4",
+            "CMSIS::STM32::F4::RTOS_V2"
+          ]
+        },
+        "absent_properties": {
+          "LINK_LIBRARIES": [
+            "CMSIS::STM32::F4::RTOS"
+          ]
+        }
+      }
+    ]
   }
 ]
