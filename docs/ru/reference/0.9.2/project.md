@@ -70,7 +70,7 @@ ioc_file: bluepill-hsi.ioc
 
 [Реализация 0.9.2](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_config.cmake) · [Index](index.md)
 
-**Проверки (частичное покрытие):** `configure.ioc-bluepill-defaults`, `configure.yaml-over-ioc`, `configure.missing-ioc`. [Test manifest](../../../../tests/cases.json).
+**Проверки (частичное покрытие):** `configure.ioc-bluepill-defaults`, `configure.yaml-over-ioc`, `configure.missing-ioc`, `configure.freertos-ioc-f4-v2`, `configure.freertos-ioc-f1-v1`, `configure.freertos-ioc-profile-precedence`, `configure.freertos-ioc-yaml-precedence`, `configure.freertos-ioc-empty-fallback`, `configure.freertos-ioc-override-disable`, `configure.freertos-ioc-reconfigure`. [Test manifest](../../../../tests/cases.json).
 
 <a id="project-name"></a>
 ## `project_name`

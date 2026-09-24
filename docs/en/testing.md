@@ -108,9 +108,9 @@ package or the resulting image bytes. Ubuntu snapshots are not required.
 
 ## Framework configuration tests
 
-[tests/cases.json](../../tests/cases.json) defines 65 scenarios, run with each of
-the three GCC and two CMake versions from the lockfile: **390 case executions**.
-Eight scenarios perform three consecutive configurations in the same build tree.
+[tests/cases.json](../../tests/cases.json) defines 72 scenarios, run with each of
+the three GCC and two CMake versions from the lockfile: **432 case executions**.
+Nine scenarios perform three consecutive configurations in the same build tree.
 
 | Area | Checks |
 | --- | --- |
@@ -262,3 +262,11 @@ Nine `freertos-*` cases use the real pinned CubeF4 and stm32-cmake packages in t
 Separate cases cover no port, multiple ports and an unknown component. Disabled FreeRTOS must ignore even an invalid component list. `freertos-required-package` blocks find_package with `CMAKE_DISABLE_FIND_PACKAGE_FreeRTOS=TRUE` and expects the required dependency to fail; this is a controlled unavailable-package simulation, not a physically damaged Cube installation.
 
 Without IOC, default `freertos_version` is checked through the selected Cube target namespace; omitting `cmsis_rtos_api` adds no wrapper. External FreeRTOS and IOC inference are not covered by this group. The fixture deliberately has no FreeRTOSConfig.h: Configure/Generate does not validate its contents or prove scheduler, interrupt-handler, heap or firmware correctness. Building requires application settings and an agreed scenario.
+
+### IOC-derived FreeRTOS
+
+Seven `freertos-ioc-*` cases extend the manual configuration group above. Reduced IOC files contain a FREERTOS marker and CMSIS-RTOS selection; tests check automatic ARM_CM3/Heap::4/v1 for F1 and ARM_CM4F/Heap::4/v2 for F4. F4 markers follow the author's supplied `mcu_gcs_web_board`; F1 is a synthetic variation using the same field format. These are parser inputs, not complete CubeMX projects or an HSI clock implementation.
+
+YAML and profiles can replace components with Heap::2 and the API with none. Empty use_freertos, freertos_version, cmsis_rtos_api and component lists fall back to IOC/automatic values. An override of false suppresses IOC activation. `freertos-ioc-reconfigure` checks enabled → disabled by profile → enabled across Configure runs sharing a cache; it supplements the usual clean-cache reconfiguration workflow.
+
+Assertions cover exported values, direct target dependencies and successful Generate. Other families, external FreeRTOS, port/core compatibility, task execution and clock setup are not tested. No firmware is built.

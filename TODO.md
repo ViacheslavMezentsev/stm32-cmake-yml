@@ -4,7 +4,7 @@
 
 ## Русский
 
-Состояние на 2026-09-24. Ниже работа сгруппирована в пять этапов; этапы могут
+Состояние на 2026-09-25. Ниже работа сгруппирована в пять этапов; этапы могут
 выполняться параллельно. Это план, а не обещание сроков или поддерживаемых функций.
 Приоритет — Configure/Generate и совместимость существующих проектов.
 Новый порядок: рабочая ветка → локальные проверки → push и CI → merge в main.
@@ -61,8 +61,10 @@ PR больше не требуются; старые ссылки остают�
   диагностика по стадиям; 48 сценариев / 288 запусков.
 - [x] Проверки версии YAML слиты в main (`9bc165f`), CI успешен:
   56 сценариев / 336 запусков.
-- [ ] Текущая ветка `codex/configure-freertos-contract`: девять проверок
-  компонентов FreeRTOS и CMSIS-RTOS; 65 сценариев / 390 запусков.
+- [x] Компоненты FreeRTOS и CMSIS-RTOS слиты в main (`8663c51`), CI успешен:
+  65 сценариев / 390 запусков.
+- [ ] Текущая ветка `codex/configure-freertos-ioc`: семь проверок IOC,
+  приоритетов и повторной настройки; 72 сценария / 432 запуска.
 - [ ] Следующий шаг согласовать по пробелам покрытия; к прошивкам переходить
   только после уточнений автора, как указано ниже.
 - [ ] По индексу выбрать следующие пробелы покрытия: отсутствующие/пустые значения,
@@ -87,7 +89,7 @@ PR больше не требуются; старые ссылки остают�
 
 ## English
 
-Status as of 2026-09-24. Work is grouped into five stages, which may overlap.
+Status as of 2026-09-25. Work is grouped into five stages, which may overlap.
 The priority is Configure/Generate and compatibility with existing consumers.
 New workflow: working branch → local checks → push and CI → merge into main.
 PRs are no longer required; old links remain historical. [Workflow](docs/en/maintenance.md).
@@ -144,8 +146,10 @@ keep defect details in errata.
   phase-specific diagnostics; 48 scenarios / 288 executions.
 - [x] YAML version checks merged into main (`9bc165f`), CI passed:
   56 scenarios / 336 executions.
-- [ ] Current branch `codex/configure-freertos-contract`: nine FreeRTOS and
-  CMSIS-RTOS component cases; 65 scenarios / 390 executions.
+- [x] FreeRTOS and CMSIS-RTOS components merged into main (`8663c51`), CI passed:
+  65 scenarios / 390 executions.
+- [ ] Current branch `codex/configure-freertos-ioc`: seven IOC, precedence
+  and reconfiguration cases; 72 scenarios / 432 executions.
 - [ ] Agree the next coverage priority; defer firmware work until the author
   supplies scenario guidance as required below.
 - [ ] Use the index to prioritize coverage gaps: missing/empty values, precedence
