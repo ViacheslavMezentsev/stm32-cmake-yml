@@ -50,6 +50,18 @@ def verify(case, build, source):
         require(str(linker) in observed("LINK_OPTIONS"), "Generated linker script not linked")
 
     ninja = (build / "build.ninja").read_text(encoding="utf-8")
+    if "generated_link_flags" in case:
+        # These fixtures have one executable; inspect generated flags, not the
+        # CMake LINK_OPTIONS property alone (which omits transitive options).
+        lines = [line.strip().split(" = ", 1)[1] for line in ninja.splitlines()
+                 if line.strip().startswith("LINK_FLAGS = ")]
+        require(len(lines) == 1, f"Expected one executable link flag line, got {len(lines)}")
+        flags = shlex.split(lines[0])
+        for token in case["generated_link_flags"].get("present", []):
+            require(token in flags, f"Generated link flags missing {token!r}")
+        for token in case["generated_link_flags"].get("absent", []):
+            require(token not in flags, f"Generated link flags unexpectedly contain {token!r}")
+
     if "crc_command" in case:
         require(("stm32_crc.py" in ninja) == case["crc_command"], "Incorrect CRC command presence")
         if case["crc_command"]:

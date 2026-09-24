@@ -1257,5 +1257,264 @@
         ]
       }
     ]
+  },
+  {
+    "name": "system-nosys-nano",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=system-libraries.yml",
+      "-DSTM32_YML_PROFILE=nosys"
+    ],
+    "properties": {
+      "LINK_LIBRARIES": [
+        "STM32::Nano",
+        "STM32::NoSys"
+      ]
+    },
+    "absent_properties": {
+      "LINK_LIBRARIES": [
+        "STM32::Semihosting"
+      ]
+    },
+    "generated_link_flags": {
+      "present": [
+        "--specs=nano.specs",
+        "--specs=nosys.specs"
+      ],
+      "absent": [
+        "--specs=rdimon.specs",
+        "-lrdimon"
+      ]
+    },
+    "command_checks": [
+      {
+        "file": "main.c",
+        "present": [
+          "--specs=nano.specs",
+          "--specs=nosys.specs"
+        ],
+        "absent": []
+      }
+    ]
+  },
+  {
+    "name": "system-semihost-nano",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=system-libraries.yml",
+      "-DSTM32_YML_PROFILE=semihost"
+    ],
+    "properties": {
+      "LINK_LIBRARIES": [
+        "STM32::Nano",
+        "STM32::Semihosting"
+      ]
+    },
+    "absent_properties": {
+      "LINK_LIBRARIES": [
+        "STM32::NoSys"
+      ]
+    },
+    "generated_link_flags": {
+      "present": [
+        "--specs=nano.specs",
+        "--specs=rdimon.specs",
+        "-lrdimon"
+      ],
+      "absent": [
+        "--specs=nosys.specs"
+      ]
+    },
+    "command_checks": [
+      {
+        "file": "main.c",
+        "present": [
+          "--specs=nano.specs"
+        ],
+        "absent": [
+          "--specs=nosys.specs"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "system-disabled",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=system-libraries.yml",
+      "-DSTM32_YML_PROFILE="
+    ],
+    "properties": {
+      "LINK_LIBRARIES": []
+    },
+    "absent_properties": {
+      "LINK_LIBRARIES": [
+        "STM32::Nano",
+        "STM32::NoSys",
+        "STM32::Semihosting"
+      ]
+    },
+    "generated_link_flags": {
+      "present": [],
+      "absent": [
+        "--specs=nano.specs",
+        "--specs=nosys.specs",
+        "--specs=rdimon.specs",
+        "-lrdimon"
+      ]
+    },
+    "command_checks": [
+      {
+        "file": "main.c",
+        "present": [],
+        "absent": [
+          "--specs=nano.specs",
+          "--specs=nosys.specs"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "system-link-options",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=system-libraries.yml",
+      "-DSTM32_YML_PROFILE=options"
+    ],
+    "properties": {
+      "LINK_OPTIONS": [
+        "-nostartfiles",
+        "-Wl,--cref",
+        "LINKER:--print-memory-usage"
+      ]
+    },
+    "generated_link_flags": {
+      "present": [
+        "-nostartfiles",
+        "-Wl,--cref",
+        "-Wl,--print-memory-usage"
+      ]
+    },
+    "command_checks": [
+      {
+        "file": "main.c",
+        "absent": [
+          "-nostartfiles",
+          "-Wl,--cref",
+          "-Wl,--print-memory-usage"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "system-reconfigure",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=system-libraries.yml"
+    ],
+    "steps": [
+      {
+        "args": [
+          "-DSTM32_YML_PROFILE=nosys"
+        ],
+        "properties": {
+          "LINK_LIBRARIES": [
+            "STM32::Nano",
+            "STM32::NoSys"
+          ]
+        },
+        "absent_properties": {
+          "LINK_LIBRARIES": [
+            "STM32::Semihosting"
+          ]
+        },
+        "generated_link_flags": {
+          "present": [
+            "--specs=nano.specs",
+            "--specs=nosys.specs"
+          ],
+          "absent": [
+            "--specs=rdimon.specs",
+            "-lrdimon"
+          ]
+        },
+        "command_checks": [
+          {
+            "file": "main.c",
+            "present": [
+              "--specs=nano.specs",
+              "--specs=nosys.specs"
+            ],
+            "absent": []
+          }
+        ]
+      },
+      {
+        "args": [
+          "-DSTM32_YML_PROFILE=semihost"
+        ],
+        "properties": {
+          "LINK_LIBRARIES": [
+            "STM32::Nano",
+            "STM32::Semihosting"
+          ]
+        },
+        "absent_properties": {
+          "LINK_LIBRARIES": [
+            "STM32::NoSys"
+          ]
+        },
+        "generated_link_flags": {
+          "present": [
+            "--specs=nano.specs",
+            "--specs=rdimon.specs",
+            "-lrdimon"
+          ],
+          "absent": [
+            "--specs=nosys.specs"
+          ]
+        },
+        "command_checks": [
+          {
+            "file": "main.c",
+            "present": [
+              "--specs=nano.specs"
+            ],
+            "absent": [
+              "--specs=nosys.specs"
+            ]
+          }
+        ]
+      },
+      {
+        "args": [
+          "-DSTM32_YML_PROFILE="
+        ],
+        "properties": {
+          "LINK_LIBRARIES": []
+        },
+        "absent_properties": {
+          "LINK_LIBRARIES": [
+            "STM32::Nano",
+            "STM32::NoSys",
+            "STM32::Semihosting"
+          ]
+        },
+        "generated_link_flags": {
+          "present": [],
+          "absent": [
+            "--specs=nano.specs",
+            "--specs=nosys.specs",
+            "--specs=rdimon.specs",
+            "-lrdimon"
+          ]
+        },
+        "command_checks": [
+          {
+            "file": "main.c",
+            "present": [],
+            "absent": [
+              "--specs=nano.specs",
+              "--specs=nosys.specs"
+            ]
+          }
+        ]
+      }
+    ]
   }
 ]
