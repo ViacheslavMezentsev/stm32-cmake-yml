@@ -920,5 +920,38 @@
         }
       }
     ]
+  },
+  {
+    "name": "freertos-external-cmake-known-failure",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=freertos.yml",
+      "-DSTM32_YML_OVERRIDE_freertos_version=external",
+      "-DSTM32_YML_OVERRIDE_cmsis_rtos_api=none",
+      "-DFREERTOS_PATH=/opt/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3/Middlewares/Third_Party/FreeRTOS"
+    ],
+    "error": "FreeRTOS::ARM_CM4F",
+    "log_contains": [
+      "Search for FreeRTOS families: STM32F4",
+      "Found FreeRTOS:",
+      "CMake Generate step failed."
+    ]
+  },
+  {
+    "name": "freertos-external-env-known-failure",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=freertos.yml",
+      "-DSTM32_YML_OVERRIDE_freertos_version=external",
+      "-DSTM32_YML_OVERRIDE_cmsis_rtos_api=none"
+    ],
+    "error": "FreeRTOS::ARM_CM4F",
+    "log_contains": [
+      "Search for FreeRTOS families: STM32F4",
+      "Found FreeRTOS:",
+      "CMake Generate step failed.",
+      "ENV FREERTOS_PATH specified, using FREERTOS_PATH: /opt/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3/Middlewares/Third_Party/FreeRTOS"
+    ],
+    "env": {
+      "FREERTOS_PATH": "/opt/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3/Middlewares/Third_Party/FreeRTOS"
+    }
   }
 ]
