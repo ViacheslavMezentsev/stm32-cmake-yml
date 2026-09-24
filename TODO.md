@@ -63,11 +63,13 @@ PR больше не требуются; старые ссылки остают�
   56 сценариев / 336 запусков.
 - [x] Компоненты FreeRTOS и CMSIS-RTOS слиты в main (`8663c51`), CI успешен:
   65 сценариев / 390 запусков.
-- [ ] Ветка `codex/configure-freertos-ioc` (CI прошёл, ожидает слияния): семь проверок IOC,
+- [x] Ветка `codex/configure-freertos-ioc` слита в main (`d12c542`): семь проверок IOC,
   приоритетов и повторной настройки; 72 сценария / 432 запуска.
-- [ ] Текущая ветка `codex/freertos-external-errata` поверх IOC-ветки: две
+- [ ] Ветка `codex/freertos-external-errata` поверх IOC-ветки: две
   регрессии известной ошибки E007; 74 сценария / 444 запуска. Исправление
   external отложено по решению автора от 2026-09-25.
+- [ ] Текущая ветка `codex/configure-mcu-families`: F0/F3/F7/G4, десять
+  новых сценариев; 84 сценария / 504 запуска.
 - [ ] Следующий шаг согласовать по пробелам покрытия; к прошивкам переходить
   только после уточнений автора, как указано ниже.
 - [ ] По индексу выбрать следующие пробелы покрытия: отсутствующие/пустые значения,
@@ -151,11 +153,13 @@ keep defect details in errata.
   56 scenarios / 336 executions.
 - [x] FreeRTOS and CMSIS-RTOS components merged into main (`8663c51`), CI passed:
   65 scenarios / 390 executions.
-- [ ] Branch `codex/configure-freertos-ioc` (CI passed, awaiting merge): seven IOC, precedence
+- [x] Branch `codex/configure-freertos-ioc` merged into main (`d12c542`): seven IOC, precedence
   and reconfiguration cases; 72 scenarios / 432 executions.
-- [ ] Current branch `codex/freertos-external-errata`, based on the IOC branch:
+- [ ] Branch `codex/freertos-external-errata`, based on the IOC branch:
   two known-failure E007 regressions; 74 scenarios / 444 executions.
   The author deferred the external fix on 2026-09-25.
+- [ ] Current branch `codex/configure-mcu-families`: F0/F3/F7/G4, ten
+  new cases; 84 scenarios / 504 executions.
 - [ ] Agree the next coverage priority; defer firmware work until the author
   supplies scenario guidance as required below.
 - [ ] Use the index to prioritize coverage gaps: missing/empty values, precedence

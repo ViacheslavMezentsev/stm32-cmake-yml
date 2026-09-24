@@ -17,7 +17,7 @@ it does not build firmware.
 | CMake | 3.19.8 (minimum compatibility), 3.28.3 (reference environment) |
 | Ninja / Mike Farah yq | 1.12.1 / 4.44.3 |
 | stm32-cmake | Commit recorded in the lockfile |
-| STM32Cube | F1 1.8.7, F4 1.28.3, G4 1.6.3 |
+| STM32Cube | F0 1.11.6, F1 1.8.7, F3 1.11.5, F4 1.28.3, F7 1.17.3, G4 1.6.3 |
 | Arduino Core STM32 / ETL | 2.12.0 / 20.47.1 |
 
 [dependencies.lock.json](../../ci/dependencies.lock.json) records archive SHA-256
@@ -108,8 +108,8 @@ package or the resulting image bytes. Ubuntu snapshots are not required.
 
 ## Framework configuration tests
 
-[tests/cases.json](../../tests/cases.json) defines 74 scenarios, run with each of
-the three GCC and two CMake versions from the lockfile: **444 case executions**.
+[tests/cases.json](../../tests/cases.json) defines 84 scenarios, run with each of
+the three GCC and two CMake versions from the lockfile: **504 case executions**.
 Nine scenarios perform three consecutive configurations in the same build tree.
 
 | Area | Checks |
@@ -274,3 +274,18 @@ Assertions cover exported values, direct target dependencies and successful Gene
 ### Known external FreeRTOS failure
 
 Two `freertos-external-*-known-failure` tests reproduce [E007](errata/E007.md) with FREERTOS_PATH passed through CMake or the environment. Passing means the expected Generate failure occurred. External mode remains unfixed and has no positive integration test.
+
+### Additional F0, F3, F7 and G4 families
+
+| Family | MCU | IOC-derived FreeRTOS | Checks |
+| --- | --- | --- | --- |
+| F0 | STM32F030R8 | ARM_CM0, Heap::4, v1 | CMSIS/HAL, LL profile, bare metal, IOC RTOS |
+| F3 | STM32F303VC | ARM_CM4F, Heap::4, v1 | CMSIS/HAL, IOC RTOS |
+| F7 | STM32F746NG | ARM_CM7, Heap::4, v1 | CMSIS/HAL, IOC RTOS |
+| G4 | STM32G431CB | ARM_CM4F, Heap::4, v1 | CMSIS/HAL, IOC RTOS |
+
+Ten cases check real imported targets and cortex-m0/m4/m7 flags in compile_commands.json. F0 bare metal sets explicit CPU flags and checks absence of CMSIS/HAL/FreeRTOS dependencies. These are Configure/Generate checks, not compilation or proof that RTOS fits and runs on the selected device.
+
+F0, F7 and G4 MCUs follow local demos `stm32f0xx/03-blink`, `stm32f7xx/03-blink` and `stm32g4xx/03-blink`; F3 uses a synthetic F303VC case. Reduced IOC fixtures add FreeRTOS/v1 markers. Full demo IOC files are not copied; the HSI field does not generate a clock implementation. Minimal HAL headers are for configuration only.
+
+CubeF0/F3/F7 are pinned by commit in the lockfile; CubeG4 was already pinned. Only CMSIS device/HAL submodules are initialized, plus FreeRTOS for F0. Selected F3/F7 packages contain FreeRTOS in the parent repository. BSP and unrelated submodules are not initialized. The parent repository is still downloaded in full; this is selective submodule initialization, not sparse checkout.
