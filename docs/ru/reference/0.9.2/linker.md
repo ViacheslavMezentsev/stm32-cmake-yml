@@ -91,7 +91,7 @@ link_options: [nostartfiles]
 
 [Реализация 0.9.2](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/stm32_yml.cmake) · [Index](index.md)
 
-**Проверки (частичное покрытие):** нет автоматической проверки этого контракта. [Test manifest](../../../../tests/cases.json).
+**Проверки (частичное покрытие):** `configure.system-link-options`. [Test manifest](../../../../tests/cases.json).
 
 <a id="linker-directives"></a>
 ## `linker_directives`
@@ -108,7 +108,7 @@ linker_directives: [--print-memory-usage]
 
 [Реализация 0.9.2](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/stm32_yml.cmake) · [Index](index.md)
 
-**Проверки (частичное покрытие):** нет автоматической проверки этого контракта. [Test manifest](../../../../tests/cases.json).
+**Проверки (частичное покрытие):** `configure.system-link-options`. [Test manifest](../../../../tests/cases.json).
 
 <a id="use-newlib-nano"></a>
 ## `use_newlib_nano`
@@ -125,7 +125,7 @@ use_newlib_nano: false
 
 [Реализация 0.9.2](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_frameworks.cmake) · [Index](index.md)
 
-**Проверки (частичное покрытие):** нет автоматической проверки этого контракта. [Test manifest](../../../../tests/cases.json).
+**Проверки (частичное покрытие):** `configure.system-nosys-nano`, `configure.system-semihost-nano`, `configure.system-disabled`, `configure.system-reconfigure`. [Test manifest](../../../../tests/cases.json).
 
 <a id="system-library"></a>
 ## `system_library`
@@ -142,4 +142,4 @@ system_library: NoSys
 
 [Реализация 0.9.2](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_frameworks.cmake) · [Index](index.md)
 
-**Проверки (частичное покрытие):** `configure.defaults-blackpill`. [Test manifest](../../../../tests/cases.json).
+**Проверки (частичное покрытие):** `configure.defaults-blackpill`, `configure.system-nosys-nano`, `configure.system-semihost-nano`, `configure.system-disabled`, `configure.system-reconfigure`. [Test manifest](../../../../tests/cases.json).

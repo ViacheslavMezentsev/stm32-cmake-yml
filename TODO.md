@@ -65,11 +65,13 @@ PR больше не требуются; старые ссылки остают�
   65 сценариев / 390 запусков.
 - [x] Ветка `codex/configure-freertos-ioc` слита в main (`d12c542`): семь проверок IOC,
   приоритетов и повторной настройки; 72 сценария / 432 запуска.
-- [ ] Ветка `codex/freertos-external-errata` поверх IOC-ветки: две
+- [x] Ветка `codex/freertos-external-errata` слита в main (`477fe95`): две
   регрессии известной ошибки E007; 74 сценария / 444 запуска. Исправление
   external отложено по решению автора от 2026-09-25.
-- [ ] Текущая ветка `codex/configure-mcu-families`: F0/F3/F7/G4, десять
-  новых сценариев; 84 сценария / 504 запуска.
+- [x] `codex/configure-mcu-families` слита в main (`477fe95`):
+  F0/F3/F7/G4; 84 сценария / 504 запуска.
+- [ ] Текущая ветка `codex/configure-system-libraries`: пять проверок
+  системных библиотек и параметров линковки; 89 сценариев / 534 запуска.
 - [ ] Следующий шаг согласовать по пробелам покрытия; к прошивкам переходить
   только после уточнений автора, как указано ниже.
 - [ ] По индексу выбрать следующие пробелы покрытия: отсутствующие/пустые значения,
@@ -155,11 +157,13 @@ keep defect details in errata.
   65 scenarios / 390 executions.
 - [x] Branch `codex/configure-freertos-ioc` merged into main (`d12c542`): seven IOC, precedence
   and reconfiguration cases; 72 scenarios / 432 executions.
-- [ ] Branch `codex/freertos-external-errata`, based on the IOC branch:
+- [x] Branch `codex/freertos-external-errata` merged into main (`477fe95`):
   two known-failure E007 regressions; 74 scenarios / 444 executions.
   The author deferred the external fix on 2026-09-25.
-- [ ] Current branch `codex/configure-mcu-families`: F0/F3/F7/G4, ten
-  new cases; 84 scenarios / 504 executions.
+- [x] `codex/configure-mcu-families` merged into main (`477fe95`):
+  F0/F3/F7/G4; 84 scenarios / 504 executions.
+- [ ] Current branch `codex/configure-system-libraries`: five system library
+  and linker option checks; 89 scenarios / 534 executions.
 - [ ] Agree the next coverage priority; defer firmware work until the author
   supplies scenario guidance as required below.
 - [ ] Use the index to prioritize coverage gaps: missing/empty values, precedence
