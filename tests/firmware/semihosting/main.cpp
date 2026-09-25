@@ -21,6 +21,8 @@ static volatile uint32_t library_input[] = {3, 1, 4, 1, 5};
 
 extern "C" {
 unsigned smoke_arduino_string(char*, unsigned);
+unsigned smoke_freertos_queue(void);
+const char* smoke_freertos_version(void);
 volatile uint32_t smoke_data_probe = 0x12345678u;
 volatile uint32_t smoke_bss_probe;
 volatile uint32_t smoke_ctor_probe;
@@ -251,6 +253,13 @@ void print_firmware_info( void )
     while (1) { __asm__ volatile("nop"); }
 }
 
+#ifdef SMOKE_FREERTOS
+extern "C" void smoke_rtos_assert(void) {
+    smoke_printf("RTOS_ASSERT=FAIL\nTEST_RESULT=FAIL\n");
+    smoke_exit(6);
+}
+#endif
+
 int main()
 {
     const uint32_t initial_data = smoke_data_probe;
@@ -335,6 +344,15 @@ int main()
         smoke_printf("TEST_RESULT=FAIL\n");
         smoke_exit(5);
     }
+#endif
+#ifdef SMOKE_FREERTOS
+    const unsigned rtos_result = smoke_freertos_queue();
+    smoke_printf("RTOS_VERSION=%s\nRTOS_RESULT=%u\n", smoke_freertos_version(), rtos_result);
+    if (rtos_result != 46u) {
+        smoke_printf("TEST_RESULT=FAIL\n");
+        smoke_exit(6);
+    }
+    smoke_printf("RTOS_SCHEDULER=not-started\nRTOS_HEAP=restored\n");
 #endif
 #if defined(SMOKE_HANG)
     while (1) { __asm__ volatile("nop"); }

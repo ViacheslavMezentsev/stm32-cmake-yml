@@ -92,7 +92,7 @@ def main():
             metadata = dict(baseline, PROFILE=profile, CMAKE=report['cmake'].removeprefix('cmake version '),
                             GIT_REVISION=report['git_revision'], GIT_DIRTY=report['git_dirty'])
             bare = profile.startswith('bare') or is_arduino
-            cmsis_only = profile.startswith('cmsis')
+            cmsis_only = profile.startswith('cmsis') or profile == 'freertosQueue'
             if bare:
                 metadata.update(CMSIS_CORE='none', CMSIS_DEVICE='none')
             if bare or cmsis_only:
@@ -122,6 +122,13 @@ def main():
                 metadata.update(LIB_RESULT='123', C_LANGUAGE='11')
                 if profile == 'cmsisEtl':
                     metadata.update(ETL_RESULT='14', ETL_TEXT='etl:14', ETL_VERSION=etl['name'].removeprefix('ETL-'))
+            if profile == 'freertosQueue':
+                if not {'tasks.c', 'list.c', 'queue.c', 'port.c', 'heap_4.c', 'freertos_queue.c'} <= set(sources):
+                    raise ValueError('Missing FreeRTOS kernel/port/heap sources')
+                if any('cmsis_os' in name for name in sources):
+                    raise ValueError('Unexpected CMSIS-RTOS wrapper')
+                metadata.update(RTOS_VERSION='V10.3.1', RTOS_RESULT='46',
+                                RTOS_SCHEDULER='not-started', RTOS_HEAP='restored')
             if is_arduino:
                 metadata.update(ARDUINO_TEXT='arm32:123', ARDUINO_LENGTH='9')
                 if any('/opt/modules/stm32-cmake' in c['command'] for c in commands_db):

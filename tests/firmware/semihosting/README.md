@@ -78,3 +78,11 @@ a bounded heap and the existing semihosting protocol; it is not a full board cor
 `arduinoString` собирает настоящие WString.cpp/itoa.c из Core 2.12.0 через свою
 обёртку и отдельный toolchain: собственные main/startup, ограниченный heap,
 прежний semihosting. Полное ядро платы не проверяется. See / см. контракт RU/EN выше.
+
+`freertosQueue`: CubeF1 FreeRTOS V10.3.1, ARM_CM3, Heap::4; FIFO and memory
+checks before scheduler startup. No HAL or CMSIS-RTOS wrapper. FreeRTOS owns a
+4096-byte BSS heap, separate from newlib. See the firmware testing contract.
+
+`freertosQueue`: FIFO и память FreeRTOS V10.3.1 из CubeF1, ARM_CM3, Heap::4 до
+запуска планировщика. Без HAL и CMSIS-RTOS. Куча FreeRTOS — отдельные 4096 байт BSS.
+Подробности — в контракте прошивочных тестов.

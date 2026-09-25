@@ -66,13 +66,13 @@ class BadgeTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             argv = ['badge', '--build', 'build', '--run', 'qemu', '--renode-run', 'renode',
                     '--output', directory, '--revision', 'abc', '--run-url', 'https://example.invalid/run']
-            results = [{'builds': 60, 'checks': 66, 'emulator': e, 'revision': 'abc'} for e in ('QEMU', 'Renode')]
+            results = [{'builds': 66, 'checks': 72, 'emulator': e, 'revision': 'abc'} for e in ('QEMU', 'Renode')]
             with patch.object(sys, 'argv', argv), patch('firmware_badge.read', return_value=self.lock), \
                     patch('firmware_badge.collect', side_effect=results):
                 main()
             report = json.loads((Path(directory) / 'firmware.json').read_text())
-            self.assertEqual((report['builds'], report['checks']), (60, 132))
-            self.assertEqual(report['checks_by_emulator'], {'QEMU': 66, 'Renode': 66})
+            self.assertEqual((report['builds'], report['checks']), (66, 144))
+            self.assertEqual(report['checks_by_emulator'], {'QEMU': 72, 'Renode': 72})
             ET.fromstring((Path(directory) / 'firmware.svg').read_text())
 
 

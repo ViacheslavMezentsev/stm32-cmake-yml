@@ -3,8 +3,8 @@
 [Documentation](index.md) · [Русский](../ru/firmware-testing.md) · [Environment](emulation.md)
 
 The first firmware test adapts the author's F1 [02-semihosting example](../../tests/firmware/semihosting/README.md).
-It is separate from the 115 configure scenarios: **60 builds, 66 QEMU runs and 66 Renode runs**:
-ten profiles plus one corrupted copy per tool pair; three xPack GCC versions × two CMake versions from the
+It is separate from the 115 configure scenarios: **66 builds, 72 QEMU runs and 72 Renode runs**:
+eleven profiles plus one corrupted copy per tool pair; three xPack GCC versions × two CMake versions from the
 [lockfile](../../ci/dependencies.lock.json), CubeF1 1.8.7, QEMU 11.0.0.
 The Windows QEMU 11.1.0 installation was also checked locally; CI uses the pinned image.
 
@@ -24,6 +24,7 @@ Readelf output is retained. These checks do not establish general linker correct
 | cmsis / cmsisTemplate | CMSIS startup, no HAL, TEST_RESULT=PASS, exit 0 |
 | cmsisLibrary / cmsisEtl | C/C++ library and optional ETL, TEST_RESULT=PASS, exit 0 |
 | arduinoString | Arduino String with own main/startup, TEST_RESULT=PASS, exit 0 |
+| freertosQueue | FreeRTOS FIFO and Heap::4 before scheduler startup, TEST_RESULT=PASS, exit 0 |
 
 Normal runs have a 15-second timeout. A hang before metadata is printed, a crash,
 a missing marker, an unexpected exit code or conflicting markers fails the suite.
@@ -67,7 +68,7 @@ is inferred from running this ELF on the F205-based netduino2.
 
 The matrix is read from the shared dependency lockfile, not duplicated in YAML.
 Images are built once; tool pairs run sequentially with separate build/log paths.
-Actual GCC/CMake versions and all ten profiles are checked for each pair.
+Actual GCC/CMake versions and all eleven profiles are checked for each pair.
 Failures do not stop collection of other pair results, but the matrix exits nonzero
 if any pair fails. Run selection uses the current lockfile rather than accepting
 whatever manifests happen to exist. Aggregate reports are matrix-summary.json;
@@ -124,7 +125,7 @@ For each tool pair, a copy of success ELF has one bit changed in .fw_version.
 Code, startup data and the injected CRC remain unchanged. The derived negative case,
 crc-corrupt, must report CRC_RESULT=FAIL and TEST_RESULT=FAIL and exit 3. A crash
 or timeout cannot pass this case. This adds six runs without extra compilations:
-60 builds, 66 runs per simulator. Reports distinguish ten profiles from eleven executions.
+66 builds, 72 runs per simulator. Reports distinguish eleven profiles from twelve executions.
 
 This verifies software CRC over loaded FLASH on netduino2, not the STM32 CRC
 peripheral. E004 (algorithm selection) and E006 (post-build error handling) remain
@@ -256,3 +257,19 @@ This tests a narrow Arduino software path on netduino2 and the same Renode memor
 model. It does not validate an F411 board, Arduino.h, Print, GPIO, Serial or timing.
 The mcu_gcs_board configuration was inspected read-only for the wrapper/own-main
 pattern; its F411 variant and device drivers were not imported.
+
+## FreeRTOS: queues and memory before the scheduler
+
+`freertosQueue` uses kernel V10.3.1 from pinned CubeF1, ARM_CM3 and Heap::4,
+CMSIS startup without HAL and `cmsis_rtos_api: none`. Checks cover a two-item FIFO
+(17 and 29), full/empty queue rejection with zero wait, allocation alignment,
+oversized allocation rejection, and free memory recovery after freeing a block
+and deleting the queue. Expected fields are RTOS_RESULT=46, RTOS_HEAP=restored
+and RTOS_SCHEDULER=not-started. A failed check or configASSERT exits with status 6;
+a hang is not accepted.
+
+The FreeRTOS heap is a separate 4096-byte BSS array, independent of the newlib
+`heap_size: 512` reservation. compile_commands must contain the kernel, port and
+heap_4 sources. Scheduling, tasks, context switching, tick and CMSIS-RTOS are not
+covered. Real port critical sections execute; SysTick is not started.
+External FreeRTOS/E007 remains a separate regression without a fix.
