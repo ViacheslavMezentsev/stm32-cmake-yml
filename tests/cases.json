@@ -1628,5 +1628,207 @@
         ]
       }
     ]
+  },
+  {
+    "name": "artifacts-defaults",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=artifacts.yml",
+      "-DSTM32_YML_PROFILE="
+    ],
+    "generated_artifacts": [],
+    "crc_command": false,
+    "properties": {
+      "LINK_OPTIONS": []
+    },
+    "absent_properties": {
+      "LINK_OPTIONS": [
+        "LINKER:-Map=baremetal_probe.map"
+      ]
+    },
+    "generated_link_flags": {
+      "present": [],
+      "absent": [
+        "-Wl,-Map=baremetal_probe.map"
+      ]
+    }
+  },
+  {
+    "name": "artifacts-all",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=artifacts.yml",
+      "-DSTM32_YML_PROFILE=all"
+    ],
+    "generated_artifacts": [
+      "bin",
+      "hex",
+      "map",
+      "lss"
+    ],
+    "crc_command": false,
+    "properties": {
+      "LINK_OPTIONS": [
+        "LINKER:-Map=baremetal_probe.map"
+      ]
+    },
+    "absent_properties": {
+      "LINK_OPTIONS": []
+    },
+    "generated_link_flags": {
+      "present": [
+        "-Wl,-Map=baremetal_probe.map"
+      ],
+      "absent": []
+    }
+  },
+  {
+    "name": "artifacts-map-only",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=artifacts.yml",
+      "-DSTM32_YML_PROFILE=maponly"
+    ],
+    "generated_artifacts": [
+      "map"
+    ],
+    "crc_command": false,
+    "properties": {
+      "LINK_OPTIONS": [
+        "LINKER:-Map=baremetal_probe.map"
+      ]
+    },
+    "absent_properties": {
+      "LINK_OPTIONS": []
+    },
+    "generated_link_flags": {
+      "present": [
+        "-Wl,-Map=baremetal_probe.map"
+      ],
+      "absent": []
+    }
+  },
+  {
+    "name": "artifacts-empty",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=artifacts.yml",
+      "-DSTM32_YML_PROFILE=empty"
+    ],
+    "generated_artifacts": [],
+    "crc_command": false,
+    "properties": {
+      "LINK_OPTIONS": []
+    },
+    "absent_properties": {
+      "LINK_OPTIONS": [
+        "LINKER:-Map=baremetal_probe.map"
+      ]
+    },
+    "generated_link_flags": {
+      "present": [],
+      "absent": [
+        "-Wl,-Map=baremetal_probe.map"
+      ]
+    }
+  },
+  {
+    "name": "artifacts-unknown",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=artifacts.yml",
+      "-DSTM32_YML_PROFILE=unknown"
+    ],
+    "generated_artifacts": [
+      "bin"
+    ],
+    "crc_command": false,
+    "properties": {
+      "LINK_OPTIONS": []
+    },
+    "absent_properties": {
+      "LINK_OPTIONS": [
+        "LINKER:-Map=baremetal_probe.map"
+      ]
+    },
+    "generated_link_flags": {
+      "present": [],
+      "absent": [
+        "-Wl,-Map=baremetal_probe.map"
+      ]
+    }
+  },
+  {
+    "name": "artifacts-reconfigure",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=artifacts.yml"
+    ],
+    "steps": [
+      {
+        "args": [
+          "-DSTM32_YML_PROFILE=all"
+        ],
+        "generated_artifacts": [
+          "bin",
+          "hex",
+          "map",
+          "lss"
+        ],
+        "crc_command": false,
+        "properties": {
+          "LINK_OPTIONS": [
+            "LINKER:-Map=baremetal_probe.map"
+          ]
+        },
+        "absent_properties": {
+          "LINK_OPTIONS": []
+        },
+        "generated_link_flags": {
+          "present": [
+            "-Wl,-Map=baremetal_probe.map"
+          ],
+          "absent": []
+        }
+      },
+      {
+        "args": [
+          "-DSTM32_YML_PROFILE=binary"
+        ],
+        "generated_artifacts": [
+          "bin"
+        ],
+        "crc_command": false,
+        "properties": {
+          "LINK_OPTIONS": []
+        },
+        "absent_properties": {
+          "LINK_OPTIONS": [
+            "LINKER:-Map=baremetal_probe.map"
+          ]
+        },
+        "generated_link_flags": {
+          "present": [],
+          "absent": [
+            "-Wl,-Map=baremetal_probe.map"
+          ]
+        }
+      },
+      {
+        "args": [
+          "-DSTM32_YML_PROFILE=empty"
+        ],
+        "generated_artifacts": [],
+        "crc_command": false,
+        "properties": {
+          "LINK_OPTIONS": []
+        },
+        "absent_properties": {
+          "LINK_OPTIONS": [
+            "LINKER:-Map=baremetal_probe.map"
+          ]
+        },
+        "generated_link_flags": {
+          "present": [],
+          "absent": [
+            "-Wl,-Map=baremetal_probe.map"
+          ]
+        }
+      }
+    ]
   }
 ]
