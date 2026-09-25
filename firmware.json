@@ -1,0 +1,8 @@
+{
+  "builds": 18,
+  "checks": 24,
+  "emulator": "QEMU",
+  "revision": "23a6d6725fc44d2c7a7d37d381adbaaffdcb2268",
+  "run_url": "https://github.com/ViacheslavMezentsev/stm32-cmake-yml/actions/runs/36117655421",
+  "generated_at": "2026-09-25T09:26:05.446975+00:00"
+}
