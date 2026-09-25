@@ -3,6 +3,7 @@
 [![Configure](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/actions/workflows/configure.yml/badge.svg?branch=main)](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/actions/workflows/configure.yml?query=branch%3Amain)
 [![Firmware](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/actions/workflows/firmware.yml/badge.svg?branch=main)](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/actions/workflows/firmware.yml?query=branch%3Amain)
 [![Docs](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/actions/workflows/documentation.yml/badge.svg?branch=main)](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/actions/workflows/documentation.yml?query=branch%3Amain)
+[![QEMU builds and checks](https://raw.githubusercontent.com/ViacheslavMezentsev/stm32-cmake-yml/ci-badges/firmware.svg)](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/ci-badges/firmware.json)
 
 [Русский](README.md) · **English** · [Documentation](docs/en/index.md) · [Getting started](docs/en/getting-started.md)
 

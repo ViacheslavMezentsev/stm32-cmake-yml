@@ -1,0 +1,70 @@
+"""Generate a last-success badge from complete build and QEMU reports."""
+import argparse
+from datetime import datetime, timezone
+import json
+from pathlib import Path
+from firmware_matrix import pairs, verify_build, verify_matrix
+
+
+def read(path):
+    return json.loads(path.read_text(encoding='utf-8'))
+
+
+def collect(build, run, lock, revision):
+    combinations = pairs(lock)
+    verify_matrix(read(build / 'matrix-summary.json'), combinations)
+    matrix = read(run / 'matrix-summary.json')
+    actual = [(p['gcc'], p['cmake']) for p in matrix['pairs']]
+    if (matrix['status'] != 'passed' or matrix['phase'] != 'run'
+            or len(actual) != len(combinations) or set(actual) != set(combinations)
+            or any(p['status'] != 'passed' for p in matrix['pairs'])):
+        raise ValueError('Incomplete QEMU matrix')
+    builds = checks = 0
+    for gcc, cmake in combinations:
+        name = f'gcc-{gcc}_cmake-{cmake}'
+        compiled = read(build / name / 'build-summary.json')
+        verify_build(compiled, gcc, cmake)
+        if compiled['git_revision'] != revision or compiled['git_dirty'] != '0':
+            raise ValueError('Build provenance differs from the clean CI checkout')
+        executed = read(run / name / 'qemu-summary.json')
+        expected = {c['profile']: c['metadata'] for c in compiled['cases'] + [compiled['crc_negative']]}
+        cases = executed['cases']
+        if (executed['status'] != 'passed' or len(cases) != len(expected)
+                or sorted(c['profile'] for c in cases) != sorted(expected)
+                or any(c['passed'] is not True or c['metadata_ok'] is not True
+                       or c['expected_metadata'] != expected[c['profile']] for c in cases)):
+            raise ValueError('Missing, failed or mismatched QEMU cases')
+        builds += len(compiled['cases'])
+        checks += len(cases)
+    return {'builds': builds, 'checks': checks, 'emulator': 'QEMU', 'revision': revision}
+
+
+def svg(result):
+    message = f'{result["builds"]} builds / {result["checks"]} checks'
+    width = 14 + len(message) * 7
+    return f'''<svg xmlns="http://www.w3.org/2000/svg" width="{52 + width}" height="20" role="img" aria-label="QEMU: {message}">
+<title>Last successful main run: QEMU, {message}</title>
+<rect width="52" height="20" fill="#555"/><rect x="52" width="{width}" height="20" fill="#22863a"/>
+<g fill="#fff" text-anchor="middle" font-family="Verdana,DejaVu Sans,sans-serif" font-size="11">
+<text x="26" y="14">QEMU</text><text x="{52 + width / 2}" y="14">{message}</text></g></svg>
+'''
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    for name in ('build', 'run', 'output'):
+        parser.add_argument('--' + name, type=Path, required=True)
+    parser.add_argument('--revision', required=True)
+    parser.add_argument('--run-url', required=True)
+    args = parser.parse_args()
+    root = Path(__file__).resolve().parent.parent
+    result = collect(args.build, args.run, read(root / 'ci/dependencies.lock.json'), args.revision)
+    result.update(run_url=args.run_url, generated_at=datetime.now(timezone.utc).isoformat())
+    args.output.mkdir(parents=True, exist_ok=True)
+    (args.output / 'firmware.svg').write_text(svg(result), encoding='utf-8')
+    (args.output / 'firmware.json').write_text(json.dumps(result, indent=2) + '\n', encoding='utf-8')
+    print(f'Confirmed: {result["builds"]} builds / {result["checks"]} QEMU checks')
+
+
+if __name__ == '__main__':
+    main()
