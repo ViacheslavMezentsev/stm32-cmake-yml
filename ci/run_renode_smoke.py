@@ -1,4 +1,5 @@
 """Run the same smoke ELFs on a bounded Cortex-M3/RAM-stub Renode platform."""
+from firmware_cases import BUILD_PROFILES
 import argparse
 import json
 import os
@@ -41,7 +42,7 @@ def main():
     try:
         build = args.build.resolve()
         manifest = json.loads((build / 'build-summary.json').read_text(encoding='utf-8'))
-        if manifest['status'] != 'passed' or sorted(c['profile'] for c in manifest['cases']) != ['failure', 'hang', 'success']:
+        if manifest['status'] != 'passed' or sorted(c['profile'] for c in manifest['cases']) != sorted(BUILD_PROFILES):
             raise ValueError('Expected complete successful build')
         if manifest['crc_negative']['profile'] != 'crc-corrupt':
             raise ValueError('Missing CRC negative image')

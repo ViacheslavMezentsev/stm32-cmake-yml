@@ -1,7 +1,10 @@
 #include <stdio.h>
 #include <stdarg.h>
+#include <stdint.h>
+#ifndef SMOKE_BARE
 #include <stm32f1xx.h>
 #include <core_cm3.h>
+#endif
 #include "version.h"
 #include "build_metadata.h"
 
@@ -56,10 +59,12 @@ static void smoke_printf(const char* format, ...) {
 }
 
 /// Обработчик прерывания SysTick.
+#ifdef USE_HAL_DRIVER
 extern "C" void SysTick_Handler( void )
 {
     HAL_IncTick();
 }
+#endif
 
 int counter = 0;
 
@@ -173,6 +178,7 @@ void print_firmware_info( void )
     // 1. Версия компилятора GCC.
     smoke_printf( "  Compiler:    GCC %d.%d.%d\n", __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__ );
 
+#ifndef SMOKE_BARE
     // 2. Версия CMSIS Core.
     // Эти макросы определены в файле 'core_cm3.h' (или аналогичном для вашего ядра).
     smoke_printf( "  CMSIS Core:  v%d.%d\n", __CM3_CMSIS_VERSION_MAIN, __CM3_CMSIS_VERSION_SUB );
@@ -184,6 +190,8 @@ void print_firmware_info( void )
             __STM32F1_CMSIS_VERSION_SUB1,
             __STM32F1_CMSIS_VERSION_SUB2 );
 
+#endif
+#ifdef USE_HAL_DRIVER
     // 4. Версия библиотеки HAL.
     // Этот макрос определен в 'stm32f1xx_hal.h'.
     uint32_t hal_version = HAL_GetHalVersion();
@@ -205,6 +213,7 @@ void print_firmware_info( void )
         smoke_printf( "  Device UID:    %08lX%08lX%08lX\n", uid_word2, uid_word1, uid_word0 );
     }
 
+#endif
     // 6. Дата и время сборки (стандартные макросы препроцессора).
     smoke_printf( "  Build Date:    %s\n", __DATE__ );
     smoke_printf( "  Build Time:    %s\n", __TIME__ );
@@ -237,7 +246,9 @@ int main()
     const uint32_t initial_ctor = smoke_ctor_probe;
 
     // Инициализация библиотеки HAL.
+#ifdef USE_HAL_DRIVER
     HAL_Init();
+#endif
 
     print_firmware_info();
 
@@ -246,12 +257,22 @@ int main()
     smoke_printf("BUILD_TARGET=%s\n", SMOKE_MCU);
     smoke_printf("PROFILE=%s\nCMAKE=%s\nFRAMEWORK=%s\n", SMOKE_PROFILE, SMOKE_CMAKE, SMOKE_FRAMEWORK);
     smoke_printf("GIT_REVISION=%s\nGIT_DIRTY=%s\n", SMOKE_GIT, SMOKE_DIRTY);
+#ifndef SMOKE_BARE
     smoke_printf("CMSIS_CORE=%u.%u\n", __CM3_CMSIS_VERSION_MAIN, __CM3_CMSIS_VERSION_SUB);
     smoke_printf("CMSIS_DEVICE=%u.%u.%u\n", __STM32F1_CMSIS_VERSION_MAIN,
            __STM32F1_CMSIS_VERSION_SUB1, __STM32F1_CMSIS_VERSION_SUB2);
+#else
+    smoke_printf("CMSIS_CORE=none\nCMSIS_DEVICE=none\n");
+#endif
+#ifdef USE_HAL_DRIVER
     const uint32_t hal_version = HAL_GetHalVersion();
     smoke_printf("HAL_VERSION=%lu.%lu.%lu\n", (hal_version >> 24) & 255u,
            (hal_version >> 16) & 255u, (hal_version >> 8) & 255u);
+#else
+    smoke_printf("HAL_VERSION=none\n");
+#endif
+    extern uint32_t _Min_Heap_Size[], _Min_Stack_Size[];
+    smoke_printf("HEAP_SIZE=%lu\nSTACK_SIZE=%lu\n", (uint32_t)_Min_Heap_Size, (uint32_t)_Min_Stack_Size);
     smoke_printf("DATA_INIT=%08lX\nBSS_INIT=%08lX\nCTOR_INIT=%08lX\n", initial_data, initial_bss, initial_ctor);
     smoke_printf("DATA_ADDRESS=%08lX\nBSS_ADDRESS=%08lX\nCTOR_ADDRESS=%08lX\n",
            (uint32_t)&smoke_data_probe, (uint32_t)&smoke_bss_probe, (uint32_t)&smoke_ctor_probe);

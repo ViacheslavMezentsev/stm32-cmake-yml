@@ -9,6 +9,7 @@ from unittest.mock import patch
 import xml.etree.ElementTree as ET
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'ci'))
+from firmware_cases import BUILD_PROFILES
 from firmware_badge import collect, svg, main
 from publish_firmware_badge import publish
 
@@ -16,10 +17,10 @@ from publish_firmware_badge import publish
 class BadgeTests(unittest.TestCase):
     def setUp(self):
         self.lock = {'gcc_versions': ['14.2.1-1.1'], 'cmake_versions': ['3.28.3']}
-        pair = {'gcc': '14.2.1-1.1', 'cmake': '3.28.3', 'status': 'passed', 'profiles': 3}
+        pair = {'gcc': '14.2.1-1.1', 'cmake': '3.28.3', 'status': 'passed', 'profiles': len(BUILD_PROFILES)}
         build = {'status': 'passed', 'phase': 'build', 'pairs': [pair]}
         run = dict(build, phase='run')
-        cases = [{'profile': p, 'metadata': {'PROFILE': p}} for p in ('success', 'failure', 'hang')]
+        cases = [{'profile': p, 'metadata': {'PROFILE': p}} for p in BUILD_PROFILES]
         negative = {'profile': 'crc-corrupt', 'metadata': {'PROFILE': 'success', 'CRC_RESULT': 'FAIL'}}
         compiled = {'status': 'passed', 'gcc': '14.2.1', 'cmake': 'cmake version 3.28.3',
                     'git_revision': 'abc', 'git_dirty': '0', 'cases': cases, 'crc_negative': negative}
@@ -33,9 +34,9 @@ class BadgeTests(unittest.TestCase):
 
     def test_counts_builds_separately_from_negative_checks(self):
         result = self.count(self.reports)
-        self.assertEqual((result['builds'], result['checks']), (3, 4))
+        self.assertEqual((result['builds'], result['checks']), (len(BUILD_PROFILES), len(BUILD_PROFILES) + 1))
         ET.fromstring(svg(result))
-        self.assertIn('3 builds / 4 checks', svg(result))
+        self.assertIn(f'{len(BUILD_PROFILES)} builds / {len(BUILD_PROFILES) + 1} checks', svg(result))
 
     def test_rejects_failed_missing_duplicate_or_stale_results(self):
         for change in ('failed', 'missing', 'duplicate', 'stale', 'dirty', 'metadata', 'matrix'):
@@ -62,13 +63,13 @@ class BadgeTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             argv = ['badge', '--build', 'build', '--run', 'qemu', '--renode-run', 'renode',
                     '--output', directory, '--revision', 'abc', '--run-url', 'https://example.invalid/run']
-            results = [{'builds': 18, 'checks': 24, 'emulator': e, 'revision': 'abc'} for e in ('QEMU', 'Renode')]
+            results = [{'builds': 42, 'checks': 48, 'emulator': e, 'revision': 'abc'} for e in ('QEMU', 'Renode')]
             with patch.object(sys, 'argv', argv), patch('firmware_badge.read', return_value=self.lock), \
                     patch('firmware_badge.collect', side_effect=results):
                 main()
             report = json.loads((Path(directory) / 'firmware.json').read_text())
-            self.assertEqual((report['builds'], report['checks']), (18, 48))
-            self.assertEqual(report['checks_by_emulator'], {'QEMU': 24, 'Renode': 24})
+            self.assertEqual((report['builds'], report['checks']), (42, 96))
+            self.assertEqual(report['checks_by_emulator'], {'QEMU': 48, 'Renode': 48})
             ET.fromstring((Path(directory) / 'firmware.svg').read_text())
 
 

@@ -1,4 +1,5 @@
-"""Build the three semihosting fixtures inside the compiler image (one tool pair)."""
+"""Build the semihosting fixtures inside the compiler image (one tool pair)."""
+from firmware_cases import BUILD_PROFILES
 import argparse
 import json
 from pathlib import Path
@@ -55,14 +56,14 @@ def main():
         baseline = json.loads((root / 'tests/firmware/semihosting/expected-metadata.json').read_text())
         report['gcc'] = subprocess.check_output(['arm-none-eabi-gcc', '-dumpfullversion'], text=True, timeout=30).strip()
         report['cmake'] = subprocess.check_output(['cmake', '--version'], text=True, timeout=30).splitlines()[0]
-        for profile in ('success', 'failure', 'hang'):
+        for profile in BUILD_PROFILES:
             build = Path(tempfile.mkdtemp(prefix=profile + '-', dir=output))
             build.chmod(0o755)  # Artifacts may be consumed by another container user.
             commands = [
                 ['cmake', '-S', str(root / 'tests/firmware/semihosting'), '-B', str(build), '-G', 'Ninja',
                  f'-DSTM32_YML_FRAMEWORK_DIR={root}', '-DCMAKE_TOOLCHAIN_FILE=/opt/modules/stm32-cmake/cmake/stm32_gcc.cmake',
                  f'-DSMOKE_GIT_REVISION={report["git_revision"]}', f'-DSMOKE_GIT_DIRTY={report["git_dirty"]}',
-                 f'-DSTM32_YML_PROFILE={profile}', '-DCMAKE_BUILD_TYPE=Debug'],
+                 f'-DSTM32_YML_PROFILE={profile}', '-DCMAKE_BUILD_TYPE=Debug', '-DCMAKE_EXPORT_COMPILE_COMMANDS=ON'],
                 ['cmake', '--build', str(build), '--parallel', '4'],
             ]
             for name, command in zip(('configure', 'build'), commands):
@@ -81,6 +82,36 @@ def main():
             (build / 'symbols.log').write_text(symbols)
             metadata = dict(baseline, PROFILE=profile, CMAKE=report['cmake'].removeprefix('cmake version '),
                             GIT_REVISION=report['git_revision'], GIT_DIRTY=report['git_dirty'])
+            bare = profile.startswith('bare')
+            cmsis_only = profile.startswith('cmsis')
+            if bare:
+                metadata.update(CMSIS_CORE='none', CMSIS_DEVICE='none')
+            if bare or cmsis_only:
+                metadata['HAL_VERSION'] = 'none'
+            commands_db = json.loads((build / 'compile_commands.json').read_text())
+            sources = [Path(c['file']).name for c in commands_db]
+            all_commands = '\n'.join(c['command'] for c in commands_db)
+            if bare:
+                if set(sources) != {'bare_startup.S', 'main.cpp'} or 'CMSIS' in all_commands or 'HAL_Driver' in all_commands:
+                    raise ValueError('Bare mode unexpectedly includes CMSIS/HAL or vendor startup')
+                if not all(flag in all_commands for flag in ('-mcpu=cortex-m3', '-mthumb', '-mfloat-abi=soft')):
+                    raise ValueError('Missing explicit bare-metal CPU flags')
+            else:
+                if not any(name.startswith('startup_stm32f103') for name in sources):
+                    raise ValueError('Missing CMSIS device startup')
+                has_hal = any(name.startswith('stm32f1xx_hal') for name in sources)
+                if has_hal == cmsis_only:
+                    raise ValueError('Unexpected HAL source selection')
+            for symbol, key, expected in [('_Min_Heap_Size', 'HEAP_SIZE', 0 if profile.endswith('Template') else 512),
+                                          ('_Min_Stack_Size', 'STACK_SIZE', 2048 if profile.endswith('Template') else 1024)]:
+                match = re.search(rf'^([0-9a-fA-F]+)\s+A\s+{symbol}$', symbols, re.M)
+                if not match or int(match[1], 16) != expected:
+                    raise ValueError(f'Incorrect linker reservation: {symbol}')
+                metadata[key] = str(expected)
+            if profile.endswith('Template'):
+                generated = (build / 'STM32F103C8_FLASH.ld').read_text()
+                if '@HEAP_SIZE@' in generated or '@STACK_SIZE@' in generated:
+                    raise ValueError('Unexpanded linker template')
             for kind, section in [('data', 'D'), ('bss', 'B'), ('ctor', 'B')]:
                 match = re.search(rf'^([0-9a-fA-F]+)\s+([0-9a-fA-F]+)\s+{section}\s+smoke_{kind}_probe$', symbols, re.M)
                 if not match or int(match[2], 16) != 4:
@@ -98,7 +129,7 @@ def main():
                 report['crc_negative'] = {'profile': 'crc-corrupt', 'elf': str(damaged.relative_to(output)),
                                           'metadata': dict(metadata, **negative), 'exit_trap': exit_trap}
             report['cases'].append({'profile': profile, 'elf': str(elf.relative_to(output)),
-                                    'structure': structure, 'metadata': metadata, 'exit_trap': exit_trap})
+                                    'sources': sources, 'structure': structure, 'metadata': metadata, 'exit_trap': exit_trap})
             print(f'PASS build/ELF: {profile}', flush=True)
         report['status'] = 'passed'
     except (OSError, ValueError, KeyError, struct.error, subprocess.SubprocessError) as error:

@@ -32,6 +32,14 @@ class VerdictTests(unittest.TestCase):
                                       (None, True, HEADER + 'TEST_RESULT=PASS')]:
             self.assertFalse(verdict('success', code, timeout, output, '14.2.1'))
 
+    def test_build_modes_require_success_and_unknown_profiles_fail(self):
+        for profile in ('bare', 'bareTemplate', 'cmsis', 'cmsisTemplate'):
+            with self.subTest(profile=profile):
+                self.assertTrue(verdict(profile, 0, False, HEADER + 'TEST_RESULT=PASS', '14.2.1'))
+                self.assertFalse(verdict(profile, 1, False, HEADER + 'TEST_RESULT=FAIL', '14.2.1'))
+                self.assertFalse(verdict(profile, None, True, HEADER, '14.2.1'))
+        self.assertFalse(verdict('unknown', 1, False, HEADER + 'TEST_RESULT=FAIL', '14.2.1'))
+
     def test_guest_failure_is_not_an_arbitrary_crash(self):
         self.assertTrue(verdict('failure', 1, False, HEADER + 'TEST_RESULT=FAIL', '14.2.1'))
         for code in (0, -6, 2):

@@ -24,7 +24,7 @@ working firmware. [Coverage and commands](testing.md).
 
 ## Building and execution
 
-A separate matrix contains **18 builds, 24 QEMU runs and 24 Renode runs**: three profiles across
+A separate matrix contains **42 builds, 48 QEMU runs and 48 Renode runs**: seven profiles across
 six tool pairs, plus one corrupted ELF copy per pair. It checks ELF layout,
 initial data, C++ construction, metadata, software CRC and controlled termination;
 negative cases distinguish guest failure from timeout.
@@ -52,9 +52,9 @@ consumer projects to be restructured.
 
 The README QEMU+Renode badge reports built configurations and completed checks from the
 last successful Firmware run on main. A full run currently gives
-18 builds / 48 checks. Expected failure, timeout and CRC rejection count as
-successful contract checks; this does not mean 48 normally exiting firmwares
-or 18 different MCUs. Builds are counted once; QEMU and Renode checks are added (24 + 24).
+42 builds / 96 checks. Expected failure, timeout and CRC rejection count as
+successful contract checks; this does not mean 96 normally exiting firmwares
+or 42 different MCUs. Builds are counted once; QEMU and Renode checks are added (48 + 48).
 
 Counts come from complete matching build/QEMU/Renode reports, checked for clean checkout
 SHA, matrix membership, results and metadata. Codex branches produce a preview

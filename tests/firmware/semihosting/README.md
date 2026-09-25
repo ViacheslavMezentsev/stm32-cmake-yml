@@ -45,3 +45,18 @@ provenance, not a digest of the full source tree.
 
 The same ELF runs on QEMU and Renode; the Renode exit hook is a test adapter, not peripheral emulation.
 Один ELF запускается в QEMU и Renode; hook выхода Renode — адаптер теста, не эмуляция периферии.
+
+Build-mode profiles / Профили режимов сборки:
+
+- `bare`, `bareTemplate`: test-owned `bare_startup.S`, no CMSIS/HAL, explicit CPU
+  flags; собственный startup без CMSIS/HAL и явные флаги ядра.
+- `cmsis`, `cmsisTemplate`: CMSIS startup, no HAL; startup CMSIS без HAL.
+- `Template`: auto discovery of `.ld.in`, heap=0, stack=2K; автопоиск `.ld.in`.
+  Other profiles use explicit `.ld`, heap=512, stack=1K; остальные — явный `.ld`.
+
+The startup assembly and linker template are test-owned additions, not copied
+inputs covered by source-hashes.json. HAL_Init and HAL version output are now
+conditional; all profiles retain data/constructor/CRC and semihosting checks.
+Ассемблерный startup и шаблон линкера добавлены для теста, не входят в исходные
+хеши source-hashes.json. HAL_Init и версии HAL теперь условные; проверки памяти,
+конструктора, CRC и semihosting сохранены для всех профилей.

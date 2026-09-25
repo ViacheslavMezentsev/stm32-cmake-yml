@@ -34,7 +34,7 @@ jobs:
           set -o pipefail
           docker build --platform linux/amd64 --progress plain -f ci/docker/Dockerfile -t stm32-yml-ci:firmware . 2>&1 | tee build/firmware-compiler-image.log
           docker build --platform linux/amd64 --progress plain -t stm32-yml-emulation:firmware ci/emulation 2>&1 | tee build/firmware-emulator-image.log
-      - name: Build three profiles on every locked GCC/CMake pair
+      - name: Build firmware profiles on every locked GCC/CMake pair
         run: |
           docker run --rm --network none --user "$(id -u):$(id -g)" -e HOME=/tmp \
             --mount "type=bind,source=$PWD,target=/workspace,readonly" \
