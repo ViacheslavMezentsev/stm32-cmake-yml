@@ -50,6 +50,20 @@ def verify(case, build, source):
         require(str(linker) in observed("LINK_OPTIONS"), "Generated linker script not linked")
 
     ninja = (build / "build.ninja").read_text(encoding="utf-8")
+    if "library_inputs" in case:
+        expected = [str(source / path) for path in case["library_inputs"]["files"]]
+        names = case["library_inputs"].get("names", [])
+        actual = observed("LINK_LIBRARIES")
+        actual = [] if actual in ("", "VALUE-NOTFOUND") else actual.split(";")
+        require(actual == expected + names,
+                f"Library inputs: expected {expected + names!r}, got {actual!r}")
+        lines = [line.strip().split(" = ", 1)[1] for line in ninja.splitlines()
+                 if line.strip().startswith("LINK_LIBRARIES = ")]
+        require(len(lines) <= 1, "Expected at most one executable library line")
+        generated = shlex.split(lines[0].replace("$ ", " ")) if lines else []
+        require(generated == expected + ["-l" + name for name in names],
+                f"Unexpected generated library inputs: {generated!r}")
+
     if "generated_artifacts" in case:
         selected = set(case["generated_artifacts"])
         target = observed("PROJECT_NAME")

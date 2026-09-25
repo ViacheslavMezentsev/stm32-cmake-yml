@@ -2,7 +2,7 @@
   "schema_version": 1,
   "framework_version": "0.9.2",
   "baseline_commit": "f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0",
-  "test_commit": "53f54b229f5ea1ab0935d3a50f73db41e9e37ad2",
+  "test_commit": "79f4d2f037b40124097aa4b29283fdf1ec3459ac",
   "fixes": [
     {
       "commit": "858013a7f31a674a91149ea3a68a5200498d92cc",
@@ -234,7 +234,13 @@
         "ru": "docs/ru/reference/0.9.2/sources.md#custom-libraries",
         "en": "docs/en/reference/0.9.2/sources.md#custom-libraries"
       },
-      "tests": [],
+      "tests": [
+        "configure.custom-library-relative",
+        "configure.custom-library-missing",
+        "configure.custom-library-append",
+        "configure.custom-library-named",
+        "configure.custom-library-reconfigure"
+      ],
       "errata": []
     },
     {
@@ -252,7 +258,8 @@
         "configure.arduino-defaults",
         "configure.module-explicit-link",
         "configure.module-not-auto-linked",
-        "configure.module-missing-target"
+        "configure.module-missing-target",
+        "configure.custom-library-named"
       ],
       "errata": []
     },

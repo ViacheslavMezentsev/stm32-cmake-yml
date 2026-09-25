@@ -53,7 +53,7 @@ custom_libraries: [lib/device.a]
 
 [0.9.2 implementation](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/stm32_yml.cmake) · [Index](index.md)
 
-**Checks (partial coverage):** no automated check of this contract. [Test manifest](../../../../tests/cases.json).
+**Checks (partial coverage):** `configure.custom-library-relative`, `configure.custom-library-missing`, `configure.custom-library-append`, `configure.custom-library-named`, `configure.custom-library-reconfigure`. [Test manifest](../../../../tests/cases.json).
 
 <a id="link-libraries"></a>
 ## `link_libraries`
@@ -70,4 +70,4 @@ link_libraries: [Arduino::Core, Arduino::Probe]
 
 [0.9.2 implementation](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/stm32_yml.cmake) · [Index](index.md)
 
-**Checks (partial coverage):** `configure.arduino-defaults`, `configure.module-explicit-link`, `configure.module-not-auto-linked`, `configure.module-missing-target`. [Test manifest](../../../../tests/cases.json).
+**Checks (partial coverage):** `configure.arduino-defaults`, `configure.module-explicit-link`, `configure.module-not-auto-linked`, `configure.module-missing-target`, `configure.custom-library-named`. [Test manifest](../../../../tests/cases.json).
