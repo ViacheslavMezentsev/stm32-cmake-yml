@@ -11,6 +11,7 @@ on:
       - tests/firmware/**
       - tests/test_firmware*.py
       - .github/workflows/firmware.yml
+      - '!**/*.md'
   workflow_dispatch:
 
 permissions:

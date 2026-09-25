@@ -97,7 +97,8 @@ PR больше не требуются; старые ссылки остают�
 - [x] `codex/firmware-count-badge` слита в main (`23a6d67`): бейдж подтверждённых сборок и QEMU-проверок.
 - [x] `codex/renode-firmware-smoke` слита в main (`493771d`): 18 сборок, 24 QEMU + 24 Renode; общий SYS_WRITE0 и адаптер выхода.
 - [x] `codex/firmware-build-modes` слита в main (`ba9bde7`): bare metal/CMSIS без HAL, `.ld`/`.ld.in`; 42 сборки и 96 проверок QEMU+Renode.
-- [ ] Текущая ветка `codex/firmware-libraries`: C/C++ и ETL, 54 сборки / 120 проверок; E008 без исправления.
+- [x] `codex/firmware-libraries` слита в main (`a53f809`): C/C++ и ETL, 54 сборки / 120 проверок; E008 без исправления.
+- [ ] Текущая ветка `codex/badges-docs-ci`: прямоугольные бейджи без иконок, `Builds (Checks)`, пропуск тяжёлого CI для MD-only push.
 - [ ] Далее согласовать отдельные сценарии Arduino/RTOS; группа 3 — [план](docs/ru/firmware-plan.md).
 - [ ] По индексу выбрать следующие пробелы покрытия: отсутствующие/пустые значения,
   приоритеты и ошибки входных данных. Каждый новый контракт — отдельный сценарий.
@@ -214,7 +215,8 @@ keep defect details in errata.
 - [x] `codex/firmware-count-badge` merged into main (`23a6d67`): confirmed build and QEMU check badge.
 - [x] `codex/renode-firmware-smoke` merged into main (`493771d`): 18 builds, 24 QEMU + 24 Renode; shared SYS_WRITE0 and exit adapter.
 - [x] `codex/firmware-build-modes` merged into main (`ba9bde7`): bare metal/CMSIS without HAL, `.ld`/`.ld.in`; 42 builds and 96 QEMU+Renode checks.
-- [ ] Current branch `codex/firmware-libraries`: C/C++ and ETL, 54 builds / 120 checks; E008 without a fix.
+- [x] `codex/firmware-libraries` merged into main (`a53f809`): C/C++ and ETL, 54 builds / 120 checks; E008 without a fix.
+- [ ] Current branch `codex/badges-docs-ci`: rectangular badges without icons, `Builds (Checks)`, skip heavy CI for MD-only pushes.
 - [ ] Next agree separate Arduino/RTOS scenarios; group 3 — [plan](docs/en/firmware-plan.md).
 - [ ] Use the index to prioritize coverage gaps: missing/empty values, precedence
   and invalid input. Give each new contract a dedicated scenario.

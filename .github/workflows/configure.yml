@@ -3,6 +3,8 @@ name: Configure
 on:
   push:
     branches: [main, 'codex/**']
+    paths-ignore:
+      - '**/*.md'
   workflow_dispatch:
 
 permissions:

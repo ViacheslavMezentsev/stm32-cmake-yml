@@ -50,9 +50,9 @@ consumer projects to be restructured.
 
 ## Confirmed build badge
 
-The README QEMU+Renode badge reports built configurations and completed checks from the
+The README `Builds (Checks)` badge reports built configurations and completed checks from the
 last successful Firmware run on main. A full run currently gives
-54 builds / 120 checks. Expected failure, timeout and CRC rejection count as
+`Builds (Checks): 54 (120)`. Expected failure, timeout and CRC rejection count as
 successful contract checks; this does not mean 120 normally exiting firmwares
 or 54 different MCUs. Builds are counted once; QEMU and Renode checks are added (60 + 60).
 

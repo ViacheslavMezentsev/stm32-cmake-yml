@@ -7,6 +7,7 @@ on:
       - ci/**
       - .github/workflows/environment.yml
       - .gitattributes
+      - '!**/*.md'
   workflow_dispatch:
 
 permissions:

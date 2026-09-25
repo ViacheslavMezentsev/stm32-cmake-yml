@@ -89,3 +89,22 @@ No PR is required. Do not force push or treat old-commit results as validation
 of new changes. Record branch, commit and status in TODO; preserve historical
 PR links. If fetch/push is unavailable, an API check does not update local refs:
 synchronization is still required before merging.
+
+## Documentation-only pushes
+
+Pushes that change only `.md` files at any depth run Docs, skipping Configure,
+Firmware and CI environment. A mixed Markdown/code push still triggers the
+relevant heavy workflows. Environment and firmware retain their existing positive
+path filters, with the Markdown exclusion last. `workflow_dispatch` still allows
+manual runs. A workflow/filter change itself is not documentation-only.
+
+The Firmware counter retains the last successful tested revision when a docs-only
+commit skips firmware CI; it does not claim the newer documentation commit was built.
+README workflow badges use Shields.io `flat-square` with no logo; the generated
+`Builds (Checks)` SVG uses the same rectangular form. Counts remain computed from
+validated reports, not entered into README manually.
+
+[GitHub path filters](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#onpushpull_requestpull_request_targetpathspaths-ignore)
+explain mixed changes, pattern ordering and skipped required checks. If branch
+protection requires an omitted workflow, adjust that policy before relying on
+MD-only merges. No protection setting is changed by this branch.
