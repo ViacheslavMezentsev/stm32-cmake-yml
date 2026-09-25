@@ -2,6 +2,7 @@
 import argparse
 import json
 from pathlib import Path
+import re
 import struct
 import subprocess
 import tempfile
@@ -47,6 +48,10 @@ def main():
     manifest = output / 'build-summary.json'
     manifest.write_text(json.dumps(report))  # Never reuse a stale successful manifest.
     try:
+        git = ['git', '-c', f'safe.directory={root}', '-C', str(root)]
+        report['git_revision'] = subprocess.check_output(git + ['rev-parse', 'HEAD'], text=True, timeout=30).strip()
+        report['git_dirty'] = '1' if subprocess.check_output(git + ['status', '--porcelain'], text=True, timeout=30).strip() else '0'
+        baseline = json.loads((root / 'tests/firmware/semihosting/expected-metadata.json').read_text())
         report['gcc'] = subprocess.check_output(['arm-none-eabi-gcc', '-dumpfullversion'], text=True, timeout=30).strip()
         report['cmake'] = subprocess.check_output(['cmake', '--version'], text=True, timeout=30).splitlines()[0]
         for profile in ('success', 'failure', 'hang'):
@@ -55,6 +60,7 @@ def main():
             commands = [
                 ['cmake', '-S', str(root / 'tests/firmware/semihosting'), '-B', str(build), '-G', 'Ninja',
                  f'-DSTM32_YML_FRAMEWORK_DIR={root}', '-DCMAKE_TOOLCHAIN_FILE=/opt/modules/stm32-cmake/cmake/stm32_gcc.cmake',
+                 f'-DSMOKE_GIT_REVISION={report["git_revision"]}', f'-DSMOKE_GIT_DIRTY={report["git_dirty"]}',
                  f'-DSTM32_YML_PROFILE={profile}', '-DCMAKE_BUILD_TYPE=Debug'],
                 ['cmake', '--build', str(build), '--parallel', '4'],
             ]
@@ -70,7 +76,17 @@ def main():
             vector = build / 'vectors.bin'
             subprocess.run(['arm-none-eabi-objcopy', '--dump-section', f'.isr_vector={vector}', str(elf), str(build / 'inspection.elf')], check=True, timeout=30)
             structure = inspect_elf(elf, vector)
-            report['cases'].append({'profile': profile, 'elf': str(elf.relative_to(output)), 'structure': structure})
+            symbols = subprocess.check_output(['arm-none-eabi-nm', '-S', '--defined-only', str(elf)], text=True, timeout=30)
+            (build / 'symbols.log').write_text(symbols)
+            metadata = dict(baseline, PROFILE=profile, CMAKE=report['cmake'].removeprefix('cmake version '),
+                            GIT_REVISION=report['git_revision'], GIT_DIRTY=report['git_dirty'])
+            for kind, section in [('data', 'D'), ('bss', 'B'), ('ctor', 'B')]:
+                match = re.search(rf'^([0-9a-fA-F]+)\s+([0-9a-fA-F]+)\s+{section}\s+smoke_{kind}_probe$', symbols, re.M)
+                if not match or int(match[2], 16) != 4:
+                    raise ValueError(f'Missing four-byte {section} symbol: smoke_{kind}_probe')
+                metadata[kind.upper() + '_ADDRESS'] = f'{int(match[1], 16):08X}'
+            report['cases'].append({'profile': profile, 'elf': str(elf.relative_to(output)),
+                                    'structure': structure, 'metadata': metadata})
             print(f'PASS build/ELF: {profile}', flush=True)
         report['status'] = 'passed'
     except (OSError, ValueError, struct.error, subprocess.SubprocessError) as error:
