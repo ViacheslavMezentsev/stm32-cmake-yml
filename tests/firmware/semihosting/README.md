@@ -60,3 +60,14 @@ conditional; all profiles retain data/constructor/CRC and semihosting checks.
 Ассемблерный startup и шаблон линкера добавлены для теста, не входят в исходные
 хеши source-hashes.json. HAL_Init и версии HAL теперь условные; проверки памяти,
 конструктора, CRC и semihosting сохранены для всех профилей.
+
+Library profiles / Библиотечные профили:
+
+`cmsisLibrary` runs a test-owned mixed C/C++ static library. `cmsisEtl` adds
+vector/string operations using pinned ETL. Their code is new, not copied from the
+demo inputs. Both use CMSIS without HAL. Details and the E008 workaround:
+[EN](../../../docs/en/firmware-testing.md) / [RU](../../../docs/ru/firmware-testing.md).
+
+`cmsisLibrary` запускает новую тестовую C/C++-библиотеку, `cmsisEtl` добавляет
+операции vector/string закреплённой ETL. Код написан для теста, не скопирован из
+исходного demo. Оба профиля используют CMSIS без HAL; обход E008 описан по ссылкам выше.

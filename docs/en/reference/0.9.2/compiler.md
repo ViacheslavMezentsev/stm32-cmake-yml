@@ -141,3 +141,5 @@ compile_definitions_cxx: [FEATURE=1]
 [0.9.2 implementation](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/stm32_yml.cmake) · [Index](index.md)
 
 **Checks (partial coverage):** `configure.defaults-blackpill`, `configure.source-directory-target`. [Test manifest](../../../../tests/cases.json).
+
+Profile-only language settings require root declarations: [E008](../../errata/E008.md).

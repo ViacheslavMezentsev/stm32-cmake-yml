@@ -7,6 +7,17 @@
 #endif
 #include "version.h"
 #include "build_metadata.h"
+#ifdef SMOKE_LIBRARY
+#include <smoke_library.h>
+#include <string.h>
+#if !defined(SMOKE_CXX_ONLY) || defined(SMOKE_C_ONLY) || defined(SMOKE_LIBRARY_PRIVATE)
+#error Incorrect C++ language definitions or leaked PRIVATE library definition
+#endif
+#if defined(__EXCEPTIONS) || defined(__GXX_RTTI)
+#error Missing executable C++ options
+#endif
+static volatile uint32_t library_input[] = {3, 1, 4, 1, 5};
+#endif
 
 extern "C" {
 volatile uint32_t smoke_data_probe = 0x12345678u;
@@ -297,6 +308,24 @@ int main()
         smoke_exit(3);
     }
 
+#ifdef SMOKE_LIBRARY
+    const uint32_t library_result = smoke_transform(library_input, 5);
+    const uint32_t language_result = smoke_language();
+    smoke_printf("LIB_RESULT=%lu\nC_LANGUAGE=%lu\n", library_result, language_result);
+    if (library_result != 123u || language_result != 11u) {
+        smoke_printf("TEST_RESULT=FAIL\n");
+        smoke_exit(4);
+    }
+#ifdef SMOKE_ETL
+    const uint32_t etl_result = smoke_etl(library_input, 5);
+    smoke_printf("ETL_RESULT=%lu\nETL_TEXT=%s\nETL_VERSION=%s\n",
+                 etl_result, smoke_etl_text(), smoke_etl_version());
+    if (etl_result != 14u || strcmp(smoke_etl_text(), "etl:14") != 0) {
+        smoke_printf("TEST_RESULT=FAIL\n");
+        smoke_exit(4);
+    }
+#endif
+#endif
 #if defined(SMOKE_HANG)
     while (1) { __asm__ volatile("nop"); }
 #elif defined(SMOKE_FAIL)
