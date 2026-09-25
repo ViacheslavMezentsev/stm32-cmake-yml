@@ -1,4 +1,4 @@
-"""Publish two generated files to ci-badges without switching or changing main."""
+"""Publish generated files to ci-badges without switching or changing main."""
 import argparse
 import json
 import os
@@ -20,19 +20,25 @@ def publish(directory, revision):
     if current != revision:
         print('main advanced; skip publishing an older result')
         return
+    publish_files(directory, ('firmware.json', 'firmware.svg', 'counts.json'), f'Firmware checks for {revision}')
+
+
+def publish_files(directory, names, message):
+    # All workflow publishers share the ci-badges concurrency group.
     previous = git('ls-remote', 'origin', 'refs/heads/ci-badges')
     parent = []
+    entries = {}
     if previous:
         git('fetch', '--no-tags', 'origin', 'refs/heads/ci-badges')
         parent = ['-p', git('rev-parse', 'FETCH_HEAD')]
-    entries = []
-    for name in ('firmware.json', 'firmware.svg'):
+        entries = {line.split('\t', 1)[1]: line for line in git('ls-tree', 'FETCH_HEAD').splitlines()}
+    for name in names:
         blob = git('hash-object', '-w', str(directory / name))
-        entries.append(f'100644 blob {blob}\t{name}\n')
-    tree = git('mktree', text=''.join(entries))
+        entries[name] = f'100644 blob {blob}\t{name}'
+    tree = git('mktree', text='\n'.join(entries[name] for name in sorted(entries)) + '\n')
     commit = git('-c', 'user.name=github-actions[bot]', '-c',
                  'user.email=41898282+github-actions[bot]@users.noreply.github.com',
-                 'commit-tree', tree, *parent, text=f'Firmware checks for {revision}\n')
+                 'commit-tree', tree, *parent, text=message + '\n')
     git('push', 'origin', f'{commit}:refs/heads/ci-badges')
 
 

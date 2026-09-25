@@ -74,6 +74,9 @@ class BadgeTests(unittest.TestCase):
             self.assertEqual((report['builds'], report['checks']), (72, 156))
             self.assertEqual(report['checks_by_emulator'], {'QEMU': 78, 'Renode': 78})
             ET.fromstring((Path(directory) / 'firmware.svg').read_text())
+            endpoint = json.loads((Path(directory) / 'counts.json').read_text())
+            self.assertEqual(endpoint['message'], '72 (156)')
+            self.assertEqual(endpoint['color'], '238636')
 
 
 if __name__ == '__main__':

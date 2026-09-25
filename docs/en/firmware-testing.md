@@ -19,7 +19,7 @@ Readelf output is retained. These checks do not establish general linker correct
 | --- | --- |
 | success | Compiler/target/machine/CPU output, TEST_RESULT=PASS, exit 0 |
 | failure | Same startup output, TEST_RESULT=FAIL, exit 1 |
-| hang | Startup output but no result marker, timeout after 5 seconds |
+| hang | Startup output but no result marker, timeout after 2 seconds |
 | bare / bareTemplate | Own startup, no CMSIS/HAL, TEST_RESULT=PASS, exit 0 |
 | cmsis / cmsisTemplate | CMSIS startup, no HAL, TEST_RESULT=PASS, exit 0 |
 | cmsisLibrary / cmsisEtl | C/C++ library and optional ETL, TEST_RESULT=PASS, exit 0 |
@@ -319,3 +319,27 @@ Renode warns that the value should be masked with 0xF0. The runner permits exact
 one occurrence of this exact warning only for freertosTasks, retaining it in the
 report. Other warnings, duplicate probe warnings, errors or missing guest exit
 still fail. configASSERT remains enabled.
+
+## CI duration and timeouts
+
+In the [main f16eb09 run](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/actions/runs/36136281504), smoke took 13:23:
+
+| Stage | Duration |
+| --- | ---: |
+| Compiler/emulator Docker images | 7:37 |
+| Firmware builds | 1:15 |
+| QEMU | 0:32 |
+| Renode | 3:42 |
+
+Six intentional QEMU hangs previously took 6 × 5 = 30 seconds. Their limit is now
+2 seconds, saving approximately 18 seconds per full run. All 78 runs passed
+locally in 13.35 seconds combined, including 12.03 seconds of intentional hangs.
+This does not guarantee identical GitHub runner timing.
+
+Normal QEMU (15 s) and Renode process (30 s) deadlines are upper bounds: successful
+or expected-error exits complete immediately. Reducing these limits does not
+speed up a successful run. Renode hang still uses 0.1 seconds of virtual time;
+a host timeout always fails. Larger opportunities are image caching, reducing
+per-process Renode startup overhead, then bounded parallelism. These are future
+steps, not optimizations implemented here. Both runners now record per-case
+duration_seconds; QEMU also records timeout_seconds. Durations do not affect verdicts.

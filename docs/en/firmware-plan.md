@@ -40,7 +40,7 @@ Arduino String with own main is merged into main (`5743602`): 60 total builds / 
 
 Merged into main (`4109bc8`), `codex/firmware-freertos-queue`: queues and Heap::4 before scheduler startup, 66 total builds / 144 checks.
 
-Current stage `codex/firmware-freertos-tasks`: starter creates receiver and sender then deletes itself; queue exchange, SysTick wakeup without HAL and semihosting from a task. Total: 72 builds / 156 checks.
+Merged into main (`f16eb09`), `codex/firmware-freertos-tasks`: starter creates receiver and sender then deletes itself; queue exchange, SysTick wakeup without HAL and semihosting from a task. Total: 72 builds / 156 checks.
 
 ## Optimistic size estimate
 

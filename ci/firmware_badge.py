@@ -46,7 +46,7 @@ def svg(result):
     left = 14 + len(label) * 7
     return f'''<svg xmlns="http://www.w3.org/2000/svg" width="{left + width}" height="20" role="img" aria-label="{label}: {message}">
 <title>Last successful main run: {label}, {message}</title>
-<rect width="{left}" height="20" fill="#555"/><rect x="{left}" width="{width}" height="20" fill="#6b9278"/>
+<rect width="{left}" height="20" fill="#555"/><rect x="{left}" width="{width}" height="20" fill="#238636"/>
 <g fill="#fff" text-anchor="middle" font-family="Verdana,DejaVu Sans,sans-serif" font-size="11">
 <text x="{left / 2}" y="14">{label}</text><text x="{left + width / 2}" y="14">{message}</text></g></svg>
 '''
@@ -70,6 +70,11 @@ def main():
         result['emulator'] = 'QEMU+Renode'
     result.update(run_url=args.run_url, generated_at=datetime.now(timezone.utc).isoformat())
     args.output.mkdir(parents=True, exist_ok=True)
+    (args.output / 'counts.json').write_text(json.dumps({
+        'schemaVersion': 1, 'label': 'Builds (Checks)',
+        'message': f'{result["builds"]} ({result["checks"]})',
+        'color': '238636', 'style': 'flat-square',
+    }) + '\n', encoding='utf-8')
     (args.output / 'firmware.svg').write_text(svg(result), encoding='utf-8')
     (args.output / 'firmware.json').write_text(json.dumps(result, indent=2) + '\n', encoding='utf-8')
     print(f'Confirmed: {result["builds"]} builds / {result["checks"]} simulator checks')

@@ -83,6 +83,9 @@ jobs:
             build/firmware-*-image.log
 
   badge:
+    concurrency:
+      group: ci-badges
+      cancel-in-progress: false
     needs: smoke
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04

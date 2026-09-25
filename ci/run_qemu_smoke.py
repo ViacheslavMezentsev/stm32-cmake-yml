@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 import shutil
 import subprocess
+import time
 
 
 def metadata_matches(output, expected):
@@ -62,10 +63,12 @@ def main():
                 raise ValueError(f'Invalid ELF path: {elf}')
             command = [qemu, '-M', 'netduino2', '-nographic', '-monitor', 'none', '-serial', 'none',
                        '-no-reboot', '-semihosting-config', 'enable=on,target=native', '-kernel', str(elf)]
+            started = time.monotonic()
+            timeout_seconds = 2 if profile == 'hang' else 15
             timed_out = False
             try:
                 process = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                                         timeout=5 if profile == 'hang' else 15)
+                                         timeout=timeout_seconds)
                 code, raw = process.returncode, process.stdout
             except subprocess.TimeoutExpired as error:
                 timed_out, code, raw = True, None, error.stdout or b''
@@ -75,6 +78,7 @@ def main():
             passed = metadata_ok and verdict(profile, code, timed_out, output, manifest['gcc'])
             report['cases'].append({'profile': profile, 'passed': passed, 'returncode': code,
                                     'timeout': timed_out, 'metadata_ok': metadata_ok,
+                                    'timeout_seconds': timeout_seconds, 'duration_seconds': round(time.monotonic() - started, 3),
                                     'expected_metadata': case['metadata'], 'command': command})
             print(f'{"PASS" if passed else "FAIL"}: {profile}; exit={code}; timeout={timed_out}', flush=True)
         report['status'] = 'passed' if all(c['passed'] for c in report['cases']) else 'failed'
