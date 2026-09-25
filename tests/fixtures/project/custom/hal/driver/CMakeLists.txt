@@ -1,0 +1,5 @@
+add_library(CustomHal OBJECT driver.c)
+add_library(Custom::Hal ALIAS CustomHal)
+target_link_libraries(CustomHal PUBLIC Arduino::Definitions Arduino::Core)
+target_compile_definitions(CustomHal PUBLIC CUSTOM_HAL=1)
+target_include_directories(CustomHal PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")

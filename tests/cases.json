@@ -2113,5 +2113,307 @@
         ]
       }
     ]
+  },
+  {
+    "name": "arduino-custom-chain",
+    "backend": "arduino",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=arduino-custom.yml",
+      "-DSTM32_YML_PROFILE="
+    ],
+    "observed": {
+      "LINK_LIBRARIES": "Custom::App"
+    },
+    "command_checks": [
+      {
+        "file": "main.c",
+        "present": [
+          "-DCUSTOM_APP=1",
+          "-DCUSTOM_HAL=1"
+        ],
+        "includes": [
+          "custom/hal/driver",
+          "custom/app/driver"
+        ]
+      },
+      {
+        "file": "custom/hal/driver/driver.c",
+        "target": "CustomHal",
+        "present": [
+          "-DCUSTOM_HAL=1",
+          "-DARDUINO_BASE=1",
+          "-Wstrict-prototypes"
+        ],
+        "absent": [
+          "-DCUSTOM_APP=1",
+          "-fno-exceptions"
+        ]
+      },
+      {
+        "file": "custom/app/driver/driver.cpp",
+        "target": "CustomApp",
+        "present": [
+          "-DCUSTOM_HAL=1",
+          "-DCUSTOM_APP=1",
+          "-DARDUINO_BASE=1",
+          "-fno-exceptions"
+        ],
+        "absent": [
+          "-Wstrict-prototypes"
+        ],
+        "includes": [
+          "custom/hal/driver"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "arduino-custom-unlinked",
+    "backend": "arduino",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=arduino-custom.yml",
+      "-DSTM32_YML_PROFILE=unlinked"
+    ],
+    "observed": {
+      "LINK_LIBRARIES": "Arduino::Core"
+    },
+    "command_checks": [
+      {
+        "file": "main.c",
+        "absent": [
+          "-DCUSTOM_APP=1",
+          "-DCUSTOM_HAL=1"
+        ],
+        "absent_includes": [
+          "custom/hal/driver",
+          "custom/app/driver"
+        ]
+      },
+      {
+        "file": "custom/hal/driver/driver.c",
+        "target": "CustomHal",
+        "present": [
+          "-DCUSTOM_HAL=1",
+          "-DARDUINO_BASE=1",
+          "-Wstrict-prototypes"
+        ],
+        "absent": [
+          "-DCUSTOM_APP=1",
+          "-fno-exceptions"
+        ]
+      },
+      {
+        "file": "custom/app/driver/driver.cpp",
+        "target": "CustomApp",
+        "present": [
+          "-DCUSTOM_HAL=1",
+          "-DCUSTOM_APP=1",
+          "-DARDUINO_BASE=1",
+          "-fno-exceptions"
+        ],
+        "absent": [
+          "-Wstrict-prototypes"
+        ],
+        "includes": [
+          "custom/hal/driver"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "arduino-custom-missing",
+    "backend": "arduino",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=arduino-custom.yml",
+      "-DSTM32_YML_PROFILE=missing"
+    ],
+    "observed": {
+      "LINK_LIBRARIES": "Arduino::Core"
+    },
+    "command_checks": [
+      {
+        "file": "main.c",
+        "absent": [
+          "-DCUSTOM_APP=1",
+          "-DCUSTOM_HAL=1"
+        ],
+        "absent_includes": [
+          "custom/hal/driver",
+          "custom/app/driver"
+        ]
+      }
+    ],
+    "absent_commands": [
+      "custom/hal/driver/driver.c",
+      "custom/app/driver/driver.cpp"
+    ],
+    "log_contains": [
+      "[arduino] Кастомная библиотека не найдена:"
+    ]
+  },
+  {
+    "name": "arduino-custom-no-wrapper",
+    "backend": "arduino",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=arduino-custom.yml",
+      "-DSTM32_YML_PROFILE=nowrap"
+    ],
+    "observed": {
+      "LINK_LIBRARIES": "Arduino::Core"
+    },
+    "command_checks": [
+      {
+        "file": "main.c",
+        "absent": [
+          "-DCUSTOM_APP=1",
+          "-DCUSTOM_HAL=1"
+        ],
+        "absent_includes": [
+          "custom/hal/driver",
+          "custom/app/driver"
+        ]
+      }
+    ],
+    "absent_commands": [
+      "custom/hal/driver/driver.c",
+      "custom/app/driver/driver.cpp"
+    ],
+    "log_contains": [
+      "[arduino] Кастомная библиотека не найдена:"
+    ]
+  },
+  {
+    "name": "arduino-custom-reconfigure",
+    "backend": "arduino",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=arduino-custom.yml"
+    ],
+    "steps": [
+      {
+        "args": [
+          "-DSTM32_YML_PROFILE="
+        ],
+        "observed": {
+          "LINK_LIBRARIES": "Custom::App"
+        },
+        "command_checks": [
+          {
+            "file": "main.c",
+            "present": [
+              "-DCUSTOM_APP=1",
+              "-DCUSTOM_HAL=1"
+            ],
+            "includes": [
+              "custom/hal/driver",
+              "custom/app/driver"
+            ]
+          },
+          {
+            "file": "custom/hal/driver/driver.c",
+            "target": "CustomHal",
+            "present": [
+              "-DCUSTOM_HAL=1",
+              "-DARDUINO_BASE=1",
+              "-Wstrict-prototypes"
+            ],
+            "absent": [
+              "-DCUSTOM_APP=1",
+              "-fno-exceptions"
+            ]
+          },
+          {
+            "file": "custom/app/driver/driver.cpp",
+            "target": "CustomApp",
+            "present": [
+              "-DCUSTOM_HAL=1",
+              "-DCUSTOM_APP=1",
+              "-DARDUINO_BASE=1",
+              "-fno-exceptions"
+            ],
+            "absent": [
+              "-Wstrict-prototypes"
+            ],
+            "includes": [
+              "custom/hal/driver"
+            ]
+          }
+        ]
+      },
+      {
+        "args": [
+          "-DSTM32_YML_PROFILE=empty"
+        ],
+        "observed": {
+          "LINK_LIBRARIES": "Arduino::Core"
+        },
+        "command_checks": [
+          {
+            "file": "main.c",
+            "absent": [
+              "-DCUSTOM_APP=1",
+              "-DCUSTOM_HAL=1"
+            ],
+            "absent_includes": [
+              "custom/hal/driver",
+              "custom/app/driver"
+            ]
+          }
+        ],
+        "absent_commands": [
+          "custom/hal/driver/driver.c",
+          "custom/app/driver/driver.cpp"
+        ]
+      },
+      {
+        "args": [
+          "-DSTM32_YML_PROFILE=unlinked"
+        ],
+        "observed": {
+          "LINK_LIBRARIES": "Arduino::Core"
+        },
+        "command_checks": [
+          {
+            "file": "main.c",
+            "absent": [
+              "-DCUSTOM_APP=1",
+              "-DCUSTOM_HAL=1"
+            ],
+            "absent_includes": [
+              "custom/hal/driver",
+              "custom/app/driver"
+            ]
+          },
+          {
+            "file": "custom/hal/driver/driver.c",
+            "target": "CustomHal",
+            "present": [
+              "-DCUSTOM_HAL=1",
+              "-DARDUINO_BASE=1",
+              "-Wstrict-prototypes"
+            ],
+            "absent": [
+              "-DCUSTOM_APP=1",
+              "-fno-exceptions"
+            ]
+          },
+          {
+            "file": "custom/app/driver/driver.cpp",
+            "target": "CustomApp",
+            "present": [
+              "-DCUSTOM_HAL=1",
+              "-DCUSTOM_APP=1",
+              "-DARDUINO_BASE=1",
+              "-fno-exceptions"
+            ],
+            "absent": [
+              "-Wstrict-prototypes"
+            ],
+            "includes": [
+              "custom/hal/driver"
+            ]
+          }
+        ]
+      }
+    ]
   }
 ]

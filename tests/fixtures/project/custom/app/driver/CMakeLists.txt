@@ -1,0 +1,5 @@
+add_library(CustomApp OBJECT driver.cpp)
+add_library(Custom::App ALIAS CustomApp)
+target_link_libraries(CustomApp PUBLIC Custom::Hal)
+target_compile_definitions(CustomApp PUBLIC CUSTOM_APP=1)
+target_include_directories(CustomApp PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
