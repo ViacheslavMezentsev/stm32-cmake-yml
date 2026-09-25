@@ -80,8 +80,11 @@ PR больше не требуются; старые ссылки остают�
   105 сценариев / 630 запусков; CI прошёл.
 - [x] `codex/configure-arduino-libraries` слита в main (`09f5629`):
   110 сценариев / 660 запусков.
-- [ ] Текущая ветка `codex/configure-arduino-custom-wrappers`: пять проверок
-  пользовательских обёрток; 115 сценариев / 690 запусков.
+- [x] `codex/configure-arduino-custom-wrappers` слита в main (`a36aa77`):
+  115 сценариев / 690 запусков.
+- [ ] Текущая ветка `codex/emulation-environment`: локальная проверка программ,
+  отдельный образ QEMU 11.0.0 / Renode 1.16.1 и CI без запуска прошивок.
+  [Порядок дальнейших этапов и ограничения](docs/ru/emulation.md).
 - [ ] Следующий шаг согласовать по пробелам покрытия; к прошивкам переходить
   только после уточнений автора, как указано ниже.
 - [ ] По индексу выбрать следующие пробелы покрытия: отсутствующие/пустые значения,
@@ -182,8 +185,11 @@ keep defect details in errata.
   105 scenarios / 630 executions; CI passed.
 - [x] `codex/configure-arduino-libraries` merged into main (`09f5629`):
   110 scenarios / 660 executions.
-- [ ] Current branch `codex/configure-arduino-custom-wrappers`: five consumer
-  wrapper checks; 115 scenarios / 690 executions.
+- [x] `codex/configure-arduino-custom-wrappers` merged into main (`a36aa77`):
+  115 scenarios / 690 executions.
+- [ ] Current branch `codex/emulation-environment`: local executable checks,
+  separate QEMU 11.0.0 / Renode 1.16.1 image and CI without firmware execution.
+  [Next stages and limitations](docs/en/emulation.md).
 - [ ] Agree the next coverage priority; defer firmware work until the author
   supplies scenario guidance as required below.
 - [ ] Use the index to prioritize coverage gaps: missing/empty values, precedence

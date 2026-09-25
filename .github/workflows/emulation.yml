@@ -1,0 +1,45 @@
+name: Emulation environment
+
+on:
+  push:
+    branches: [main, 'codex/**']
+    paths:
+      - ci/emulation/**
+      - .github/workflows/emulation.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: emulation-environment-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  environment:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Test checker failure paths
+        run: python3 -m unittest discover -s ci/emulation -p test_check.py
+      - name: Build pinned emulators (no firmware)
+        run: |
+          mkdir -p build/emulation
+          set -o pipefail
+          docker build --platform linux/amd64 --progress plain -t stm32-yml-emulation:check ci/emulation 2>&1 | tee build/emulation/build.log
+      - name: Check release versions and machines offline
+        run: |
+          docker run --rm --network none \
+            --user "$(id -u):$(id -g)" \
+            -e HOME=/tmp \
+            --mount "type=bind,source=$PWD/build/emulation,target=/results" \
+            stm32-yml-emulation:check python3 /opt/emulation/check.py --locked --output /results/environment.json
+          docker run --rm --network none stm32-yml-emulation:check cat /opt/emulation/packages.txt > build/emulation/packages.txt
+      - name: Upload environment diagnostics
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: emulation-environment
+          path: build/emulation/
+          retention-days: 14

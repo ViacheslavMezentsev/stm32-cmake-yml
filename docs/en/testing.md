@@ -333,3 +333,5 @@ The [synthetic core layout](../../tests/fixtures/project/arduino-library-core/RE
 Five `arduino-custom-*` cases exercise `arduino.custom_libraries` with an empty `arduino.libraries` list. Two consumer OBJECT libraries form a public dependency chain through Arduino::Definitions and Arduino::Core. Both wrapper directories end in `driver`, so successful generation also checks distinct binary directories for different relative paths (not arbitrary path-sanitization collisions).
 
 Assertions cover owning targets, transitive definitions/includes, separate C/C++ flags, absence of automatic linkage, warnings for missing directories/CMakeLists.txt, and selected → empty → unlinked profile transitions. The wrappers are synthetic, inspired by a consumer pattern with Core/SrcWrapper/peripheral libraries; they do not implement or validate SPI, Wire or HAL. Compilation, object inclusion at link time and firmware execution remain outside this suite.
+
+[QEMU/Renode environment and firmware roadmap](emulation.md).
