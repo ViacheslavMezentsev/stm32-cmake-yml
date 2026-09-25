@@ -20,6 +20,7 @@ static volatile uint32_t library_input[] = {3, 1, 4, 1, 5};
 #endif
 
 extern "C" {
+unsigned smoke_arduino_string(char*, unsigned);
 volatile uint32_t smoke_data_probe = 0x12345678u;
 volatile uint32_t smoke_bss_probe;
 volatile uint32_t smoke_ctor_probe;
@@ -325,6 +326,15 @@ int main()
         smoke_exit(4);
     }
 #endif
+#endif
+#ifdef SMOKE_ARDUINO
+    char arduino_text[32] = {};
+    const unsigned arduino_length = smoke_arduino_string(arduino_text, sizeof(arduino_text));
+    smoke_printf("ARDUINO_TEXT=%s\nARDUINO_LENGTH=%u\n", arduino_text, arduino_length);
+    if (arduino_length != 9u) {
+        smoke_printf("TEST_RESULT=FAIL\n");
+        smoke_exit(5);
+    }
 #endif
 #if defined(SMOKE_HANG)
     while (1) { __asm__ volatile("nop"); }

@@ -71,3 +71,10 @@ demo inputs. Both use CMSIS without HAL. Details and the E008 workaround:
 `cmsisLibrary` запускает новую тестовую C/C++-библиотеку, `cmsisEtl` добавляет
 операции vector/string закреплённой ETL. Код написан для теста, не скопирован из
 исходного demo. Оба профиля используют CMSIS без HAL; обход E008 описан по ссылкам выше.
+
+`arduinoString` builds original WString.cpp/itoa.c from pinned Arduino Core 2.12.0
+with a consumer-owned wrapper and standalone toolchain. It uses own main/startup,
+a bounded heap and the existing semihosting protocol; it is not a full board core.
+`arduinoString` собирает настоящие WString.cpp/itoa.c из Core 2.12.0 через свою
+обёртку и отдельный toolchain: собственные main/startup, ограниченный heap,
+прежний semihosting. Полное ядро платы не проверяется. See / см. контракт RU/EN выше.

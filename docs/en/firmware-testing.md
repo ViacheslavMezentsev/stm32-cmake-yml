@@ -3,8 +3,8 @@
 [Documentation](index.md) · [Русский](../ru/firmware-testing.md) · [Environment](emulation.md)
 
 The first firmware test adapts the author's F1 [02-semihosting example](../../tests/firmware/semihosting/README.md).
-It is separate from the 115 configure scenarios: **54 builds, 60 QEMU runs and 60 Renode runs**:
-nine profiles plus one corrupted copy per tool pair; three xPack GCC versions × two CMake versions from the
+It is separate from the 115 configure scenarios: **60 builds, 66 QEMU runs and 66 Renode runs**:
+ten profiles plus one corrupted copy per tool pair; three xPack GCC versions × two CMake versions from the
 [lockfile](../../ci/dependencies.lock.json), CubeF1 1.8.7, QEMU 11.0.0.
 The Windows QEMU 11.1.0 installation was also checked locally; CI uses the pinned image.
 
@@ -23,6 +23,7 @@ Readelf output is retained. These checks do not establish general linker correct
 | bare / bareTemplate | Own startup, no CMSIS/HAL, TEST_RESULT=PASS, exit 0 |
 | cmsis / cmsisTemplate | CMSIS startup, no HAL, TEST_RESULT=PASS, exit 0 |
 | cmsisLibrary / cmsisEtl | C/C++ library and optional ETL, TEST_RESULT=PASS, exit 0 |
+| arduinoString | Arduino String with own main/startup, TEST_RESULT=PASS, exit 0 |
 
 Normal runs have a 15-second timeout. A hang before metadata is printed, a crash,
 a missing marker, an unexpected exit code or conflicting markers fails the suite.
@@ -66,7 +67,7 @@ is inferred from running this ELF on the F205-based netduino2.
 
 The matrix is read from the shared dependency lockfile, not duplicated in YAML.
 Images are built once; tool pairs run sequentially with separate build/log paths.
-Actual GCC/CMake versions and all nine profiles are checked for each pair.
+Actual GCC/CMake versions and all ten profiles are checked for each pair.
 Failures do not stop collection of other pair results, but the matrix exits nonzero
 if any pair fails. Run selection uses the current lockfile rather than accepting
 whatever manifests happen to exist. Aggregate reports are matrix-summary.json;
@@ -123,7 +124,7 @@ For each tool pair, a copy of success ELF has one bit changed in .fw_version.
 Code, startup data and the injected CRC remain unchanged. The derived negative case,
 crc-corrupt, must report CRC_RESULT=FAIL and TEST_RESULT=FAIL and exit 3. A crash
 or timeout cannot pass this case. This adds six runs without extra compilations:
-54 builds, 60 runs per simulator. Reports distinguish nine profiles from ten executions.
+60 builds, 66 runs per simulator. Reports distinguish ten profiles from eleven executions.
 
 This verifies software CRC over loaded FLASH on netduino2, not the STM32 CRC
 peripheral. E004 (algorithm selection) and E006 (post-build error handling) remain
@@ -221,3 +222,37 @@ The build exposed [E008](errata/E008.md): language keys declared only inside a
 profile do not reach the executable. The fixture declares empty root lists as a
 verified workaround; six configure-only probes preserve the known deviation.
 These probes do not add firmware builds or simulator checks to the badge.
+
+## Arduino String with a project-owned main
+
+The author approved this first Arduino stage: software components and own main;
+the default Arduino init/setup/loop, clock setup and SysTick remain separate work.
+`arduinoString` selects the actual Arduino backend and `use_core_main: false`.
+The consumer-owned `ArduinoString/CMakeLists.txt` builds pinned Core STM32 2.12.0
+WString.cpp and itoa.c as Arduino::Core, with Arduino::Definitions usage requirements.
+No Core sources are copied or mocked. Only the selected String components are
+compiled, not the complete Arduino board core or SrcWrapper/HAL.
+
+The toolchain is independent of stm32-cmake, reusing the existing consumer test
+toolchain and adding real BIN/HEX helpers. Cortex-M3, Thumb, soft-float, nano/nosys
+specs, `-nostartfiles` and `--gc-sections` are explicit. `use_newlib_nano: false`
+disables the framework's STM32::Nano target; nano is selected by compiler/linker
+specs instead. Direct SYS_WRITE0/SYS_EXIT_EXTENDED does not use nosys file I/O.
+Unused floating-point String methods requiring dtostrf are discarded; float
+formatting is outside this scenario. The builder supplies core_path relative to
+the source directory, as required by this backend.
+
+The existing test-owned startup initializes data, BSS and constructors. A bounded
+512-byte `_sbrk` heap services real String allocations without semihosting heap
+queries; this is a single-threaded test allocator, not an Arduino runtime replacement.
+The test exercises reserve, integer construction, concatenation, copy, replace,
+lowercasing, search, substring and toInt. It requires `ARDUINO_TEXT=arm32:123` and
+`ARDUINO_LENGTH=9`; the runner checks both values. Failed internal checks or an
+incorrect length terminate the firmware with status 5. Selected allocation failures
+are also detected by these assertions; exhaustive heap exhaustion is not tested.
+Existing FLASH CRC and metadata checks still apply. CMSIS/HAL fields are `none`.
+
+This tests a narrow Arduino software path on netduino2 and the same Renode memory
+model. It does not validate an F411 board, Arduino.h, Print, GPIO, Serial or timing.
+The mcu_gcs_board configuration was inspected read-only for the wrapper/own-main
+pattern; its F411 variant and device drivers were not imported.

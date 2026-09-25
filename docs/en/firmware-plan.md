@@ -11,7 +11,7 @@ its own branch.
 | --- | --- | --- |
 | 1. Basic execution | Startup, .data/.bss, C++ construction, metadata, CRC, exit and hang | Adapted F1 `02-semihosting`: 18 builds, 24 QEMU + 24 Renode runs. Merged into main (`493771d`). |
 | 2. Build modes | Bare metal without CMSIS/HAL and with project-owned startup; CMSIS without HAL; explicit/template linker scripts; profiles on one MCU | Merged into main `ba9bde7`: four extra profiles, own bare startup and shared runtime assertions. Total: 42 builds and 48 checks per simulator. No new clock/peripheral configuration. |
-| 3. Libraries and C/C++ runtime | Custom CMake modules, ETL, language flags; Arduino and RTOS in subsequent separate stages | Current branch `codex/firmware-libraries`: mixed C/C++ library and ETL vector/string without I/O; total 54 builds / 120 simulator checks. E008 documented with a workaround and regression; Arduino startup and RTOS tick need their own contracts. External FreeRTOS/E007 stays regression/errata only, without a fix. |
+| 3. Libraries and C/C++ runtime | Custom CMake modules, ETL, language flags; Arduino and RTOS in subsequent separate stages | Merged into main `a53f809`: mixed C/C++ library and ETL vector/string without I/O; total 54 builds / 120 simulator checks. E008 documented with a workaround and regression; Arduino startup and RTOS tick need their own contracts. External FreeRTOS/E007 stays regression/errata only, without a fix. |
 | 4. Cores and ABI | M0, M3, M4/FPU, M7; startup, instruction sets and soft/hard-float | Separate F0, F1, F3/F4/G4 and F7 checks. Use netduino2/netduinoplus2 only after confirming ISA and memory compatibility; a higher core does not prove a lower core works. Use an appropriate Renode model for other cases. |
 | 5. Peripherals | GPIO, SysTick/timers, UART, then individual protocols | Start with `03-blink`, HSI without PLL; assert GPIO events and virtual time. Requires functional register/IRQ models. Memory stubs cannot establish peripheral behavior. External devices and electrical properties need hardware tests. |
 
@@ -35,3 +35,5 @@ belongs to a firmware execution path, not an entire family name. Reports must
 explicitly identify partial models. Incorporate the author's guidance before a
 new group; the already selected semihosting firmware can be moved between
 simulators without choosing the example again.
+
+Arduino String with own main is implemented in `codex/firmware-arduino-string`: 60 total builds / 132 simulator checks. Full Arduino startup and RTOS remain separate stages.

@@ -33,7 +33,7 @@ class VerdictTests(unittest.TestCase):
             self.assertFalse(verdict('success', code, timeout, output, '14.2.1'))
 
     def test_build_modes_require_success_and_unknown_profiles_fail(self):
-        for profile in ('bare', 'bareTemplate', 'cmsis', 'cmsisTemplate', 'cmsisLibrary', 'cmsisEtl'):
+        for profile in ('bare', 'bareTemplate', 'cmsis', 'cmsisTemplate', 'cmsisLibrary', 'cmsisEtl', 'arduinoString'):
             with self.subTest(profile=profile):
                 self.assertTrue(verdict(profile, 0, False, HEADER + 'TEST_RESULT=PASS', '14.2.1'))
                 self.assertFalse(verdict(profile, 1, False, HEADER + 'TEST_RESULT=FAIL', '14.2.1'))
@@ -49,6 +49,14 @@ class VerdictTests(unittest.TestCase):
             with self.subTest(key=key):
                 self.assertFalse(metadata_matches(output.replace(f'{key}={value}', f'{key}=wrong'), expected))
         self.assertFalse(verdict('cmsisEtl', 4, False, output, '14.2.1'))
+
+    def test_arduino_result_requires_both_text_and_length(self):
+        expected = {'ARDUINO_TEXT': 'arm32:123', 'ARDUINO_LENGTH': '9'}
+        good = 'ARDUINO_TEXT=arm32:123\nARDUINO_LENGTH=9\n'
+        self.assertTrue(metadata_matches(good, expected))
+        for bad in (good.replace('123', '124'), good.replace('=9', '=0'), 'ARDUINO_LENGTH=9'):
+            self.assertFalse(metadata_matches(bad, expected))
+        self.assertFalse(verdict('arduinoString', 5, False, HEADER + 'TEST_RESULT=FAIL', '14.2.1'))
 
     def test_guest_failure_is_not_an_arbitrary_crash(self):
         self.assertTrue(verdict('failure', 1, False, HEADER + 'TEST_RESULT=FAIL', '14.2.1'))
