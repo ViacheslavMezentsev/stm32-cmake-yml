@@ -75,3 +75,20 @@ profiles:
     compile_definitions_cxx: [SMOKE_CXX_ONLY=1]
     compile_options_c: [Wstrict-prototypes]
     compile_options_cxx: [fno-exceptions, fno-rtti]
+  arduinoString:
+    toolchain_backend: arduino
+    use_cmsis: false
+    use_hal: false
+    sources: [bare_startup.S, main.cpp, arduino_string.cpp, heap.c]
+    compile_definitions: [SMOKE_BARE=1, SMOKE_ARDUINO=1]
+    compile_options_append: [mcpu=cortex-m3, mthumb, mfloat-abi=soft, ffunction-sections, fdata-sections, specs=nano.specs]
+    compile_options_cxx: [fno-exceptions, fno-rtti]
+    link_options: [mcpu=cortex-m3, mthumb, mfloat-abi=soft, nostartfiles, specs=nano.specs, specs=nosys.specs]
+    link_libraries: [Arduino::Core]
+    linker_directives_append: [--gc-sections]
+    use_newlib_nano: false
+    system_library: none
+    arduino:
+      core_cmake_dir: ArduinoString
+      mcu_target: F103
+      use_core_main: false

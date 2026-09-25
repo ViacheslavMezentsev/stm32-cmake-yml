@@ -2,6 +2,7 @@
 from firmware_cases import BUILD_PROFILES
 import argparse
 import json
+import os
 from pathlib import Path
 import re
 import shutil
@@ -59,16 +60,21 @@ def main():
         report['cmake'] = subprocess.check_output(['cmake', '--version'], text=True, timeout=30).splitlines()[0]
         lock = json.loads((root / 'ci/dependencies.lock.json').read_text())
         etl = next(source for source in lock['sources'] if source['name'].startswith('ETL-'))
+        arduino = next(source for source in lock['sources'] if source['name'].startswith('Arduino-'))
         for profile in BUILD_PROFILES:
+            is_arduino = profile == 'arduinoString'
+            toolchain = str(root / 'tests/firmware/semihosting/arduino-toolchain.cmake') if is_arduino else '/opt/modules/stm32-cmake/cmake/stm32_gcc.cmake'
             build = Path(tempfile.mkdtemp(prefix=profile + '-', dir=output))
             build.chmod(0o755)  # Artifacts may be consumed by another container user.
             commands = [
                 ['cmake', '-S', str(root / 'tests/firmware/semihosting'), '-B', str(build), '-G', 'Ninja',
-                 f'-DSTM32_YML_FRAMEWORK_DIR={root}', '-DCMAKE_TOOLCHAIN_FILE=/opt/modules/stm32-cmake/cmake/stm32_gcc.cmake',
+                 f'-DSTM32_YML_FRAMEWORK_DIR={root}', f'-DCMAKE_TOOLCHAIN_FILE={toolchain}',
                  f'-DSMOKE_GIT_REVISION={report["git_revision"]}', f'-DSMOKE_GIT_DIRTY={report["git_dirty"]}',
                  f'-DSTM32_YML_PROFILE={profile}', f'-DSMOKE_ETL_INCLUDE={etl["destination"]}/include', '-DCMAKE_BUILD_TYPE=Debug', '-DCMAKE_EXPORT_COMPILE_COMMANDS=ON'],
                 ['cmake', '--build', str(build), '--parallel', '4'],
             ]
+            if is_arduino:
+                commands[0].append(f'-DSTM32_YML_OVERRIDE_arduino_core_path={os.path.relpath(arduino["destination"], root / "tests/firmware/semihosting")}')
             for name, command in zip(('configure', 'build'), commands):
                 with (build / (name + '.log')).open('w') as log:
                     subprocess.run(command, stdout=log, stderr=subprocess.STDOUT, check=True, timeout=180)
@@ -85,7 +91,7 @@ def main():
             (build / 'symbols.log').write_text(symbols)
             metadata = dict(baseline, PROFILE=profile, CMAKE=report['cmake'].removeprefix('cmake version '),
                             GIT_REVISION=report['git_revision'], GIT_DIRTY=report['git_dirty'])
-            bare = profile.startswith('bare')
+            bare = profile.startswith('bare') or is_arduino
             cmsis_only = profile.startswith('cmsis')
             if bare:
                 metadata.update(CMSIS_CORE='none', CMSIS_DEVICE='none')
@@ -95,7 +101,8 @@ def main():
             sources = [Path(c['file']).name for c in commands_db]
             all_commands = '\n'.join(c['command'] for c in commands_db)
             if bare:
-                if set(sources) != {'bare_startup.S', 'main.cpp'} or 'CMSIS' in all_commands or 'HAL_Driver' in all_commands:
+                expected_sources = {'bare_startup.S', 'main.cpp'} | ({'arduino_string.cpp', 'heap.c', 'WString.cpp', 'itoa.c'} if is_arduino else set())
+                if set(sources) != expected_sources or 'CMSIS' in all_commands or 'HAL_Driver' in all_commands:
                     raise ValueError('Bare mode unexpectedly includes CMSIS/HAL or vendor startup')
                 if not all(flag in all_commands for flag in ('-mcpu=cortex-m3', '-mthumb', '-mfloat-abi=soft')):
                     raise ValueError('Missing explicit bare-metal CPU flags')
@@ -115,6 +122,10 @@ def main():
                 metadata.update(LIB_RESULT='123', C_LANGUAGE='11')
                 if profile == 'cmsisEtl':
                     metadata.update(ETL_RESULT='14', ETL_TEXT='etl:14', ETL_VERSION=etl['name'].removeprefix('ETL-'))
+            if is_arduino:
+                metadata.update(ARDUINO_TEXT='arm32:123', ARDUINO_LENGTH='9')
+                if any('/opt/modules/stm32-cmake' in c['command'] for c in commands_db):
+                    raise ValueError('Arduino build unexpectedly uses stm32-cmake')
             for symbol, key, expected in [('_Min_Heap_Size', 'HEAP_SIZE', 0 if profile.endswith('Template') else 512),
                                           ('_Min_Stack_Size', 'STACK_SIZE', 2048 if profile.endswith('Template') else 1024)]:
                 match = re.search(rf'^([0-9a-fA-F]+)\s+A\s+{symbol}$', symbols, re.M)
@@ -157,6 +168,8 @@ def main():
         command = list(commands[0])
         command[command.index('-S') + 1] = str(source)
         command[command.index('-B') + 1] = str(probe / 'build')
+        command = [arg for arg in command if not arg.startswith('-DSTM32_YML_OVERRIDE_arduino_core_path=')]
+        command = ['-DCMAKE_TOOLCHAIN_FILE=/opt/modules/stm32-cmake/cmake/stm32_gcc.cmake' if arg.startswith('-DCMAKE_TOOLCHAIN_FILE=') else arg for arg in command]
         command = ['-DSTM32_YML_PROFILE=cmsisLibrary' if arg.startswith('-DSTM32_YML_PROFILE=') else arg for arg in command]
         with (probe / 'configure.log').open('w') as log:
             subprocess.run(command, stdout=log, stderr=subprocess.STDOUT, check=True, timeout=180)

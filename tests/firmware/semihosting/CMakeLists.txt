@@ -13,3 +13,7 @@ if(NOT SMOKE_GIT_REVISION MATCHES "^[0-9a-f]+$" OR NOT DEFINED SMOKE_GIT_DIRTY)
 endif()
 configure_file(build_metadata.h.in build_metadata.h @ONLY)
 target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_BINARY_DIR}")
+
+if(toolchain_backend STREQUAL "arduino")
+    set_target_properties(${PROJECT_NAME} PROPERTIES SUFFIX ".elf")
+endif()

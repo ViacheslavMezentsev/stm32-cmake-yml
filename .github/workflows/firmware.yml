@@ -9,6 +9,7 @@ on:
       - scripts/**
       - ci/**
       - tests/firmware/**
+      - tests/toolchains/**
       - tests/test_firmware*.py
       - .github/workflows/firmware.yml
       - '!**/*.md'

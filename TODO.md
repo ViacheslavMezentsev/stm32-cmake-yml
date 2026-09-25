@@ -98,7 +98,8 @@ PR больше не требуются; старые ссылки остают�
 - [x] `codex/renode-firmware-smoke` слита в main (`493771d`): 18 сборок, 24 QEMU + 24 Renode; общий SYS_WRITE0 и адаптер выхода.
 - [x] `codex/firmware-build-modes` слита в main (`ba9bde7`): bare metal/CMSIS без HAL, `.ld`/`.ld.in`; 42 сборки и 96 проверок QEMU+Renode.
 - [x] `codex/firmware-libraries` слита в main (`a53f809`): C/C++ и ETL, 54 сборки / 120 проверок; E008 без исправления.
-- [ ] Текущая ветка `codex/badges-docs-ci`: прямоугольные бейджи без иконок, `Builds (Checks)`, пропуск тяжёлого CI для MD-only push.
+- [x] `codex/badges-docs-ci` слита в main (`a3015d9`): прямоугольные бейджи без иконок, `Builds (Checks)`, пропуск тяжёлого CI для MD-only push.
+- [ ] Текущая ветка `codex/firmware-arduino-string`: собственный main, реальный String из Core 2.12.0, 60 сборок / 132 проверки.
 - [ ] Далее согласовать отдельные сценарии Arduino/RTOS; группа 3 — [план](docs/ru/firmware-plan.md).
 - [ ] По индексу выбрать следующие пробелы покрытия: отсутствующие/пустые значения,
   приоритеты и ошибки входных данных. Каждый новый контракт — отдельный сценарий.
@@ -216,7 +217,8 @@ keep defect details in errata.
 - [x] `codex/renode-firmware-smoke` merged into main (`493771d`): 18 builds, 24 QEMU + 24 Renode; shared SYS_WRITE0 and exit adapter.
 - [x] `codex/firmware-build-modes` merged into main (`ba9bde7`): bare metal/CMSIS without HAL, `.ld`/`.ld.in`; 42 builds and 96 QEMU+Renode checks.
 - [x] `codex/firmware-libraries` merged into main (`a53f809`): C/C++ and ETL, 54 builds / 120 checks; E008 without a fix.
-- [ ] Current branch `codex/badges-docs-ci`: rectangular badges without icons, `Builds (Checks)`, skip heavy CI for MD-only pushes.
+- [x] `codex/badges-docs-ci` merged into main (`a3015d9`): rectangular badges without icons, `Builds (Checks)`, skip heavy CI for MD-only pushes.
+- [ ] Current branch `codex/firmware-arduino-string`: own main, real String from Core 2.12.0, 60 builds / 132 checks.
 - [ ] Next agree separate Arduino/RTOS scenarios; group 3 — [plan](docs/en/firmware-plan.md).
 - [ ] Use the index to prioritize coverage gaps: missing/empty values, precedence
   and invalid input. Give each new contract a dedicated scenario.
