@@ -13,7 +13,7 @@ foreach(KEY IN ITEMS PROJECT_NAME MCU STM32_YML_PROFILE heap_size stack_size
         freertos_version freertos_components cmsis_rtos_api)
     file(WRITE "${CMAKE_BINARY_DIR}/observed/${KEY}.txt" "${${KEY}}")
 endforeach()
-foreach(KEY IN ITEMS SOURCES COMPILE_DEFINITIONS COMPILE_OPTIONS LINK_OPTIONS LINK_LIBRARIES)
+foreach(KEY IN ITEMS SOURCES COMPILE_DEFINITIONS COMPILE_OPTIONS LINK_OPTIONS LINK_LIBRARIES C_CPPCHECK CXX_CPPCHECK)
     get_target_property(VALUE ${PROJECT_NAME} ${KEY})
     file(WRITE "${CMAKE_BINARY_DIR}/observed/${KEY}.txt" "${VALUE}")
 endforeach()

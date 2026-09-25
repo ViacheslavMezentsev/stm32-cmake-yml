@@ -16,7 +16,7 @@ profiles, manual configuration and an Arduino backend using consumer CMake wrapp
 ## Проверки / Checks
 
 <!-- configure-counts -->
-**89 scenarios × 6 tool pairs = 534 configure executions**
+**94 scenarios × 6 tool pairs = 564 configure executions**
 <!-- /configure-counts -->
 
 Объём набора этой версии: три xPack GCC × два CMake, включая CMake 3.19.8.

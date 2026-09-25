@@ -1,0 +1,26 @@
+stm32_cmake_yml_version: 0.9.2
+project_name: baremetal_probe
+mcu: STM32F103C8T6
+languages: [C, CXX, ASM]
+sources: [main.c, helper.cpp]
+use_cmsis: false
+use_hal: false
+use_freertos: false
+use_newlib_nano: false
+crc_enable: false
+heap_size: 0
+stack_size: 1K
+linker_script_dir: linker
+compile_options: [mcpu=cortex-m3, mthumb]
+compile_definitions: [BAREMETAL=1]
+include_directories: []
+cppcheck_enable: true
+profiles:
+  custom:
+    cppcheck_args: [--enable=warning, --error-exitcode=2]
+    cppcheck_ignores: [Vendor SDK]
+  empty:
+    cppcheck_args: []
+    cppcheck_ignores: []
+  disabled:
+    cppcheck_enable: false
