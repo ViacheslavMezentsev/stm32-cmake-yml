@@ -1926,5 +1926,192 @@
         }
       }
     ]
+  },
+  {
+    "name": "arduino-library-linked",
+    "backend": "arduino",
+    "arduino_library_fixture": true,
+    "args": [
+      "-DPROJECT_CONFIG_FILE=arduino-libraries.yml",
+      "-DSTM32_YML_PROFILE="
+    ],
+    "observed": {
+      "LINK_LIBRARIES": "Arduino::Core;Arduino::LibraryProbe"
+    },
+    "command_checks": [
+      {
+        "file": "main.c",
+        "present": [
+          "-DLIBRARY_PROBE=1"
+        ]
+      },
+      {
+        "file": "arduino-library-core/libraries/Probe/probe.cpp",
+        "target": "ArduinoLibraryProbe",
+        "present": [
+          "-DLIBRARY_PROBE=1",
+          "-DARDUINO_BASE=1"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "arduino-library-unlinked",
+    "backend": "arduino",
+    "arduino_library_fixture": true,
+    "args": [
+      "-DPROJECT_CONFIG_FILE=arduino-libraries.yml",
+      "-DSTM32_YML_PROFILE=unlinked"
+    ],
+    "observed": {
+      "LINK_LIBRARIES": "Arduino::Core"
+    },
+    "command_checks": [
+      {
+        "file": "main.c",
+        "absent": [
+          "-DLIBRARY_PROBE=1"
+        ]
+      },
+      {
+        "file": "arduino-library-core/libraries/Probe/probe.cpp",
+        "target": "ArduinoLibraryProbe",
+        "present": [
+          "-DLIBRARY_PROBE=1",
+          "-DARDUINO_BASE=1"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "arduino-library-missing",
+    "backend": "arduino",
+    "arduino_library_fixture": true,
+    "args": [
+      "-DPROJECT_CONFIG_FILE=arduino-libraries.yml",
+      "-DSTM32_YML_PROFILE=missing"
+    ],
+    "observed": {
+      "LINK_LIBRARIES": "Arduino::Core"
+    },
+    "command_checks": [
+      {
+        "file": "main.c",
+        "absent": [
+          "-DLIBRARY_PROBE=1"
+        ]
+      }
+    ],
+    "absent_commands": [
+      "arduino-library-core/libraries/Probe/probe.cpp"
+    ],
+    "log_contains": [
+      "Библиотека 'Missing' не найдена",
+      "Проверьте имя в arduino.libraries и наличие CMakeLists.txt."
+    ]
+  },
+  {
+    "name": "arduino-library-no-wrapper",
+    "backend": "arduino",
+    "arduino_library_fixture": true,
+    "args": [
+      "-DPROJECT_CONFIG_FILE=arduino-libraries.yml",
+      "-DSTM32_YML_PROFILE=nowrap"
+    ],
+    "observed": {
+      "LINK_LIBRARIES": "Arduino::Core"
+    },
+    "command_checks": [
+      {
+        "file": "main.c",
+        "absent": [
+          "-DLIBRARY_PROBE=1"
+        ]
+      }
+    ],
+    "absent_commands": [
+      "arduino-library-core/libraries/Probe/probe.cpp"
+    ],
+    "log_contains": [
+      "Библиотека 'NoWrapper' не найдена",
+      "Проверьте имя в arduino.libraries и наличие CMakeLists.txt."
+    ]
+  },
+  {
+    "name": "arduino-library-reconfigure",
+    "backend": "arduino",
+    "arduino_library_fixture": true,
+    "args": [
+      "-DPROJECT_CONFIG_FILE=arduino-libraries.yml"
+    ],
+    "steps": [
+      {
+        "args": [
+          "-DSTM32_YML_PROFILE="
+        ],
+        "observed": {
+          "LINK_LIBRARIES": "Arduino::Core;Arduino::LibraryProbe"
+        },
+        "command_checks": [
+          {
+            "file": "main.c",
+            "present": [
+              "-DLIBRARY_PROBE=1"
+            ]
+          },
+          {
+            "file": "arduino-library-core/libraries/Probe/probe.cpp",
+            "target": "ArduinoLibraryProbe",
+            "present": [
+              "-DLIBRARY_PROBE=1",
+              "-DARDUINO_BASE=1"
+            ]
+          }
+        ]
+      },
+      {
+        "args": [
+          "-DSTM32_YML_PROFILE=empty"
+        ],
+        "observed": {
+          "LINK_LIBRARIES": "Arduino::Core"
+        },
+        "command_checks": [
+          {
+            "file": "main.c",
+            "absent": [
+              "-DLIBRARY_PROBE=1"
+            ]
+          }
+        ],
+        "absent_commands": [
+          "arduino-library-core/libraries/Probe/probe.cpp"
+        ]
+      },
+      {
+        "args": [
+          "-DSTM32_YML_PROFILE=unlinked"
+        ],
+        "observed": {
+          "LINK_LIBRARIES": "Arduino::Core"
+        },
+        "command_checks": [
+          {
+            "file": "main.c",
+            "absent": [
+              "-DLIBRARY_PROBE=1"
+            ]
+          },
+          {
+            "file": "arduino-library-core/libraries/Probe/probe.cpp",
+            "target": "ArduinoLibraryProbe",
+            "present": [
+              "-DLIBRARY_PROBE=1",
+              "-DARDUINO_BASE=1"
+            ]
+          }
+        ]
+      }
+    ]
   }
 ]
