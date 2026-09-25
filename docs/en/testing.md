@@ -108,9 +108,9 @@ package or the resulting image bytes. Ubuntu snapshots are not required.
 
 ## Framework configuration tests
 
-[tests/cases.json](../../tests/cases.json) defines 100 scenarios, run with each of
-the three GCC and two CMake versions from the lockfile: **600 case executions**.
-Twelve scenarios perform three consecutive configurations in the same build tree.
+[tests/cases.json](../../tests/cases.json) defines 105 scenarios, run with each of
+the three GCC and two CMake versions from the lockfile: **630 case executions**.
+Thirteen scenarios perform three consecutive configurations in the same build tree.
 
 | Area | Checks |
 | --- | --- |
@@ -315,3 +315,9 @@ Six `artifacts-*` cases check commands declared during Configure/Generate: omitt
 Assertions cover objcopy binary/ihex, objdump -h -S and output filenames in Ninja POST_BUILD; map checks both LINK_OPTIONS and the generated linker flag. The primary ELF target and size-reporting command remain with an empty list. Unknown items add no conversion; supported bin still adds its command. Profile transitions must remove commands from the previous selection.
 
 Tests also assert that no ELF/BIN/HEX/MAP/LSS output has been created in the build directory: conversion and linking are never executed. These cases do not prove file-format, listing, memory-size or CRC correctness, and do not cover the Arduino backend.
+
+### Custom library paths
+
+Five `custom-library-*` cases check custom_libraries relative to the project root, warning and skipping a missing file, profile `_append`, replacement/clearing on repeated Configure, and combination with `link_libraries: [m]`. Assertions cover exact LINK_LIBRARIES order and generated Ninja arguments, including `prebuilt/vendor sdk/libbeta.a`, a path containing a space. The plain name m becomes -lm, but its existence and symbol resolution are not checked at this stage.
+
+The two `.a` files in [prebuilt](../../tests/fixtures/project/prebuilt/README.md) contain only the standard ar header, with no object members or ABI. They are path-handling input fixtures; no compiler or archiver was invoked to create them. The linker is not executed either. Tests do not establish MCU suitability, ABI compatibility or symbol resolution. Arduino custom-library semantics are separate and are not covered by these cases.

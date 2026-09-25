@@ -74,8 +74,10 @@ PR больше не требуются; старые ссылки остают�
   системные библиотеки и параметры линковки; 89 сценариев / 534 запуска.
 - [x] `codex/configure-cppcheck` слита в main (`0a8b89b`):
   94 сценария / 564 запуска.
-- [ ] Текущая ветка `codex/configure-build-artifacts`: шесть сценариев
-  выбора BIN/HEX/MAP/LSS; 100 сценариев / 600 запусков.
+- [x] `codex/configure-build-artifacts` слита в main (`fa95034`):
+  100 сценариев / 600 запусков.
+- [ ] Текущая ветка `codex/configure-custom-libraries`: пять проверок
+  путей библиотек; 105 сценариев / 630 запусков.
 - [ ] Следующий шаг согласовать по пробелам покрытия; к прошивкам переходить
   только после уточнений автора, как указано ниже.
 - [ ] По индексу выбрать следующие пробелы покрытия: отсутствующие/пустые значения,
@@ -170,8 +172,10 @@ keep defect details in errata.
   system libraries and linker options; 89 scenarios / 534 executions.
 - [x] `codex/configure-cppcheck` merged into main (`0a8b89b`):
   94 scenarios / 564 executions.
-- [ ] Current branch `codex/configure-build-artifacts`: six BIN/HEX/MAP/LSS
-  selection cases; 100 scenarios / 600 executions.
+- [x] `codex/configure-build-artifacts` merged into main (`fa95034`):
+  100 scenarios / 600 executions.
+- [ ] Current branch `codex/configure-custom-libraries`: five library-path
+  checks; 105 scenarios / 630 executions.
 - [ ] Agree the next coverage priority; defer firmware work until the author
   supplies scenario guidance as required below.
 - [ ] Use the index to prioritize coverage gaps: missing/empty values, precedence
