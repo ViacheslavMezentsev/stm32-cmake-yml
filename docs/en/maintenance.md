@@ -71,7 +71,7 @@ ambiguous, ask the author before declaring a defect or changing behavior.
 Unsupported input does not imply a bug. `closed-by-design` preserves a previously
 misclassified entry for stable links; it does not imply a released fix.
 
-README shows validated suite size, not passed tests. When changing
+docs/ru/status.md and docs/en/status.md show validated suite size, not passed tests. When changing
 `tests/cases.json` or the locked tool matrix, update `configure-counts`: the
 validator checks scenarios, tool pairs and their product. Separate badges show
 workflow status on main.

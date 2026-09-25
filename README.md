@@ -1,44 +1,97 @@
-# STM32 CMake YML Framework
+# stm32-cmake-yml
 
-[![Configure tests](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/actions/workflows/configure.yml/badge.svg?branch=main)](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/actions/workflows/configure.yml?query=branch%3Amain)
-[![Documentation reference](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/actions/workflows/documentation.yml/badge.svg?branch=main)](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/actions/workflows/documentation.yml?query=branch%3Amain)
+[![Configure](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/actions/workflows/configure.yml/badge.svg?branch=main)](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/actions/workflows/configure.yml?query=branch%3Amain)
+[![Firmware](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/actions/workflows/firmware.yml/badge.svg?branch=main)](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/actions/workflows/firmware.yml?query=branch%3Amain)
+[![Docs](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/actions/workflows/documentation.yml/badge.svg?branch=main)](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/actions/workflows/documentation.yml?query=branch%3Amain)
 
-[Документация RU](docs/ru/index.md) · [Documentation EN](docs/en/index.md) · [Roadmap](TODO.md)
+**Русский** · [English](README.en.md) · [Документация](docs/ru/index.md) · [Начало работы](docs/ru/getting-started.md)
 
-**stm32-cmake-yml** — декларативная конфигурация STM32-проектов через
-`stm32_config.yml` поверх [stm32-cmake](https://github.com/ObKo/stm32-cmake).
-Поддерживает настройки из CubeMX IOC, именованные профили, ручную конфигурацию
-и Arduino Core STM32 через пользовательские CMake-обёртки.
+**Опишите состав STM32-проекта в YAML, сохранив свободу CMake.**
+`stm32-cmake-yml` — набор CMake-скриптов, который читает `stm32_config.yml`
+и настраивает сборку: MCU, исходники, драйверы, библиотеки, флаги и артефакты.
+Основной backend опирается на [stm32-cmake](https://github.com/ObKo/stm32-cmake);
+для Arduino Core STM32 предусмотрен отдельный backend с CMake-обёртками проекта.
 
-Declarative STM32 project configuration through YAML, with CubeMX IOC input,
-profiles, manual configuration and an Arduino backend using consumer CMake wrappers.
+## Зачем это нужно
 
-## Проверки / Checks
+В обычном CMake-проекте настройки MCU, поиск драйверов и подключение компонентов
+описываются командами и условиями, которые часто повторяются между проектами.
+Здесь типовые решения уже собраны в скриптах, а их параметры вынесены в YAML.
+Проще увидеть состав прошивки, сравнить ревизии платы и переключить профиль,
+не копируя всю логику сборки.
 
-<!-- configure-counts -->
-**115 scenarios × 6 tool pairs = 690 configure executions**
-<!-- /configure-counts -->
+Можно взять часть настроек из CubeMX `.ioc` или задать их вручную. Профили
+меняют выбранные параметры — например MCU, определения или скрипт линкера —
+и подходят также для разных вариантов одной и той же платы.
 
-Объём набора этой версии: три xPack GCC × два CMake, включая CMake 3.19.8.
-Число проверяется по manifest в CI; это не счётчик успешных запусков.
-Бейджи показывают состояние workflow на `main`. Проверяется Configure/Generate,
-а не компиляция, линковка или исполнение прошивки.
+```mermaid
+flowchart LR
+    I["CubeMX .ioc — опционально"] --> Y["stm32_config.yml + профиль"]
+    Y --> F["stm32-cmake-yml"]
+    C["Исходники и CMakeLists.txt проекта"] --> G["CMake Configure / Generate"]
+    F --> G
+    G --> B["Ninja / Make + Arm GCC"]
+    B --> E["ELF / BIN / HEX"]
+```
 
-The count describes this checkout's suite, not passed tests. Badges show workflow
-status on `main`. Scope and local commands: [RU](docs/ru/testing.md) / [EN](docs/en/testing.md).
+YAML **не подменяет всю систему сборки**. Корневой `CMakeLists.txt` подключает
+фреймворк; включаемые `CMakeLists.txt` остаются вашим кодом. В них можно добавлять
+исходники, создавать библиотеки и цели, задавать зависимости и дополнительные
+команды. Для папок в `sources` нужен собственный `CMakeLists.txt`; автоматического
+рекурсивного включения всех файлов нет.
 
-## Начало работы
+## Где применять
 
-Нужны CMake 3.19+, Arm GCC и Mike Farah yq; Python используется для CRC.
-Подключение, toolchain и минимальный CMakeLists: [RU](docs/ru/getting-started.md) / [EN](docs/en/getting-started.md).
+- **Прототипы и учебные проекты:** начать с готового примера, выбрать MCU и нужные компоненты.
+- **Проекты с CubeMX и CMSIS/HAL/LL:** использовать сгенерированный код и явно управлять составом сборки.
+- **Несколько конфигураций:** общие исходники, профили ревизий платы или наборов функций.
+- **Arduino Core STM32:** подключать Core, variant и библиотеки через CMake-обёртки своего проекта.
+- **Bare metal:** отключить CMSIS и HAL/LL и самостоятельно предоставить startup, таблицу векторов, нужные флаги и разметку памяти. При включённом CMSIS часть этой работы выполняет stm32-cmake.
 
-| Задача / Task | Русский | English |
-| --- | --- | --- |
-| IOC, профили, Arduino / Usage scenarios | [Сценарии](docs/ru/scenarios.md) | [Scenarios](docs/en/scenarios.md) |
-| Значения и приоритеты / Option contracts | [Reference 0.9.2](docs/ru/reference/0.9.2/index.md) | [Reference 0.9.2](docs/en/reference/0.9.2/index.md) |
-| Ограничения и обходы / Known issues | [Errata](docs/ru/errata/index.md) | [Errata](docs/en/errata/index.md) |
-| VS Code, кэш, bare metal / Development | [Режимы разработки](docs/ru/development.md) | [Development](docs/en/development.md) |
-| Устройство и навыки / Structure and skills | [Репозиторий](docs/ru/repository.md) | [Repository](docs/en/repository.md) |
+## С чего начать
 
-[Подробное руководство](docs/user_manual.md) · [Примеры / Examples](https://github.com/ViacheslavMezentsev/demo-stm32-cmake)
-· [Changelog](CHANGELOG.md) · [MIT License](LICENSE)
+Нужны **CMake 3.19+**, **Arm GCC**, **Mike Farah yq v4** и генератор сборки
+(Ninja или Make). Python нужен для расчёта CRC; драйверы и библиотеки выбираются
+под проект. VS Code с CMake Tools удобен, но не обязателен.
+
+1. Выберите близкий [демо-проект](https://github.com/ViacheslavMezentsev/demo-stm32-cmake) или [подключите фреймворк](docs/ru/getting-started.md) к своему.
+2. Опишите исходники, MCU/IOC и компоненты в `stm32_config.yml`; при необходимости добавьте профили.
+3. Выполните Configure, затем сборку. После изменения YAML повторите Configure; особенности кэша описаны в [режимах разработки](docs/ru/development.md).
+
+## Границы подхода
+
+YAML описывает поддерживаемые опции, а произвольная логика остаётся в CMake.
+Чтение `.ioc` не запускает CubeMX и не генерирует код инициализации периферии.
+Поддержка MCU зависит от backend, toolchain и библиотек; успешная конфигурация
+не гарантирует работу прошивки на плате.
+
+В версии 0.9.2 не используйте `_` в именах профилей: дерево YAML преобразуется
+в плоские имена CMake, что создаёт неоднозначность. Переопределения и кэш имеют
+свой порядок применения. Перед переносом нетиповой конфигурации загляните
+в [семантику](docs/ru/reference/0.9.2/semantics.md) и [errata](docs/ru/errata/index.md).
+[Статус проверок](docs/ru/status.md) отдельно описывает Configure, сборку и симуляцию.
+
+## Документация и навыки
+
+[Карта документации](docs/ru/index.md) · [Сценарии](docs/ru/scenarios.md) ·
+[Справочник 0.9.2](docs/ru/reference/0.9.2/index.md) · [Руководство](docs/user_manual.md) ·
+[Диагностика](docs/ru/troubleshooting.md) · [Дорожная карта](TODO.md)
+
+В `skills/` находятся инструкции для ИИ-агентов. Их можно передать ассистенту
+способом, поддерживаемым вашим инструментом; они не нужны для обычной сборки.
+
+| Навык | Для чего |
+| --- | --- |
+| [stm32-config-manager](skills/stm32-config-manager/SKILL.md) | Настройка YAML, профилей и опций с учётом reference и errata. |
+| [stm32-simple-sources](skills/stm32-simple-sources/SKILL.md) | Подключение C/C++/ASM-файлов и папок к основной цели, в том числе CubeMX Core. |
+| [stm32-module-creator](skills/stm32-module-creator/SKILL.md) | Создание отдельных библиотек с явными зависимостями и флагами. |
+| [stm32-build-helper](skills/stm32-build-helper/SKILL.md) | Разбор ошибок по стадиям: Configure, Compile, Link, Post-build и Run. |
+
+## Дружественные проекты автора
+
+- [demo-stm32-cmake](https://github.com/ViacheslavMezentsev/demo-stm32-cmake) — примеры для разных семейств STM32, YAML-конфигурации и настройки VS Code.
+- [stm32-flasher](https://github.com/ViacheslavMezentsev/stm32-flasher) — прошивка STM32 в Windows через ST-Link/J-Link с выбором backend и отчётом о результате.
+- [stm32-gdbtest](https://github.com/ViacheslavMezentsev/stm32-gdbtest) — подключаемый модуль проверки работающей прошивки на реальном STM32 через GDB-Python и SWD; тестовые сценарии выполняются на ПК.
+- [stm32-hwtest-blackpill](https://github.com/ViacheslavMezentsev/stm32-hwtest-blackpill) — прошивки, аппаратный стенд и сценарии применения stm32-gdbtest на BlackPill, BluePill и других платах.
+
+[История изменений](CHANGELOG.md) · [MIT License](LICENSE)

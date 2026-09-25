@@ -34,10 +34,11 @@ def main():
     tests = {"configure." + c["name"] for c in json.loads((ROOT / "tests/cases.json").read_text(encoding="utf-8"))}
     lock = json.loads((ROOT / "ci/dependencies.lock.json").read_text(encoding="utf-8"))
     pairs = len(lock["gcc_versions"]) * len(lock["cmake_versions"])
-    readme = (ROOT / "README.md").read_text(encoding="utf-8")
     count = f"**{len(tests)} scenarios × {pairs} tool pairs = {len(tests) * pairs} configure executions**"
-    block = re.search(r"<!-- configure-counts -->\s*(.*?)\s*<!-- /configure-counts -->", readme, re.S)
-    require(block is not None and block.group(1) == count, "Update README configure counts from tests/cases.json and the dependency lock")
+    for language in ("ru", "en"):
+        status = (ROOT / "docs" / language / "status.md").read_text(encoding="utf-8")
+        block = re.search(r"<!-- configure-counts -->\s*(.*?)\s*<!-- /configure-counts -->", status, re.S)
+        require(block is not None and block.group(1) == count, f"Update {language} status configure counts from tests/cases.json and the dependency lock")
     options = {o["key"]: o for o in data["options"]}
     errata = {e["id"]: e for e in data["errata"]}
     require(len(options) == len(data["options"]) > 0, "Empty/duplicate option keys")
@@ -66,13 +67,13 @@ def main():
         pages += list((base / "reference").rglob("*.md"))
         pages += list((base / "errata").glob("*.md"))
         pages += [base / "index.md", base / "maintenance.md"]
-        pages += [base / name for name in ("getting-started.md", "scenarios.md", "development.md", "repository.md", "simple-sources.md", "modules.md", "troubleshooting.md", "testing.md", "emulation.md", "firmware-testing.md")]
+        pages += [base / name for name in ("getting-started.md", "scenarios.md", "development.md", "repository.md", "simple-sources.md", "modules.md", "troubleshooting.md", "testing.md", "emulation.md", "firmware-testing.md", "status.md")]
     pages += [ROOT / "skills/stm32-config-manager/SKILL.md"]
     pages += [ROOT / "skills/stm32-simple-sources/SKILL.md"]
     pages += [ROOT / "skills/stm32-module-creator/SKILL.md"]
     pages += [ROOT / "skills/stm32-build-helper/SKILL.md"]
     pages += [ROOT / "TODO.md"]
-    pages += [ROOT / "README.md"]
+    pages += [ROOT / "README.md", ROOT / "README.en.md"]
     for page in pages:
         for target in re.findall(r"\]\(([^)]+)\)", page.read_text(encoding="utf-8")):
             link_exists(page, target)

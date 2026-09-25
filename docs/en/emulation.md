@@ -4,7 +4,7 @@
 
 This first stage checks executable availability, versions and QEMU machines only.
 It does not build/load firmware or validate semihosting, CRC or peripherals.
-Environment checks are not included in the README configure-test count.
+Environment checks are not included in the configure-test count on the [status page](status.md).
 
 ## Local checks
 

@@ -92,7 +92,8 @@ PR больше не требуются; старые ссылки остают�
   18 запусков QEMU, три профиля на шести парах инструментов.
 - [x] `codex/firmware-metadata` слита в main (`833aed7`): метаданные, .data/.bss и C++-конструктор;
   тот же набор из 18 сборок/запусков.
-- [ ] Текущая ветка `codex/firmware-crc`: CRC FLASH и повреждённый образ; 18 сборок / 24 запуска.
+- [x] `codex/firmware-crc` слита в main (`0ae6613`): CRC FLASH и повреждённый образ; 18 сборок / 24 запуска.
+- [ ] Текущая ветка `codex/readme-overview`: вводный README RU/EN, отдельные страницы статуса, навыки и дружественные проекты.
 - [ ] Далее Renode по согласованному плану. Новые сценарии
   выбирать с автором.
 - [ ] По индексу выбрать следующие пробелы покрытия: отсутствующие/пустые значения,
@@ -205,7 +206,8 @@ keep defect details in errata.
   and 18 QEMU runs, three profiles across six tool pairs.
 - [x] `codex/firmware-metadata` merged into main (`833aed7`): metadata, .data/.bss and C++ constructor;
   the same 18 builds/runs.
-- [ ] Current branch `codex/firmware-crc`: FLASH CRC and corrupted image; 18 builds / 24 runs.
+- [x] `codex/firmware-crc` merged into main (`0ae6613`): FLASH CRC and corrupted image; 18 builds / 24 runs.
+- [ ] Current branch `codex/readme-overview`: introductory RU/EN READMEs, separate status pages, skills and related projects.
 - [ ] Next: Renode following the agreed plan. Select new
   scenarios with the author.
 - [ ] Use the index to prioritize coverage gaps: missing/empty values, precedence
