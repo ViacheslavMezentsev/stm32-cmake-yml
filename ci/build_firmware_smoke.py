@@ -4,6 +4,7 @@ import argparse
 import json
 from pathlib import Path
 import re
+import shutil
 import struct
 import subprocess
 import tempfile
@@ -56,6 +57,8 @@ def main():
         baseline = json.loads((root / 'tests/firmware/semihosting/expected-metadata.json').read_text())
         report['gcc'] = subprocess.check_output(['arm-none-eabi-gcc', '-dumpfullversion'], text=True, timeout=30).strip()
         report['cmake'] = subprocess.check_output(['cmake', '--version'], text=True, timeout=30).splitlines()[0]
+        lock = json.loads((root / 'ci/dependencies.lock.json').read_text())
+        etl = next(source for source in lock['sources'] if source['name'].startswith('ETL-'))
         for profile in BUILD_PROFILES:
             build = Path(tempfile.mkdtemp(prefix=profile + '-', dir=output))
             build.chmod(0o755)  # Artifacts may be consumed by another container user.
@@ -63,7 +66,7 @@ def main():
                 ['cmake', '-S', str(root / 'tests/firmware/semihosting'), '-B', str(build), '-G', 'Ninja',
                  f'-DSTM32_YML_FRAMEWORK_DIR={root}', '-DCMAKE_TOOLCHAIN_FILE=/opt/modules/stm32-cmake/cmake/stm32_gcc.cmake',
                  f'-DSMOKE_GIT_REVISION={report["git_revision"]}', f'-DSMOKE_GIT_DIRTY={report["git_dirty"]}',
-                 f'-DSTM32_YML_PROFILE={profile}', '-DCMAKE_BUILD_TYPE=Debug', '-DCMAKE_EXPORT_COMPILE_COMMANDS=ON'],
+                 f'-DSTM32_YML_PROFILE={profile}', f'-DSMOKE_ETL_INCLUDE={etl["destination"]}/include', '-DCMAKE_BUILD_TYPE=Debug', '-DCMAKE_EXPORT_COMPILE_COMMANDS=ON'],
                 ['cmake', '--build', str(build), '--parallel', '4'],
             ]
             for name, command in zip(('configure', 'build'), commands):
@@ -102,6 +105,16 @@ def main():
                 has_hal = any(name.startswith('stm32f1xx_hal') for name in sources)
                 if has_hal == cmsis_only:
                     raise ValueError('Unexpected HAL source selection')
+            if profile in ('cmsisLibrary', 'cmsisEtl'):
+                required = {'weighted.c', 'transform.cpp', 'language_probe.c'}
+                if not required <= set(sources) or ('etl_probe.cpp' in sources) != (profile == 'cmsisEtl'):
+                    raise ValueError('Missing or unexpected library sources')
+                for name in ('smoke_weighted', 'smoke_transform', 'smoke_language'):
+                    if not re.search(rf'^.*\sT\s+{name}$', symbols, re.M):
+                        raise ValueError(f'Missing linked library function: {name}')
+                metadata.update(LIB_RESULT='123', C_LANGUAGE='11')
+                if profile == 'cmsisEtl':
+                    metadata.update(ETL_RESULT='14', ETL_TEXT='etl:14', ETL_VERSION=etl['name'].removeprefix('ETL-'))
             for symbol, key, expected in [('_Min_Heap_Size', 'HEAP_SIZE', 0 if profile.endswith('Template') else 512),
                                           ('_Min_Stack_Size', 'STACK_SIZE', 2048 if profile.endswith('Template') else 1024)]:
                 match = re.search(rf'^([0-9a-fA-F]+)\s+A\s+{symbol}$', symbols, re.M)
@@ -131,6 +144,27 @@ def main():
             report['cases'].append({'profile': profile, 'elf': str(elf.relative_to(output)),
                                     'sources': sources, 'structure': structure, 'metadata': metadata, 'exit_trap': exit_trap})
             print(f'PASS build/ELF: {profile}', flush=True)
+        # E008: profile-only dynamic keys are not exported by prepare_project_data.
+        probe = Path(tempfile.mkdtemp(prefix='profile-only-', dir=output))
+        probe.chmod(0o755)
+        source = probe / 'source'
+        shutil.copytree(root / 'tests/firmware/semihosting', source)
+        yaml = source / 'stm32_config.yml'
+        config = yaml.read_text()
+        for key in ('compile_options_c', 'compile_options_cxx', 'compile_definitions_c', 'compile_definitions_cxx'):
+            config = config.replace(key + ': []\n', '')
+        yaml.write_text(config)
+        command = list(commands[0])
+        command[command.index('-S') + 1] = str(source)
+        command[command.index('-B') + 1] = str(probe / 'build')
+        command = ['-DSTM32_YML_PROFILE=cmsisLibrary' if arg.startswith('-DSTM32_YML_PROFILE=') else arg for arg in command]
+        with (probe / 'configure.log').open('w') as log:
+            subprocess.run(command, stdout=log, stderr=subprocess.STDOUT, check=True, timeout=180)
+        db = json.loads((probe / 'build/compile_commands.json').read_text())
+        app_commands = '\n'.join(c['command'] for c in db if Path(c['file']).name in ('main.cpp', 'language_probe.c'))
+        if any(token in app_commands for token in ('SMOKE_C_ONLY', 'SMOKE_CXX_ONLY', '-Wstrict-prototypes', '-fno-exceptions', '-fno-rtti')):
+            raise ValueError('E008 behavior changed: review regression and workaround')
+        report['profile_only_regression'] = {'status': 'reproduced', 'errata': 'E008'}
         report['status'] = 'passed'
     except (OSError, ValueError, KeyError, struct.error, subprocess.SubprocessError) as error:
         report['error'] = str(error)

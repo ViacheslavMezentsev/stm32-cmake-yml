@@ -3,8 +3,8 @@
 [Documentation](index.md) · [Русский](../ru/firmware-testing.md) · [Environment](emulation.md)
 
 The first firmware test adapts the author's F1 [02-semihosting example](../../tests/firmware/semihosting/README.md).
-It is separate from the 115 configure scenarios: **42 builds, 48 QEMU runs and 48 Renode runs**:
-seven profiles plus one corrupted copy per tool pair; three xPack GCC versions × two CMake versions from the
+It is separate from the 115 configure scenarios: **54 builds, 60 QEMU runs and 60 Renode runs**:
+nine profiles plus one corrupted copy per tool pair; three xPack GCC versions × two CMake versions from the
 [lockfile](../../ci/dependencies.lock.json), CubeF1 1.8.7, QEMU 11.0.0.
 The Windows QEMU 11.1.0 installation was also checked locally; CI uses the pinned image.
 
@@ -22,6 +22,7 @@ Readelf output is retained. These checks do not establish general linker correct
 | hang | Startup output but no result marker, timeout after 5 seconds |
 | bare / bareTemplate | Own startup, no CMSIS/HAL, TEST_RESULT=PASS, exit 0 |
 | cmsis / cmsisTemplate | CMSIS startup, no HAL, TEST_RESULT=PASS, exit 0 |
+| cmsisLibrary / cmsisEtl | C/C++ library and optional ETL, TEST_RESULT=PASS, exit 0 |
 
 Normal runs have a 15-second timeout. A hang before metadata is printed, a crash,
 a missing marker, an unexpected exit code or conflicting markers fails the suite.
@@ -65,7 +66,7 @@ is inferred from running this ELF on the F205-based netduino2.
 
 The matrix is read from the shared dependency lockfile, not duplicated in YAML.
 Images are built once; tool pairs run sequentially with separate build/log paths.
-Actual GCC/CMake versions and all seven profiles are checked for each pair.
+Actual GCC/CMake versions and all nine profiles are checked for each pair.
 Failures do not stop collection of other pair results, but the matrix exits nonzero
 if any pair fails. Run selection uses the current lockfile rather than accepting
 whatever manifests happen to exist. Aggregate reports are matrix-summary.json;
@@ -122,7 +123,7 @@ For each tool pair, a copy of success ELF has one bit changed in .fw_version.
 Code, startup data and the injected CRC remain unchanged. The derived negative case,
 crc-corrupt, must report CRC_RESULT=FAIL and TEST_RESULT=FAIL and exit 3. A crash
 or timeout cannot pass this case. This adds six runs without extra compilations:
-42 builds, 48 runs per simulator. Reports distinguish seven profiles from eight executions.
+54 builds, 60 runs per simulator. Reports distinguish nine profiles from ten executions.
 
 This verifies software CRC over loaded FLASH on netduino2, not the STM32 CRC
 peripheral. E004 (algorithm selection) and E006 (post-build error handling) remain
@@ -192,3 +193,31 @@ two project-owned sources and no CMSIS/HAL paths; CMSIS mode must include the ST
 startup and exclude HAL sources. Absent libraries print `none` in metadata.
 The shared profile list in `ci/firmware_cases.py` prevents old three-profile reports
 from satisfying the expanded matrix. Unknown runtime profiles fail validation.
+
+## User libraries and ETL
+
+`cmsisLibrary` adds the `Library` source directory (its own CMakeLists.txt) and
+links `Smoke::Library` through `link_libraries`. The mixed C/C++ static library
+exports its include path and PUBLIC definition; PRIVATE definitions remain local.
+Its CPU and language options are set explicitly because executable PRIVATE flags
+do not propagate to separately compiled targets. Compile-time guards check the
+C/C++ definitions and C++ no-exceptions/no-RTTI settings. ELF symbol inspection
+requires the C function, C++ wrapper and executable C probe to survive linking.
+
+Runtime volatile input `[3, 1, 4, 1, 5]` gives weighted sum 46 in C and XOR 0x55
+in C++, producing `LIB_RESULT=123`; `C_LANGUAGE=11` confirms the executable's C
+translation unit was called. Wrong results exit with status 4 and fail the run.
+`cmsisEtl` also uses ETL vector push/pop and string operations, requiring sum 14,
+text `etl:14`, and the version from ETL's header. Both profiles retain startup,
+metadata and CRC checks and use CMSIS without HAL.
+
+ETL 20.47.1 comes from the existing pinned lockfile; the builder passes its include
+path to the test module. No new dependency download is added. The inspected
+`etl-default` example's HSE setup and endless loop are not imported. This tests
+the selected bounded container operations, not ETL's entire API or heap behavior.
+The framework has not gained an ETL-specific configuration option.
+
+The build exposed [E008](errata/E008.md): language keys declared only inside a
+profile do not reach the executable. The fixture declares empty root lists as a
+verified workaround; six configure-only probes preserve the known deviation.
+These probes do not add firmware builds or simulator checks to the badge.

@@ -33,12 +33,22 @@ class VerdictTests(unittest.TestCase):
             self.assertFalse(verdict('success', code, timeout, output, '14.2.1'))
 
     def test_build_modes_require_success_and_unknown_profiles_fail(self):
-        for profile in ('bare', 'bareTemplate', 'cmsis', 'cmsisTemplate'):
+        for profile in ('bare', 'bareTemplate', 'cmsis', 'cmsisTemplate', 'cmsisLibrary', 'cmsisEtl'):
             with self.subTest(profile=profile):
                 self.assertTrue(verdict(profile, 0, False, HEADER + 'TEST_RESULT=PASS', '14.2.1'))
                 self.assertFalse(verdict(profile, 1, False, HEADER + 'TEST_RESULT=FAIL', '14.2.1'))
                 self.assertFalse(verdict(profile, None, True, HEADER, '14.2.1'))
         self.assertFalse(verdict('unknown', 1, False, HEADER + 'TEST_RESULT=FAIL', '14.2.1'))
+
+    def test_library_results_cannot_be_hidden_by_pass_marker(self):
+        expected = {'LIB_RESULT': '123', 'C_LANGUAGE': '11', 'ETL_RESULT': '14',
+                    'ETL_TEXT': 'etl:14', 'ETL_VERSION': '20.47.1'}
+        output = HEADER + 'TEST_RESULT=PASS\n' + ''.join(f'{k}={v}\n' for k, v in expected.items())
+        self.assertTrue(metadata_matches(output, expected))
+        for key, value in expected.items():
+            with self.subTest(key=key):
+                self.assertFalse(metadata_matches(output.replace(f'{key}={value}', f'{key}=wrong'), expected))
+        self.assertFalse(verdict('cmsisEtl', 4, False, output, '14.2.1'))
 
     def test_guest_failure_is_not_an_arbitrary_crash(self):
         self.assertTrue(verdict('failure', 1, False, HEADER + 'TEST_RESULT=FAIL', '14.2.1'))

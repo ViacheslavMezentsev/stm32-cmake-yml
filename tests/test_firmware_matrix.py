@@ -39,7 +39,7 @@ class MatrixTests(unittest.TestCase):
                 'cases': [{'profile': p} for p in BUILD_PROFILES]}
         verify_build(good, '14.2.1-1.1', '3.19.8')
         for key, value in [('gcc', '13.3.1'), ('cmake', 'cmake version 3.28.3'),
-                           ('status', 'failed'), ('cases', []), ('cases', [{'profile': p} for p in ('success', 'failure', 'hang')]),
+                           ('status', 'failed'), ('cases', []), ('cases', [{'profile': p} for p in BUILD_PROFILES[:-2]]), ('cases', [{'profile': p} for p in ('success', 'failure', 'hang')]),
                            ('cases', [{'profile': 'success'}] * 3)]:
             report = copy.deepcopy(good)
             report[key] = value

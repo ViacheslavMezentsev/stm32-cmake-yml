@@ -24,7 +24,7 @@ working firmware. [Coverage and commands](testing.md).
 
 ## Building and execution
 
-A separate matrix contains **42 builds, 48 QEMU runs and 48 Renode runs**: seven profiles across
+A separate matrix contains **54 builds, 60 QEMU runs and 60 Renode runs**: nine profiles across
 six tool pairs, plus one corrupted ELF copy per pair. It checks ELF layout,
 initial data, C++ construction, metadata, software CRC and controlled termination;
 negative cases distinguish guest failure from timeout.
@@ -42,7 +42,7 @@ An option-to-test mapping identifies documented coverage, not proof of every
 possible use. [Machine-readable index](../reference-index.json).
 
 [Errata](errata/index.md) records limitations and workarounds; E004 (CRC algorithm
-selection), E006 (CRC errors) and E007 (external FreeRTOS) remain open.
+selection), E006 (CRC errors), E007 (external FreeRTOS) and E008 (profile-only language settings) remain open.
 [TODO](../../TODO.md) tracks planned work and completed stages;
 [maintenance rules](maintenance.md) explain how to update documentation and checks.
 Public framework entry paths remain stable; tests are added without requiring
@@ -52,9 +52,9 @@ consumer projects to be restructured.
 
 The README QEMU+Renode badge reports built configurations and completed checks from the
 last successful Firmware run on main. A full run currently gives
-42 builds / 96 checks. Expected failure, timeout and CRC rejection count as
-successful contract checks; this does not mean 96 normally exiting firmwares
-or 42 different MCUs. Builds are counted once; QEMU and Renode checks are added (48 + 48).
+54 builds / 120 checks. Expected failure, timeout and CRC rejection count as
+successful contract checks; this does not mean 120 normally exiting firmwares
+or 54 different MCUs. Builds are counted once; QEMU and Renode checks are added (60 + 60).
 
 Counts come from complete matching build/QEMU/Renode reports, checked for clean checkout
 SHA, matrix membership, results and metadata. Codex branches produce a preview
@@ -67,3 +67,5 @@ badge shows current workflow status. Clicking the counter opens JSON containing
 SHA, time and a run link. GitHub image caching may delay refreshes. The image is
 unavailable until the first successful main run with this workflow. Branch rules
 must allow GITHUB_TOKEN writes to ci-badges. Runs for an older main are skipped.
+
+[E008](errata/E008.md) records profile-only language settings; firmware tests verify the root-key workaround and reproduce the limitation.

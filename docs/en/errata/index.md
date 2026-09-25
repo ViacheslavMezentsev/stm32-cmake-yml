@@ -13,5 +13,6 @@ Applies to baseline `f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0`. Status audited 2
 | [E005](E005.md) | Profile names without `_` | Closed: by design |
 | [E006](E006.md) | CRC failure can exit successfully with a stub | Open |
 | [E007](E007.md) | External FreeRTOS target namespace mismatch | Open; fix deferred |
+| [E008](E008.md) | Profile-only language settings are not exported | Open |
 
 [Reference](../reference/0.9.2/index.md) · [Maintenance](../maintenance.md)

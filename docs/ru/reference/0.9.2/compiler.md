@@ -141,3 +141,5 @@ compile_definitions_cxx: [FEATURE=1]
 [Реализация 0.9.2](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/stm32_yml.cmake) · [Index](index.md)
 
 **Проверки (частичное покрытие):** `configure.defaults-blackpill`, `configure.source-directory-target`. [Test manifest](../../../../tests/cases.json).
+
+Языковые параметры только из профиля требуют корневых объявлений: [E008](../../errata/E008.md).

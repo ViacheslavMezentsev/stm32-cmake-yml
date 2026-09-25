@@ -349,7 +349,9 @@
         "configure.defaults-blackpill",
         "configure.source-directory-target"
       ],
-      "errata": []
+      "errata": [
+        "E008"
+      ]
     },
     {
       "key": "compile_definitions_c",
@@ -366,7 +368,9 @@
         "configure.defaults-blackpill",
         "configure.source-directory-target"
       ],
-      "errata": []
+      "errata": [
+        "E008"
+      ]
     },
     {
       "key": "compile_options_cxx",
@@ -383,7 +387,9 @@
         "configure.defaults-blackpill",
         "configure.source-directory-target"
       ],
-      "errata": []
+      "errata": [
+        "E008"
+      ]
     },
     {
       "key": "compile_definitions_cxx",
@@ -400,7 +406,9 @@
         "configure.defaults-blackpill",
         "configure.source-directory-target"
       ],
-      "errata": []
+      "errata": [
+        "E008"
+      ]
     },
     {
       "key": "use_cmsis",
@@ -1202,6 +1210,23 @@
       "pages": {
         "ru": "docs/ru/errata/E007.md",
         "en": "docs/en/errata/E007.md"
+      },
+      "evidence": "reproduced",
+      "status": "open",
+      "fixed_commit": null,
+      "fixed_release": null
+    },
+    {
+      "id": "E008",
+      "options": [
+        "compile_options_c",
+        "compile_options_cxx",
+        "compile_definitions_c",
+        "compile_definitions_cxx"
+      ],
+      "pages": {
+        "ru": "docs/ru/errata/E008.md",
+        "en": "docs/en/errata/E008.md"
       },
       "evidence": "reproduced",
       "status": "open",

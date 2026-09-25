@@ -21,6 +21,11 @@ crc_enable: true
 crc_algorithm: STM32_HW_DEFAULT
 linker_script: STM32F103C8_FLASH.ld
 validate_linker_script: true
+# Seed dynamic keys so profile values are exported (E008).
+compile_options_c: []
+compile_options_cxx: []
+compile_definitions_c: []
+compile_definitions_cxx: []
 profiles:
   success:
     compile_definitions: [SMOKE_SUCCESS=1]
@@ -52,3 +57,21 @@ profiles:
     linker_script: auto
     heap_size: 0
     stack_size: 2K
+  cmsisLibrary:
+    use_hal: false
+    sources_append: [Library, language_probe.c]
+    link_libraries: [Smoke::Library]
+    compile_definitions: [SMOKE_LIBRARY=1]
+    compile_definitions_c: [SMOKE_C_ONLY=1]
+    compile_definitions_cxx: [SMOKE_CXX_ONLY=1]
+    compile_options_c: [Wstrict-prototypes]
+    compile_options_cxx: [fno-exceptions, fno-rtti]
+  cmsisEtl:
+    use_hal: false
+    sources_append: [Library, language_probe.c]
+    link_libraries: [Smoke::Library]
+    compile_definitions: [SMOKE_LIBRARY=1, SMOKE_ETL=1]
+    compile_definitions_c: [SMOKE_C_ONLY=1]
+    compile_definitions_cxx: [SMOKE_CXX_ONLY=1]
+    compile_options_c: [Wstrict-prototypes]
+    compile_options_cxx: [fno-exceptions, fno-rtti]
