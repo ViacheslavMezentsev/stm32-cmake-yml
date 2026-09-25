@@ -6,6 +6,18 @@ import shutil
 import subprocess
 
 
+def metadata_matches(output, expected):
+    # Each field must appear exactly once; conflicting duplicate values fail.
+    fields = {}
+    for line in output.splitlines():
+        key, separator, value = line.strip().partition('=')
+        if separator and key in expected:
+            if key in fields:
+                return False
+            fields[key] = value
+    return bool(expected) and fields == expected
+
+
 def verdict(profile, code, timed_out, output, gcc):
     lines = {line.strip() for line in output.splitlines()}
     if not {'BUILD_TARGET=STM32F103C8T6', 'EMULATOR_MACHINE=netduino2'} <= lines:
@@ -52,9 +64,11 @@ def main():
                 timed_out, code, raw = True, None, error.stdout or b''
             output = raw.decode('utf-8', errors='replace')
             (args.output / (profile + '.log')).write_text(output, encoding='utf-8')
-            passed = verdict(profile, code, timed_out, output, manifest['gcc'])
+            metadata_ok = metadata_matches(output, case['metadata'])
+            passed = metadata_ok and verdict(profile, code, timed_out, output, manifest['gcc'])
             report['cases'].append({'profile': profile, 'passed': passed, 'returncode': code,
-                                    'timeout': timed_out, 'command': command})
+                                    'timeout': timed_out, 'metadata_ok': metadata_ok,
+                                    'expected_metadata': case['metadata'], 'command': command})
             print(f'{"PASS" if passed else "FAIL"}: {profile}; exit={code}; timeout={timed_out}', flush=True)
         report['status'] = 'passed' if all(c['passed'] for c in report['cases']) else 'failed'
     except (OSError, ValueError, KeyError, subprocess.SubprocessError) as error:

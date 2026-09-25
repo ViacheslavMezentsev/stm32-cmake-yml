@@ -2,6 +2,17 @@
 #include <stm32f1xx.h>
 #include <core_cm3.h>
 #include "version.h"
+#include "build_metadata.h"
+
+extern "C" {
+volatile uint32_t smoke_data_probe = 0x12345678u;
+volatile uint32_t smoke_bss_probe;
+volatile uint32_t smoke_ctor_probe;
+}
+struct ConstructorProbe {
+    ConstructorProbe() { smoke_ctor_probe = 0xC0DEC0DEu; }
+};
+static ConstructorProbe constructor_probe;
 
 /**
  * @brief  Адрес регистра CPUID в блоке System Control Block (SCB).
@@ -195,6 +206,9 @@ void print_firmware_info( void )
 
 int main()
 {
+    const uint32_t initial_data = smoke_data_probe;
+    const uint32_t initial_bss = smoke_bss_probe;
+    const uint32_t initial_ctor = smoke_ctor_probe;
     // Инициализация библиотеки Semihosting.
     initialise_monitor_handles();
 
@@ -205,9 +219,25 @@ int main()
 
     print_cpu_id();
 
-    printf("BUILD_TARGET=STM32F103C8T6\n");
+    printf("BUILD_TARGET=%s\n", SMOKE_MCU);
+    printf("PROFILE=%s\nCMAKE=%s\nFRAMEWORK=%s\n", SMOKE_PROFILE, SMOKE_CMAKE, SMOKE_FRAMEWORK);
+    printf("GIT_REVISION=%s\nGIT_DIRTY=%s\n", SMOKE_GIT, SMOKE_DIRTY);
+    printf("CMSIS_CORE=%u.%u\n", __CM3_CMSIS_VERSION_MAIN, __CM3_CMSIS_VERSION_SUB);
+    printf("CMSIS_DEVICE=%u.%u.%u\n", __STM32F1_CMSIS_VERSION_MAIN,
+           __STM32F1_CMSIS_VERSION_SUB1, __STM32F1_CMSIS_VERSION_SUB2);
+    const uint32_t hal_version = HAL_GetHalVersion();
+    printf("HAL_VERSION=%lu.%lu.%lu\n", (hal_version >> 24) & 255u,
+           (hal_version >> 16) & 255u, (hal_version >> 8) & 255u);
+    printf("DATA_INIT=%08lX\nBSS_INIT=%08lX\nCTOR_INIT=%08lX\n", initial_data, initial_bss, initial_ctor);
+    printf("DATA_ADDRESS=%08lX\nBSS_ADDRESS=%08lX\nCTOR_ADDRESS=%08lX\n",
+           (uint32_t)&smoke_data_probe, (uint32_t)&smoke_bss_probe, (uint32_t)&smoke_ctor_probe);
     printf("EMULATOR_MACHINE=netduino2\n");
     fflush(stdout);
+    if (initial_data != 0x12345678u || initial_bss != 0 || initial_ctor != 0xC0DEC0DEu) {
+        printf("TEST_RESULT=FAIL\n");
+        fflush(stdout);
+        smoke_exit(2);
+    }
 #if defined(SMOKE_HANG)
     while (1) { __asm__ volatile("nop"); }
 #elif defined(SMOKE_FAIL)

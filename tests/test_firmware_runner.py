@@ -4,12 +4,21 @@ import sys
 import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'ci'))
-from run_qemu_smoke import verdict
+from run_qemu_smoke import verdict, metadata_matches
 
 HEADER = 'BUILD_TARGET=STM32F103C8T6\nEMULATOR_MACHINE=netduino2\n  Compiler:    GCC 14.2.1\n0xC23 -> Cortex-M3\n'
 
 
 class VerdictTests(unittest.TestCase):
+    def test_metadata_requires_all_fields_and_exact_values(self):
+        expected = {'PROFILE': 'success', 'BSS_INIT': '00000000'}
+        self.assertTrue(metadata_matches('PROFILE=success\nBSS_INIT=00000000\n', expected))
+        for output in ('PROFILE=success', 'PROFILE=failure\nBSS_INIT=00000000',
+                       'PROFILE=success\nBSS_INIT=DEADBEEF',
+                       'PROFILE=success\nBSS_INIT=00000000\nPROFILE=success'):
+            self.assertFalse(metadata_matches(output, expected))
+        self.assertFalse(metadata_matches('', {}))
+
     def test_success_requires_marker_and_exit_zero(self):
         self.assertTrue(verdict('success', 0, False, HEADER + 'TEST_RESULT=PASS\n', '14.2.1'))
         for code, timeout, output in [(0, False, HEADER), (1, False, HEADER + 'TEST_RESULT=PASS'),

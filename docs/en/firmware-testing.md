@@ -27,7 +27,8 @@ The intentional failure and timeout are passing *harness tests*, not ignored err
 stdout/stderr, command lines, observed exits and emulator version are retained.
 No GDB server or GUI is started. SYS_EXIT_EXTENDED uses the reason/status block;
 stdio is flushed before exit. Compiler version is compared with the build manifest.
-Other library versions are diagnostic output at this stage.
+CMSIS Core/Device, HAL and framework versions are compared with the reviewed
+expected-metadata.json baseline for the pinned dependencies.
 
 ## Running locally
 
@@ -55,8 +56,7 @@ python -m unittest discover -s tests -p "test_firmware*.py"
 `--qemu` accepts an explicit executable. Builds use fresh directories and replace
 the manifest at the start; a failed build cannot reuse a stale successful manifest.
 The [workflow](../../.github/workflows/firmware.yml) builds both images and saves
-artifacts/logs for 14 days. Runtime .data/.bss checks, CRC and
-Renode execution remain subsequent steps. No F1 peripheral or clock-model support
+artifacts/logs for 14 days. CRC and Renode execution remain subsequent steps. No F1 peripheral or clock-model support
 is inferred from running this ELF on the F205-based netduino2.
 
 ## Matrix isolation and compatibility
@@ -74,3 +74,27 @@ compiler that supports C17: CMake added that value in 3.21. The source C files d
 not need C17. This is a fixture compatibility adjustment, not a framework change.
 To run just one pair, the original build_firmware_smoke.py/run_qemu_smoke.py remain
 available with a dedicated output directory.
+
+## Metadata and initial memory state
+
+Each profile prints PROFILE, CMAKE, FRAMEWORK, GIT_REVISION and GIT_DIRTY.
+The header is generated from the actual CMake configuration; the builder records
+Git HEAD and whether the working tree has changes. HEAD plus a dirty flag is not
+a content hash of uncommitted changes. Date/time fields remain diagnostic only.
+A missing field, wrong value or duplicate metadata field fails the run, including
+the intentional failure and timeout profiles. Older build manifests without
+metadata must be rebuilt.
+
+Three volatile four-byte probes are checked at entry to main, before HAL setup:
+initialized .data = 0x12345678, .bss = 0, and a C++ constructor-written value =
+0xC0DEC0DE. A mismatch exits with code 2 before normal success/failure/hang behavior.
+The builder verifies D/B symbol types and sizes using nm and records their addresses;
+the runner compares those addresses with values printed by the firmware. Runtime
+values are also checked independently against the reviewed baseline.
+
+This observes initial memory state and constructor execution. Zero .bss alone does
+not prove that the startup clearing loop executed: emulator RAM may start zeroed.
+A development negative check modified only the .data probe's load bytes in a copy
+of one ELF: the guest printed FAIL and exited 2, and the runner rejected it. That
+extra corruption experiment is not part of the recurring 18-run CI matrix; CRC
+coverage is still separate future work. The original demo remains read only.
