@@ -50,6 +50,8 @@ may take several minutes. Official sources: [QEMU](https://download.qemu.org/),
 
 ## Next stages
 
+Steps 1–4 are implemented in the [firmware suite](firmware-testing.md): 18 builds and 24 QEMU runs. Next is Renode.
+
 1. Agree the first known-working example with the author; build ELF and inspect
    sections, vectors and stack. Then expand to three GCC and two CMake versions.
 2. QEMU early startup without PLL/peripheral initialization, semihosting, success,

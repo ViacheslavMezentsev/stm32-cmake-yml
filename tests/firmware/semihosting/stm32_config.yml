@@ -17,7 +17,9 @@ linker_directives: [--print-memory-usage, --no-warn-rwx-segments]
 use_newlib_nano: true
 system_library: Semihosting
 build_artifacts: [bin, hex, map, lss]
-crc_enable: false
+crc_enable: true
+crc_algorithm: STM32_HW_DEFAULT
+linker_script: STM32F103C8_FLASH.ld
 validate_linker_script: true
 profiles:
   success:

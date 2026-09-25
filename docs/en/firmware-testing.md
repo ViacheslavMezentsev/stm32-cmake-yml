@@ -3,8 +3,8 @@
 [Documentation](index.md) · [Русский](../ru/firmware-testing.md) · [Environment](emulation.md)
 
 The first firmware test adapts the author's F1 [02-semihosting example](../../tests/firmware/semihosting/README.md).
-It is separate from the 115 configure scenarios: **18 builds and 18 QEMU runs**:
-three profiles × three xPack GCC versions × two CMake versions from the
+It is separate from the 115 configure scenarios: **18 builds and 24 QEMU runs**:
+three profiles plus one corrupted copy per tool pair; three xPack GCC versions × two CMake versions from the
 [lockfile](../../ci/dependencies.lock.json), CubeF1 1.8.7, QEMU 11.0.0.
 The Windows QEMU 11.1.0 installation was also checked locally; CI uses the pinned image.
 
@@ -56,7 +56,7 @@ python -m unittest discover -s tests -p "test_firmware*.py"
 `--qemu` accepts an explicit executable. Builds use fresh directories and replace
 the manifest at the start; a failed build cannot reuse a stale successful manifest.
 The [workflow](../../.github/workflows/firmware.yml) builds both images and saves
-artifacts/logs for 14 days. CRC and Renode execution remain subsequent steps. No F1 peripheral or clock-model support
+artifacts/logs for 14 days. Renode execution remains a subsequent step. No F1 peripheral or clock-model support
 is inferred from running this ELF on the F205-based netduino2.
 
 ## Matrix isolation and compatibility
@@ -96,5 +96,32 @@ This observes initial memory state and constructor execution. Zero .bss alone do
 not prove that the startup clearing loop executed: emulator RAM may start zeroed.
 A development negative check modified only the .data probe's load bytes in a copy
 of one ELF: the guest printed FAIL and exited 2, and the runner rejected it. That
-extra corruption experiment is not part of the recurring 18-run CI matrix; CRC
-coverage is still separate future work. The original demo remains read only.
+extra .data corruption experiment is not part of the recurring CI matrix. The original demo remains read only.
+
+## CRC of the loaded firmware
+
+The test-local STM32F103C8_FLASH.ld keeps .data's FLASH load image and a four-byte
+.fw_version record before .checksum. The record contains 0x00090200 (fixture
+format for 0.9.2); it is retained by KEEP. This fixed 64/20 KiB layout is not a
+general-purpose linker template. Existing startup, heap and stack symbols remain.
+
+The framework injects STM32_HW_DEFAULT CRC. An independent host calculation and
+the firmware's C++ calculation use polynomial 0x04C11DB7, initial 0xFFFFFFFF,
+little-endian 32-bit words, no reflection and no final XOR. Three supplied vectors
+are checked in Python and by static_assert. The range starts at 0x08000000 and
+ends just before the checksum word; all bounds are word-aligned.
+
+The builder rejects gaps/overlaps in FLASH load segments, a checksum that is not
+last, misplaced .data/.fw_version, incorrect injected CRC and BIN/ELF differences.
+The guest prints CRC_START, CRC_END, CRC_STORED, CRC_COMPUTED and CRC_RESULT;
+all five fields must match the host manifest exactly, even for failure/hang.
+
+For each tool pair, a copy of success ELF has one bit changed in .fw_version.
+Code, startup data and the injected CRC remain unchanged. The fourth QEMU case,
+crc-corrupt, must report CRC_RESULT=FAIL and TEST_RESULT=FAIL and exit 3. A crash
+or timeout cannot pass this case. This adds six runs without extra compilations:
+18 builds, 24 runs. Reports distinguish three profiles from four executions.
+
+This verifies software CRC over loaded FLASH on netduino2, not the STM32 CRC
+peripheral. E004 (algorithm selection) and E006 (post-build error handling) remain
+open and unchanged. Old manifests must be rebuilt to include CRC expectations.

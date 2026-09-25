@@ -10,6 +10,13 @@ HEADER = 'BUILD_TARGET=STM32F103C8T6\nEMULATOR_MACHINE=netduino2\n  Compiler:   
 
 
 class VerdictTests(unittest.TestCase):
+    def test_crc_corruption_requires_dedicated_exit(self):
+        output = HEADER + 'TEST_RESULT=FAIL'
+        self.assertTrue(verdict('crc-corrupt', 3, False, output, '14.2.1'))
+        for code in (0, 1, 2, -6):
+            self.assertFalse(verdict('crc-corrupt', code, False, output, '14.2.1'))
+        self.assertFalse(verdict('crc-corrupt', None, True, output, '14.2.1'))
+
     def test_metadata_requires_all_fields_and_exact_values(self):
         expected = {'PROFILE': 'success', 'BSS_INIT': '00000000'}
         self.assertTrue(metadata_matches('PROFILE=success\nBSS_INIT=00000000\n', expected))

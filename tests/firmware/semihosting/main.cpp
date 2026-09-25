@@ -9,6 +9,19 @@ volatile uint32_t smoke_data_probe = 0x12345678u;
 volatile uint32_t smoke_bss_probe;
 volatile uint32_t smoke_ctor_probe;
 }
+// Dedicated metadata word: the negative test changes only this unused payload.
+__attribute__((section(".fw_version"), used)) static const uint32_t firmware_version = 0x00090200u;
+extern "C" uint32_t __checksum_start[], __checksum_end[];
+constexpr uint32_t crcStepWord(uint32_t crc, uint32_t word) {
+    crc ^= word;
+    for (int i = 0; i < 32; ++i)
+        crc = (crc & 0x80000000u) ? (crc << 1) ^ 0x04C11DB7u : crc << 1;
+    return crc;
+}
+static_assert(crcStepWord(0xFFFFFFFFu, 0x12345678u) == 0xDF8A8A2Bu);
+static_assert(crcStepWord(0xFFFFFFFFu, 0) == 0xC704DD7Bu);
+static_assert(crcStepWord(crcStepWord(0xFFFFFFFFu, 0x12345678u), 0x9ABCDEF0u) == 0x7D24A31Bu);
+
 struct ConstructorProbe {
     ConstructorProbe() { smoke_ctor_probe = 0xC0DEC0DEu; }
 };
@@ -238,6 +251,20 @@ int main()
         fflush(stdout);
         smoke_exit(2);
     }
+    uint32_t crc = 0xFFFFFFFFu;
+    // Volatile FLASH reads prevent folding the image into compile-time constants.
+    for (uintptr_t address = (uintptr_t)__checksum_start; address < (uintptr_t)__checksum_end; address += 4)
+        crc = crcStepWord(crc, *(volatile const uint32_t*)address);
+    const uint32_t stored = *(volatile const uint32_t*)__checksum_end;
+    printf("CRC_START=%08lX\nCRC_END=%08lX\nCRC_STORED=%08lX\nCRC_COMPUTED=%08lX\n",
+           (uint32_t)__checksum_start, (uint32_t)__checksum_end, stored, crc);
+    printf("CRC_RESULT=%s\n", crc == stored ? "PASS" : "FAIL");
+    if (crc != stored) {
+        printf("TEST_RESULT=FAIL\n");
+        fflush(stdout);
+        smoke_exit(3);
+    }
+    fflush(stdout);
 #if defined(SMOKE_HANG)
     while (1) { __asm__ volatile("nop"); }
 #elif defined(SMOKE_FAIL)
