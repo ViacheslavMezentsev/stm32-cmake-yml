@@ -6,13 +6,14 @@ import sys
 import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'ci'))
+from firmware_cases import BUILD_PROFILES
 from firmware_matrix import pairs, verify_build, verify_matrix
 
 
 class MatrixTests(unittest.TestCase):
     def test_stale_or_partial_build_matrix_is_rejected(self):
         good = {'status': 'passed', 'phase': 'build', 'pairs': [
-            {'gcc': '14', 'cmake': '3', 'status': 'passed', 'profiles': 3}]}
+            {'gcc': '14', 'cmake': '3', 'status': 'passed', 'profiles': len(BUILD_PROFILES)}]}
         verify_matrix(good, [('14', '3')])
         for key, value in [('status', 'failed'), ('phase', 'run'), ('pairs', [])]:
             bad = copy.deepcopy(good)
@@ -35,10 +36,10 @@ class MatrixTests(unittest.TestCase):
 
     def test_wrong_tools_and_incomplete_profiles_fail(self):
         good = {'status': 'passed', 'gcc': '14.2.1', 'cmake': 'cmake version 3.19.8',
-                'cases': [{'profile': p} for p in ('success', 'failure', 'hang')]}
+                'cases': [{'profile': p} for p in BUILD_PROFILES]}
         verify_build(good, '14.2.1-1.1', '3.19.8')
         for key, value in [('gcc', '13.3.1'), ('cmake', 'cmake version 3.28.3'),
-                           ('status', 'failed'), ('cases', []),
+                           ('status', 'failed'), ('cases', []), ('cases', [{'profile': p} for p in ('success', 'failure', 'hang')]),
                            ('cases', [{'profile': 'success'}] * 3)]:
             report = copy.deepcopy(good)
             report[key] = value

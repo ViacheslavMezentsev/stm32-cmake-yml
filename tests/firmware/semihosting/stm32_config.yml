@@ -28,3 +28,27 @@ profiles:
     compile_definitions: [SMOKE_FAIL=1]
   hang:
     compile_definitions: [SMOKE_HANG=1]
+  bare:
+    use_cmsis: false
+    use_hal: false
+    sources: [bare_startup.S, main.cpp]
+    compile_definitions: [SMOKE_BARE=1]
+    compile_options_append: [mcpu=cortex-m3, mthumb, mfloat-abi=soft, ffunction-sections, fdata-sections]
+    link_options: [mcpu=cortex-m3, mthumb, mfloat-abi=soft, nostartfiles]
+  bareTemplate:
+    use_cmsis: false
+    use_hal: false
+    sources: [bare_startup.S, main.cpp]
+    compile_definitions: [SMOKE_BARE=1]
+    compile_options_append: [mcpu=cortex-m3, mthumb, mfloat-abi=soft, ffunction-sections, fdata-sections]
+    link_options: [mcpu=cortex-m3, mthumb, mfloat-abi=soft, nostartfiles]
+    linker_script: auto
+    heap_size: 0
+    stack_size: 2K
+  cmsis:
+    use_hal: false
+  cmsisTemplate:
+    use_hal: false
+    linker_script: auto
+    heap_size: 0
+    stack_size: 2K

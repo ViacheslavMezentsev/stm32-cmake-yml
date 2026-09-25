@@ -3,8 +3,8 @@
 [Documentation](index.md) · [Русский](../ru/firmware-testing.md) · [Environment](emulation.md)
 
 The first firmware test adapts the author's F1 [02-semihosting example](../../tests/firmware/semihosting/README.md).
-It is separate from the 115 configure scenarios: **18 builds, 24 QEMU runs and 24 Renode runs**:
-three profiles plus one corrupted copy per tool pair; three xPack GCC versions × two CMake versions from the
+It is separate from the 115 configure scenarios: **42 builds, 48 QEMU runs and 48 Renode runs**:
+seven profiles plus one corrupted copy per tool pair; three xPack GCC versions × two CMake versions from the
 [lockfile](../../ci/dependencies.lock.json), CubeF1 1.8.7, QEMU 11.0.0.
 The Windows QEMU 11.1.0 installation was also checked locally; CI uses the pinned image.
 
@@ -20,6 +20,8 @@ Readelf output is retained. These checks do not establish general linker correct
 | success | Compiler/target/machine/CPU output, TEST_RESULT=PASS, exit 0 |
 | failure | Same startup output, TEST_RESULT=FAIL, exit 1 |
 | hang | Startup output but no result marker, timeout after 5 seconds |
+| bare / bareTemplate | Own startup, no CMSIS/HAL, TEST_RESULT=PASS, exit 0 |
+| cmsis / cmsisTemplate | CMSIS startup, no HAL, TEST_RESULT=PASS, exit 0 |
 
 Normal runs have a 15-second timeout. A hang before metadata is printed, a crash,
 a missing marker, an unexpected exit code or conflicting markers fails the suite.
@@ -63,7 +65,7 @@ is inferred from running this ELF on the F205-based netduino2.
 
 The matrix is read from the shared dependency lockfile, not duplicated in YAML.
 Images are built once; tool pairs run sequentially with separate build/log paths.
-Actual GCC/CMake versions and all three profiles are checked for each pair.
+Actual GCC/CMake versions and all seven profiles are checked for each pair.
 Failures do not stop collection of other pair results, but the matrix exits nonzero
 if any pair fails. Run selection uses the current lockfile rather than accepting
 whatever manifests happen to exist. Aggregate reports are matrix-summary.json;
@@ -117,10 +119,10 @@ The guest prints CRC_START, CRC_END, CRC_STORED, CRC_COMPUTED and CRC_RESULT;
 all five fields must match the host manifest exactly, even for failure/hang.
 
 For each tool pair, a copy of success ELF has one bit changed in .fw_version.
-Code, startup data and the injected CRC remain unchanged. The fourth QEMU case,
+Code, startup data and the injected CRC remain unchanged. The derived negative case,
 crc-corrupt, must report CRC_RESULT=FAIL and TEST_RESULT=FAIL and exit 3. A crash
 or timeout cannot pass this case. This adds six runs without extra compilations:
-18 builds, 24 runs per simulator. Reports distinguish three profiles from four executions.
+42 builds, 48 runs per simulator. Reports distinguish seven profiles from eight executions.
 
 This verifies software CRC over loaded FLASH on netduino2, not the STM32 CRC
 peripheral. E004 (algorithm selection) and E006 (post-build error handling) remain
@@ -164,3 +166,29 @@ ELFs/manifests: the smoke_exit_trap symbol address is now required.
 
 Limitation source: [Renode 1.16.1 Arm.cs](https://github.com/renode/renode-infrastructure/blob/add012af003a0f620d3da52828262676f374d121/src/Emulator/Cores/Arm/Arm.cs).
 Further scenarios: [five test groups](firmware-plan.md).
+
+## Build modes and linker templates
+
+The four additional profiles share the same F103C8 fixture and output protocol.
+`bare` and `bareTemplate` replace sources with `bare_startup.S` and `main.cpp`;
+they explicitly supply Cortex-M3/Thumb/soft-float flags and `-nostartfiles`.
+The test-owned assembly provides core vectors, copies .data, clears .bss and calls
+`__libc_init_array` before main. It does not include device IRQ handlers or a clock
+initialization routine. This is a minimal CPU test, not a board startup template.
+`cmsis` and `cmsisTemplate` retain the CMSIS device startup and the existing
+SystemInit source, with HAL disabled. No new profile configures PLL or peripherals.
+The inspected `cmsis-02-semihosting` example supplied the own-startup use case;
+its GPIO/SysTick/HSE path was not imported.
+
+Explicit `.ld` profiles reserve 512 bytes for heap and 1K for stack. The `Template`
+profiles select `linker_script: auto`, discover `STM32F103C8_FLASH.ld.in` and
+substitute heap=0 and stack=2K. The builder compares absolute linker symbols with
+these expectations and the firmware prints their values. Reservations are not a
+measurement of maximum stack usage or a proof that every application can use zero heap.
+CRC remains after all FLASH load data, including .data and .fw_version.
+
+`compile_commands.json` is checked for source selection: bare mode has only its
+two project-owned sources and no CMSIS/HAL paths; CMSIS mode must include the ST
+startup and exclude HAL sources. Absent libraries print `none` in metadata.
+The shared profile list in `ci/firmware_cases.py` prevents old three-profile reports
+from satisfying the expanded matrix. Unknown runtime profiles fail validation.

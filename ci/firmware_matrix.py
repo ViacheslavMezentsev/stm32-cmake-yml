@@ -1,4 +1,5 @@
 """Build or run the locked firmware toolchain matrix in separate containers."""
+from firmware_cases import BUILD_PROFILES, RUN_PROFILES
 import argparse
 import itertools
 import json
@@ -17,7 +18,7 @@ def pairs(lock):
 
 
 def verify_build(report, gcc, cmake):
-    if report['status'] != 'passed' or sorted(c['profile'] for c in report['cases']) != ['failure', 'hang', 'success']:
+    if report['status'] != 'passed' or sorted(c['profile'] for c in report['cases']) != sorted(BUILD_PROFILES):
         raise ValueError('Missing or failed build profiles')
     if report['gcc'] != gcc.split('-')[0] or report['cmake'] != 'cmake version ' + cmake:
         raise ValueError('Actual compiler/CMake versions do not match selected pair')
@@ -27,7 +28,7 @@ def verify_matrix(report, combinations):
     actual = [(item['gcc'], item['cmake']) for item in report['pairs']]
     if (report['status'] != 'passed' or report['phase'] != 'build'
             or len(actual) != len(combinations) or set(actual) != set(combinations)
-            or any(item['status'] != 'passed' or item['profiles'] != 3 for item in report['pairs'])):
+            or any(item['status'] != 'passed' or item['profiles'] != len(BUILD_PROFILES) for item in report['pairs'])):
         raise ValueError('Expected a complete successful build matrix matching the current lockfile')
 
 
@@ -83,9 +84,9 @@ def main():
             report = json.loads((directory / filename).read_text(encoding='utf-8'))
             if args.phase == 'build':
                 verify_build(report, gcc, cmake)
-            elif report['status'] != 'passed' or sorted(c['profile'] for c in report['cases']) != ['crc-corrupt', 'failure', 'hang', 'success'] or not all(c['passed'] for c in report['cases']):
+            elif report['status'] != 'passed' or sorted(c['profile'] for c in report['cases']) != sorted(RUN_PROFILES) or not all(c['passed'] for c in report['cases']):
                 raise ValueError(f'Missing or failed {args.emulator} profiles')
-            item.update(status='passed', profiles=3)
+            item.update(status='passed', profiles=len(BUILD_PROFILES))
             if args.phase == 'run':
                 item['executions'] = len(report['cases'])
         except (OSError, ValueError, KeyError, subprocess.SubprocessError) as error:
