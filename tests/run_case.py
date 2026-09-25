@@ -107,6 +107,9 @@ def verify(case, build, source):
                 require(token in ninja, f"CRC command missing {token!r}")
 
     commands = json.loads((build / "compile_commands.json").read_text(encoding="utf-8"))
+    for filename in case.get("absent_commands", []):
+        require(not any(Path(entry["file"]) == source / filename for entry in commands),
+                f"Unexpected compile command for {filename}")
     if case.get("no_st_dependencies"):
         for value in (observed("LINK_LIBRARIES"), json.dumps(commands), ninja):
             for token in ("CMSIS::", "HAL::", "FreeRTOS::", "/Drivers/", "USE_HAL_DRIVER"):
@@ -173,6 +176,8 @@ def main():
         require((core / "cores/arduino/wiring_digital.c").is_file(), "Pinned Arduino core missing")
         (source / "modules").mkdir()
         (source / "modules/Arduino_Core_STM32").symlink_to(core, target_is_directory=True)
+        if case.get("arduino_library_fixture"):
+            (source / "arduino-library-core/cores").symlink_to(core / "cores", target_is_directory=True)
         toolchain = tests / "toolchains/arduino.cmake"
         config_args = ["-DPROJECT_CONFIG_FILE=arduino.yml"]
     else:

@@ -1,0 +1,30 @@
+stm32_cmake_yml_version: 0.9.2
+project_name: arduino_probe
+toolchain_backend: arduino
+mcu: STM32F411CE
+languages: [C, CXX, ASM]
+sources: [main.c, helper.cpp]
+compile_definitions: [STM32F411xE, ARDUINO_BASE=1]
+compile_options: [mcpu=cortex-m4, mthumb]
+linker_script_dir: linker
+arduino:
+  core_path: arduino-library-core
+  mcu_target: F411
+  use_core_main: false
+  libraries: [Probe]
+link_libraries: [Arduino::Core, Arduino::LibraryProbe]
+profiles:
+  unlinked:
+    link_libraries: [Arduino::Core]
+  missing:
+    arduino:
+      libraries: [Missing]
+    link_libraries: [Arduino::Core]
+  nowrap:
+    arduino:
+      libraries: [NoWrapper]
+    link_libraries: [Arduino::Core]
+  empty:
+    arduino:
+      libraries: []
+    link_libraries: [Arduino::Core]
