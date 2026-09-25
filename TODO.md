@@ -82,11 +82,14 @@ PR больше не требуются; старые ссылки остают�
   110 сценариев / 660 запусков.
 - [x] `codex/configure-arduino-custom-wrappers` слита в main (`a36aa77`):
   115 сценариев / 690 запусков.
-- [ ] Текущая ветка `codex/emulation-environment`: локальная проверка программ,
+- [x] `codex/emulation-environment` слита в main (`3f1c589`): локальная проверка программ,
   отдельный образ QEMU 11.0.0 / Renode 1.16.1 и CI без запуска прошивок.
   [Порядок дальнейших этапов и ограничения](docs/ru/emulation.md).
-- [ ] Следующий шаг согласовать по пробелам покрытия; к прошивкам переходить
-  только после уточнений автора, как указано ниже.
+- [ ] Ветка `codex/firmware-semihosting-smoke`: выбранный автором F1 02-semihosting,
+  три профиля сборки и запуска netduino2; GCC 14.2 / CMake 3.28.
+  [Контракт и ограничения](docs/ru/firmware-testing.md).
+- [ ] После первого smoke-теста расширить матрицу сборки; затем метаданные, CRC
+  и Renode по согласованному плану. Новые сценарии выбирать с автором.
 - [ ] По индексу выбрать следующие пробелы покрытия: отсутствующие/пустые значения,
   приоритеты и ошибки входных данных. Каждый новый контракт — отдельный сценарий.
 - [ ] В отдельных ветках разобрать [E004 и E006](docs/ru/errata/index.md):
@@ -94,10 +97,10 @@ PR больше не требуются; старые ссылки остают�
   Для каждого исправления сначала зафиксировать ожидаемое поведение и регрессию.
 - [x] Уточнить контракт с автором: E003/E005 закрыты как ограничения по замыслу.
   Дробные K/M и `_` в именах профилей не поддерживаются; расширение не планируется.
-- [ ] Перед подготовкой и сборкой тестовых прошивок уведомить автора и дождаться
-  его уточнений по сценариям и заведомо рабочим примерам. До этого — Configure/Generate.
-- [ ] Подготовить отдельное окружение эмуляции: сборка QEMU 11 из закреплённых
-  исходников и закреплённая версия Renode. Проверить доступность версий при реализации.
+- [x] Автор выбрал доработанный F1 `02-semihosting` и netduino2 для первого
+  теста сборки/запуска. Другие сценарии требуют отдельного уточнения.
+- [x] Отдельное окружение эмуляции: QEMU 11.0.0 из закреплённых исходников
+  и Renode 1.16.1; слито в main (`3f1c589`).
 - [ ] Добавить минимальные прошивки: semihosting, bare metal и blink на HSI без PLL.
   Выбрать поддерживаемые модели по фактическим возможностям эмуляторов;
   BluePill/BlackPill — кандидаты, а не обещание полной эмуляции плат.
@@ -187,11 +190,14 @@ keep defect details in errata.
   110 scenarios / 660 executions.
 - [x] `codex/configure-arduino-custom-wrappers` merged into main (`a36aa77`):
   115 scenarios / 690 executions.
-- [ ] Current branch `codex/emulation-environment`: local executable checks,
+- [x] `codex/emulation-environment` merged into main (`3f1c589`): local executable checks,
   separate QEMU 11.0.0 / Renode 1.16.1 image and CI without firmware execution.
   [Next stages and limitations](docs/en/emulation.md).
-- [ ] Agree the next coverage priority; defer firmware work until the author
-  supplies scenario guidance as required below.
+- [ ] Branch `codex/firmware-semihosting-smoke`: author-selected F1 02-semihosting,
+  three build/run profiles on netduino2; GCC 14.2 / CMake 3.28.
+  [Contract and limitations](docs/en/firmware-testing.md).
+- [ ] After the first smoke test, expand the build matrix; then metadata, CRC
+  and Renode following the agreed plan. Select new scenarios with the author.
 - [ ] Use the index to prioritize coverage gaps: missing/empty values, precedence
   and invalid input. Give each new contract a dedicated scenario.
 - [ ] Address [E004 and E006](docs/en/errata/index.md) in separate branches:
@@ -199,10 +205,10 @@ keep defect details in errata.
   behavior and a regression before each fix.
 - [x] Clarify the contract with the author: E003/E005 are closed by design.
   Fractional K/M and `_` in profile names are unsupported; expansion is not planned.
-- [ ] Before preparing or building test firmware, notify the author and wait for
-  scenario guidance and known-working examples. Until then, stay with Configure/Generate.
-- [ ] Prepare a separate emulation environment: QEMU 11 built from pinned sources
-  and a pinned Renode version. Verify version availability at implementation time.
+- [x] The author selected the modified F1 `02-semihosting` with netduino2 for
+  the first build/run test. Other scenarios need separate guidance.
+- [x] Separate emulation environment: QEMU 11.0.0 from pinned sources and
+  Renode 1.16.1; merged into main (`3f1c589`).
 - [ ] Add minimal firmware: semihosting, bare metal and blink using HSI without
   PLL. Select models based on actual emulator support; BluePill/BlackPill are
   candidates, not promises of complete board emulation.

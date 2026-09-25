@@ -28,3 +28,5 @@ in VS Code. Navigation does not require a separate site. The new reference and
 errata are bilingual; the existing scenario manual remains at its original URL.
 
 [Documentation maintenance](maintenance.md) · [Machine-readable index](../reference-index.json).
+
+[Firmware build and execution tests](firmware-testing.md).
