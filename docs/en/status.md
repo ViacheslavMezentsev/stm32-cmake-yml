@@ -47,3 +47,23 @@ selection), E006 (CRC errors) and E007 (external FreeRTOS) remain open.
 [maintenance rules](maintenance.md) explain how to update documentation and checks.
 Public framework entry paths remain stable; tests are added without requiring
 consumer projects to be restructured.
+
+## Confirmed build badge
+
+The README QEMU badge reports built configurations and completed checks from the
+last successful Firmware run on main. A full run currently gives
+18 builds / 24 checks. Expected failure, timeout and CRC rejection count as
+successful contract checks; this does not mean 24 normally exiting firmwares
+or 18 different MCUs. Renode is not included yet.
+
+Counts come from complete matching build/QEMU reports, checked for clean checkout
+SHA, matrix membership, results and metadata. Codex branches produce a preview
+artifact but do not update the public badge. After main succeeds, a separate job
+with contents: write publishes SVG and JSON to the dedicated ci-badges branch.
+It does not change sources or main. No extra PAT or Pages setup is needed.
+
+Failures/cancellations retain the last successful result; the adjacent Firmware
+badge shows current workflow status. Clicking the counter opens JSON containing
+SHA, time and a run link. GitHub image caching may delay refreshes. The image is
+unavailable until the first successful main run with this workflow. Branch rules
+must allow GITHUB_TOKEN writes to ci-badges. Runs for an older main are skipped.
