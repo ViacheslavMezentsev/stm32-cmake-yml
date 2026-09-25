@@ -40,9 +40,9 @@ def collect(build, run, lock, revision, emulator="qemu"):
 
 
 def svg(result):
-    message = f'{result["builds"]} builds / {result["checks"]} checks'
+    message = f'{result["builds"]} ({result["checks"]})'
     width = 14 + len(message) * 7
-    label = result['emulator']
+    label = 'Builds (Checks)'
     left = 14 + len(label) * 7
     return f'''<svg xmlns="http://www.w3.org/2000/svg" width="{left + width}" height="20" role="img" aria-label="{label}: {message}">
 <title>Last successful main run: {label}, {message}</title>

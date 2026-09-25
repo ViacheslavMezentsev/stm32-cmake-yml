@@ -1,9 +1,9 @@
 # stm32-cmake-yml
 
-[![Configure](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/actions/workflows/configure.yml/badge.svg?branch=main)](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/actions/workflows/configure.yml?query=branch%3Amain)
-[![Firmware](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/actions/workflows/firmware.yml/badge.svg?branch=main)](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/actions/workflows/firmware.yml?query=branch%3Amain)
-[![Docs](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/actions/workflows/documentation.yml/badge.svg?branch=main)](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/actions/workflows/documentation.yml?query=branch%3Amain)
-[![Simulator builds and checks](https://raw.githubusercontent.com/ViacheslavMezentsev/stm32-cmake-yml/ci-badges/firmware.svg)](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/ci-badges/firmware.json)
+[![Configure](https://img.shields.io/github/actions/workflow/status/ViacheslavMezentsev/stm32-cmake-yml/configure.yml?branch=main&label=Configure&style=flat-square)](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/actions/workflows/configure.yml?query=branch%3Amain)
+[![Firmware](https://img.shields.io/github/actions/workflow/status/ViacheslavMezentsev/stm32-cmake-yml/firmware.yml?branch=main&label=Firmware&style=flat-square)](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/actions/workflows/firmware.yml?query=branch%3Amain)
+[![Docs](https://img.shields.io/github/actions/workflow/status/ViacheslavMezentsev/stm32-cmake-yml/documentation.yml?branch=main&label=Docs&style=flat-square)](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/actions/workflows/documentation.yml?query=branch%3Amain)
+[![Builds (Checks)](https://raw.githubusercontent.com/ViacheslavMezentsev/stm32-cmake-yml/ci-badges/firmware.svg)](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/ci-badges/firmware.json)
 
 [Русский](README.md) · **English** · [Documentation](docs/en/index.md) · [Getting started](docs/en/getting-started.md)
 
@@ -12,6 +12,10 @@
 configures the MCU, sources, drivers, libraries, flags and output artifacts.
 The main backend uses [stm32-cmake](https://github.com/ObKo/stm32-cmake).
 A separate Arduino Core STM32 backend uses CMake wrappers supplied by your project.
+
+`Builds (Checks)` shows built configurations and QEMU/Renode execution checks from
+the last successful Firmware CI run on main. [Reading the counter](docs/en/status.md) ·
+[Test scope and procedure](docs/en/firmware-testing.md).
 
 ## Why use it?
 
