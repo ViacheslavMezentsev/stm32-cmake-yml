@@ -16,7 +16,7 @@ The MCU build target is STM32F103C8T6 (64 KiB FLASH, 20 KiB RAM). netduino2 mode
 STM32F205/Cortex-M3; this test does not validate F1 peripheral behavior. The
 supplied SystemInit does not configure PLL in this configuration. Its software
 SystemCoreClock value is 16 MHz; no clock frequency or HAL tick accuracy is asserted.
-CRC is disabled. Metadata and initial-memory probes are checked; CRC remains later work.
+CRC is enabled with a test-local linker script; metadata, initial memory and loaded FLASH CRC are checked.
 
 Адаптировано из примера автора; исходный проект не изменялся. Хеши входных файлов
 сохранены до адаптации. system_stm32f1xx.c, stm32f1xx_hal_conf.h и version.h
@@ -28,7 +28,7 @@ printf через semihosting, HAL_Init, версии и CPUID; бесконеч
 Собирается STM32F103C8T6, запускается на netduino2 (F205/Cortex-M3). Периферия F1
 не проверяется. PLL в выбранном пути SystemInit не настраивается; программное
 SystemCoreClock равно 16 МГц, точность частоты и HAL tick не проверяется. CRC
-отключён; проверяются метаданные и начальное состояние памяти. Подробный контракт запуска: [RU](../../../docs/ru/firmware-testing.md) /
+включён с тестовым скриптом линкера; проверяются метаданные, начальное состояние памяти и CRC загруженной FLASH. Подробный контракт запуска: [RU](../../../docs/ru/firmware-testing.md) /
 [EN](../../../docs/en/firmware-testing.md).
 
 Matrix compatibility: C11 for CMake 3.19; C++17 retained.

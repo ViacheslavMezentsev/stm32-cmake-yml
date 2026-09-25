@@ -81,9 +81,11 @@ def main():
             report = json.loads((directory / filename).read_text(encoding='utf-8'))
             if args.phase == 'build':
                 verify_build(report, gcc, cmake)
-            elif report['status'] != 'passed' or sorted(c['profile'] for c in report['cases']) != ['failure', 'hang', 'success'] or not all(c['passed'] for c in report['cases']):
+            elif report['status'] != 'passed' or sorted(c['profile'] for c in report['cases']) != ['crc-corrupt', 'failure', 'hang', 'success'] or not all(c['passed'] for c in report['cases']):
                 raise ValueError('Missing or failed QEMU profiles')
             item.update(status='passed', profiles=3)
+            if args.phase == 'run':
+                item['executions'] = len(report['cases'])
         except (OSError, ValueError, KeyError, subprocess.SubprocessError) as error:
             item['error'] = str(error)
         summary['pairs'].append(item)

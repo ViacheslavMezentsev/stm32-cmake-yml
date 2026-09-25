@@ -26,6 +26,8 @@ def verdict(profile, code, timed_out, output, gcc):
         return False
     if profile == 'hang':
         return timed_out and not ({'TEST_RESULT=PASS', 'TEST_RESULT=FAIL'} & lines)
+    if profile == 'crc-corrupt':
+        return not timed_out and code == 3 and 'TEST_RESULT=FAIL' in lines and 'TEST_RESULT=PASS' not in lines
     marker = 'TEST_RESULT=PASS' if profile == 'success' else 'TEST_RESULT=FAIL'
     opposite = 'TEST_RESULT=FAIL' if profile == 'success' else 'TEST_RESULT=PASS'
     return not timed_out and code == (0 if profile == 'success' else 1) and marker in lines and opposite not in lines
@@ -48,7 +50,9 @@ def main():
         if not qemu:
             raise ValueError(f'QEMU not found: {args.qemu}')
         report['qemu'] = subprocess.check_output([qemu, '--version'], text=True, timeout=30).strip()
-        for case in manifest['cases']:
+        if manifest['crc_negative']['profile'] != 'crc-corrupt':
+            raise ValueError('Missing CRC negative image')
+        for case in manifest['cases'] + [manifest['crc_negative']]:
             profile = case['profile']
             elf = (build / case['elf']).resolve()
             if not elf.is_relative_to(build) or not elf.is_file():

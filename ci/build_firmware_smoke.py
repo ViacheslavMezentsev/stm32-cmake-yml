@@ -6,6 +6,7 @@ import re
 import struct
 import subprocess
 import tempfile
+from firmware_crc import inspect_crc
 
 
 def inspect_elf(path, vector):
@@ -85,11 +86,18 @@ def main():
                 if not match or int(match[2], 16) != 4:
                     raise ValueError(f'Missing four-byte {section} symbol: smoke_{kind}_probe')
                 metadata[kind.upper() + '_ADDRESS'] = f'{int(match[1], 16):08X}'
+            crc_metadata, corrupted, negative = inspect_crc(elf)
+            metadata.update(crc_metadata)
+            if profile == 'success':
+                damaged = build / 'crc-corrupt.elf'
+                damaged.write_bytes(corrupted)
+                report['crc_negative'] = {'profile': 'crc-corrupt', 'elf': str(damaged.relative_to(output)),
+                                          'metadata': dict(metadata, **negative)}
             report['cases'].append({'profile': profile, 'elf': str(elf.relative_to(output)),
                                     'structure': structure, 'metadata': metadata})
             print(f'PASS build/ELF: {profile}', flush=True)
         report['status'] = 'passed'
-    except (OSError, ValueError, struct.error, subprocess.SubprocessError) as error:
+    except (OSError, ValueError, KeyError, struct.error, subprocess.SubprocessError) as error:
         report['error'] = str(error)
     manifest.write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8')
     print(json.dumps(report, indent=2))

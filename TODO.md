@@ -90,9 +90,10 @@ PR больше не требуются; старые ссылки остают�
   [Контракт и ограничения](docs/ru/firmware-testing.md).
 - [x] `codex/firmware-toolchain-matrix` слита в main (`5548735`): 18 сборок и
   18 запусков QEMU, три профиля на шести парах инструментов.
-- [ ] Текущая ветка `codex/firmware-metadata`: метаданные, .data/.bss и C++-конструктор;
+- [x] `codex/firmware-metadata` слита в main (`833aed7`): метаданные, .data/.bss и C++-конструктор;
   тот же набор из 18 сборок/запусков.
-- [ ] Далее CRC и Renode по согласованному плану. Новые сценарии
+- [ ] Текущая ветка `codex/firmware-crc`: CRC FLASH и повреждённый образ; 18 сборок / 24 запуска.
+- [ ] Далее Renode по согласованному плану. Новые сценарии
   выбирать с автором.
 - [ ] По индексу выбрать следующие пробелы покрытия: отсутствующие/пустые значения,
   приоритеты и ошибки входных данных. Каждый новый контракт — отдельный сценарий.
@@ -202,9 +203,10 @@ keep defect details in errata.
   [Contract and limitations](docs/en/firmware-testing.md).
 - [x] `codex/firmware-toolchain-matrix` merged into main (`5548735`): 18 builds
   and 18 QEMU runs, three profiles across six tool pairs.
-- [ ] Current branch `codex/firmware-metadata`: metadata, .data/.bss and C++ constructor;
+- [x] `codex/firmware-metadata` merged into main (`833aed7`): metadata, .data/.bss and C++ constructor;
   the same 18 builds/runs.
-- [ ] Next: CRC and Renode following the agreed plan. Select new
+- [ ] Current branch `codex/firmware-crc`: FLASH CRC and corrupted image; 18 builds / 24 runs.
+- [ ] Next: Renode following the agreed plan. Select new
   scenarios with the author.
 - [ ] Use the index to prioritize coverage gaps: missing/empty values, precedence
   and invalid input. Give each new contract a dedicated scenario.
