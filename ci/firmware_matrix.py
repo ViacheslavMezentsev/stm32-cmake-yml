@@ -7,6 +7,7 @@ import os
 from pathlib import Path
 import subprocess
 import sys
+import time
 
 
 def pairs(lock):
@@ -40,6 +41,10 @@ def main():
     parser.add_argument('--qemu', default='qemu-system-arm')
     parser.add_argument('--emulator', choices=('qemu', 'renode'), default='qemu')
     parser.add_argument('--renode', default='renode')
+    parser.add_argument('--renode-mode', choices=('batch', 'process'), default='batch',
+                        help='batch: one Renode process per GCC/CMake pair; process: one per firmware (diagnostics)')
+    parser.add_argument('--renode-shuffle', type=int, metavar='SEED',
+                        help='Seeded random firmware order inside each Renode batch')
     args = parser.parse_args()
     if args.phase == 'run' and args.build is None:
         parser.error('--build is required for run')
@@ -51,6 +56,8 @@ def main():
     args.output.mkdir(parents=True, exist_ok=True)
     output = args.output.resolve()
     summary = {'status': 'failed', 'phase': args.phase, 'expected_pairs': len(combinations), 'emulator': args.emulator if args.phase == 'run' else None, 'pairs': []}
+    if args.phase == 'run' and args.emulator == 'renode':
+        summary.update(renode_mode=args.renode_mode, renode_shuffle=args.renode_shuffle)
     destination = output / 'matrix-summary.json'
     destination.write_text(json.dumps(summary) + '\n')
     if args.phase == 'run':
@@ -75,8 +82,14 @@ def main():
                 verify_build(json.loads((build / 'build-summary.json').read_text(encoding='utf-8')), gcc, cmake)
                 command = [sys.executable, str(root / f'ci/run_{args.emulator}_smoke.py'), '--build', str(build),
                            '--output', str(directory), '--' + args.emulator, getattr(args, args.emulator)]
+                if args.emulator == 'renode':
+                    command += ['--mode', args.renode_mode]
+                    if args.renode_shuffle is not None:
+                        command += ['--shuffle', str(args.renode_shuffle)]
+            started = time.monotonic()
             with (directory / 'matrix-driver.log').open('w', encoding='utf-8') as log:
                 result = subprocess.run(command, env=env, stdout=log, stderr=subprocess.STDOUT, timeout=1200)
+            item['duration_seconds'] = round(time.monotonic() - started, 3)
             item['returncode'] = result.returncode
             if result.returncode:
                 raise ValueError(f'{args.phase} returned {result.returncode}; see matrix-driver.log')

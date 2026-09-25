@@ -3,10 +3,13 @@ from firmware_cases import BUILD_PROFILES
 import argparse
 import json
 import os
+import random
+import re
 from pathlib import Path
 import shutil
 import subprocess
 import tempfile
+import threading
 import time
 from run_qemu_smoke import metadata_matches, verdict
 
@@ -41,17 +44,200 @@ def process_completed(log, profile):
             and not any(marker in log for marker in ('There was an error', '[ERROR]')))
 
 
+CASE_TIMEOUT = 30  # host seconds without progress for one case (both modes)
+CASE_END = 'RENODE_CASE_END='
+CASE_MARKER = re.compile(CASE_END + r'\d+')
+# Markers go through Renode's logger ('log' command), not 'echo', so they stay
+# ordered with emulation messages. Log entries are whole lines, but direct console
+# output ('echo', "Renode is quitting") can be split by one, e.g.
+# "R<entry>\nenode is ...": embedded entries are moved to their own lines first.
+LOG_ENTRY = re.compile(r'\d{2}:\d{2}:\d{2}\.\d+ \[(?:NOISY|DEBUG|INFO|WARNING|ERROR)\] ')
+LOGGED_MARKER = re.compile(r'^\d{2}:\d{2}:\d{2}\.\d+ \[INFO\] Script: (RENODE_RUN_COMPLETED|RENODE_CASE_END=\d+)$')
+
+
+def split_line(line):
+    """Split direct console text from an embedded log entry; unwrap logged markers."""
+    match = LOG_ENTRY.search(line)
+    parts = [line[:match.start()], line[match.start():]] if match and match.start() else [line]
+    return [marker.group(1) if (marker := LOGGED_MARKER.match(part)) else part for part in parts]
+
+
+def split_log(text):
+    return '\n'.join(part for line in text.splitlines() for part in split_line(line)) + '\n'
+
+
+def prepare_case(root, build, output, case):
+    """Validate one case and return its directory and Renode commands.
+
+    The commands start with Clear, so every case gets a new machine: CPU, NVIC,
+    SysTick, memories and the exit hook are recreated even inside one process.
+    """
+    profile = case['profile']
+    directory = Path(tempfile.mkdtemp(prefix=profile + '-', dir=output))
+    directory.chmod(0o755)
+    elf = (build / case['elf']).resolve()
+    if not elf.is_relative_to(build) or not elf.is_file():
+        raise ValueError('Invalid ELF path')
+    trap = case['exit_trap']
+    if not isinstance(trap, int) or trap % 2 or not 0x08000000 <= trap < 0x08010000:
+        raise ValueError('Invalid exit trap address')
+    hook = root / 'tests/firmware/renode/exit_hook.py'
+    # Python repr quotes paths inside the Renode triple-quoted hook body.
+    hook_code = f'result_path = {(directory / "guest-exit.json").as_posix()!r}\nexecfile({hook.as_posix()!r})'
+    commands = [
+        'Clear',
+        'mach create "f103-smoke"',
+        f'machine LoadPlatformDescription {resc_path(root / "tests/firmware/renode/f103-smoke.repl")}',
+        f'sysbus.cpu.uart CreateFileBackend {resc_path(directory / "firmware.log")}',
+        f'sysbus LoadELF {resc_path(elf)}',
+        f'sysbus.cpu AddHook 0x{trap:X} """{hook_code}"""',
+        'emulation RunFor "0.1"',
+        'log "RENODE_RUN_COMPLETED"',
+    ]
+    return directory, commands
+
+
+def case_result(case, directory, code, log, host_timeout, duration, command, gcc):
+    """Classify one case from its own Renode log segment and output files."""
+    profile = case['profile']
+    (directory / 'process.log').write_text(log, encoding='utf-8')
+    output = (directory / 'firmware.log').read_text(encoding='utf-8') if (directory / 'firmware.log').exists() else ''
+    guest_path = directory / 'guest-exit.json'
+    guest = json.loads(guest_path.read_text()) if guest_path.exists() else None
+    completed = process_completed(log, profile)
+    passed = classify(profile, code, host_timeout, completed, guest, output, case['metadata'], gcc)
+    return {'profile': profile, 'passed': passed, 'returncode': code,
+            'host_timeout': host_timeout, 'virtual_budget_seconds': 0.1,
+            'duration_seconds': duration,
+            'guest_exit': guest, 'completed': completed,
+            'metadata_ok': metadata_matches(output, case['metadata']),
+            'warnings': [line for line in log.splitlines() if '[WARNING]' in line],
+            'expected_metadata': case['metadata'], 'command': command}
+
+
+# Renode fills the remaining defaults. Synchronous logging keeps every entry:
+# asynchronous entries still queued at Clear or quit can be dropped, losing a
+# marker or, worse, an [ERROR] line. Collapsing would hide repeated warnings.
+RENODE_CONFIG = '[general]\nuse-synchronous-logging = True\ncollapse-repeated-log-entries = False\n'
+
+
+def renode_command(renode, config, script):
+    config.write_text(RENODE_CONFIG, encoding='utf-8')
+    return [renode, '--disable-gui', '--console', '--plain', '--config', str(config), '--execute', 'include ' + resc_path(script)]
+
+
+def run_process_mode(renode, root, build, output, cases, gcc):
+    """Diagnostic mode: one fresh Renode process per case."""
+    results = []
+    for case in cases:
+        directory, commands = prepare_case(root, build, output, case)
+        script = directory / 'run.resc'
+        script.write_text('\n'.join(commands + ['quit']) + '\n', encoding='utf-8')
+        command = renode_command(renode, directory / 'renode.config', script)
+        started = time.monotonic()
+        host_timeout = False
+        try:
+            process = subprocess.run(command, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
+                                     stderr=subprocess.STDOUT, timeout=CASE_TIMEOUT)
+            code, raw = process.returncode, process.stdout
+        except subprocess.TimeoutExpired as error:
+            host_timeout, code, raw = True, None, error.stdout or b''
+        log = split_log(raw.decode('utf-8', errors='replace'))
+        results.append(case_result(case, directory, code, log, host_timeout,
+                                   round(time.monotonic() - started, 3), command, gcc))
+    return results
+
+
+def run_batch_mode(renode, root, build, output, cases, gcc):
+    """Run every case in one Renode process; Clear recreates the machine per case.
+
+    Output is split by per-case end markers. A case that does not reach its
+    marker within CASE_TIMEOUT host seconds stops the process; it and all later
+    cases fail as host timeouts, and a non-zero exit fails every case.
+    """
+    prepared = [prepare_case(root, build, output, case) for case in cases]
+    lines = []
+    for index, (_, commands) in enumerate(prepared):
+        lines += commands + [f'log "{CASE_END}{index}"']
+    script = output / 'batch.resc'
+    script.write_text('\n'.join(lines + ['quit']) + '\n', encoding='utf-8')
+    command = renode_command(renode, output / 'renode.config', script)
+    segments, ends, current, raw_lines = [], [], [], []
+    progress = threading.Event()
+    started = time.monotonic()
+    # Closed stdin: after a script error Renode exits instead of waiting at the prompt.
+    process = subprocess.Popen(command, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+
+    def reader():
+        try:
+            for raw in process.stdout:
+                raw_lines.append(raw)
+                for line in split_line(raw.decode('utf-8', errors='replace').rstrip('\r\n')):
+                    index = int(line[len(CASE_END):]) if CASE_MARKER.fullmatch(line) else -1
+                    if index >= len(segments):
+                        # A skipped marker leaves empty segments: only those cases fail.
+                        while len(segments) < index:
+                            segments.append('')
+                            ends.append(None)
+                        segments.append('\n'.join(current) + '\n')
+                        ends.append(time.monotonic())
+                        current.clear()
+                        progress.set()
+                    else:
+                        current.append(line)
+        finally:
+            progress.set()  # EOF: wake the watchdog immediately
+
+    thread = threading.Thread(target=reader, daemon=True)
+    thread.start()
+    host_timeout = False
+    while thread.is_alive():
+        if not progress.wait(CASE_TIMEOUT) and thread.is_alive():
+            host_timeout = True
+            process.kill()
+            break
+        progress.clear()
+    thread.join(10)
+    try:
+        code = None if host_timeout else process.wait(CASE_TIMEOUT)
+    except subprocess.TimeoutExpired:
+        process.kill()
+        code = None
+    (output / 'process.log').write_bytes(b''.join(raw_lines))
+    results = []
+    previous = started
+    for index, (case, (directory, _)) in enumerate(zip(cases, prepared)):
+        if index < len(segments) and ends[index] is None:
+            log, duration, timed_out = '', None, False
+        elif index < len(segments):
+            log, duration, timed_out = segments[index], round(ends[index] - previous, 3), False
+            previous = ends[index]
+        else:
+            # Unfinished output belongs to the first case without an end marker.
+            log = '\n'.join(current) + '\n' if index == len(segments) else ''
+            duration, timed_out = None, host_timeout
+        results.append(case_result(case, directory, code, log, timed_out, duration, command, gcc))
+    return results
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--build', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--renode', default=os.environ.get('RENODE_BINARY', 'renode'))
+    parser.add_argument('--mode', choices=('batch', 'process'), default='batch',
+                        help='batch: one Renode process, Clear between cases; process: one process per case')
+    parser.add_argument('--shuffle', type=int, metavar='SEED',
+                        help='Run cases in a seeded random order to check order independence')
     args = parser.parse_args()
     args.output.mkdir(parents=True, exist_ok=True)
-    report = {'status': 'failed', 'model': 'f103-smoke', 'exit_adapter': 'SYS_EXIT_EXTENDED hook', 'cases': []}
+    report = {'status': 'failed', 'model': 'f103-smoke', 'exit_adapter': 'SYS_EXIT_EXTENDED hook',
+              'mode': args.mode, 'shuffle_seed': args.shuffle, 'cases': []}
     root = Path(__file__).resolve().parent.parent
+    started = time.monotonic()
     try:
         build = args.build.resolve()
+        output = args.output.resolve()
         manifest = json.loads((build / 'build-summary.json').read_text(encoding='utf-8'))
         if manifest['status'] != 'passed' or sorted(c['profile'] for c in manifest['cases']) != sorted(BUILD_PROFILES):
             raise ValueError('Expected complete successful build')
@@ -63,55 +249,18 @@ def main():
         if not renode or not Path(renode).is_file():
             raise ValueError('Renode executable not found')
         report['renode'] = subprocess.check_output([renode, '--version'], text=True, timeout=30).strip()
-        for case in manifest['cases'] + [manifest['crc_negative']]:
-            profile = case['profile']
-            directory = Path(tempfile.mkdtemp(prefix=profile + '-', dir=args.output.resolve()))
-            directory.chmod(0o755)
-            elf = (build / case['elf']).resolve()
-            if not elf.is_relative_to(build) or not elf.is_file():
-                raise ValueError('Invalid ELF path')
-            trap = case['exit_trap']
-            if not isinstance(trap, int) or trap % 2 or not 0x08000000 <= trap < 0x08010000:
-                raise ValueError('Invalid exit trap address')
-            hook = root / 'tests/firmware/renode/exit_hook.py'
-            guest_path = directory / 'guest-exit.json'
-            # Python repr quotes paths inside the Renode triple-quoted hook body.
-            hook_code = f'result_path = {guest_path.as_posix()!r}\nexecfile({hook.as_posix()!r})'
-            script = directory / 'run.resc'
-            script.write_text(f'''mach create "f103-smoke"
-machine LoadPlatformDescription {resc_path(root / 'tests/firmware/renode/f103-smoke.repl')}
-sysbus.cpu.uart CreateFileBackend {resc_path(directory / 'firmware.log')}
-sysbus LoadELF {resc_path(elf)}
-sysbus.cpu AddHook 0x{trap:X} """{hook_code}"""
-emulation RunFor "0.1"
-echo "RENODE_RUN_COMPLETED"
-quit
-''', encoding='utf-8')
-            command = [renode, '--disable-gui', '--console', '--plain', '--config', str(directory / 'renode.config'), '--execute', 'include ' + resc_path(script)]
-            started = time.monotonic()
-            host_timeout = False
-            try:
-                process = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=30)
-                code, raw = process.returncode, process.stdout
-            except subprocess.TimeoutExpired as error:
-                host_timeout, code, raw = True, None, error.stdout or b''
-            log = raw.decode('utf-8', errors='replace')
-            (directory / 'process.log').write_text(log, encoding='utf-8')
-            output = (directory / 'firmware.log').read_text(encoding='utf-8') if (directory / 'firmware.log').exists() else ''
-            guest = json.loads(guest_path.read_text()) if guest_path.exists() else None
-            completed = process_completed(log, profile)
-            passed = classify(profile, code, host_timeout, completed, guest, output, case['metadata'], manifest['gcc'])
-            report['cases'].append({'profile': profile, 'passed': passed, 'returncode': code,
-                                    'host_timeout': host_timeout, 'virtual_budget_seconds': 0.1,
-                                    'duration_seconds': round(time.monotonic() - started, 3),
-                                    'guest_exit': guest, 'completed': completed,
-                                    'metadata_ok': metadata_matches(output, case['metadata']),
-                                    'warnings': [line for line in log.splitlines() if '[WARNING]' in line],
-                                    'expected_metadata': case['metadata'], 'command': command})
-            print(f'{"PASS" if passed else "FAIL"}: {profile}; guest={guest}; host={code}', flush=True)
-        report['status'] = 'passed' if all(c['passed'] for c in report['cases']) else 'failed'
+        cases = manifest['cases'] + [manifest['crc_negative']]
+        if args.shuffle is not None:
+            random.Random(args.shuffle).shuffle(cases)
+        run = run_batch_mode if args.mode == 'batch' else run_process_mode
+        report['cases'] = run(renode, root, build, output, cases, manifest['gcc'])
+        for case in report['cases']:
+            print(f'{"PASS" if case["passed"] else "FAIL"}: {case["profile"]}; guest={case["guest_exit"]}; '
+                  f'host={case["returncode"]}', flush=True)
+        report['status'] = 'passed' if report['cases'] and all(c['passed'] for c in report['cases']) else 'failed'
     except (OSError, ValueError, KeyError, subprocess.SubprocessError) as error:
         report['error'] = str(error)
+    report['duration_seconds'] = round(time.monotonic() - started, 3)
     (args.output / 'renode-summary.json').write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8')
     return 0 if report['status'] == 'passed' else 1
 

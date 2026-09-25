@@ -156,15 +156,39 @@ complete expected output, no guest exit and completion of the virtual budget.
 A host timeout always fails. Renode errors/warnings, incomplete scripts, wrong
 metadata and output-buffer overflow fail the check. The sole exception is the exact
 freertosTasks priority-probe warning documented below and retained in the report.
-Artifacts include run.resc,
-process.log, firmware.log, guest-exit.json (when reached) and renode-summary.json.
-No downloads, GUI or GDB are needed.
+Artifacts include process.log, firmware.log, guest-exit.json (when reached) and
+renode-summary.json. No downloads, GUI or GDB are needed.
+
+By default (`--mode batch`) all 13 ELFs of one GCC/CMake pair run in a single
+Renode process: 6 processes instead of 78. Before each case `Clear` removes the
+machine, which is then recreated and loads the ELF, so CPU, NVIC, SysTick,
+memory and the exit hook never carry over. Output is split by
+`RENODE_CASE_END=<n>` markers: every case keeps its own process.log,
+firmware.log, guest-exit.json, duration and verdict; the shared batch.resc and
+full process.log stay in the pair directory. The 30-second host deadline applies
+per case: without progress the process is stopped and this and later cases are
+host timeouts. A non-zero process exit fails every case in the batch.
+
+Markers are written with `log`, not `echo`, and Renode runs with
+`use-synchronous-logging = True` and `collapse-repeated-log-entries = False`.
+The asynchronous 1.16.1 logger dropped entries still queued at `Clear` (in about
+one batch in 20, "Machine paused" and the case markers vanished), and a log entry
+could split an `echo` line. A lost `[ERROR]` line would be a false pass, so
+synchronous logging is required in both modes. Direct console text glued to a log
+entry is separated before any check. Stdin is closed, so a script error makes
+Renode exit instead of waiting for input.
+
+`--mode process` keeps the former one-process-per-case scheme for diagnostics
+(with run.resc in each case directory). `--shuffle <seed>` sets a reproducible
+random order to check order independence; the seed is recorded in the report.
 
 ```powershell
 python ci/firmware_matrix.py run --emulator renode --build build/firmware-smoke --output build/firmware-renode
 ```
 
 For one pair: `python ci/run_renode_smoke.py --build <pair-directory> --output <logs>`.
+The matrix runner forwards mode and order via `--renode-mode batch|process` and
+`--renode-shuffle <seed>`.
 Use `--renode "C:/Program Files/Renode/renode.exe"` if needed; standard Windows
 installation paths are discovered automatically. In the container, use the same
 matrix runner and bind mounts as QEMU with `--emulator renode`. Rebuild old
@@ -339,7 +363,13 @@ This does not guarantee identical GitHub runner timing.
 Normal QEMU (15 s) and Renode process (30 s) deadlines are upper bounds: successful
 or expected-error exits complete immediately. Reducing these limits does not
 speed up a successful run. Renode hang still uses 0.1 seconds of virtual time;
-a host timeout always fails. Larger opportunities are image caching, reducing
-per-process Renode startup overhead, then bounded parallelism. These are future
-steps, not optimizations implemented here. Both runners now record per-case
+a host timeout always fails.
+
+Most Renode time was .NET process startup (about 4 s for each of 78 runs), not
+emulation. Batch mode removes it: measured locally on the same machine and ELFs
+(Renode 1.16.1, 2 vCPUs), the full matrix took **5:24 in process mode and 0:36
+in batch mode**; one pair took 50 s and 6 s. All 78 cases passed in both modes.
+60 consecutive batches in random order (`--shuffle 1..60`) passed without
+failures. GitHub runner timing is checked in the smoke job after push. Next
+opportunities are image caching, then bounded parallelism. Both runners record per-case
 duration_seconds; QEMU also records timeout_seconds. Durations do not affect verdicts.
