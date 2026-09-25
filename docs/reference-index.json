@@ -2,7 +2,7 @@
   "schema_version": 1,
   "framework_version": "0.9.2",
   "baseline_commit": "f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0",
-  "test_commit": "79f4d2f037b40124097aa4b29283fdf1ec3459ac",
+  "test_commit": "95f1fe3dc493b28627da900be64bc0aa3957555b",
   "fixes": [
     {
       "commit": "858013a7f31a674a91149ea3a68a5200498d92cc",
@@ -872,7 +872,13 @@
         "ru": "docs/ru/reference/0.9.2/arduino.md#arduino-libraries",
         "en": "docs/en/reference/0.9.2/arduino.md#arduino-libraries"
       },
-      "tests": [],
+      "tests": [
+        "configure.arduino-library-linked",
+        "configure.arduino-library-unlinked",
+        "configure.arduino-library-missing",
+        "configure.arduino-library-no-wrapper",
+        "configure.arduino-library-reconfigure"
+      ],
       "errata": []
     },
     {
