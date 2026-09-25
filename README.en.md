@@ -16,6 +16,7 @@ A separate Arduino Core STM32 backend uses CMake wrappers supplied by your proje
 `Builds (Checks)` shows built configurations and QEMU/Renode execution checks from
 the last successful Firmware CI run on main. [Reading the counter](docs/en/status.md) ·
 [Test scope and procedure](docs/en/firmware-testing.md).
+Markdown-only changes run the fast Docs check without rebuilding firmware.
 
 ## Why use it?
 
