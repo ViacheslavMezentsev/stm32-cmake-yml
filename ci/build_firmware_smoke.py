@@ -1,0 +1,84 @@
+"""Build the three semihosting fixtures inside the compiler image (one tool pair)."""
+import argparse
+import json
+from pathlib import Path
+import struct
+import subprocess
+import tempfile
+
+
+def inspect_elf(path, vector):
+    data = path.read_bytes()
+    if data[:7] != b'\x7fELF\x01\x01\x01' or struct.unpack_from('<HH', data, 16) != (2, 40):
+        raise ValueError('Expected a little-endian ELF32 ARM image')
+    entry = struct.unpack_from('<I', data, 24)[0]
+    sp, reset = struct.unpack_from('<II', vector.read_bytes())
+    if not (0x20000000 < sp <= 0x20005000 and sp % 8 == 0):
+        raise ValueError(f'Invalid initial stack pointer: {sp:#x}')
+    if not (reset & 1 and 0x08000000 <= (reset & ~1) < 0x08010000 and entry == reset):
+        raise ValueError(f'Invalid reset vector/entry: {reset:#x}/{entry:#x}')
+    # Physical load addresses include the FLASH copy of initialized RAM data.
+    offset = struct.unpack_from('<I', data, 28)[0]
+    size, count = struct.unpack_from('<HH', data, 42)
+    loads = []
+    for index in range(count):
+        kind, _, vaddr, paddr, filesz, memsz, _, _ = struct.unpack_from('<8I', data, offset + index * size)
+        if kind != 1:
+            continue
+        if filesz and not (0x08000000 <= paddr < paddr + filesz <= 0x08010000):
+            raise ValueError(f'Load image outside 64 KiB FLASH: {paddr:#x}/{filesz}')
+        if memsz and not any(low <= vaddr < vaddr + memsz <= high for low, high in
+                            ((0x08000000, 0x08010000), (0x20000000, 0x20005000))):
+            raise ValueError(f'Segment outside F103C8 memory: {vaddr:#x}/{memsz}')
+        loads.append({'vaddr': vaddr, 'paddr': paddr, 'filesz': filesz, 'memsz': memsz})
+    if not any(segment['vaddr'] <= (entry & ~1) < segment['vaddr'] + segment['filesz'] for segment in loads):
+        raise ValueError('Entry point is not backed by a loadable segment')
+    return {'entry': entry, 'initial_sp': sp, 'reset_vector': reset, 'segments': loads}
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--output', type=Path, required=True)
+    args = parser.parse_args()
+    root = Path(__file__).resolve().parent.parent
+    args.output.mkdir(parents=True, exist_ok=True)
+    output = args.output.resolve()
+    report = {'status': 'failed', 'cases': []}
+    manifest = output / 'build-summary.json'
+    manifest.write_text(json.dumps(report))  # Never reuse a stale successful manifest.
+    try:
+        report['gcc'] = subprocess.check_output(['arm-none-eabi-gcc', '-dumpfullversion'], text=True, timeout=30).strip()
+        report['cmake'] = subprocess.check_output(['cmake', '--version'], text=True, timeout=30).splitlines()[0]
+        for profile in ('success', 'failure', 'hang'):
+            build = Path(tempfile.mkdtemp(prefix=profile + '-', dir=output))
+            build.chmod(0o755)  # Artifacts may be consumed by another container user.
+            commands = [
+                ['cmake', '-S', str(root / 'tests/firmware/semihosting'), '-B', str(build), '-G', 'Ninja',
+                 f'-DSTM32_YML_FRAMEWORK_DIR={root}', '-DCMAKE_TOOLCHAIN_FILE=/opt/modules/stm32-cmake/cmake/stm32_gcc.cmake',
+                 f'-DSTM32_YML_PROFILE={profile}', '-DCMAKE_BUILD_TYPE=Debug'],
+                ['cmake', '--build', str(build), '--parallel', '4'],
+            ]
+            for name, command in zip(('configure', 'build'), commands):
+                with (build / (name + '.log')).open('w') as log:
+                    subprocess.run(command, stdout=log, stderr=subprocess.STDOUT, check=True, timeout=180)
+            elf = build / 'semihosting_smoke.elf'
+            for extension in ('elf', 'bin', 'hex', 'map', 'lss'):
+                if not (build / ('semihosting_smoke.' + extension)).stat().st_size:
+                    raise ValueError(f'Empty {extension} artifact')
+            with (build / 'readelf.log').open('w') as log:
+                subprocess.run(['arm-none-eabi-readelf', '-h', '-l', '-S', '-A', str(elf)], stdout=log, stderr=subprocess.STDOUT, check=True, timeout=30)
+            vector = build / 'vectors.bin'
+            subprocess.run(['arm-none-eabi-objcopy', '--dump-section', f'.isr_vector={vector}', str(elf), str(build / 'inspection.elf')], check=True, timeout=30)
+            structure = inspect_elf(elf, vector)
+            report['cases'].append({'profile': profile, 'elf': str(elf.relative_to(output)), 'structure': structure})
+            print(f'PASS build/ELF: {profile}', flush=True)
+        report['status'] = 'passed'
+    except (OSError, ValueError, struct.error, subprocess.SubprocessError) as error:
+        report['error'] = str(error)
+    manifest.write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8')
+    print(json.dumps(report, indent=2))
+    return 0 if report['status'] == 'passed' else 1
+
+
+if __name__ == '__main__':
+    raise SystemExit(main())

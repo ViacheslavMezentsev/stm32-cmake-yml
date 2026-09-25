@@ -69,3 +69,5 @@ a memory-backed peripheral stub does not validate device behavior. Resolve ELF/B
 loading and FLASH gap differences before CRC. CI must not wait for GDB; isolate
 debug ports and processes. Semihosting and controlled exit on the pinned versions
 still need firmware-level validation.
+
+A separate [first build and QEMU test](firmware-testing.md) is now implemented.

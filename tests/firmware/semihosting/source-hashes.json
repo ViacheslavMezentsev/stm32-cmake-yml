@@ -1,0 +1,10 @@
+{
+  "source": "https://github.com/ViacheslavMezentsev/demo-stm32-cmake/tree/main/stm32f1xx/02-semihosting",
+  "note": "SHA-256 of local inputs before adaptation; remote main may differ.",
+  "files": {
+    "main.cpp": "6ec0cb98ccea01542fd52c9baf56ea3f1b457b6e053bcfbc4ca0b1d32860321f",
+    "system_stm32f1xx.c": "27573afe9bfb5f9e8cd008a630a75dc697f413ead75c39487d5893928ebad8c0",
+    "stm32f1xx_hal_conf.h": "996d024bc534d604a136617876c6ba656d7452c37402ce548f8721e2702a1796",
+    "version.h": "77a5ce62cdf1f786a366ac9264d199223a341d4687365f1ba22ae9bc78a1e361"
+  }
+}
