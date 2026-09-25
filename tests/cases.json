@@ -1830,5 +1830,101 @@
         }
       }
     ]
+  },
+  {
+    "name": "custom-library-relative",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=custom-libraries.yml"
+    ],
+    "library_inputs": {
+      "files": [
+        "prebuilt/libalpha.a"
+      ],
+      "names": []
+    }
+  },
+  {
+    "name": "custom-library-missing",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=custom-libraries.yml",
+      "-DSTM32_YML_PROFILE=missing"
+    ],
+    "library_inputs": {
+      "files": [
+        "prebuilt/libalpha.a"
+      ],
+      "names": []
+    },
+    "log_contains": [
+      "Пользовательская библиотека не найдена и будет проигнорирована:"
+    ]
+  },
+  {
+    "name": "custom-library-append",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=custom-libraries.yml",
+      "-DSTM32_YML_PROFILE=append"
+    ],
+    "library_inputs": {
+      "files": [
+        "prebuilt/libalpha.a",
+        "prebuilt/vendor sdk/libbeta.a"
+      ],
+      "names": []
+    }
+  },
+  {
+    "name": "custom-library-named",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=custom-libraries.yml",
+      "-DSTM32_YML_PROFILE=named"
+    ],
+    "library_inputs": {
+      "files": [
+        "prebuilt/libalpha.a"
+      ],
+      "names": [
+        "m"
+      ]
+    }
+  },
+  {
+    "name": "custom-library-reconfigure",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=custom-libraries.yml"
+    ],
+    "steps": [
+      {
+        "args": [
+          "-DSTM32_YML_PROFILE="
+        ],
+        "library_inputs": {
+          "files": [
+            "prebuilt/libalpha.a"
+          ],
+          "names": []
+        }
+      },
+      {
+        "args": [
+          "-DSTM32_YML_PROFILE=replace"
+        ],
+        "library_inputs": {
+          "files": [
+            "prebuilt/vendor sdk/libbeta.a"
+          ],
+          "names": []
+        }
+      },
+      {
+        "args": [
+          "-DSTM32_YML_PROFILE=empty"
+        ],
+        "library_inputs": {
+          "files": [],
+          "names": []
+        }
+      }
+    ]
   }
 ]
