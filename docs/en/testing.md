@@ -108,9 +108,9 @@ package or the resulting image bytes. Ubuntu snapshots are not required.
 
 ## Framework configuration tests
 
-[tests/cases.json](../../tests/cases.json) defines 94 scenarios, run with each of
-the three GCC and two CMake versions from the lockfile: **564 case executions**.
-Eleven scenarios perform three consecutive configurations in the same build tree.
+[tests/cases.json](../../tests/cases.json) defines 100 scenarios, run with each of
+the three GCC and two CMake versions from the lockfile: **600 case executions**.
+Twelve scenarios perform three consecutive configurations in the same build tree.
 
 | Area | Checks |
 | --- | --- |
@@ -307,3 +307,11 @@ Positive cases explicitly set CPPCHECK_EXECUTABLE to `/usr/bin/false`, a test co
 Nonempty cppcheck_args replace default arguments. Nonempty cppcheck_ignores replace default exclusions; `Vendor SDK`, containing a space, remains one CMake property argument. Empty lists restore defaults rather than removing all arguments/exclusions. Exact values are asserted for both languages. No firmware is compiled and no static analysis is executed.
 
 CMake 3.19 stores the command in `CMakeFiles/rules.ninja`, while 3.28 stores it in `build.ninja`; the check considers both files.
+
+### Post-build artifact selection
+
+Six `artifacts-*` cases check commands declared during Configure/Generate: omitted setting, `[bin, hex, map, lss]`, map only, an empty list, an unknown item alongside bin, and shared-cache profile transitions all formats → bin → empty. CRC is disabled so its intermediate BIN commands cannot be mistaken for artifact selection.
+
+Assertions cover objcopy binary/ihex, objdump -h -S and output filenames in Ninja POST_BUILD; map checks both LINK_OPTIONS and the generated linker flag. The primary ELF target and size-reporting command remain with an empty list. Unknown items add no conversion; supported bin still adds its command. Profile transitions must remove commands from the previous selection.
+
+Tests also assert that no ELF/BIN/HEX/MAP/LSS output has been created in the build directory: conversion and linking are never executed. These cases do not prove file-format, listing, memory-size or CRC correctness, and do not cover the Arduino backend.

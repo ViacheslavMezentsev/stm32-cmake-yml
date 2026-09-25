@@ -50,6 +50,25 @@ def verify(case, build, source):
         require(str(linker) in observed("LINK_OPTIONS"), "Generated linker script not linked")
 
     ninja = (build / "build.ninja").read_text(encoding="utf-8")
+    if "generated_artifacts" in case:
+        selected = set(case["generated_artifacts"])
+        target = observed("PROJECT_NAME")
+        post = "\n".join(line for line in ninja.splitlines()
+                         if line.strip().startswith("POST_BUILD = "))
+        for extension, command in (("bin", "arm-none-eabi-objcopy -O binary"),
+                                   ("hex", "arm-none-eabi-objcopy -O ihex"),
+                                   ("lss", "arm-none-eabi-objdump -h -S")):
+            require((command in post) == (extension in selected),
+                    f"Incorrect {extension} conversion command presence")
+            require((f"{target}.{extension}" in post) == (extension in selected),
+                    f"Incorrect {extension} command output presence")
+        require(f"{target}_always_display_size" in ninja and "arm-none-eabi-size" in ninja,
+                "Size reporting command missing")
+        require(f"{target}.elf" in ninja, "Primary ELF target missing")
+        for extension in ("elf", "bin", "hex", "map", "lss"):
+            require(not (build / f"{target}.{extension}").exists(),
+                    f"Unexpected built artifact: {target}.{extension}")
+
     if "cppcheck_rules" in case:
         rules = (build / "CMakeFiles/rules.ninja").read_text(encoding="utf-8")
         require(("--cppcheck=" in (rules + ninja)) == case["cppcheck_rules"],
