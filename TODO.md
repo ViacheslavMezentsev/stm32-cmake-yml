@@ -94,9 +94,9 @@ PR больше не требуются; старые ссылки остают�
   тот же набор из 18 сборок/запусков.
 - [x] `codex/firmware-crc` слита в main (`0ae6613`): CRC FLASH и повреждённый образ; 18 сборок / 24 запуска.
 - [x] `codex/readme-overview` слита в main (`0940142`): вводный README RU/EN, отдельные страницы статуса, навыки и дружественные проекты.
-- [ ] Текущая ветка `codex/firmware-count-badge`: бейдж подтверждённых сборок и QEMU-проверок.
-- [ ] Далее Renode по согласованному плану. Новые сценарии
-  выбирать с автором.
+- [x] `codex/firmware-count-badge` слита в main (`23a6d67`): бейдж подтверждённых сборок и QEMU-проверок.
+- [ ] Текущая ветка `codex/renode-firmware-smoke`: 18 сборок, 24 QEMU + 24 Renode; общий SYS_WRITE0 и адаптер выхода.
+- [ ] Далее группа 2: bare metal/CMSIS и linker-сценарии — [план](docs/ru/firmware-plan.md).
 - [ ] По индексу выбрать следующие пробелы покрытия: отсутствующие/пустые значения,
   приоритеты и ошибки входных данных. Каждый новый контракт — отдельный сценарий.
 - [ ] В отдельных ветках разобрать [E004 и E006](docs/ru/errata/index.md):
@@ -209,9 +209,9 @@ keep defect details in errata.
   the same 18 builds/runs.
 - [x] `codex/firmware-crc` merged into main (`0ae6613`): FLASH CRC and corrupted image; 18 builds / 24 runs.
 - [x] `codex/readme-overview` merged into main (`0940142`): introductory RU/EN READMEs, separate status pages, skills and related projects.
-- [ ] Current branch `codex/firmware-count-badge`: confirmed build and QEMU check badge.
-- [ ] Next: Renode following the agreed plan. Select new
-  scenarios with the author.
+- [x] `codex/firmware-count-badge` merged into main (`23a6d67`): confirmed build and QEMU check badge.
+- [ ] Current branch `codex/renode-firmware-smoke`: 18 builds, 24 QEMU + 24 Renode; shared SYS_WRITE0 and exit adapter.
+- [ ] Next group 2: bare metal/CMSIS and linker scenarios — [plan](docs/en/firmware-plan.md).
 - [ ] Use the index to prioritize coverage gaps: missing/empty values, precedence
   and invalid input. Give each new contract a dedicated scenario.
 - [ ] Address [E004 and E006](docs/en/errata/index.md) in separate branches:

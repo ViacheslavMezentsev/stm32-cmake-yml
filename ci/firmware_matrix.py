@@ -37,6 +37,8 @@ def main():
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--build', type=Path, help='Matrix build root, required for run')
     parser.add_argument('--qemu', default='qemu-system-arm')
+    parser.add_argument('--emulator', choices=('qemu', 'renode'), default='qemu')
+    parser.add_argument('--renode', default='renode')
     args = parser.parse_args()
     if args.phase == 'run' and args.build is None:
         parser.error('--build is required for run')
@@ -47,7 +49,7 @@ def main():
     combinations = pairs(lock)
     args.output.mkdir(parents=True, exist_ok=True)
     output = args.output.resolve()
-    summary = {'status': 'failed', 'phase': args.phase, 'expected_pairs': len(combinations), 'pairs': []}
+    summary = {'status': 'failed', 'phase': args.phase, 'expected_pairs': len(combinations), 'emulator': args.emulator if args.phase == 'run' else None, 'pairs': []}
     destination = output / 'matrix-summary.json'
     destination.write_text(json.dumps(summary) + '\n')
     if args.phase == 'run':
@@ -70,19 +72,19 @@ def main():
             else:
                 build = args.build.resolve() / name
                 verify_build(json.loads((build / 'build-summary.json').read_text(encoding='utf-8')), gcc, cmake)
-                command = [sys.executable, str(root / 'ci/run_qemu_smoke.py'), '--build', str(build),
-                           '--output', str(directory), '--qemu', args.qemu]
+                command = [sys.executable, str(root / f'ci/run_{args.emulator}_smoke.py'), '--build', str(build),
+                           '--output', str(directory), '--' + args.emulator, getattr(args, args.emulator)]
             with (directory / 'matrix-driver.log').open('w', encoding='utf-8') as log:
                 result = subprocess.run(command, env=env, stdout=log, stderr=subprocess.STDOUT, timeout=1200)
             item['returncode'] = result.returncode
             if result.returncode:
                 raise ValueError(f'{args.phase} returned {result.returncode}; see matrix-driver.log')
-            filename = 'build-summary.json' if args.phase == 'build' else 'qemu-summary.json'
+            filename = 'build-summary.json' if args.phase == 'build' else f'{args.emulator}-summary.json'
             report = json.loads((directory / filename).read_text(encoding='utf-8'))
             if args.phase == 'build':
                 verify_build(report, gcc, cmake)
             elif report['status'] != 'passed' or sorted(c['profile'] for c in report['cases']) != ['crc-corrupt', 'failure', 'hang', 'success'] or not all(c['passed'] for c in report['cases']):
-                raise ValueError('Missing or failed QEMU profiles')
+                raise ValueError(f'Missing or failed {args.emulator} profiles')
             item.update(status='passed', profiles=3)
             if args.phase == 'run':
                 item['executions'] = len(report['cases'])

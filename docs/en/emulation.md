@@ -50,7 +50,7 @@ may take several minutes. Official sources: [QEMU](https://download.qemu.org/),
 
 ## Next stages
 
-Steps 1–4 are implemented in the [firmware suite](firmware-testing.md): 18 builds and 24 QEMU runs. Next is Renode.
+Steps 1–4 are implemented in the [firmware suite](firmware-testing.md): 18 builds and 24 QEMU and 24 Renode runs. [Further groups](firmware-plan.md).
 
 1. Agree the first known-working example with the author; build ELF and inspect
    sections, vectors and stack. Then expand to three GCC and two CMake versions.
@@ -69,7 +69,7 @@ Each run needs isolated logs, a timeout and a mandatory final marker. Never hide
 errors/timeouts with `|| true`. Check model CPU, FPU and memory-map compatibility;
 a memory-backed peripheral stub does not validate device behavior. Resolve ELF/BIN
 loading and FLASH gap differences before CRC. CI must not wait for GDB; isolate
-debug ports and processes. Semihosting and controlled exit on the pinned versions
-still need firmware-level validation.
+debug ports and processes. SYS_WRITE0 is verified on the pinned versions; Renode SYS_EXIT_EXTENDED
+uses an explicit test adapter.
 
 A separate [first build and QEMU test](firmware-testing.md) is now implemented.

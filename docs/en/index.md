@@ -31,3 +31,5 @@ errata are bilingual; the existing scenario manual remains at its original URL.
 [Documentation maintenance](maintenance.md) · [Machine-readable index](../reference-index.json).
 
 [Firmware build and execution tests](firmware-testing.md).
+
+[Firmware test groups](firmware-plan.md).

@@ -24,15 +24,15 @@ working firmware. [Coverage and commands](testing.md).
 
 ## Building and execution
 
-A separate matrix contains **18 builds and 24 QEMU runs**: three profiles across
+A separate matrix contains **18 builds, 24 QEMU runs and 24 Renode runs**: three profiles across
 six tool pairs, plus one corrupted ELF copy per pair. It checks ELF layout,
 initial data, C++ construction, metadata, software CRC and controlled termination;
 negative cases distinguish guest failure from timeout.
 
 The firmware targets STM32F103C8T6 and runs on QEMU 11.0.0 `netduino2`
 (Cortex-M3/F205). This checks the selected startup path and image contents,
-not F1 peripheral emulation. Renode has environment checks so far; running these
-firmwares is the next stage. [Firmware contract](firmware-testing.md) ·
+not F1 peripheral emulation. Renode checks the same ELFs on the f103-smoke CPU/memory model
+with RCC/FLASH controller stubs and a semihosting exit adapter. [Firmware contract](firmware-testing.md) ·
 [QEMU/Renode environment](emulation.md).
 
 ## Documentation and further work
@@ -50,13 +50,13 @@ consumer projects to be restructured.
 
 ## Confirmed build badge
 
-The README QEMU badge reports built configurations and completed checks from the
+The README QEMU+Renode badge reports built configurations and completed checks from the
 last successful Firmware run on main. A full run currently gives
-18 builds / 24 checks. Expected failure, timeout and CRC rejection count as
-successful contract checks; this does not mean 24 normally exiting firmwares
-or 18 different MCUs. Renode is not included yet.
+18 builds / 48 checks. Expected failure, timeout and CRC rejection count as
+successful contract checks; this does not mean 48 normally exiting firmwares
+or 18 different MCUs. Builds are counted once; QEMU and Renode checks are added (24 + 24).
 
-Counts come from complete matching build/QEMU reports, checked for clean checkout
+Counts come from complete matching build/QEMU/Renode reports, checked for clean checkout
 SHA, matrix membership, results and metadata. Codex branches produce a preview
 artifact but do not update the public badge. After main succeeds, a separate job
 with contents: write publishes SVG and JSON to the dedicated ci-badges branch.

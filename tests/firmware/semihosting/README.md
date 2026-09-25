@@ -8,9 +8,9 @@ ST copyright/license notices in copied files are retained.
 Inputs with unchanged logic (whitespace normalized): system_stm32f1xx.c, stm32f1xx_hal_conf.h, version.h. The test
 CMakeLists accepts external framework/toolchain paths. YAML is reduced to the
 same essential settings, explicitly selects framework 0.9.2 and CubeF1 1.8.7,
-and adds success/failure/hang profiles. main.cpp retains semihosting printf,
+and adds success/failure/hang profiles. main.cpp retains formatted semihosting output,
 HAL_Init, version and CPUID output. Its endless HAL_Delay loop is replaced with
-flushed protocol markers and SYS_EXIT_EXTENDED, or an intentional hang.
+immediate SYS_WRITE0 protocol markers and SYS_EXIT_EXTENDED, or an intentional hang.
 
 The MCU build target is STM32F103C8T6 (64 KiB FLASH, 20 KiB RAM). netduino2 models
 STM32F205/Cortex-M3; this test does not validate F1 peripheral behavior. The
@@ -22,7 +22,7 @@ CRC is enabled with a test-local linker script; metadata, initial memory and loa
 сохранены до адаптации. system_stm32f1xx.c, stm32f1xx_hal_conf.h и version.h
 скопированы без изменения логики; нормализованы пробелы и окончания строк.
 CMake получает пути извне, YAML закрепляет версии и три профиля. main.cpp сохраняет
-printf через semihosting, HAL_Init, версии и CPUID; бесконечный цикл заменён
+форматированный вывод через SYS_WRITE0, HAL_Init, версии и CPUID; бесконечный цикл заменён
 маркерами и управляемым выходом либо намеренным зависанием.
 
 Собирается STM32F103C8T6, запускается на netduino2 (F205/Cortex-M3). Периферия F1
@@ -42,3 +42,6 @@ provenance, not a digest of the full source tree.
 Поля метаданных получаются из build_metadata.h и макросов библиотек. Версии и
 значения переменных закреплены в expected-metadata.json; адреса nm сравниваются
 с выводом прошивки. Git revision/dirty не заменяют хеш всего дерева исходников.
+
+The same ELF runs on QEMU and Renode; the Renode exit hook is a test adapter, not peripheral emulation.
+Один ELF запускается в QEMU и Renode; hook выхода Renode — адаптер теста, не эмуляция периферии.
