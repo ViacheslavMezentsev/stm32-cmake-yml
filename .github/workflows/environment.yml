@@ -2,7 +2,7 @@ name: CI environment
 
 on:
   push:
-    branches: [main, 'codex/**']
+    branches: [main, 'codex/**', 'claude/**']
     paths:
       - ci/**
       - .github/workflows/environment.yml

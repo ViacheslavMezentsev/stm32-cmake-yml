@@ -94,7 +94,7 @@ terminal. Interactive debugging and VS Code launch configurations come later.
 ## Updates and CI
 
 The environment workflow builds the image and verifies it without network access.
-The separate `Configure tests` workflow runs on pushes to `main` and `codex/**`, and manual dispatch. It builds the image once and tests all six tool pairs
+The separate `Configure tests` workflow runs on pushes to `main`, `codex/**` and `claude/**`, and manual dispatch. It builds the image once and tests all six tool pairs
 in one job, continuing after a failing pair. Neither workflow publishes images
 or builds firmware. Keeping this check unconditional also makes it suitable as
 a check on every branch push rather than only selected file changes.
@@ -237,7 +237,7 @@ compile_commands.json. A missing file warns; a directory without CMakeLists fail
 Configure. [Guide and coverage limits](simple-sources.md).
 
 Since 2026-09-24, checks run without PRs on pushes to working branches
-`codex/**` and main. [Merge workflow](maintenance.md).
+`codex/**`, `claude/**` and main. [Merge workflow](maintenance.md).
 
 ### Library modules
 

@@ -102,8 +102,9 @@ PR больше не требуются; старые ссылки остают�
 - [x] `codex/firmware-arduino-string` слита в main (`5743602`): собственный main, реальный String из Core 2.12.0, 60 сборок / 132 проверки.
 - [x] `codex/firmware-freertos-queue` слита в main (`4109bc8`): очереди и Heap::4 без планировщика; 66 сборок / 144 проверки.
 - [x] `codex/firmware-freertos-tasks` слита в main (`f16eb09`): starter, обмен двух задач, SysTick без HAL; 72 сборки / 156 проверок, единый цвет бейджев.
-- [ ] Текущая ветка `codex/badge-status-and-timings`: единые Shields-бейджи, PASS/FAIL, цвет #238636; QEMU hang 2 с и измерение длительностей.
-- [ ] Ускорить подготовку CI через кэш образов; затем оценить пакетные запуски/ограниченное распараллеливание Renode.
+- [x] `codex/badge-status-and-timings` слита в main (`7246a2c`): единые Shields-бейджи, PASS/FAIL, цвет #238636; QEMU hang 2 с и измерение длительностей.
+- [ ] Текущая ветка `claude/renode-batch`: один процесс Renode на пару GCC/CMake, `Clear` между сценариями, синхронный лог; локально 5:24 → 0:36. Ожидает CI.
+- [ ] Ускорить подготовку CI через кэш образов; затем оценить ограниченное распараллеливание.
 - [ ] Далее согласовать полный Arduino runtime и расширение ядер/ABI; группа 3 — [план](docs/ru/firmware-plan.md).
 - [ ] По индексу выбрать следующие пробелы покрытия: отсутствующие/пустые значения,
   приоритеты и ошибки входных данных. Каждый новый контракт — отдельный сценарий.
@@ -225,8 +226,9 @@ keep defect details in errata.
 - [x] `codex/firmware-arduino-string` merged into main (`5743602`): own main, real String from Core 2.12.0, 60 builds / 132 checks.
 - [x] `codex/firmware-freertos-queue` merged into main (`4109bc8`): queues and Heap::4 before scheduler startup; 66 builds / 144 checks.
 - [x] `codex/firmware-freertos-tasks` merged into main (`f16eb09`): starter, two-task exchange, SysTick without HAL; 72 builds / 156 checks, shared badge color.
-- [ ] Current branch `codex/badge-status-and-timings`: shared Shields rendering, PASS/FAIL, #238636; QEMU hang 2 s and per-case timings.
-- [ ] Cache CI images, then evaluate batched runs/bounded Renode parallelism.
+- [x] `codex/badge-status-and-timings` merged into main (`7246a2c`): shared Shields rendering, PASS/FAIL, #238636; QEMU hang 2 s and per-case timings.
+- [ ] Current branch `claude/renode-batch`: one Renode process per GCC/CMake pair, `Clear` between cases, synchronous logging; locally 5:24 → 0:36. Awaiting CI.
+- [ ] Cache CI images, then evaluate bounded parallelism.
 - [ ] Next agree full Arduino runtime and core/ABI coverage; group 3 — [plan](docs/en/firmware-plan.md).
 - [ ] Use the index to prioritize coverage gaps: missing/empty values, precedence
   and invalid input. Give each new contract a dedicated scenario.

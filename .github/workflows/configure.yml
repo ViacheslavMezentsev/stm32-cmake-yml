@@ -2,7 +2,7 @@ name: Configure
 
 on:
   push:
-    branches: [main, 'codex/**']
+    branches: [main, 'codex/**', 'claude/**']
     paths-ignore:
       - '**/*.md'
   workflow_dispatch:

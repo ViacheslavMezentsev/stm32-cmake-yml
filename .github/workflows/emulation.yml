@@ -2,7 +2,7 @@ name: Emulation environment
 
 on:
   push:
-    branches: [main, 'codex/**']
+    branches: [main, 'codex/**', 'claude/**']
     paths:
       - ci/emulation/**
       - .github/workflows/emulation.yml
