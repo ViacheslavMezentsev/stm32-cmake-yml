@@ -1,6 +1,6 @@
 # stm32-cmake-yml documentation
 
-[README](../../README.md) → Documentation · [Русский](../ru/index.md)
+[README](../../README.en.md) → Documentation · [Русский](../ru/index.md)
 
 | Task | Destination |
 | --- | --- |
@@ -16,6 +16,7 @@
 | Understand precedence and cache | [Semantics](reference/0.9.2/semantics.md) |
 | Find a defect and workaround | [Errata](errata/index.md) |
 | Check QEMU and Renode | [Emulation environment](emulation.md) |
+| Understand test coverage and limits | [Project status](status.md) |
 | Run checks | [Testing](testing.md) |
 | Compare versions | [Changelog](../../CHANGELOG.md) |
 | Find planned work and status | [RU/EN roadmap](../../TODO.md) |

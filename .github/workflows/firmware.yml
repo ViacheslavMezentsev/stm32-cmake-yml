@@ -1,4 +1,4 @@
-name: Firmware semihosting smoke
+name: Firmware
 
 on:
   push:
