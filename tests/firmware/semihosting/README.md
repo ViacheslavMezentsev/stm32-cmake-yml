@@ -30,3 +30,6 @@ printf через semihosting, HAL_Init, версии и CPUID; бесконеч
 SystemCoreClock равно 16 МГц, точность частоты и HAL tick не проверяется. CRC
 отключён. Подробный контракт запуска: [RU](../../../docs/ru/firmware-testing.md) /
 [EN](../../../docs/en/firmware-testing.md).
+
+Matrix compatibility: C11 for CMake 3.19; C++17 retained.
+Совместимость матрицы: C11 для CMake 3.19; C++17 сохранён.

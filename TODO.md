@@ -85,11 +85,13 @@ PR больше не требуются; старые ссылки остают�
 - [x] `codex/emulation-environment` слита в main (`3f1c589`): локальная проверка программ,
   отдельный образ QEMU 11.0.0 / Renode 1.16.1 и CI без запуска прошивок.
   [Порядок дальнейших этапов и ограничения](docs/ru/emulation.md).
-- [ ] Ветка `codex/firmware-semihosting-smoke`: выбранный автором F1 02-semihosting,
+- [x] `codex/firmware-semihosting-smoke` слита в main (`c25f7b1`): F1 02-semihosting,
   три профиля сборки и запуска netduino2; GCC 14.2 / CMake 3.28.
   [Контракт и ограничения](docs/ru/firmware-testing.md).
-- [ ] После первого smoke-теста расширить матрицу сборки; затем метаданные, CRC
-  и Renode по согласованному плану. Новые сценарии выбирать с автором.
+- [ ] Текущая ветка `codex/firmware-toolchain-matrix`: 18 сборок и 18 запусков QEMU,
+  три профиля на шести парах инструментов.
+- [ ] Далее метаданные, CRC и Renode по согласованному плану. Новые сценарии
+  выбирать с автором.
 - [ ] По индексу выбрать следующие пробелы покрытия: отсутствующие/пустые значения,
   приоритеты и ошибки входных данных. Каждый новый контракт — отдельный сценарий.
 - [ ] В отдельных ветках разобрать [E004 и E006](docs/ru/errata/index.md):
@@ -193,11 +195,13 @@ keep defect details in errata.
 - [x] `codex/emulation-environment` merged into main (`3f1c589`): local executable checks,
   separate QEMU 11.0.0 / Renode 1.16.1 image and CI without firmware execution.
   [Next stages and limitations](docs/en/emulation.md).
-- [ ] Branch `codex/firmware-semihosting-smoke`: author-selected F1 02-semihosting,
+- [x] `codex/firmware-semihosting-smoke` merged into main (`c25f7b1`): F1 02-semihosting,
   three build/run profiles on netduino2; GCC 14.2 / CMake 3.28.
   [Contract and limitations](docs/en/firmware-testing.md).
-- [ ] After the first smoke test, expand the build matrix; then metadata, CRC
-  and Renode following the agreed plan. Select new scenarios with the author.
+- [ ] Current branch `codex/firmware-toolchain-matrix`: 18 builds and 18 QEMU runs,
+  three profiles across six tool pairs.
+- [ ] Next: metadata, CRC and Renode following the agreed plan. Select new
+  scenarios with the author.
 - [ ] Use the index to prioritize coverage gaps: missing/empty values, precedence
   and invalid input. Give each new contract a dedicated scenario.
 - [ ] Address [E004 and E006](docs/en/errata/index.md) in separate branches:

@@ -11,6 +11,8 @@ Shared rules: [semantics](semantics.md). Baseline: `f8ef5200fc7a4a96d6f3fe9111af
 
 C standard. Forwarded to CMake, e.g. 11 or 17; support depends on CMake and compiler versions. The framework does not set STANDARD_REQUIRED or EXTENSIONS, and does not promise default 17.
 
+C17 (`c_standard: 17`) requires CMake 3.21 or later. Use C11 for the CMake 3.19 baseline. [CMake C_STANDARD](https://cmake.org/cmake/help/latest/prop_tgt/C_STANDARD.html).
+
 **Omission and emptiness:** see [shared rules](semantics.md#empty-values); exceptions are stated above. Profiles/overrides apply before defaults. Backend/path restrictions are stated in the description.
 
 ```yaml

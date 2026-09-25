@@ -10,6 +10,7 @@ on:
       - ci/**
       - tests/firmware/**
       - tests/test_firmware_runner.py
+      - tests/test_firmware_matrix.py
       - .github/workflows/firmware.yml
   workflow_dispatch:
 
@@ -27,20 +28,19 @@ jobs:
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       - name: Check result classification
-        run: python3 -m unittest discover -s tests -p test_firmware_runner.py
+        run: python3 -m unittest discover -s tests -p "test_firmware*.py"
       - name: Build compiler and emulator images
         run: |
           mkdir -p build/firmware-smoke build/firmware-qemu
           set -o pipefail
           docker build --platform linux/amd64 --progress plain -f ci/docker/Dockerfile -t stm32-yml-ci:firmware . 2>&1 | tee build/firmware-compiler-image.log
           docker build --platform linux/amd64 --progress plain -t stm32-yml-emulation:firmware ci/emulation 2>&1 | tee build/firmware-emulator-image.log
-      - name: Build success, failure and timeout profiles and inspect ELF
+      - name: Build three profiles on every locked GCC/CMake pair
         run: |
           docker run --rm --network none --user "$(id -u):$(id -g)" -e HOME=/tmp \
-            -e GCC_VERSION=14.2.1-1.1 -e CMAKE_VERSION=3.28.3 \
             --mount "type=bind,source=$PWD,target=/workspace,readonly" \
             --mount "type=bind,source=$PWD/build/firmware-smoke,target=/results" \
-            stm32-yml-ci:firmware python3 /workspace/ci/build_firmware_smoke.py --output /results
+            stm32-yml-ci:firmware python3 /workspace/ci/firmware_matrix.py build --output /results
       - name: Check pinned emulators offline
         run: docker run --rm --network none stm32-yml-emulation:firmware
       - name: Run QEMU with explicit result and timeout checks
@@ -48,7 +48,7 @@ jobs:
           docker run --rm --network none --user "$(id -u):$(id -g)" -e HOME=/tmp \
             --mount "type=bind,source=$PWD,target=/workspace,readonly" \
             --mount "type=bind,source=$PWD/build/firmware-qemu,target=/results" \
-            stm32-yml-emulation:firmware python3 /workspace/ci/run_qemu_smoke.py \
+            stm32-yml-emulation:firmware python3 /workspace/ci/firmware_matrix.py run \
               --build /workspace/build/firmware-smoke --output /results
       - name: Upload build and execution diagnostics
         if: always()
