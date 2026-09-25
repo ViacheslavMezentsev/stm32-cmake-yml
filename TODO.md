@@ -78,8 +78,10 @@ PR больше не требуются; старые ссылки остают�
   100 сценариев / 600 запусков.
 - [x] `codex/configure-custom-libraries` слита в main (`16e54d9`):
   105 сценариев / 630 запусков; CI прошёл.
-- [ ] Текущая ветка `codex/configure-arduino-libraries`: пять проверок
-  поиска и подключения библиотек; 110 сценариев / 660 запусков.
+- [x] `codex/configure-arduino-libraries` слита в main (`09f5629`):
+  110 сценариев / 660 запусков.
+- [ ] Текущая ветка `codex/configure-arduino-custom-wrappers`: пять проверок
+  пользовательских обёрток; 115 сценариев / 690 запусков.
 - [ ] Следующий шаг согласовать по пробелам покрытия; к прошивкам переходить
   только после уточнений автора, как указано ниже.
 - [ ] По индексу выбрать следующие пробелы покрытия: отсутствующие/пустые значения,
@@ -178,8 +180,10 @@ keep defect details in errata.
   100 scenarios / 600 executions.
 - [x] `codex/configure-custom-libraries` merged into main (`16e54d9`):
   105 scenarios / 630 executions; CI passed.
-- [ ] Current branch `codex/configure-arduino-libraries`: five discovery/linkage
-  checks; 110 scenarios / 660 executions.
+- [x] `codex/configure-arduino-libraries` merged into main (`09f5629`):
+  110 scenarios / 660 executions.
+- [ ] Current branch `codex/configure-arduino-custom-wrappers`: five consumer
+  wrapper checks; 115 scenarios / 690 executions.
 - [ ] Agree the next coverage priority; defer firmware work until the author
   supplies scenario guidance as required below.
 - [ ] Use the index to prioritize coverage gaps: missing/empty values, precedence
