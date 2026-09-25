@@ -19,7 +19,7 @@ build_artifacts: [bin, hex, map, lss]
 
 [0.9.2 implementation](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_postbuild.cmake) · [Index](index.md)
 
-**Checks (partial coverage):** no automated check of this contract. [Test manifest](../../../../tests/cases.json).
+**Checks (partial coverage):** `configure.artifacts-defaults`, `configure.artifacts-all`, `configure.artifacts-map-only`, `configure.artifacts-empty`, `configure.artifacts-unknown`, `configure.artifacts-reconfigure`. [Test manifest](../../../../tests/cases.json).
 
 <a id="crc-enable"></a>
 ## `crc_enable`

@@ -2,7 +2,7 @@
   "schema_version": 1,
   "framework_version": "0.9.2",
   "baseline_commit": "f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0",
-  "test_commit": "bd3cc3a057a44f8ec31938c27c0058caff0036dc",
+  "test_commit": "53f54b229f5ea1ab0935d3a50f73db41e9e37ad2",
   "fixes": [
     {
       "commit": "858013a7f31a674a91149ea3a68a5200498d92cc",
@@ -895,7 +895,14 @@
         "ru": "docs/ru/reference/0.9.2/postbuild.md#build-artifacts",
         "en": "docs/en/reference/0.9.2/postbuild.md#build-artifacts"
       },
-      "tests": [],
+      "tests": [
+        "configure.artifacts-defaults",
+        "configure.artifacts-all",
+        "configure.artifacts-map-only",
+        "configure.artifacts-empty",
+        "configure.artifacts-unknown",
+        "configure.artifacts-reconfigure"
+      ],
       "errata": []
     },
     {
