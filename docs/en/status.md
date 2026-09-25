@@ -4,7 +4,7 @@
 
 The reference and regressions describe **version 0.9.2**. This page records the
 suite in this checkout and its scope. See [GitHub Actions](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/actions?query=branch%3Amain)
-for current `main` results. README badges show workflow status, not passed-test counts.
+for current `main` results. The three status badges show latest completed workflows; Builds (Checks) shows the verified firmware matrix size.
 
 ## Configuration
 
@@ -70,4 +70,6 @@ must allow GITHUB_TOKEN writes to ci-badges. Runs for an older main are skipped.
 
 [E008](errata/E008.md) records profile-only language settings; firmware tests verify the root-key workaround and reproduce the limitation.
 
-Badges share muted background #6b9278. The [Shields color parameter](https://shields.io/badges/git-hub-actions-workflow-status) fixes the background regardless of result; read passing/failing text and the linked workflow for CI state. The counter still reports the last successful main run.
+All four README badges use [Shields endpoints](https://shields.io/badges/endpoint-badge), sharing font, 20 px height and padding. Green PASS and the counter use #238636, matching the GitHub Code button in the supplied image. Errors show red FAIL; cancellation is CANCEL, skipping is SKIP and missing results are N/A.
+
+Status badges show the latest **completed** run of each workflow on main. A lightweight Badges workflow refreshes JSON after Configure/Firmware/Docs completes; follow the badge link to inspect a currently running job. counts.json contains only the verified count from the last successful Firmware run. Status run URLs and SHAs are saved in workflow-status-report.json. Both publishers share the ci-badges concurrency group and preserve each other's files. No extra PAT is needed.

@@ -7,6 +7,7 @@ from pathlib import Path
 import shutil
 import subprocess
 import tempfile
+import time
 from run_qemu_smoke import metadata_matches, verdict
 
 
@@ -87,6 +88,7 @@ echo "RENODE_RUN_COMPLETED"
 quit
 ''', encoding='utf-8')
             command = [renode, '--disable-gui', '--console', '--plain', '--config', str(directory / 'renode.config'), '--execute', 'include ' + resc_path(script)]
+            started = time.monotonic()
             host_timeout = False
             try:
                 process = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=30)
@@ -101,6 +103,7 @@ quit
             passed = classify(profile, code, host_timeout, completed, guest, output, case['metadata'], manifest['gcc'])
             report['cases'].append({'profile': profile, 'passed': passed, 'returncode': code,
                                     'host_timeout': host_timeout, 'virtual_budget_seconds': 0.1,
+                                    'duration_seconds': round(time.monotonic() - started, 3),
                                     'guest_exit': guest, 'completed': completed,
                                     'metadata_ok': metadata_matches(output, case['metadata']),
                                     'warnings': [line for line in log.splitlines() if '[WARNING]' in line],
