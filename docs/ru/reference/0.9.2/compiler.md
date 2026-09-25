@@ -11,6 +11,8 @@
 
 Стандарт C. Значение передаётся CMake, например 11 или 17; поддержку определяют версия CMake и компилятор. Фреймворк не задаёт STANDARD_REQUIRED или EXTENSIONS и не обещает стандарт 17 по умолчанию.
 
+C17 (`c_standard: 17`) требует CMake 3.21 или новее. Для базовой версии CMake 3.19 используйте C11. [CMake C_STANDARD](https://cmake.org/cmake/help/latest/prop_tgt/C_STANDARD.html).
+
 **Пропуск и пустота:** см. [общие правила](semantics.md#empty-values); исключения указаны выше. Профиль/override применяется до выбора defaults. Ограничения backend и путей указаны в описании.
 
 ```yaml

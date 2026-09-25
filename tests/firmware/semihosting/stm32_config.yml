@@ -10,7 +10,7 @@ use_hal: true
 hal_components: [CORTEX]
 cubefw_package: V1.8.7
 languages: [C, CXX, ASM]
-c_standard: 17
+c_standard: 11
 cpp_standard: 17
 compile_options: [Os, g3]
 linker_directives: [--print-memory-usage, --no-warn-rwx-segments]

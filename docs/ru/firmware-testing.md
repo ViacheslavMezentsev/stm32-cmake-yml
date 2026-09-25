@@ -3,8 +3,9 @@
 [Документация](index.md) · [English](../en/firmware-testing.md) · [Окружение](emulation.md)
 
 Первый тест адаптирует [пример автора 02-semihosting для F1](../../tests/firmware/semihosting/README.md).
-Он отделён от 115 configure-сценариев: **три сборки и три запуска QEMU**, одна пара
-инструментов (xPack GCC 14.2.1-1.1 / CMake 3.28.3), CubeF1 1.8.7, QEMU 11.0.0.
+Он отделён от 115 configure-сценариев: **18 сборок и 18 запусков QEMU**:
+три профиля × три версии xPack GCC × два CMake из
+[lock-файла](../../ci/dependencies.lock.json), CubeF1 1.8.7, QEMU 11.0.0.
 Локально проверен также Windows QEMU 11.1.0; CI использует закреплённый образ.
 
 ## Контракт
@@ -37,24 +38,40 @@ stdio сбрасывается перед выходом. Версия GCC ср�
 
 ```sh
 mkdir -p build/firmware-smoke build/firmware-qemu
-docker run --rm --network none -e GCC_VERSION=14.2.1-1.1 -e CMAKE_VERSION=3.28.3 \
+docker run --rm --network none \
   -v "$PWD:/workspace:ro" -v "$PWD/build/firmware-smoke:/results" \
-  stm32-yml-ci:local python3 /workspace/ci/build_firmware_smoke.py --output /results
+  stm32-yml-ci:local python3 /workspace/ci/firmware_matrix.py build --output /results
 docker run --rm --network none -v "$PWD:/workspace:ro" -v "$PWD/build/firmware-qemu:/results" \
-  stm32-yml-emulation:local python3 /workspace/ci/run_qemu_smoke.py \
+  stm32-yml-emulation:local python3 /workspace/ci/firmware_matrix.py run \
   --build /workspace/build/firmware-smoke --output /results
 ```
 
 Готовые ELF можно запустить локальным QEMU в Windows:
 
 ```powershell
-python ci/run_qemu_smoke.py --build build/firmware-smoke --output build/firmware-qemu-windows
-python -m unittest discover -s tests -p test_firmware_runner.py
+python ci/firmware_matrix.py run --build build/firmware-smoke --output build/firmware-qemu-windows
+python -m unittest discover -s tests -p "test_firmware*.py"
 ```
 
 `--qemu` задаёт путь к программе. Сборки используют новые каталоги, манифест
 сбрасывается в начале; неудачная сборка не подхватит старый успешный манифест.
 [Workflow](../../.github/workflows/firmware.yml) собирает оба образа и сохраняет
-артефакты/логи на 14 дней. Матрица компиляторов, runtime-проверки .data/.bss, CRC
+артефакты/логи на 14 дней. Runtime-проверки .data/.bss, CRC
 и запуск Renode остаются следующими этапами. Запуск на netduino2 с F205 не
 подтверждает поддержку периферии или модели тактирования F1.
+
+## Изоляция матрицы и совместимость
+
+Матрица читается из общего lock-файла зависимостей, без дублирования версий в YAML.
+Образы собираются один раз; пары инструментов запускаются последовательно с
+отдельными каталогами сборки/логов. Для каждой пары проверяются фактические версии
+GCC/CMake и все три профиля. Ошибка не останавливает сбор результатов остальных
+пар, но любая неудачная пара даёт ненулевой результат матрицы. Выбор запусков
+определяется текущим lock-файлом, а не случайно оставшимися манифестами. Сводный
+отчёт — matrix-summary.json, отчёты пары — build-summary.json и qemu-summary.json.
+
+Тестовый пример использует C11 и C++17. CMake 3.19 отвергает C_STANDARD=17 даже
+при поддержке C17 компилятором: это значение появилось в CMake 3.21. C-файлам
+примера C17 не требуется. Изменена совместимость тестового примера, а не фреймворк.
+Для одной пары сохранены build_firmware_smoke.py/run_qemu_smoke.py; использовать
+отдельный каталог результатов.
