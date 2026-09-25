@@ -99,8 +99,9 @@ PR больше не требуются; старые ссылки остают�
 - [x] `codex/firmware-build-modes` слита в main (`ba9bde7`): bare metal/CMSIS без HAL, `.ld`/`.ld.in`; 42 сборки и 96 проверок QEMU+Renode.
 - [x] `codex/firmware-libraries` слита в main (`a53f809`): C/C++ и ETL, 54 сборки / 120 проверок; E008 без исправления.
 - [x] `codex/badges-docs-ci` слита в main (`a3015d9`): прямоугольные бейджи без иконок, `Builds (Checks)`, пропуск тяжёлого CI для MD-only push.
-- [ ] Текущая ветка `codex/firmware-arduino-string`: собственный main, реальный String из Core 2.12.0, 60 сборок / 132 проверки.
-- [ ] Далее согласовать отдельные сценарии Arduino/RTOS; группа 3 — [план](docs/ru/firmware-plan.md).
+- [x] `codex/firmware-arduino-string` слита в main (`5743602`): собственный main, реальный String из Core 2.12.0, 60 сборок / 132 проверки.
+- [ ] Текущая ветка `codex/firmware-freertos-queue`: очереди и Heap::4 без планировщика; 66 сборок / 144 проверки.
+- [ ] Далее согласовать запуск планировщика RTOS и полный Arduino runtime; группа 3 — [план](docs/ru/firmware-plan.md).
 - [ ] По индексу выбрать следующие пробелы покрытия: отсутствующие/пустые значения,
   приоритеты и ошибки входных данных. Каждый новый контракт — отдельный сценарий.
 - [ ] В отдельных ветках разобрать [E004 и E006](docs/ru/errata/index.md):
@@ -218,8 +219,9 @@ keep defect details in errata.
 - [x] `codex/firmware-build-modes` merged into main (`ba9bde7`): bare metal/CMSIS without HAL, `.ld`/`.ld.in`; 42 builds and 96 QEMU+Renode checks.
 - [x] `codex/firmware-libraries` merged into main (`a53f809`): C/C++ and ETL, 54 builds / 120 checks; E008 without a fix.
 - [x] `codex/badges-docs-ci` merged into main (`a3015d9`): rectangular badges without icons, `Builds (Checks)`, skip heavy CI for MD-only pushes.
-- [ ] Current branch `codex/firmware-arduino-string`: own main, real String from Core 2.12.0, 60 builds / 132 checks.
-- [ ] Next agree separate Arduino/RTOS scenarios; group 3 — [plan](docs/en/firmware-plan.md).
+- [x] `codex/firmware-arduino-string` merged into main (`5743602`): own main, real String from Core 2.12.0, 60 builds / 132 checks.
+- [ ] Current branch `codex/firmware-freertos-queue`: queues and Heap::4 before scheduler startup; 66 builds / 144 checks.
+- [ ] Next agree RTOS scheduler startup and full Arduino runtime; group 3 — [plan](docs/en/firmware-plan.md).
 - [ ] Use the index to prioritize coverage gaps: missing/empty values, precedence
   and invalid input. Give each new contract a dedicated scenario.
 - [ ] Address [E004 and E006](docs/en/errata/index.md) in separate branches:
