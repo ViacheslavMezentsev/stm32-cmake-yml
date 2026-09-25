@@ -2,11 +2,11 @@
   "builds": 54,
   "checks": 120,
   "emulator": "QEMU+Renode",
-  "revision": "a53f809388f2737653cf08f4a716b7a14001cc8f",
+  "revision": "a3015d9b9815447c5fd9ed9ed7dd341614f1121f",
   "checks_by_emulator": {
     "QEMU": 60,
     "Renode": 60
   },
-  "run_url": "https://github.com/ViacheslavMezentsev/stm32-cmake-yml/actions/runs/36125286766",
-  "generated_at": "2026-09-25T10:53:36.260626+00:00"
+  "run_url": "https://github.com/ViacheslavMezentsev/stm32-cmake-yml/actions/runs/36126572568",
+  "generated_at": "2026-09-25T11:08:22.688162+00:00"
 }
