@@ -100,3 +100,11 @@ profiles:
     freertos_components: [ARM_CM3, Heap::4]
     sources: [system_stm32f1xx.c, main.cpp, freertos_queue.c]
     compile_definitions: [SMOKE_FREERTOS=1]
+  freertosTasks:
+    use_hal: false
+    use_freertos: true
+    freertos_version: cube
+    cmsis_rtos_api: none
+    freertos_components: [ARM_CM3, Heap::4]
+    sources: [system_stm32f1xx.c, main.cpp, freertos_tasks.c]
+    compile_definitions: [SMOKE_RTOS_TASKS=1]

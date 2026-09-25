@@ -46,7 +46,7 @@ def svg(result):
     left = 14 + len(label) * 7
     return f'''<svg xmlns="http://www.w3.org/2000/svg" width="{left + width}" height="20" role="img" aria-label="{label}: {message}">
 <title>Last successful main run: {label}, {message}</title>
-<rect width="{left}" height="20" fill="#555"/><rect x="{left}" width="{width}" height="20" fill="#22863a"/>
+<rect width="{left}" height="20" fill="#555"/><rect x="{left}" width="{width}" height="20" fill="#6b9278"/>
 <g fill="#fff" text-anchor="middle" font-family="Verdana,DejaVu Sans,sans-serif" font-size="11">
 <text x="{left / 2}" y="14">{label}</text><text x="{left + width / 2}" y="14">{message}</text></g></svg>
 '''

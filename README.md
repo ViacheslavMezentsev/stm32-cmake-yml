@@ -1,8 +1,8 @@
 # stm32-cmake-yml
 
-[![Configure](https://img.shields.io/github/actions/workflow/status/ViacheslavMezentsev/stm32-cmake-yml/configure.yml?branch=main&label=Configure&style=flat-square)](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/actions/workflows/configure.yml?query=branch%3Amain)
-[![Firmware](https://img.shields.io/github/actions/workflow/status/ViacheslavMezentsev/stm32-cmake-yml/firmware.yml?branch=main&label=Firmware&style=flat-square)](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/actions/workflows/firmware.yml?query=branch%3Amain)
-[![Docs](https://img.shields.io/github/actions/workflow/status/ViacheslavMezentsev/stm32-cmake-yml/documentation.yml?branch=main&label=Docs&style=flat-square)](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/actions/workflows/documentation.yml?query=branch%3Amain)
+[![Configure](https://img.shields.io/github/actions/workflow/status/ViacheslavMezentsev/stm32-cmake-yml/configure.yml?branch=main&label=Configure&style=flat-square&color=6b9278)](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/actions/workflows/configure.yml?query=branch%3Amain)
+[![Firmware](https://img.shields.io/github/actions/workflow/status/ViacheslavMezentsev/stm32-cmake-yml/firmware.yml?branch=main&label=Firmware&style=flat-square&color=6b9278)](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/actions/workflows/firmware.yml?query=branch%3Amain)
+[![Docs](https://img.shields.io/github/actions/workflow/status/ViacheslavMezentsev/stm32-cmake-yml/documentation.yml?branch=main&label=Docs&style=flat-square&color=6b9278)](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/actions/workflows/documentation.yml?query=branch%3Amain)
 [![Builds (Checks)](https://raw.githubusercontent.com/ViacheslavMezentsev/stm32-cmake-yml/ci-badges/firmware.svg)](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/ci-badges/firmware.json)
 
 **Русский** · [English](README.en.md) · [Документация](docs/ru/index.md) · [Начало работы](docs/ru/getting-started.md)

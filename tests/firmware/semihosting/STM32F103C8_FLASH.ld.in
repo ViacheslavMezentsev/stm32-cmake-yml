@@ -20,7 +20,8 @@ SECTIONS
     . = ALIGN(4);
     __checksum_start = .;
     KEEP(*(.isr_vector))
-    . = ALIGN(4);
+    /* Materialize padding before the 16-byte-aligned FreeRTOS port text. */
+    . = ALIGN(16);
   } >FLASH
 
   .text :
