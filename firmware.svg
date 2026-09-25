@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="252" height="20" role="img" aria-label="QEMU+Renode: 42 builds / 96 checks">
-<title>Last successful main run: QEMU+Renode, 42 builds / 96 checks</title>
-<rect width="91" height="20" fill="#555"/><rect x="91" width="161" height="20" fill="#22863a"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="259" height="20" role="img" aria-label="QEMU+Renode: 54 builds / 120 checks">
+<title>Last successful main run: QEMU+Renode, 54 builds / 120 checks</title>
+<rect width="91" height="20" fill="#555"/><rect x="91" width="168" height="20" fill="#22863a"/>
 <g fill="#fff" text-anchor="middle" font-family="Verdana,DejaVu Sans,sans-serif" font-size="11">
-<text x="45.5" y="14">QEMU+Renode</text><text x="171.5" y="14">42 builds / 96 checks</text></g></svg>
+<text x="45.5" y="14">QEMU+Renode</text><text x="175.0" y="14">54 builds / 120 checks</text></g></svg>
