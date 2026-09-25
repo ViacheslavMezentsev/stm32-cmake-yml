@@ -15,6 +15,7 @@
 | Look up an option | [Reference 0.9.2: alphabetical and topic indexes](reference/0.9.2/index.md) |
 | Understand precedence and cache | [Semantics](reference/0.9.2/semantics.md) |
 | Find a defect and workaround | [Errata](errata/index.md) |
+| Check QEMU and Renode | [Emulation environment](emulation.md) |
 | Run checks | [Testing](testing.md) |
 | Compare versions | [Changelog](../../CHANGELOG.md) |
 | Find planned work and status | [RU/EN roadmap](../../TODO.md) |
