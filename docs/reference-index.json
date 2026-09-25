@@ -2,7 +2,7 @@
   "schema_version": 1,
   "framework_version": "0.9.2",
   "baseline_commit": "f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0",
-  "test_commit": "95f1fe3dc493b28627da900be64bc0aa3957555b",
+  "test_commit": "8e8da3fb46d4046545e6954f38c4c5e1ed255361",
   "fixes": [
     {
       "commit": "858013a7f31a674a91149ea3a68a5200498d92cc",
@@ -893,7 +893,12 @@
         "en": "docs/en/reference/0.9.2/arduino.md#arduino-custom-libraries"
       },
       "tests": [
-        "configure.arduino-profile"
+        "configure.arduino-profile",
+        "configure.arduino-custom-chain",
+        "configure.arduino-custom-unlinked",
+        "configure.arduino-custom-missing",
+        "configure.arduino-custom-no-wrapper",
+        "configure.arduino-custom-reconfigure"
       ],
       "errata": []
     },

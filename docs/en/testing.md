@@ -108,9 +108,9 @@ package or the resulting image bytes. Ubuntu snapshots are not required.
 
 ## Framework configuration tests
 
-[tests/cases.json](../../tests/cases.json) defines 110 scenarios, run with each of
-the three GCC and two CMake versions from the lockfile: **660 case executions**.
-Fourteen scenarios perform three consecutive configurations in the same build tree.
+[tests/cases.json](../../tests/cases.json) defines 115 scenarios, run with each of
+the three GCC and two CMake versions from the lockfile: **690 case executions**.
+Fifteen scenarios perform three consecutive configurations in the same build tree.
 
 | Area | Checks |
 | --- | --- |
@@ -327,3 +327,9 @@ The two `.a` files in [prebuilt](../../tests/fixtures/project/prebuilt/README.md
 Five `arduino-library-*` cases check a library with a CMake wrapper, explicit linkage versus adding a target alone, warnings for a missing directory or CMakeLists.txt, and profile transitions selected → empty → selected without linkage. Checks inspect LINK_LIBRARIES, compile commands, propagation of a public definition, and removal of the library source after clearing the list.
 
 The [synthetic core layout](../../tests/fixtures/project/arduino-library-core/README.md) uses test-owned library wrappers and the pinned core source through a symlink. It does not establish support for native Arduino library wrappers: for example, EEPROM and IWatchdog in pinned Core 2.12.0 require CMake 3.21. The framework minimum remains 3.19; dependencies may impose higher requirements. Consumer wrappers connected through `arduino.custom_libraries` are a separate path and can have different requirements. No firmware is built.
+
+### Consumer Arduino wrappers
+
+Five `arduino-custom-*` cases exercise `arduino.custom_libraries` with an empty `arduino.libraries` list. Two consumer OBJECT libraries form a public dependency chain through Arduino::Definitions and Arduino::Core. Both wrapper directories end in `driver`, so successful generation also checks distinct binary directories for different relative paths (not arbitrary path-sanitization collisions).
+
+Assertions cover owning targets, transitive definitions/includes, separate C/C++ flags, absence of automatic linkage, warnings for missing directories/CMakeLists.txt, and selected → empty → unlinked profile transitions. The wrappers are synthetic, inspired by a consumer pattern with Core/SrcWrapper/peripheral libraries; they do not implement or validate SPI, Wire or HAL. Compilation, object inclusion at link time and firmware execution remain outside this suite.
