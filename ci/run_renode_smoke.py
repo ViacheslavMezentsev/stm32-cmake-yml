@@ -30,6 +30,16 @@ def classify(profile, process_code, host_timeout, completed, guest, output, expe
     return verdict(profile, guest.get('status'), False, output, gcc)
 
 
+PRIORITY_PROBE_WARNING = 'nvic: Trying to set the priority for interrupt 16 to 0xFF, but it should be maskable with 0xF0'
+
+
+def process_completed(log, profile):
+    warnings = [line.partition('[WARNING] ')[2] for line in log.splitlines() if '[WARNING]' in line]
+    allowed = (not warnings or (profile == 'freertosTasks' and warnings == [PRIORITY_PROBE_WARNING]))
+    return (log.splitlines().count('RENODE_RUN_COMPLETED') == 1 and allowed
+            and not any(marker in log for marker in ('There was an error', '[ERROR]')))
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--build', type=Path, required=True)
@@ -87,13 +97,13 @@ quit
             (directory / 'process.log').write_text(log, encoding='utf-8')
             output = (directory / 'firmware.log').read_text(encoding='utf-8') if (directory / 'firmware.log').exists() else ''
             guest = json.loads(guest_path.read_text()) if guest_path.exists() else None
-            completed = (log.splitlines().count('RENODE_RUN_COMPLETED') == 1
-                         and not any(marker in log for marker in ('There was an error', '[ERROR]', '[WARNING]')))
+            completed = process_completed(log, profile)
             passed = classify(profile, code, host_timeout, completed, guest, output, case['metadata'], manifest['gcc'])
             report['cases'].append({'profile': profile, 'passed': passed, 'returncode': code,
                                     'host_timeout': host_timeout, 'virtual_budget_seconds': 0.1,
                                     'guest_exit': guest, 'completed': completed,
                                     'metadata_ok': metadata_matches(output, case['metadata']),
+                                    'warnings': [line for line in log.splitlines() if '[WARNING]' in line],
                                     'expected_metadata': case['metadata'], 'command': command})
             print(f'{"PASS" if passed else "FAIL"}: {profile}; guest={guest}; host={code}', flush=True)
         report['status'] = 'passed' if all(c['passed'] for c in report['cases']) else 'failed'

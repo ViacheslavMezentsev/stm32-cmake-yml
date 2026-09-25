@@ -24,14 +24,14 @@ working firmware. [Coverage and commands](testing.md).
 
 ## Building and execution
 
-A separate matrix contains **66 builds, 72 QEMU runs and 72 Renode runs**: eleven profiles across
+A separate matrix contains **72 builds, 78 QEMU runs and 78 Renode runs**: twelve profiles across
 six tool pairs, plus one corrupted ELF copy per pair. It checks ELF layout,
 initial data, C++ construction, metadata, software CRC and controlled termination;
 negative cases distinguish guest failure from timeout.
 
 The firmware targets STM32F103C8T6 and runs on QEMU 11.0.0 `netduino2`
 (Cortex-M3/F205). This checks the selected startup path and image contents,
-not F1 peripheral emulation. Renode checks the same ELFs on the f103-smoke CPU/memory model
+not F1 peripheral emulation. Renode checks the same ELFs on the f103-smoke CPU/NVIC/SysTick/memory model
 with RCC/FLASH controller stubs and a semihosting exit adapter. [Firmware contract](firmware-testing.md) ·
 [QEMU/Renode environment](emulation.md).
 
@@ -52,9 +52,9 @@ consumer projects to be restructured.
 
 The README `Builds (Checks)` badge reports built configurations and completed checks from the
 last successful Firmware run on main. A full run currently gives
-`Builds (Checks): 66 (144)`. Expected failure, timeout and CRC rejection count as
-successful contract checks; this does not mean 144 normally exiting firmwares
-or 66 different MCUs. Builds are counted once; QEMU and Renode checks are added (72 + 72).
+`Builds (Checks): 72 (156)`. Expected failure, timeout and CRC rejection count as
+successful contract checks; this does not mean 156 normally exiting firmwares
+or 72 different MCUs. Builds are counted once; QEMU and Renode checks are added (78 + 78).
 
 Counts come from complete matching build/QEMU/Renode reports, checked for clean checkout
 SHA, matrix membership, results and metadata. Codex branches produce a preview
@@ -69,3 +69,5 @@ unavailable until the first successful main run with this workflow. Branch rules
 must allow GITHUB_TOKEN writes to ci-badges. Runs for an older main are skipped.
 
 [E008](errata/E008.md) records profile-only language settings; firmware tests verify the root-key workaround and reproduce the limitation.
+
+Badges share muted background #6b9278. The [Shields color parameter](https://shields.io/badges/git-hub-actions-workflow-status) fixes the background regardless of result; read passing/failing text and the linked workflow for CI state. The counter still reports the last successful main run.

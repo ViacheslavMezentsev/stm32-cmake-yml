@@ -100,8 +100,9 @@ PR больше не требуются; старые ссылки остают�
 - [x] `codex/firmware-libraries` слита в main (`a53f809`): C/C++ и ETL, 54 сборки / 120 проверок; E008 без исправления.
 - [x] `codex/badges-docs-ci` слита в main (`a3015d9`): прямоугольные бейджи без иконок, `Builds (Checks)`, пропуск тяжёлого CI для MD-only push.
 - [x] `codex/firmware-arduino-string` слита в main (`5743602`): собственный main, реальный String из Core 2.12.0, 60 сборок / 132 проверки.
-- [ ] Текущая ветка `codex/firmware-freertos-queue`: очереди и Heap::4 без планировщика; 66 сборок / 144 проверки.
-- [ ] Далее согласовать запуск планировщика RTOS и полный Arduino runtime; группа 3 — [план](docs/ru/firmware-plan.md).
+- [x] `codex/firmware-freertos-queue` слита в main (`4109bc8`): очереди и Heap::4 без планировщика; 66 сборок / 144 проверки.
+- [ ] Текущая ветка `codex/firmware-freertos-tasks`: starter, обмен двух задач, SysTick без HAL; 72 сборки / 156 проверок, единый цвет бейджев.
+- [ ] Далее согласовать полный Arduino runtime и расширение ядер/ABI; группа 3 — [план](docs/ru/firmware-plan.md).
 - [ ] По индексу выбрать следующие пробелы покрытия: отсутствующие/пустые значения,
   приоритеты и ошибки входных данных. Каждый новый контракт — отдельный сценарий.
 - [ ] В отдельных ветках разобрать [E004 и E006](docs/ru/errata/index.md):
@@ -220,8 +221,9 @@ keep defect details in errata.
 - [x] `codex/firmware-libraries` merged into main (`a53f809`): C/C++ and ETL, 54 builds / 120 checks; E008 without a fix.
 - [x] `codex/badges-docs-ci` merged into main (`a3015d9`): rectangular badges without icons, `Builds (Checks)`, skip heavy CI for MD-only pushes.
 - [x] `codex/firmware-arduino-string` merged into main (`5743602`): own main, real String from Core 2.12.0, 60 builds / 132 checks.
-- [ ] Current branch `codex/firmware-freertos-queue`: queues and Heap::4 before scheduler startup; 66 builds / 144 checks.
-- [ ] Next agree RTOS scheduler startup and full Arduino runtime; group 3 — [plan](docs/en/firmware-plan.md).
+- [x] `codex/firmware-freertos-queue` merged into main (`4109bc8`): queues and Heap::4 before scheduler startup; 66 builds / 144 checks.
+- [ ] Current branch `codex/firmware-freertos-tasks`: starter, two-task exchange, SysTick without HAL; 72 builds / 156 checks, shared badge color.
+- [ ] Next agree full Arduino runtime and core/ABI coverage; group 3 — [plan](docs/en/firmware-plan.md).
 - [ ] Use the index to prioritize coverage gaps: missing/empty values, precedence
   and invalid input. Give each new contract a dedicated scenario.
 - [ ] Address [E004 and E006](docs/en/errata/index.md) in separate branches:

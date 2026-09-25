@@ -92,7 +92,7 @@ def main():
             metadata = dict(baseline, PROFILE=profile, CMAKE=report['cmake'].removeprefix('cmake version '),
                             GIT_REVISION=report['git_revision'], GIT_DIRTY=report['git_dirty'])
             bare = profile.startswith('bare') or is_arduino
-            cmsis_only = profile.startswith('cmsis') or profile == 'freertosQueue'
+            cmsis_only = profile.startswith('cmsis') or profile in ('freertosQueue', 'freertosTasks')
             if bare:
                 metadata.update(CMSIS_CORE='none', CMSIS_DEVICE='none')
             if bare or cmsis_only:
@@ -122,13 +122,24 @@ def main():
                 metadata.update(LIB_RESULT='123', C_LANGUAGE='11')
                 if profile == 'cmsisEtl':
                     metadata.update(ETL_RESULT='14', ETL_TEXT='etl:14', ETL_VERSION=etl['name'].removeprefix('ETL-'))
-            if profile == 'freertosQueue':
-                if not {'tasks.c', 'list.c', 'queue.c', 'port.c', 'heap_4.c', 'freertos_queue.c'} <= set(sources):
+            if profile in ('freertosQueue', 'freertosTasks'):
+                rtos_source = 'freertos_queue.c' if profile == 'freertosQueue' else 'freertos_tasks.c'
+                if not {'tasks.c', 'list.c', 'queue.c', 'port.c', 'heap_4.c', rtos_source} <= set(sources):
                     raise ValueError('Missing FreeRTOS kernel/port/heap sources')
                 if any('cmsis_os' in name for name in sources):
                     raise ValueError('Unexpected CMSIS-RTOS wrapper')
-                metadata.update(RTOS_VERSION='V10.3.1', RTOS_RESULT='46',
-                                RTOS_SCHEDULER='not-started', RTOS_HEAP='restored')
+                metadata['RTOS_VERSION'] = 'V10.3.1'
+                if profile == 'freertosQueue':
+                    metadata.update(RTOS_RESULT='46', RTOS_SCHEDULER='not-started', RTOS_HEAP='restored')
+                else:
+                    metadata.update(RTOS_REPLY='46', RTOS_SCHEDULER='running', RTOS_TICK='advanced',
+                                    RTOS_TASK_MESSAGE='hello from sender')
+                    # CMSIS vectors must select the real FreeRTOS exception handlers.
+                    vectors = vector.read_bytes()
+                    for slot, name in ((11, 'SVC_Handler'), (14, 'PendSV_Handler'), (15, 'SysTick_Handler')):
+                        match = re.search(rf'^([0-9a-fA-F]+)(?:\s+[0-9a-fA-F]+)?\s+T\s+{name}$', symbols, re.M)
+                        if not match or struct.unpack_from('<I', vectors, slot * 4)[0] != (int(match[1], 16) | 1):
+                            raise ValueError(f'Incorrect RTOS vector: {name}')
             if is_arduino:
                 metadata.update(ARDUINO_TEXT='arm32:123', ARDUINO_LENGTH='9')
                 if any('/opt/modules/stm32-cmake' in c['command'] for c in commands_db):

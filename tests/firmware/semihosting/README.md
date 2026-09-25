@@ -86,3 +86,13 @@ checks before scheduler startup. No HAL or CMSIS-RTOS wrapper. FreeRTOS owns a
 `freertosQueue`: FIFO и память FreeRTOS V10.3.1 из CubeF1, ARM_CM3, Heap::4 до
 запуска планировщика. Без HAL и CMSIS-RTOS. Куча FreeRTOS — отдельные 4096 байт BSS.
 Подробности — в контракте прошивочных тестов.
+
+`freertosTasks`: starter creates receiver/sender then deletes itself. Real
+SysTick/PendSV/SVC, two queues, delayed sender, reply 46 and semihosting from a
+task. No HAL; separate 8192-byte FreeRTOS heap. Vector padding is explicit so
+ELF and binary CRC inputs match even with 16-byte-aligned port code.
+
+`freertosTasks`: стартовая задача создаёт две тестовые и удаляет себя. Реальные
+SysTick/PendSV/SVC, две очереди, задержка отправителя, ответ 46 и semihosting из
+задачи. Без HAL; куча FreeRTOS 8192 байта. Padding после векторов задан явно для
+совпадения CRC ELF и BIN при выравнивании кода порта на 16 байт.

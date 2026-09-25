@@ -33,7 +33,7 @@ class VerdictTests(unittest.TestCase):
             self.assertFalse(verdict('success', code, timeout, output, '14.2.1'))
 
     def test_build_modes_require_success_and_unknown_profiles_fail(self):
-        for profile in ('bare', 'bareTemplate', 'cmsis', 'cmsisTemplate', 'cmsisLibrary', 'cmsisEtl', 'arduinoString', 'freertosQueue'):
+        for profile in ('bare', 'bareTemplate', 'cmsis', 'cmsisTemplate', 'cmsisLibrary', 'cmsisEtl', 'arduinoString', 'freertosQueue', 'freertosTasks'):
             with self.subTest(profile=profile):
                 self.assertTrue(verdict(profile, 0, False, HEADER + 'TEST_RESULT=PASS', '14.2.1'))
                 self.assertFalse(verdict(profile, 1, False, HEADER + 'TEST_RESULT=FAIL', '14.2.1'))
@@ -66,6 +66,16 @@ class VerdictTests(unittest.TestCase):
         for key, value in expected.items():
             self.assertFalse(metadata_matches(good.replace(f'{key}={value}', f'{key}=wrong'), expected))
         self.assertFalse(verdict('freertosQueue', 6, False, HEADER + 'TEST_RESULT=FAIL', '14.2.1'))
+
+    def test_task_exchange_requires_tick_and_task_output(self):
+        expected = {'RTOS_REPLY': '46', 'RTOS_SCHEDULER': 'running',
+                    'RTOS_TICK': 'advanced', 'RTOS_TASK_MESSAGE': 'hello from sender'}
+        good = ''.join(f'{key}={value}\n' for key, value in expected.items())
+        self.assertTrue(metadata_matches(good, expected))
+        for key, value in expected.items():
+            self.assertFalse(metadata_matches(good.replace(f'{key}={value}', ''), expected))
+        for code, timeout in ((6, False), (7, False), (None, True)):
+            self.assertFalse(verdict('freertosTasks', code, timeout, HEADER + 'TEST_RESULT=PASS', '14.2.1'))
 
     def test_guest_failure_is_not_an_arbitrary_crash(self):
         self.assertTrue(verdict('failure', 1, False, HEADER + 'TEST_RESULT=FAIL', '14.2.1'))

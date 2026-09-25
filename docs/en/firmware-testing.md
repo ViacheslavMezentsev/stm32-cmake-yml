@@ -3,8 +3,8 @@
 [Documentation](index.md) · [Русский](../ru/firmware-testing.md) · [Environment](emulation.md)
 
 The first firmware test adapts the author's F1 [02-semihosting example](../../tests/firmware/semihosting/README.md).
-It is separate from the 115 configure scenarios: **66 builds, 72 QEMU runs and 72 Renode runs**:
-eleven profiles plus one corrupted copy per tool pair; three xPack GCC versions × two CMake versions from the
+It is separate from the 115 configure scenarios: **72 builds, 78 QEMU runs and 78 Renode runs**:
+twelve profiles plus one corrupted copy per tool pair; three xPack GCC versions × two CMake versions from the
 [lockfile](../../ci/dependencies.lock.json), CubeF1 1.8.7, QEMU 11.0.0.
 The Windows QEMU 11.1.0 installation was also checked locally; CI uses the pinned image.
 
@@ -24,6 +24,7 @@ Readelf output is retained. These checks do not establish general linker correct
 | cmsis / cmsisTemplate | CMSIS startup, no HAL, TEST_RESULT=PASS, exit 0 |
 | cmsisLibrary / cmsisEtl | C/C++ library and optional ETL, TEST_RESULT=PASS, exit 0 |
 | arduinoString | Arduino String with own main/startup, TEST_RESULT=PASS, exit 0 |
+| freertosTasks | Starter task, queue exchange, SysTick and semihosting, exit 0 |
 | freertosQueue | FreeRTOS FIFO and Heap::4 before scheduler startup, TEST_RESULT=PASS, exit 0 |
 
 Normal runs have a 15-second timeout. A hang before metadata is printed, a crash,
@@ -68,7 +69,7 @@ is inferred from running this ELF on the F205-based netduino2.
 
 The matrix is read from the shared dependency lockfile, not duplicated in YAML.
 Images are built once; tool pairs run sequentially with separate build/log paths.
-Actual GCC/CMake versions and all eleven profiles are checked for each pair.
+Actual GCC/CMake versions and all twelve profiles are checked for each pair.
 Failures do not stop collection of other pair results, but the matrix exits nonzero
 if any pair fails. Run selection uses the current lockfile rather than accepting
 whatever manifests happen to exist. Aggregate reports are matrix-summary.json;
@@ -125,7 +126,7 @@ For each tool pair, a copy of success ELF has one bit changed in .fw_version.
 Code, startup data and the injected CRC remain unchanged. The derived negative case,
 crc-corrupt, must report CRC_RESULT=FAIL and TEST_RESULT=FAIL and exit 3. A crash
 or timeout cannot pass this case. This adds six runs without extra compilations:
-66 builds, 72 runs per simulator. Reports distinguish eleven profiles from twelve executions.
+72 builds, 78 runs per simulator. Reports distinguish twelve profiles from thirteen executions.
 
 This verifies software CRC over loaded FLASH on netduino2, not the STM32 CRC
 peripheral. E004 (algorithm selection) and E006 (post-build error handling) remain
@@ -153,7 +154,9 @@ The Renode process normally returns 0 for all three, which is insufficient to pa
 Each case gets 0.1 seconds of virtual time and a 30-second host deadline. Hang needs
 complete expected output, no guest exit and completion of the virtual budget.
 A host timeout always fails. Renode errors/warnings, incomplete scripts, wrong
-metadata and output-buffer overflow fail the check. Artifacts include run.resc,
+metadata and output-buffer overflow fail the check. The sole exception is the exact
+freertosTasks priority-probe warning documented below and retained in the report.
+Artifacts include run.resc,
 process.log, firmware.log, guest-exit.json (when reached) and renode-summary.json.
 No downloads, GUI or GDB are needed.
 
@@ -273,3 +276,46 @@ The FreeRTOS heap is a separate 4096-byte BSS array, independent of the newlib
 heap_4 sources. Scheduling, tasks, context switching, tick and CMSIS-RTOS are not
 covered. Real port critical sections execute; SysTick is not started.
 External FreeRTOS/E007 remains a separate regression without a fix.
+
+## FreeRTOS: starter task and inter-task exchange
+
+`freertosTasks` starts FreeRTOS without HAL or CMSIS-RTOS wrappers. A priority-2
+starter creates two length-1 queues and two priority-1 tasks, then deletes itself
+with vTaskDelete(NULL). The receiver waits for a request. The sender delays for
+two ticks, sends 17 and waits for reply 46 (the receiver adds 29).
+Queue waits are bounded to 1000 ticks. The receiver deletes itself; the sender
+checks the reply, tick advancement and scheduler state, prints
+`RTOS_TASK_MESSAGE=hello from sender` through SYS_WRITE0, then exits the simulator
+through SYS_EXIT_EXTENDED. Only one task prints.
+
+FreeRTOS owns Cortex-M3 SysTick. No additional TIM is needed: HAL_Init/HAL_IncTick
+are not called and there is no separate HAL time base. The test overrides the
+standard weak vPortSetupTimerInterrupt hook with CMSIS SysTick_Config: reload,
+clear CURRENT, then enable. This avoids the observed Renode 1.16.1 first-tick
+delay with the original port CURRENT-before-reload ordering; neither the kernel
+nor the framework is changed. FreeRTOSConfig.h connects
+the real port SVC/PendSV/SysTick handlers; the builder verifies their ELF vector
+addresses. Renode SysTick runs at 8 MHz, matching configCPU_CLOCK_HZ. QEMU netduino2
+still models F205, so the test checks logical tick progress rather than actual
+F103 HSI frequency accuracy. Renode keeps its 0.1-second virtual budget; no
+RCC/PLL/TIM hardware models are added. A lost tick fails the test.
+
+This profile reserves an 8192-byte FreeRTOS BSS heap, including task stacks:
+256 words each for starter/receiver and 512 for sender with formatted output.
+The system stack_size remains 1K; the idle task and internal structures also fit
+inside the heap. Long-running load, timing accuracy, FreeRTOS software timers and
+HAL/RTOS coexistence are outside this test. configASSERT exits with status 6;
+unexpected scheduler startup return is also an error.
+
+The port requires 16-byte .text alignment. Test .ld/.ld.in files now explicitly
+include padding up to that boundary inside .isr_vector. Previously the ELF gap
+contained zeros while the CRC command used --gap-fill 0xFF; the independent CRC
+check detected this discrepancy. The framework algorithm is unchanged: the test
+image contract requires identical contiguous ELF/BIN FLASH bytes, with CRC after
+all FLASH load sections.
+
+FreeRTOS probes the priority mask by writing 0xFF to the priority of IRQ 16.
+Renode warns that the value should be masked with 0xF0. The runner permits exactly
+one occurrence of this exact warning only for freertosTasks, retaining it in the
+report. Other warnings, duplicate probe warnings, errors or missing guest exit
+still fail. configASSERT remains enabled.

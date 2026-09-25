@@ -7,7 +7,16 @@
 #define configTICK_RATE_HZ 1000
 #define configMAX_PRIORITIES 3
 #define configMINIMAL_STACK_SIZE 128
+#ifdef SMOKE_RTOS_TASKS
+#define configTOTAL_HEAP_SIZE 8192
+#define INCLUDE_vTaskDelete 1
+#define INCLUDE_vTaskDelay 1
+#define vPortSVCHandler SVC_Handler
+#define xPortPendSVHandler PendSV_Handler
+#define xPortSysTickHandler SysTick_Handler
+#else
 #define configTOTAL_HEAP_SIZE 4096
+#endif
 #define configMAX_TASK_NAME_LEN 16
 #define configUSE_16_BIT_TICKS 0
 #define configIDLE_SHOULD_YIELD 1

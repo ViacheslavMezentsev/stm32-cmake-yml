@@ -4,7 +4,7 @@ import sys
 import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'ci'))
-from run_renode_smoke import classify, resc_path
+from run_renode_smoke import classify, resc_path, process_completed, PRIORITY_PROBE_WARNING
 
 HEADER = 'BUILD_TARGET=STM32F103C8T6\nTEST_PLATFORM=cortex-m3-smoke\nCompiler:    GCC 14.2.1\n0xC23 -> Cortex-M3\nPROFILE=success\n'
 
@@ -36,6 +36,17 @@ class RenodeTests(unittest.TestCase):
         self.assertFalse(self.check(profile='hang', timeout=True, text=''))
         self.assertFalse(self.check(profile='hang', completed=False, text=''))
         self.assertFalse(self.check(profile='hang', text='TEST_RESULT=PASS'))
+
+    def test_only_single_known_priority_probe_warning_is_allowed_for_tasks(self):
+        warning = '[WARNING] ' + PRIORITY_PROBE_WARNING + '\n'
+        completed = 'RENODE_RUN_COMPLETED\n'
+        self.assertTrue(process_completed(completed, 'freertosTasks'))
+        self.assertTrue(process_completed(warning + completed, 'freertosTasks'))
+        self.assertFalse(process_completed(warning + completed, 'success'))
+        for bad in (warning * 2 + completed, warning.replace('0xFF', '0x80') + completed,
+                    warning + '[ERROR] cpu fault\n' + completed, warning,
+                    '[WARNING] unmapped register\n' + completed):
+            self.assertFalse(process_completed(bad, 'freertosTasks'))
 
     def test_paths_escape_spaces_and_reject_script_breaks(self):
         self.assertIn('path\\ with\\ spaces', resc_path(Path('path with spaces')))
