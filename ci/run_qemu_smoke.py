@@ -19,8 +19,10 @@ def metadata_matches(output, expected):
 
 
 def verdict(profile, code, timed_out, output, gcc):
+    if 'TRANSPORT_ERROR=' in output:
+        return False
     lines = {line.strip() for line in output.splitlines()}
-    if not {'BUILD_TARGET=STM32F103C8T6', 'EMULATOR_MACHINE=netduino2'} <= lines:
+    if not {'BUILD_TARGET=STM32F103C8T6', 'TEST_PLATFORM=cortex-m3-smoke'} <= lines:
         return False
     if f'Compiler:    GCC {gcc}' not in lines or '0xC23 -> Cortex-M3' not in output:
         return False

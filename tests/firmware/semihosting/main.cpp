@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdarg.h>
 #include <stm32f1xx.h>
 #include <core_cm3.h>
 #include "version.h"
@@ -39,8 +40,20 @@ static ConstructorProbe constructor_probe;
   */
 #define ARM_IMPLEMENTER_CODE (0x41UL)
 
-/// Semihosting Initializing.
-extern "C" void initialise_monitor_handles( void );
+/// Formatted output over the common semihosting transport.
+// SYS_WRITE0 is supported by both pinned emulators. Formatting stays in newlib.
+static void smoke_printf(const char* format, ...) {
+    char buffer[512];
+    va_list args;
+    va_start(args, format);
+    const int length = vsnprintf(buffer, sizeof(buffer), format, args);
+    va_end(args);
+    const char* message = (length < 0 || length >= (int)sizeof(buffer))
+        ? "TRANSPORT_ERROR=format overflow\n" : buffer;
+    register uint32_t operation __asm__("r0") = 4u;
+    register const char* parameter __asm__("r1") = message;
+    __asm__ volatile("bkpt 0xAB" : "+r"(operation), "+r"(parameter) : : "memory");
+}
 
 /// Обработчик прерывания SysTick.
 extern "C" void SysTick_Handler( void )
@@ -78,95 +91,95 @@ void print_cpu_id( void )
 
     // --- Выводим информацию ---
 
-    printf( "--- CPUID Register Analysis (Value: 0x%08lX) ---\n", cpuid_val );
+    smoke_printf( "--- CPUID Register Analysis (Value: 0x%08lX) ---\n", cpuid_val );
 
     // 1. Implementer (Производитель ядра)
-    printf( "  Implementer [31:24]: 0x%02X -> ", implementer );
+    smoke_printf( "  Implementer [31:24]: 0x%02X -> ", implementer );
     if ( implementer == 0x41 )
     {
-        printf( "ARM Ltd. ('A')\n" );
+        smoke_printf( "ARM Ltd. ('A')\n" );
     } else if ( implementer == 0x51 )
     {
-        printf( "QEMU ('Q')\n" );
+        smoke_printf( "QEMU ('Q')\n" );
     } else
     {
-        printf( "Unknown\n" );
+        smoke_printf( "Unknown\n" );
     }
 
     // 2. Variant (Ревизия ядра)
-    printf( "  Variant     [23:20]: 0x%X   -> r%dp\n", variant, variant );
+    smoke_printf( "  Variant     [23:20]: 0x%X   -> r%dp\n", variant, variant );
 
     // 3. Architecture (Архитектура)
-    printf( "  Architecture[19:16]: 0x%X   -> ", architecture );
+    smoke_printf( "  Architecture[19:16]: 0x%X   -> ", architecture );
 
     if ( architecture == 0xF )
     {
-        printf( "ARMv7-M Architecture\n" );
+        smoke_printf( "ARMv7-M Architecture\n" );
     }
     else if ( architecture == 0xC )
     {
-        printf( "ARMv6-M Architecture\n" );
+        smoke_printf( "ARMv6-M Architecture\n" );
     }
     else
     {
-        printf( "Unknown Architecture\n" );
+        smoke_printf( "Unknown Architecture\n" );
     }
 
     // 4. Part Number (Модель ядра)
-    printf( "  Part Number [15:4]:  0x%03X -> ", part_no );
+    smoke_printf( "  Part Number [15:4]:  0x%03X -> ", part_no );
 
     switch ( part_no )
     {
         case 0xC20:
-            printf( "Cortex-M0\n" );
+            smoke_printf( "Cortex-M0\n" );
             break;
         case 0xC60:
-            printf( "Cortex-M0+\n" );
+            smoke_printf( "Cortex-M0+\n" );
             break;
         case 0xC21:
-            printf( "Cortex-M1\n" );
+            smoke_printf( "Cortex-M1\n" );
             break;
         case 0xC23:
-            printf( "Cortex-M3\n" );
+            smoke_printf( "Cortex-M3\n" );
             break;
         case 0xC24:
-            printf( "Cortex-M4\n" );
+            smoke_printf( "Cortex-M4\n" );
             break;
         case 0xC27:
-            printf( "Cortex-M7\n" );
+            smoke_printf( "Cortex-M7\n" );
             break;
         case 0xD20:
-            printf( "Cortex-M23\n" );
+            smoke_printf( "Cortex-M23\n" );
             break;
         case 0xD21:
-            printf( "Cortex-M33\n" );
+            smoke_printf( "Cortex-M33\n" );
             break;
         default:
-            printf( "Unknown Core\n" );
+            smoke_printf( "Unknown Core\n" );
             break;
     }
 
     // 5. Revision (Патч ревизии)
-    printf( "  Revision    [3:0]:   0x%X   -> p%d\n", revision, revision );
+    smoke_printf( "  Revision    [3:0]:   0x%X   -> p%d\n", revision, revision );
 
-    printf( "-------------------------------------------------------\n" );
+    smoke_printf( "-------------------------------------------------------\n" );
 }
 
 void print_firmware_info( void )
 {
     // Блок вывода версий.
-    printf( "--- Firmware build information ------------------------\n" );
+    smoke_printf( "--- Firmware build information ------------------------\n" );
 
     // 1. Версия компилятора GCC.
-    printf( "  Compiler:    GCC %d.%d.%d\n", __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__ );
+    smoke_printf( "  Compiler:    GCC %d.%d.%d\n", __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__ );
 
     // 2. Версия CMSIS Core.
     // Эти макросы определены в файле 'core_cm3.h' (или аналогичном для вашего ядра).
-    printf( "  CMSIS Core:  v%d.%d\n", __CM3_CMSIS_VERSION_MAIN, __CM3_CMSIS_VERSION_SUB );
+    smoke_printf( "  CMSIS Core:  v%d.%d\n", __CM3_CMSIS_VERSION_MAIN, __CM3_CMSIS_VERSION_SUB );
 
     // 3. Версия CMSIS Device (специфично для вендора, в нашем случае ST).
     // Эти макросы определены в файле 'stm32f1xx.h'.
-    printf( "  CMSIS Device:  v%d.%d.%d\n",
+    smoke_printf( "  CMSIS Device:  v%d.%d.%d\n",
             __STM32F1_CMSIS_VERSION_MAIN,
             __STM32F1_CMSIS_VERSION_SUB1,
             __STM32F1_CMSIS_VERSION_SUB2 );
@@ -179,7 +192,7 @@ void print_firmware_info( void )
     uint8_t hal_patch = ( hal_version >> 8 ) & 0xFF;
     // uint8_t hal_rc = hal_version & 0xFF; // Ревизия (обычно 0)
 
-    printf( "  STM32Cube HAL: v%d.%d.%d\n", hal_major, hal_minor, hal_patch );
+    smoke_printf( "  STM32Cube HAL: v%d.%d.%d\n", hal_major, hal_minor, hal_patch );
 
     if ( 0 )
     {
@@ -189,18 +202,18 @@ void print_firmware_info( void )
         uint32_t uid_word1 = HAL_GetUIDw1();
         uint32_t uid_word2 = HAL_GetUIDw2();
 
-        printf( "  Device UID:    %08lX%08lX%08lX\n", uid_word2, uid_word1, uid_word0 );
+        smoke_printf( "  Device UID:    %08lX%08lX%08lX\n", uid_word2, uid_word1, uid_word0 );
     }
 
     // 6. Дата и время сборки (стандартные макросы препроцессора).
-    printf( "  Build Date:    %s\n", __DATE__ );
-    printf( "  Build Time:    %s\n", __TIME__ );
+    smoke_printf( "  Build Date:    %s\n", __DATE__ );
+    smoke_printf( "  Build Time:    %s\n", __TIME__ );
 
-    printf( "  Version: %u.%u.%u.%u (%02u.%02u.%02u %02u:%02u:%02u)\n",
+    smoke_printf( "  Version: %u.%u.%u.%u (%02u.%02u.%02u %02u:%02u:%02u)\n",
             Version.Major, Version.Minor, Version.Build, Version.Revision,
             DAY, MON, YEAR, HOUR, MIN, SEC );
 
-    printf( "--------------------------------------------------\n" );
+    smoke_printf( "--------------------------------------------------\n" );
 }
 
 /**
@@ -208,12 +221,12 @@ void print_firmware_info( void )
  *
  */
 // ARM SYS_EXIT_EXTENDED: reason + application status, both 32-bit words.
-[[noreturn]] static void smoke_exit(uint32_t status)
+[[noreturn]] __attribute__((noinline)) static void smoke_exit(uint32_t status)
 {
     const uint32_t arguments[2] = {0x20026u, status};
     register uint32_t operation __asm__("r0") = 0x20u;
     register const uint32_t* parameter __asm__("r1") = arguments;
-    __asm__ volatile("bkpt 0xAB" : "+r"(operation), "+r"(parameter) : : "memory");
+    __asm__ volatile(".global smoke_exit_trap\nsmoke_exit_trap:\nbkpt 0xAB" : "+r"(operation), "+r"(parameter) : : "memory");
     while (1) { __asm__ volatile("nop"); }
 }
 
@@ -222,8 +235,6 @@ int main()
     const uint32_t initial_data = smoke_data_probe;
     const uint32_t initial_bss = smoke_bss_probe;
     const uint32_t initial_ctor = smoke_ctor_probe;
-    // Инициализация библиотеки Semihosting.
-    initialise_monitor_handles();
 
     // Инициализация библиотеки HAL.
     HAL_Init();
@@ -232,23 +243,23 @@ int main()
 
     print_cpu_id();
 
-    printf("BUILD_TARGET=%s\n", SMOKE_MCU);
-    printf("PROFILE=%s\nCMAKE=%s\nFRAMEWORK=%s\n", SMOKE_PROFILE, SMOKE_CMAKE, SMOKE_FRAMEWORK);
-    printf("GIT_REVISION=%s\nGIT_DIRTY=%s\n", SMOKE_GIT, SMOKE_DIRTY);
-    printf("CMSIS_CORE=%u.%u\n", __CM3_CMSIS_VERSION_MAIN, __CM3_CMSIS_VERSION_SUB);
-    printf("CMSIS_DEVICE=%u.%u.%u\n", __STM32F1_CMSIS_VERSION_MAIN,
+    smoke_printf("BUILD_TARGET=%s\n", SMOKE_MCU);
+    smoke_printf("PROFILE=%s\nCMAKE=%s\nFRAMEWORK=%s\n", SMOKE_PROFILE, SMOKE_CMAKE, SMOKE_FRAMEWORK);
+    smoke_printf("GIT_REVISION=%s\nGIT_DIRTY=%s\n", SMOKE_GIT, SMOKE_DIRTY);
+    smoke_printf("CMSIS_CORE=%u.%u\n", __CM3_CMSIS_VERSION_MAIN, __CM3_CMSIS_VERSION_SUB);
+    smoke_printf("CMSIS_DEVICE=%u.%u.%u\n", __STM32F1_CMSIS_VERSION_MAIN,
            __STM32F1_CMSIS_VERSION_SUB1, __STM32F1_CMSIS_VERSION_SUB2);
     const uint32_t hal_version = HAL_GetHalVersion();
-    printf("HAL_VERSION=%lu.%lu.%lu\n", (hal_version >> 24) & 255u,
+    smoke_printf("HAL_VERSION=%lu.%lu.%lu\n", (hal_version >> 24) & 255u,
            (hal_version >> 16) & 255u, (hal_version >> 8) & 255u);
-    printf("DATA_INIT=%08lX\nBSS_INIT=%08lX\nCTOR_INIT=%08lX\n", initial_data, initial_bss, initial_ctor);
-    printf("DATA_ADDRESS=%08lX\nBSS_ADDRESS=%08lX\nCTOR_ADDRESS=%08lX\n",
+    smoke_printf("DATA_INIT=%08lX\nBSS_INIT=%08lX\nCTOR_INIT=%08lX\n", initial_data, initial_bss, initial_ctor);
+    smoke_printf("DATA_ADDRESS=%08lX\nBSS_ADDRESS=%08lX\nCTOR_ADDRESS=%08lX\n",
            (uint32_t)&smoke_data_probe, (uint32_t)&smoke_bss_probe, (uint32_t)&smoke_ctor_probe);
-    printf("EMULATOR_MACHINE=netduino2\n");
-    fflush(stdout);
+    smoke_printf("TEST_PLATFORM=cortex-m3-smoke\n");
+
     if (initial_data != 0x12345678u || initial_bss != 0 || initial_ctor != 0xC0DEC0DEu) {
-        printf("TEST_RESULT=FAIL\n");
-        fflush(stdout);
+        smoke_printf("TEST_RESULT=FAIL\n");
+
         smoke_exit(2);
     }
     uint32_t crc = 0xFFFFFFFFu;
@@ -256,24 +267,24 @@ int main()
     for (uintptr_t address = (uintptr_t)__checksum_start; address < (uintptr_t)__checksum_end; address += 4)
         crc = crcStepWord(crc, *(volatile const uint32_t*)address);
     const uint32_t stored = *(volatile const uint32_t*)__checksum_end;
-    printf("CRC_START=%08lX\nCRC_END=%08lX\nCRC_STORED=%08lX\nCRC_COMPUTED=%08lX\n",
+    smoke_printf("CRC_START=%08lX\nCRC_END=%08lX\nCRC_STORED=%08lX\nCRC_COMPUTED=%08lX\n",
            (uint32_t)__checksum_start, (uint32_t)__checksum_end, stored, crc);
-    printf("CRC_RESULT=%s\n", crc == stored ? "PASS" : "FAIL");
+    smoke_printf("CRC_RESULT=%s\n", crc == stored ? "PASS" : "FAIL");
     if (crc != stored) {
-        printf("TEST_RESULT=FAIL\n");
-        fflush(stdout);
+        smoke_printf("TEST_RESULT=FAIL\n");
+
         smoke_exit(3);
     }
-    fflush(stdout);
+
 #if defined(SMOKE_HANG)
     while (1) { __asm__ volatile("nop"); }
 #elif defined(SMOKE_FAIL)
-    printf("TEST_RESULT=FAIL\n");
-    fflush(stdout);
+    smoke_printf("TEST_RESULT=FAIL\n");
+
     smoke_exit(1);
 #else
-    printf("TEST_RESULT=PASS\n");
-    fflush(stdout);
+    smoke_printf("TEST_RESULT=PASS\n");
+
     smoke_exit(0);
 #endif
 }

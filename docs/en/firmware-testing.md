@@ -1,9 +1,9 @@
-# Firmware build and QEMU smoke tests
+# Firmware build and QEMU/Renode smoke tests
 
 [Documentation](index.md) · [Русский](../ru/firmware-testing.md) · [Environment](emulation.md)
 
 The first firmware test adapts the author's F1 [02-semihosting example](../../tests/firmware/semihosting/README.md).
-It is separate from the 115 configure scenarios: **18 builds and 24 QEMU runs**:
+It is separate from the 115 configure scenarios: **18 builds, 24 QEMU runs and 24 Renode runs**:
 three profiles plus one corrupted copy per tool pair; three xPack GCC versions × two CMake versions from the
 [lockfile](../../ci/dependencies.lock.json), CubeF1 1.8.7, QEMU 11.0.0.
 The Windows QEMU 11.1.0 installation was also checked locally; CI uses the pinned image.
@@ -26,7 +26,7 @@ a missing marker, an unexpected exit code or conflicting markers fails the suite
 The intentional failure and timeout are passing *harness tests*, not ignored errors.
 stdout/stderr, command lines, observed exits and emulator version are retained.
 No GDB server or GUI is started. SYS_EXIT_EXTENDED uses the reason/status block;
-stdio is flushed before exit. Compiler version is compared with the build manifest.
+SYS_WRITE0 emits output immediately. Compiler version is compared with the build manifest.
 CMSIS Core/Device, HAL and framework versions are compared with the reviewed
 expected-metadata.json baseline for the pinned dependencies.
 
@@ -56,7 +56,7 @@ python -m unittest discover -s tests -p "test_firmware*.py"
 `--qemu` accepts an explicit executable. Builds use fresh directories and replace
 the manifest at the start; a failed build cannot reuse a stale successful manifest.
 The [workflow](../../.github/workflows/firmware.yml) builds both images and saves
-artifacts/logs for 14 days. Renode execution remains a subsequent step. No F1 peripheral or clock-model support
+artifacts/logs for 14 days. Both simulators use the same ELFs. No F1 peripheral or clock-model support
 is inferred from running this ELF on the F205-based netduino2.
 
 ## Matrix isolation and compatibility
@@ -120,8 +120,47 @@ For each tool pair, a copy of success ELF has one bit changed in .fw_version.
 Code, startup data and the injected CRC remain unchanged. The fourth QEMU case,
 crc-corrupt, must report CRC_RESULT=FAIL and TEST_RESULT=FAIL and exit 3. A crash
 or timeout cannot pass this case. This adds six runs without extra compilations:
-18 builds, 24 runs. Reports distinguish three profiles from four executions.
+18 builds, 24 runs per simulator. Reports distinguish three profiles from four executions.
 
 This verifies software CRC over loaded FLASH on netduino2, not the STM32 CRC
 peripheral. E004 (algorithm selection) and E006 (post-build error handling) remain
 open and unchanged. Old manifests must be rebuilt to include CRC expectations.
+
+## Renode and a shared ELF
+
+The fixture uses vsnprintf + SYS_WRITE0 instead of newlib SYS_WRITE/initialise_monitor_handles:
+the pinned Renode 1.16.1 lacks the full set of those semihosting operations. This
+changes test transport, not framework behavior. TEST_PLATFORM=cortex-m3-smoke replaces
+the hardcoded EMULATOR_MACHINE=netduino2 line; the runner records the actual model
+in its command and report.
+
+[f103-smoke.repl](../../tests/firmware/renode/f103-smoke.repl) supplies Cortex-M3, NVIC,
+64 KiB FLASH and 20 KiB RAM. RCC and the FLASH controller are memory stubs for the
+selected HAL_Init path, without PLL or peripheral validation. The stock Renode F103
+platform is not used: its broad memory ranges and online SVD are unnecessary here.
+
+Renode handles SYS_WRITE0 natively. The [exit adapter](../../tests/firmware/renode/exit_hook.py)
+hooks the exported smoke_exit_trap, reads R0/R1 and the reason/status block in RAM,
+and halts the CPU. It does not supply expected results. Required values are operation
+0x20, reason 0x20026 and status 0/1/3 for success/failure/crc-corrupt respectively.
+The Renode process normally returns 0 for all three, which is insufficient to pass.
+
+Each case gets 0.1 seconds of virtual time and a 30-second host deadline. Hang needs
+complete expected output, no guest exit and completion of the virtual budget.
+A host timeout always fails. Renode errors/warnings, incomplete scripts, wrong
+metadata and output-buffer overflow fail the check. Artifacts include run.resc,
+process.log, firmware.log, guest-exit.json (when reached) and renode-summary.json.
+No downloads, GUI or GDB are needed.
+
+```powershell
+python ci/firmware_matrix.py run --emulator renode --build build/firmware-smoke --output build/firmware-renode
+```
+
+For one pair: `python ci/run_renode_smoke.py --build <pair-directory> --output <logs>`.
+Use `--renode "C:/Program Files/Renode/renode.exe"` if needed; standard Windows
+installation paths are discovered automatically. In the container, use the same
+matrix runner and bind mounts as QEMU with `--emulator renode`. Rebuild old
+ELFs/manifests: the smoke_exit_trap symbol address is now required.
+
+Limitation source: [Renode 1.16.1 Arm.cs](https://github.com/renode/renode-infrastructure/blob/add012af003a0f620d3da52828262676f374d121/src/Emulator/Cores/Arm/Arm.cs).
+Further scenarios: [five test groups](firmware-plan.md).

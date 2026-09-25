@@ -86,15 +86,19 @@ def main():
                 if not match or int(match[2], 16) != 4:
                     raise ValueError(f'Missing four-byte {section} symbol: smoke_{kind}_probe')
                 metadata[kind.upper() + '_ADDRESS'] = f'{int(match[1], 16):08X}'
+            trap = re.search(r'^([0-9a-fA-F]+)\s+T\s+smoke_exit_trap$', symbols, re.M)
+            if not trap:
+                raise ValueError('Missing semihosting exit trap')
+            exit_trap = int(trap[1], 16)
             crc_metadata, corrupted, negative = inspect_crc(elf)
             metadata.update(crc_metadata)
             if profile == 'success':
                 damaged = build / 'crc-corrupt.elf'
                 damaged.write_bytes(corrupted)
                 report['crc_negative'] = {'profile': 'crc-corrupt', 'elf': str(damaged.relative_to(output)),
-                                          'metadata': dict(metadata, **negative)}
+                                          'metadata': dict(metadata, **negative), 'exit_trap': exit_trap}
             report['cases'].append({'profile': profile, 'elf': str(elf.relative_to(output)),
-                                    'structure': structure, 'metadata': metadata})
+                                    'structure': structure, 'metadata': metadata, 'exit_trap': exit_trap})
             print(f'PASS build/ELF: {profile}', flush=True)
         report['status'] = 'passed'
     except (OSError, ValueError, KeyError, struct.error, subprocess.SubprocessError) as error:

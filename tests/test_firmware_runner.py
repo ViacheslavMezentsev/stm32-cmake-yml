@@ -6,7 +6,7 @@ import unittest
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'ci'))
 from run_qemu_smoke import verdict, metadata_matches
 
-HEADER = 'BUILD_TARGET=STM32F103C8T6\nEMULATOR_MACHINE=netduino2\n  Compiler:    GCC 14.2.1\n0xC23 -> Cortex-M3\n'
+HEADER = 'BUILD_TARGET=STM32F103C8T6\nTEST_PLATFORM=cortex-m3-smoke\n  Compiler:    GCC 14.2.1\n0xC23 -> Cortex-M3\n'
 
 
 class VerdictTests(unittest.TestCase):
