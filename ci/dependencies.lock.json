@@ -109,6 +109,10 @@
         "Drivers/CMSIS/Device/ST/STM32F1xx/Include/stm32f1xx.h",
         "Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h",
         "Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h"
+      ],
+      "sparse_exclude": [
+        "Projects",
+        "Utilities"
       ]
     },
     {
@@ -124,6 +128,10 @@
         "Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h",
         "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h",
         "Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h"
+      ],
+      "sparse_exclude": [
+        "Projects",
+        "Utilities"
       ]
     },
     {
@@ -140,6 +148,10 @@
         "Drivers/CMSIS/Device/ST/STM32G4xx/Include/stm32g4xx.h",
         "Drivers/STM32G4xx_HAL_Driver/Inc/stm32g4xx_hal.h",
         "Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h"
+      ],
+      "sparse_exclude": [
+        "Projects",
+        "Utilities"
       ]
     },
     {
@@ -157,6 +169,10 @@
         "Drivers/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal.h",
         "Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h",
         "Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM0/port.c"
+      ],
+      "sparse_exclude": [
+        "Projects",
+        "Utilities"
       ]
     },
     {
@@ -172,6 +188,10 @@
         "Drivers/CMSIS/Device/ST/STM32F3xx/Include/stm32f3xx.h",
         "Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal.h",
         "Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h"
+      ],
+      "sparse_exclude": [
+        "Projects",
+        "Utilities"
       ]
     },
     {
@@ -187,6 +207,10 @@
         "Drivers/CMSIS/Device/ST/STM32F7xx/Include/stm32f7xx.h",
         "Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal.h",
         "Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h"
+      ],
+      "sparse_exclude": [
+        "Projects",
+        "Utilities"
       ]
     }
   ]
