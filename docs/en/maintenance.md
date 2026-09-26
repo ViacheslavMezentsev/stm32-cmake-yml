@@ -90,6 +90,32 @@ of new changes. Record branch, commit and status in TODO; preserve historical
 PR links. If fetch/push is unavailable, an API check does not update local refs:
 synchronization is still required before merging.
 
+## Docker layer cache
+
+The `ci/emulation` image (QEMU from source, Renode) is built with BuildKit and the
+GitHub Actions layer cache (`type=gha`, scope `stm32-yml-emulation`). A layer key
+is the Dockerfile instruction plus the content of copied files, so a lock file,
+install script or Dockerfile change rebuilds that layer and later ones. Downloads
+are SHA-256 pinned, so caching does not change image contents.
+
+Firmware reads and updates the cache. Emulation environment builds from scratch
+(`no-cache`) and only writes a fresh cache, proving the pinned downloads remain
+available and buildable. A branch cache is visible to that branch and its
+descendants; branches read main's cache, main does not read branch caches.
+Entries unused for 7 days are evicted; a miss builds from scratch as before.
+
+The `ci/docker` image (about 8 GB: three GCCs, two CMakes, Cube/Arduino/ETL
+sources) is not cached. Measurements on branch `claude/docker-image-cache`:
+
+| Image | No cache | Build and write cache | From cache |
+| --- | ---: | ---: | ---: |
+| emulation | 3:08 | 6:16 | 0:12 |
+| ci/docker | 2:55–3:01 | 9:02–10:37 | 2:35–2:38 |
+
+For compilers, downloading the cache and loading 8 GB into Docker nearly equals
+building from fast release downloads, while every cache write adds 6–7 minutes.
+Firmware with all images cached took 5:34 instead of 10:04.
+
 ## Documentation-only pushes
 
 Pushes that change only `.md` files at any depth run Docs, skipping Configure,

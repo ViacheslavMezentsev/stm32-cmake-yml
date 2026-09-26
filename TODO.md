@@ -103,8 +103,9 @@ PR больше не требуются; старые ссылки остают�
 - [x] `codex/firmware-freertos-queue` слита в main (`4109bc8`): очереди и Heap::4 без планировщика; 66 сборок / 144 проверки.
 - [x] `codex/firmware-freertos-tasks` слита в main (`f16eb09`): starter, обмен двух задач, SysTick без HAL; 72 сборки / 156 проверок, единый цвет бейджев.
 - [x] `codex/badge-status-and-timings` слита в main (`7246a2c`): единые Shields-бейджи, PASS/FAIL, цвет #238636; QEMU hang 2 с и измерение длительностей.
-- [ ] Текущая ветка `claude/renode-batch`: один процесс Renode на пару GCC/CMake, `Clear` между сценариями, синхронный лог; локально 5:24 → 0:36. Ожидает CI.
-- [ ] Ускорить подготовку CI через кэш образов; затем оценить ограниченное распараллеливание.
+- [x] `claude/renode-batch` слита в main (`aa58116`): один процесс Renode на пару GCC/CMake, `Clear` между сценариями, синхронный лог; Renode в CI 3:42 → 0:33.
+- [ ] Текущая ветка `claude/docker-image-cache`: кэш слоёв BuildKit (`type=gha`) только для образа эмуляторов (3:08 → 0:12); образ компиляторов без кэша — выигрыша нет. Ожидает CI.
+- [ ] Затем оценить ограниченное распараллеливание.
 - [ ] Далее согласовать полный Arduino runtime и расширение ядер/ABI; группа 3 — [план](docs/ru/firmware-plan.md).
 - [ ] По индексу выбрать следующие пробелы покрытия: отсутствующие/пустые значения,
   приоритеты и ошибки входных данных. Каждый новый контракт — отдельный сценарий.
@@ -227,8 +228,9 @@ keep defect details in errata.
 - [x] `codex/firmware-freertos-queue` merged into main (`4109bc8`): queues and Heap::4 before scheduler startup; 66 builds / 144 checks.
 - [x] `codex/firmware-freertos-tasks` merged into main (`f16eb09`): starter, two-task exchange, SysTick without HAL; 72 builds / 156 checks, shared badge color.
 - [x] `codex/badge-status-and-timings` merged into main (`7246a2c`): shared Shields rendering, PASS/FAIL, #238636; QEMU hang 2 s and per-case timings.
-- [ ] Current branch `claude/renode-batch`: one Renode process per GCC/CMake pair, `Clear` between cases, synchronous logging; locally 5:24 → 0:36. Awaiting CI.
-- [ ] Cache CI images, then evaluate bounded parallelism.
+- [x] `claude/renode-batch` merged into main (`aa58116`): one Renode process per GCC/CMake pair, `Clear` between cases, synchronous logging; Renode in CI 3:42 → 0:33.
+- [ ] Current branch `claude/docker-image-cache`: BuildKit layer cache (`type=gha`) for the emulator image only (3:08 → 0:12); the compiler image stays uncached — no gain. Awaiting CI.
+- [ ] Then evaluate bounded parallelism.
 - [ ] Next agree full Arduino runtime and core/ABI coverage; group 3 — [plan](docs/en/firmware-plan.md).
 - [ ] Use the index to prioritize coverage gaps: missing/empty values, precedence
   and invalid input. Give each new contract a dedicated scenario.

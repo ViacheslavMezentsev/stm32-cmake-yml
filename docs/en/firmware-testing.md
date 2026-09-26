@@ -370,6 +370,11 @@ emulation. Batch mode removes it: measured locally on the same machine and ELFs
 (Renode 1.16.1, 2 vCPUs), the full matrix took **5:24 in process mode and 0:36
 in batch mode**; one pair took 50 s and 6 s. All 78 cases passed in both modes.
 60 consecutive batches in random order (`--shuffle 1..60`) passed without
-failures. GitHub runner timing is checked in the smoke job after push. Next
-opportunities are image caching, then bounded parallelism. Both runners record per-case
+failures.
+
+On the GitHub runner, the [main aa58116 run](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/actions/runs/36195015021)
+took **0:33 instead of 3:42** for Renode and 10:04 instead of 13:23 for the smoke
+job (images 7:27, builds 1:30, QEMU 0:13). Docker image preparation now takes about
+three quarters of the job; next opportunities are image caching, then bounded
+parallelism. Both runners record per-case
 duration_seconds; QEMU also records timeout_seconds. Durations do not affect verdicts.
