@@ -28,6 +28,8 @@ use_cmsis: false
 
 Requires use_cmsis: true even with empty hal_components. A nonempty list adds HAL/LL dependencies and USE_HAL_DRIVER. hal_conf.h is checked whenever true, regardless of the list. It does not control Arduino core drivers.
 
+**Change in 0.9.3** (`d8708b4`; spec 4.7.6): the missing `hal_conf.h` hint names the actual configuration file (`stm32_config.yml` by default) instead of `project_config.yml`.
+
 **Omission and emptiness:** see [shared rules](semantics.md#empty-values); exceptions are stated above. Profiles/overrides apply before defaults. Backend/path restrictions are stated in the description.
 
 ```yaml

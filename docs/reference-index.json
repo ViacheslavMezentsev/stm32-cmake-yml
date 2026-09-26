@@ -105,7 +105,9 @@
         "configure.stm32f0-ioc-freertos",
         "configure.stm32f3-ioc-freertos",
         "configure.stm32f7-ioc-freertos",
-        "configure.stm32g4-ioc-freertos"
+        "configure.stm32g4-ioc-freertos",
+        "configure.ioc-missing-values-defaults",
+        "configure.configure-depends"
       ],
       "errata": []
     },
@@ -122,7 +124,8 @@
       },
       "tests": [
         "configure.ioc-bluepill-defaults",
-        "configure.yaml-over-ioc"
+        "configure.yaml-over-ioc",
+        "configure.ioc-missing-values-defaults"
       ],
       "errata": []
     },
@@ -347,7 +350,8 @@
       },
       "tests": [
         "configure.defaults-blackpill",
-        "configure.source-directory-target"
+        "configure.source-directory-target",
+        "configure.profile-only-keys"
       ],
       "errata": [
         "E008"
@@ -366,7 +370,8 @@
       },
       "tests": [
         "configure.defaults-blackpill",
-        "configure.source-directory-target"
+        "configure.source-directory-target",
+        "configure.profile-only-keys"
       ],
       "errata": [
         "E008"
@@ -385,7 +390,8 @@
       },
       "tests": [
         "configure.defaults-blackpill",
-        "configure.source-directory-target"
+        "configure.source-directory-target",
+        "configure.profile-only-keys"
       ],
       "errata": [
         "E008"
@@ -404,7 +410,8 @@
       },
       "tests": [
         "configure.defaults-blackpill",
-        "configure.source-directory-target"
+        "configure.source-directory-target",
+        "configure.profile-only-keys"
       ],
       "errata": [
         "E008"
@@ -626,7 +633,10 @@
         "configure.linker-template",
         "configure.baremetal-no-cube",
         "configure.empty-and-null-defaults",
-        "configure.reconfigure-memory"
+        "configure.reconfigure-memory",
+        "configure.memory-size-format",
+        "configure.memory-size-unused-warning",
+        "configure.ioc-missing-values-defaults"
       ],
       "errata": [
         "E001",
@@ -650,7 +660,10 @@
         "configure.empty-and-null-defaults",
         "configure.reconfigure-memory",
         "configure.reconfigure-profile-name-boundaries",
-        "configure.reconfigure-empty-override"
+        "configure.reconfigure-empty-override",
+        "configure.memory-size-format",
+        "configure.memory-size-unused-warning",
+        "configure.ioc-missing-values-defaults"
       ],
       "errata": [
         "E001",
@@ -671,7 +684,8 @@
       "tests": [
         "configure.linker-template",
         "configure.explicit-linker",
-        "configure.missing-linker"
+        "configure.missing-linker",
+        "configure.memory-size-unused-warning"
       ],
       "errata": []
     },
@@ -778,7 +792,8 @@
         "configure.profile-replace-and-append",
         "configure.unknown-profile-warning",
         "configure.reconfigure-profile-lists",
-        "configure.reconfigure-profile-name-boundaries"
+        "configure.reconfigure-profile-name-boundaries",
+        "configure.profile-only-keys"
       ],
       "errata": [
         "E005"
@@ -798,7 +813,9 @@
       "tests": [
         "configure.external-profile",
         "configure.external-list-profiles",
-        "configure.reconfigure-external-profile-reset"
+        "configure.reconfigure-external-profile-reset",
+        "configure.external-profile-ignores-top-level",
+        "configure.configure-depends"
       ],
       "errata": [
         "E002"
@@ -1237,9 +1254,10 @@
         "en": "docs/en/errata/E008.md"
       },
       "evidence": "reproduced",
-      "status": "open",
-      "fixed_commit": null,
-      "fixed_release": null
+      "status": "fix-prepared",
+      "fixed_commit": "d8708b49e1734d7495d8c84cfe039515932a01e4",
+      "fixed_release": null,
+      "branch": "claude/release-0.9.3"
     }
   ],
   "audit_date": "2026-09-24",

@@ -246,10 +246,11 @@ path to the test module. No new dependency download is added. The inspected
 the selected bounded container operations, not ETL's entire API or heap behavior.
 The framework has not gained an ETL-specific configuration option.
 
-The build exposed [E008](errata/E008.md): language keys declared only inside a
-profile do not reach the executable. The fixture declares empty root lists as a
-verified workaround; six configure-only probes preserve the known deviation.
-These probes do not add firmware builds or simulator checks to the badge.
+The build exposed [E008](errata/E008.md): in 0.9.2 language keys declared only
+inside a profile did not reach the executable, and the fixture used empty root lists
+as a workaround. The 0.9.3 branch fixes it: the workaround and the known-failure
+configure probes are removed, and the profiles set language keys without root
+declarations.
 
 ## Arduino String with a project-owned main
 

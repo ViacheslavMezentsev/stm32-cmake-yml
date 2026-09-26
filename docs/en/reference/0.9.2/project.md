@@ -11,6 +11,8 @@ Shared rules: [semantics](semantics.md). Baseline: `f8ef5200fc7a4a96d6f3fe9111af
 
 Version the YAML targets. Set it explicitly; it does not select framework code. Missing/mismatched versions produce warnings, not a configuration prohibition.
 
+**Change in 0.9.3** (`d8708b4`; spec 4.2.3): the parameter is recommended: a missing or empty value warns that the recommended parameter is not set, not that a mandatory one is missing. The "What is new in 0.9" note is removed from the older-config warning.
+
 **Processing order:** version comparison runs immediately after YAML loading, **before** profiles and `STM32_YML_OVERRIDE_*`. Changing these two options through a profile/override cannot change diagnostics already emitted. Set them at the YAML root. Missing or empty versions warn when checking is enabled; configuration continues. An omitted or empty switch defaults to `true` (the empty switch is not separately tested).
 
 ```yaml
@@ -62,6 +64,8 @@ toolchain_backend: stm32-cmake
 
 Path relative to the project root. IOC supplies MCU, name, heap/stack, Cube FW and FreeRTOS data only where YAML/profile/override values are absent. A missing file fails. Arduino ignores IOC. It does not generate clocks or sources from IOC.
 
+**Change in 0.9.3** (`d8708b4`; spec 3.6.5, 4.4.6): the IOC file is registered as a Configure dependency: changing it re-runs Configure on the next build. When the IOC has no project name, `HeapSize` or `StackSize` and YAML, profile and overrides do not set them, the manual-mode values `auto`, 512 and 1024 apply.
+
 **Omission and emptiness:** see [shared rules](semantics.md#empty-values); exceptions are stated above. Profiles/overrides apply before defaults. Backend/path restrictions are stated in the description.
 
 ```yaml
@@ -70,7 +74,7 @@ ioc_file: bluepill-hsi.ioc
 
 [0.9.2 implementation](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_config.cmake) · [Index](index.md)
 
-**Checks (partial coverage):** `configure.ioc-bluepill-defaults`, `configure.yaml-over-ioc`, `configure.missing-ioc`, `configure.freertos-ioc-f4-v2`, `configure.freertos-ioc-f1-v1`, `configure.freertos-ioc-profile-precedence`, `configure.freertos-ioc-yaml-precedence`, `configure.freertos-ioc-empty-fallback`, `configure.freertos-ioc-override-disable`, `configure.freertos-ioc-reconfigure`, `configure.stm32f0-ioc-freertos`, `configure.stm32f3-ioc-freertos`, `configure.stm32f7-ioc-freertos`, `configure.stm32g4-ioc-freertos`. [Test manifest](../../../../tests/cases.json).
+**Checks (partial coverage):** `configure.ioc-bluepill-defaults`, `configure.yaml-over-ioc`, `configure.missing-ioc`, `configure.freertos-ioc-f4-v2`, `configure.freertos-ioc-f1-v1`, `configure.freertos-ioc-profile-precedence`, `configure.freertos-ioc-yaml-precedence`, `configure.freertos-ioc-empty-fallback`, `configure.freertos-ioc-override-disable`, `configure.freertos-ioc-reconfigure`, `configure.stm32f0-ioc-freertos`, `configure.stm32f3-ioc-freertos`, `configure.stm32f7-ioc-freertos`, `configure.stm32g4-ioc-freertos`, `configure.ioc-missing-values-defaults`, `configure.configure-depends`. [Test manifest](../../../../tests/cases.json).
 
 <a id="project-name"></a>
 ## `project_name`
@@ -78,6 +82,8 @@ ioc_file: bluepill-hsi.ioc
 `CFG-PROJECT-NAME` · **Type:** string · **Default:** auto (manual); IOC (ioc_file)
 
 Name for project() and the target in a typical consumer. auto means the root folder name. In the IOC branch a missing IOC project name does not receive the general auto fallback; set it explicitly for incomplete IOC files.
+
+**Change in 0.9.3** (`d8708b4`; spec 4.4.6): an IOC without a project name yields `auto` (the project directory name) instead of an empty value.
 
 **Omission and emptiness:** see [shared rules](semantics.md#empty-values); exceptions are stated above. Profiles/overrides apply before defaults. Backend/path restrictions are stated in the description.
 
@@ -87,7 +93,7 @@ project_name: bluepill
 
 [0.9.2 implementation](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_config.cmake) · [Index](index.md)
 
-**Checks (partial coverage):** `configure.ioc-bluepill-defaults`, `configure.yaml-over-ioc`. [Test manifest](../../../../tests/cases.json).
+**Checks (partial coverage):** `configure.ioc-bluepill-defaults`, `configure.yaml-over-ioc`, `configure.ioc-missing-values-defaults`. [Test manifest](../../../../tests/cases.json).
 
 <a id="mcu"></a>
 ## `mcu`

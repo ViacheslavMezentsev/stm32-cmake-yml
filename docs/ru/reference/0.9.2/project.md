@@ -11,6 +11,8 @@
 
 Версия, под которую написан YAML. Рекомендуется задавать явно; не выбирает версию кода. При отсутствии или несовпадении проверка выдаёт предупреждение, а не запрет настройки.
 
+**Изменение в 0.9.3** (`d8708b4`; ТЗ 4.2.3): параметр рекомендуемый: при отсутствии или пустом значении предупреждение называет его рекомендуемым, а не обязательным. Из предупреждения о более старой версии конфигурации убрана справка «Что нового в 0.9».
+
 **Порядок обработки:** сравнение версии выполняется сразу после чтения YAML, **до** профиля и `STM32_YML_OVERRIDE_*`. Поэтому изменение этих двух опций через профиль/override не меняет уже выданную диагностику. Задавайте их в корне YAML. Отсутствующая или пустая версия вызывает предупреждение при включённой проверке; настройка продолжается. Отсутствующий или пустой переключатель получает default `true` (пустой переключатель отдельно не проверен).
 
 ```yaml
@@ -62,6 +64,8 @@ toolchain_backend: stm32-cmake
 
 Путь от корня проекта. IOC даёт MCU, имя, heap/stack, Cube FW и сведения о FreeRTOS только при отсутствии соответствующих значений YAML/профиля/override. Отсутствующий файл — ошибка. Arduino игнорирует IOC. Тактирование и исходники из IOC не генерируются.
 
+**Изменение в 0.9.3** (`d8708b4`; ТЗ 3.6.5, 4.4.6): IOC-файл регистрируется как зависимость Configure: его изменение перезапускает Configure при следующей сборке. Если IOC не содержит имени проекта, `HeapSize` или `StackSize`, а YAML, профиль и override их не задают, применяются значения ручного режима `auto`, 512 и 1024.
+
 **Пропуск и пустота:** см. [общие правила](semantics.md#empty-values); исключения указаны выше. Профиль/override применяется до выбора defaults. Ограничения backend и путей указаны в описании.
 
 ```yaml
@@ -70,7 +74,7 @@ ioc_file: bluepill-hsi.ioc
 
 [Реализация 0.9.2](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_config.cmake) · [Index](index.md)
 
-**Проверки (частичное покрытие):** `configure.ioc-bluepill-defaults`, `configure.yaml-over-ioc`, `configure.missing-ioc`, `configure.freertos-ioc-f4-v2`, `configure.freertos-ioc-f1-v1`, `configure.freertos-ioc-profile-precedence`, `configure.freertos-ioc-yaml-precedence`, `configure.freertos-ioc-empty-fallback`, `configure.freertos-ioc-override-disable`, `configure.freertos-ioc-reconfigure`, `configure.stm32f0-ioc-freertos`, `configure.stm32f3-ioc-freertos`, `configure.stm32f7-ioc-freertos`, `configure.stm32g4-ioc-freertos`. [Test manifest](../../../../tests/cases.json).
+**Проверки (частичное покрытие):** `configure.ioc-bluepill-defaults`, `configure.yaml-over-ioc`, `configure.missing-ioc`, `configure.freertos-ioc-f4-v2`, `configure.freertos-ioc-f1-v1`, `configure.freertos-ioc-profile-precedence`, `configure.freertos-ioc-yaml-precedence`, `configure.freertos-ioc-empty-fallback`, `configure.freertos-ioc-override-disable`, `configure.freertos-ioc-reconfigure`, `configure.stm32f0-ioc-freertos`, `configure.stm32f3-ioc-freertos`, `configure.stm32f7-ioc-freertos`, `configure.stm32g4-ioc-freertos`, `configure.ioc-missing-values-defaults`, `configure.configure-depends`. [Test manifest](../../../../tests/cases.json).
 
 <a id="project-name"></a>
 ## `project_name`
@@ -78,6 +82,8 @@ ioc_file: bluepill-hsi.ioc
 `CFG-PROJECT-NAME` · **Тип:** string · **Default:** auto (manual); IOC (ioc_file)
 
 Имя для project() и цели в типичном потребителе. auto означает имя корневой папки. В IOC-ветке отсутствие имени в самом IOC не получает общего fallback auto; задавайте имя явно для неполных IOC.
+
+**Изменение в 0.9.3** (`d8708b4`; ТЗ 4.4.6): при IOC без имени проекта применяется `auto` (имя каталога проекта), а не пустое значение.
 
 **Пропуск и пустота:** см. [общие правила](semantics.md#empty-values); исключения указаны выше. Профиль/override применяется до выбора defaults. Ограничения backend и путей указаны в описании.
 
@@ -87,7 +93,7 @@ project_name: bluepill
 
 [Реализация 0.9.2](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_config.cmake) · [Index](index.md)
 
-**Проверки (частичное покрытие):** `configure.ioc-bluepill-defaults`, `configure.yaml-over-ioc`. [Test manifest](../../../../tests/cases.json).
+**Проверки (частичное покрытие):** `configure.ioc-bluepill-defaults`, `configure.yaml-over-ioc`, `configure.ioc-missing-values-defaults`. [Test manifest](../../../../tests/cases.json).
 
 <a id="mcu"></a>
 ## `mcu`

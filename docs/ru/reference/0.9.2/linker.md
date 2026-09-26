@@ -11,6 +11,8 @@
 
 Размер для подстановки в локальный .ld.in. Поддерживаются 0, целые байты, целые K/M в верхнем регистре. В IOC-ветке берётся HEX-поле; неполный IOC требует явного значения. Готовый .ld не переписывается; стандартный linker stm32-cmake не получает эти значения через эту ветку. Дробные размеры не поддерживаются по контракту (E003). При повторном Configure исходная 0.9.2 сохраняет прежнее значение кэша.
 
+**Изменение в 0.9.3** (`d8708b4`; ТЗ 4.11.4, 4.11.8, 4.11.9): формат проверяется при каждом Configure, а не только при генерации из шаблона: допустимы целое число байт или целое число с `K`/`M` в верхнем регистре (`0`, `1536`, `2K`, `1M`); `1k`, `1.5K`, `-1`, `0x200` — ошибка. Размер, заданный в YAML, профиле, override или IOC, при скрипте stm32-cmake или явном `linker_script` вызывает предупреждение, что он не применяется (для stm32-cmake — с его размерами heap/stack); значения по умолчанию предупреждения не вызывают.
+
 **Пропуск и пустота:** см. [общие правила](semantics.md#empty-values); исключения указаны выше. Профиль/override применяется до выбора defaults. Ограничения backend и путей указаны в описании.
 
 ```yaml
@@ -19,7 +21,7 @@ heap_size: 1K
 
 [Реализация 0.9.2](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_linker.cmake) · [Index](index.md)
 
-**Проверки (частичное покрытие):** `configure.linker-template`, `configure.baremetal-no-cube`, `configure.empty-and-null-defaults`, `configure.reconfigure-memory`. [Test manifest](../../../../tests/cases.json).
+**Проверки (частичное покрытие):** `configure.linker-template`, `configure.baremetal-no-cube`, `configure.empty-and-null-defaults`, `configure.reconfigure-memory`, `configure.memory-size-format`, `configure.memory-size-unused-warning`, `configure.ioc-missing-values-defaults`. [Test manifest](../../../../tests/cases.json).
 
 **Errata:** [E001](../../errata/E001.md), [E003](../../errata/E003.md).
 
@@ -30,6 +32,8 @@ heap_size: 1K
 
 Размер для подстановки в локальный .ld.in. Поддерживаются 0, целые байты, целые K/M в верхнем регистре. В IOC-ветке берётся HEX-поле; неполный IOC требует явного значения. Готовый .ld не переписывается; стандартный linker stm32-cmake не получает эти значения через эту ветку. Дробные размеры не поддерживаются по контракту (E003). При повторном Configure исходная 0.9.2 сохраняет прежнее значение кэша.
 
+**Изменение в 0.9.3** (`d8708b4`; ТЗ 4.11.4, 4.11.8, 4.11.9): формат проверяется при каждом Configure, а не только при генерации из шаблона: допустимы целое число байт или целое число с `K`/`M` в верхнем регистре (`0`, `1536`, `2K`, `1M`); `1k`, `1.5K`, `-1`, `0x200` — ошибка. Размер, заданный в YAML, профиле, override или IOC, при скрипте stm32-cmake или явном `linker_script` вызывает предупреждение, что он не применяется (для stm32-cmake — с его размерами heap/stack); значения по умолчанию предупреждения не вызывают.
+
 **Пропуск и пустота:** см. [общие правила](semantics.md#empty-values); исключения указаны выше. Профиль/override применяется до выбора defaults. Ограничения backend и путей указаны в описании.
 
 ```yaml
@@ -38,7 +42,7 @@ stack_size: 1K
 
 [Реализация 0.9.2](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_linker.cmake) · [Index](index.md)
 
-**Проверки (частичное покрытие):** `configure.linker-template`, `configure.baremetal-no-cube`, `configure.empty-and-null-defaults`, `configure.reconfigure-memory`, `configure.reconfigure-profile-name-boundaries`, `configure.reconfigure-empty-override`. [Test manifest](../../../../tests/cases.json).
+**Проверки (частичное покрытие):** `configure.linker-template`, `configure.baremetal-no-cube`, `configure.empty-and-null-defaults`, `configure.reconfigure-memory`, `configure.reconfigure-profile-name-boundaries`, `configure.reconfigure-empty-override`, `configure.memory-size-format`, `configure.memory-size-unused-warning`, `configure.ioc-missing-values-defaults`. [Test manifest](../../../../tests/cases.json).
 
 **Errata:** [E001](../../errata/E001.md), [E003](../../errata/E003.md).
 
@@ -49,6 +53,8 @@ stack_size: 1K
 
 auto ищет локальный .ld.in: конкретный тип MCU, замена корпуса на X, затем XX и xx. Сначала linker_script_dir, затем корень. Найденный шаблон создаёт .ld в build с HEAP_SIZE, STACK_SIZE и USE_READONLY (GCC >=11). Без шаблона stm32-cmake использует CMSIS target при use_cmsis; Arduino завершает настройку ошибкой. При bare metal задайте собственный скрипт/шаблон. Явный отсутствующий .ld — ошибка.
 
+**Изменение в 0.9.3** (`d8708b4`; ТЗ 4.11.9): с явным скриптом или скриптом stm32-cmake явно заданные `heap_size`/`stack_size` вызывают предупреждение, что они не применяются.
+
 **Пропуск и пустота:** см. [общие правила](semantics.md#empty-values); исключения указаны выше. Профиль/override применяется до выбора defaults. Ограничения backend и путей указаны в описании.
 
 ```yaml
@@ -57,7 +63,7 @@ linker_script: auto
 
 [Реализация 0.9.2](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_linker.cmake) · [Index](index.md)
 
-**Проверки (частичное покрытие):** `configure.linker-template`, `configure.explicit-linker`, `configure.missing-linker`. [Test manifest](../../../../tests/cases.json).
+**Проверки (частичное покрытие):** `configure.linker-template`, `configure.explicit-linker`, `configure.missing-linker`, `configure.memory-size-unused-warning`. [Test manifest](../../../../tests/cases.json).
 
 <a id="linker-script-dir"></a>
 ## `linker_script_dir`

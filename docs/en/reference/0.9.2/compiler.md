@@ -81,6 +81,8 @@ compile_definitions: [FEATURE=1]
 
 PRIVATE flags for C only. Items are split on spaces, with leading dashes added where needed; recognized flags with separate arguments preserve the next token. This is not a shell parser: YAML quotes do not protect a space inside an argument from normalization.
 
+**Change in 0.9.3** (`d8708b4`; spec 3.4.9): a value set only in a profile is applied without declaring the key at the YAML root (E008).
+
 **Omission and emptiness:** see [shared rules](semantics.md#empty-values); exceptions are stated above. Profiles/overrides apply before defaults. Backend/path restrictions are stated in the description.
 
 ```yaml
@@ -89,7 +91,7 @@ compile_options_c: [Wstrict-prototypes]
 
 [0.9.2 implementation](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/stm32_yml.cmake) · [Index](index.md)
 
-**Checks (partial coverage):** `configure.defaults-blackpill`, `configure.source-directory-target`. [Test manifest](../../../../tests/cases.json).
+**Checks (partial coverage):** `configure.defaults-blackpill`, `configure.source-directory-target`, `configure.profile-only-keys`. [Test manifest](../../../../tests/cases.json).
 
 <a id="compile-definitions-c"></a>
 ## `compile_definitions_c`
@@ -97,6 +99,8 @@ compile_options_c: [Wstrict-prototypes]
 `CFG-COMPILE-DEFINITIONS-C` · **Type:** list of definition strings · **Default:** []
 
 PRIVATE definitions for C only. Use NAME or NAME=value without -D; CMake adds -D. Strings are split on spaces. An empty list removes user definitions, not the automatic MCU define.
+
+**Change in 0.9.3** (`d8708b4`; spec 3.4.9): a value set only in a profile is applied without declaring the key at the YAML root (E008).
 
 **Omission and emptiness:** see [shared rules](semantics.md#empty-values); exceptions are stated above. Profiles/overrides apply before defaults. Backend/path restrictions are stated in the description.
 
@@ -106,7 +110,7 @@ compile_definitions_c: [FEATURE=1]
 
 [0.9.2 implementation](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/stm32_yml.cmake) · [Index](index.md)
 
-**Checks (partial coverage):** `configure.defaults-blackpill`, `configure.source-directory-target`. [Test manifest](../../../../tests/cases.json).
+**Checks (partial coverage):** `configure.defaults-blackpill`, `configure.source-directory-target`, `configure.profile-only-keys`. [Test manifest](../../../../tests/cases.json).
 
 <a id="compile-options-cxx"></a>
 ## `compile_options_cxx`
@@ -114,6 +118,8 @@ compile_definitions_c: [FEATURE=1]
 `CFG-COMPILE-OPTIONS-CXX` · **Type:** list of flag strings · **Default:** []
 
 PRIVATE flags for C++ only. Items are split on spaces, with leading dashes added where needed; recognized flags with separate arguments preserve the next token. This is not a shell parser: YAML quotes do not protect a space inside an argument from normalization.
+
+**Change in 0.9.3** (`d8708b4`; spec 3.4.9): a value set only in a profile is applied without declaring the key at the YAML root (E008).
 
 **Omission and emptiness:** see [shared rules](semantics.md#empty-values); exceptions are stated above. Profiles/overrides apply before defaults. Backend/path restrictions are stated in the description.
 
@@ -123,7 +129,7 @@ compile_options_cxx: [fno-exceptions]
 
 [0.9.2 implementation](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/stm32_yml.cmake) · [Index](index.md)
 
-**Checks (partial coverage):** `configure.defaults-blackpill`, `configure.source-directory-target`. [Test manifest](../../../../tests/cases.json).
+**Checks (partial coverage):** `configure.defaults-blackpill`, `configure.source-directory-target`, `configure.profile-only-keys`. [Test manifest](../../../../tests/cases.json).
 
 <a id="compile-definitions-cxx"></a>
 ## `compile_definitions_cxx`
@@ -131,6 +137,8 @@ compile_options_cxx: [fno-exceptions]
 `CFG-COMPILE-DEFINITIONS-CXX` · **Type:** list of definition strings · **Default:** []
 
 PRIVATE definitions for C++ only. Use NAME or NAME=value without -D; CMake adds -D. Strings are split on spaces. An empty list removes user definitions, not the automatic MCU define.
+
+**Change in 0.9.3** (`d8708b4`; spec 3.4.9): a value set only in a profile is applied without declaring the key at the YAML root (E008).
 
 **Omission and emptiness:** see [shared rules](semantics.md#empty-values); exceptions are stated above. Profiles/overrides apply before defaults. Backend/path restrictions are stated in the description.
 
@@ -140,6 +148,6 @@ compile_definitions_cxx: [FEATURE=1]
 
 [0.9.2 implementation](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/stm32_yml.cmake) · [Index](index.md)
 
-**Checks (partial coverage):** `configure.defaults-blackpill`, `configure.source-directory-target`. [Test manifest](../../../../tests/cases.json).
+**Checks (partial coverage):** `configure.defaults-blackpill`, `configure.source-directory-target`, `configure.profile-only-keys`. [Test manifest](../../../../tests/cases.json).
 
 Profile-only language settings require root declarations: [E008](../../errata/E008.md).

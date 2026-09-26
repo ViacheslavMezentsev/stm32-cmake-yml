@@ -39,6 +39,34 @@
   An unknown `crc_algorithm` warns and `STM32_HW_DEFAULT` is applied (E004).
   **Compatibility:** builds that used to pass with a zero stub now fail; CRC
   projects without a `.ld.in` template or explicit script must add one or disable CRC.
+- Ключи, заданные только в профиле или через `STM32_YML_OVERRIDE_*`, применяются
+  без объявления в корне YAML, в том числе `compile_options_c`/`_cxx`,
+  `compile_definitions_c`/`_cxx` и собственные ключи проекта (E008).
+  Keys set only in a profile or override are applied without a root declaration,
+  including the C/C++-specific options and project-specific keys (E008).
+- Из `profiles_file` читается только секция `profiles:`; остальные ключи файла
+  больше не подменяют базовое значение для `_append`.
+  Only the `profiles:` section of `profiles_file` is read; its other keys no longer
+  replace the base value for `_append`.
+- Изменение YAML, IOC-файла или `profiles_file` перезапускает Configure при
+  следующей сборке. Changing the YAML, IOC or profile file re-runs Configure on
+  the next build.
+- IOC без имени проекта, `HeapSize` или `StackSize` получает значения ручного
+  режима `auto`, 512 и 1024 вместо пустых. An incomplete IOC gets `auto`, 512
+  and 1024 instead of empty values.
+- Предупреждение о версии называет `stm32_cmake_yml_version` рекомендуемым
+  параметром; справка «Что нового в 0.9» удалена. Подсказка о `hal_conf.h`
+  называет фактический файл конфигурации. The version warning calls the parameter
+  recommended; the `hal_conf.h` hint names the actual configuration file.
+- `heap_size`/`stack_size` проверяются при каждом Configure: допустимы целое
+  число байт или целое число с `K`/`M` в верхнем регистре. Явно заданные размеры
+  при скрипте stm32-cmake или явном `linker_script` вызывают предупреждение, что
+  они не применяются. **Совместимость:** значения вроде `1k` или `0x200` при
+  скрипте без шаблона раньше молча игнорировались, теперь это ошибка Configure.
+  Sizes are validated on every Configure (integer bytes or integer with upper-case
+  `K`/`M`), and explicit sizes warn when the stm32-cmake or explicit linker script
+  ignores them. **Compatibility:** values such as `1k` or `0x200` used to be ignored
+  silently without a template and are now a Configure error.
 
 ## [0.9.2] - 2026-09-19
 
