@@ -7,6 +7,8 @@
 #                [--image <образ.bin>] <выход.bin> [предел_байт]
 #       Образ Flash строится из секций ELF с адресом загрузки в регионе FLASH
 #       (ТЗ 4.15.9) и не раздувается секциями вне Flash.
+#   stm32_crc.py --elf <вход.elf> --flash <начало>:<длина> --image <образ.bin>
+#       Только образ Flash без расчёта CRC: BIN-артефакт (ТЗ 4.14.2).
 #
 # Выход — 4 байта CRC little-endian. Любой сбой завершает скрипт с ненулевым
 # кодом и сообщением [CRC ERROR]; нулевая заглушка не записывается (ТЗ 4.15.7).
@@ -131,20 +133,26 @@ def run(argv):
         parser.add_argument('--flash', required=True, type=str)
         parser.add_argument('--exclude', action='append', default=[])
         parser.add_argument('--image')
-        parser.add_argument('output')
+        parser.add_argument('output', nargs='?')
         parser.add_argument('limit', nargs='?')
         args = parser.parse_args(argv)
+        if args.output is None and not args.image:
+            raise CrcError('Pass <output.bin> for the CRC or --image for the FLASH image')
         if not os.path.exists(args.elf):
             raise CrcError(f"Input file '{args.elf}' not found.")
         origin, length = parse_flash(args.flash)
         limit = parse_int(args.limit, 'FLASH limit') if args.limit is not None else None
         start, image, skipped = flash_image(args.elf, origin, length, set(args.exclude))
+        tag = '[STM32 CRC32]' if args.output else '[STM32 BIN]'
         for name, load, size in skipped:
-            print(f"[STM32 CRC32] Skipped {name}: load address 0x{load:08X} ({size} bytes) is outside FLASH")
+            print(f"{tag} Skipped {name}: load address 0x{load:08X} ({size} bytes) is outside FLASH")
         check_limit(len(image), limit)
         if args.image:
             with open(args.image, 'wb') as stream:
                 stream.write(image)
+        if args.output is None:
+            print(f"{tag} Written {args.image}: {len(image)} bytes from 0x{start:08X}")
+            return
         crc = write_crc(args.output, image)
         print(f"[STM32 CRC32] Calculated: 0x{crc:08X} (Size: {len(image)} bytes from 0x{start:08X})")
         return

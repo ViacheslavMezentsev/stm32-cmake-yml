@@ -86,22 +86,8 @@ function(stm32_yml_setup_postbuild TARGET_NAME)
             endif()
 
             # ТЗ 4.15.9: образ CRC строится из секций в регионе FLASH итогового скрипта.
-            set(_flash_re "(^|\n)[ \t]*FLASH[ \t]*(\\([^)]*\\))?[ \t]*:[ \t]*ORIGIN[ \t]*=[ \t]*(0[xX][0-9A-Fa-f]+|[0-9]+)[ \t]*,[ \t]*LENGTH[ \t]*=[ \t]*(0[xX][0-9A-Fa-f]+|[0-9]+[KkMm]?)")
-            if(_ld_text MATCHES "${_flash_re}")
-                set(CRC_FLASH_ORIGIN "${CMAKE_MATCH_3}")
-                string(TOUPPER "${CMAKE_MATCH_4}" _flash_length)
-                if(_flash_length MATCHES "^0X")
-                    math(EXPR CRC_FLASH_LENGTH "${_flash_length}")
-                elseif(_flash_length MATCHES "K$")
-                    string(REGEX REPLACE "K$" "" _flash_length "${_flash_length}")
-                    math(EXPR CRC_FLASH_LENGTH "${_flash_length} * 1024")
-                elseif(_flash_length MATCHES "M$")
-                    string(REGEX REPLACE "M$" "" _flash_length "${_flash_length}")
-                    math(EXPR CRC_FLASH_LENGTH "${_flash_length} * 1024 * 1024")
-                else()
-                    set(CRC_FLASH_LENGTH "${_flash_length}")
-                endif()
-            else()
+            stm32_yml_flash_region(CRC_FLASH_ORIGIN CRC_FLASH_LENGTH)
+            if("${CRC_FLASH_ORIGIN}" STREQUAL "")
                 message(WARNING
                     " Расчет CRC отключен. Не удалось определить регион FLASH (ORIGIN, LENGTH) "
                     "в скрипте ${LINKER_SCRIPT_PATH}.")
@@ -191,7 +177,7 @@ function(stm32_yml_setup_postbuild TARGET_NAME)
 
     # Генерируем запрошенные пользователем файлы из YAML
     if("bin" IN_LIST build_artifacts)
-        stm32_generate_binary_file(${TARGET_NAME})
+        stm32_yml_generate_bin_file(${TARGET_NAME})
     endif()
 
     if("hex" IN_LIST build_artifacts)

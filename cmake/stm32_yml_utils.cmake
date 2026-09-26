@@ -611,3 +611,90 @@ function(stm32_yml_mcu_memory_size KIND OUT_BYTES)
         set(${ARGV2} "${_size}" PARENT_SCOPE)
     endif()
 endfunction()
+
+# ==============================================================================
+# Регион FLASH итогового скрипта компоновщика (ТЗ 4.15.9, 4.14.2): из шаблона
+# или явного скрипта (LINKER_SCRIPT_PATH), а для скрипта stm32-cmake — по
+# stm32_get_memory_info с учётом ядра. Если регион не определить, OUT_ORIGIN пуст.
+#
+# @param OUT_ORIGIN  - Переменная для начального адреса (как в скрипте, 0x...).
+# @param OUT_LENGTH  - Переменная для длины в байтах.
+# ==============================================================================
+function(stm32_yml_flash_region OUT_ORIGIN OUT_LENGTH)
+    set(${OUT_ORIGIN} "" PARENT_SCOPE)
+    set(${OUT_LENGTH} "" PARENT_SCOPE)
+    if(LINKER_SCRIPT_PATH AND EXISTS "${LINKER_SCRIPT_PATH}")
+        file(READ "${LINKER_SCRIPT_PATH}" _ld_text)
+        set(_flash_re "(^|\n)[ \t]*FLASH[ \t]*(\\([^)]*\\))?[ \t]*:[ \t]*ORIGIN[ \t]*=[ \t]*(0[xX][0-9A-Fa-f]+|[0-9]+)[ \t]*,[ \t]*LENGTH[ \t]*=[ \t]*(0[xX][0-9A-Fa-f]+|[0-9]+[KkMm]?)")
+        if(NOT _ld_text MATCHES "${_flash_re}")
+            return()
+        endif()
+        set(_origin "${CMAKE_MATCH_3}")
+        string(TOUPPER "${CMAKE_MATCH_4}" _length)
+    elseif(NOT toolchain_backend STREQUAL "arduino" AND use_cmsis)
+        # Скрипт формирует stm32-cmake по той же базе памяти.
+        set(_core_args "")
+        if(NOT "${mcu_core}" STREQUAL "")
+            set(_core_args CORE ${mcu_core})
+        endif()
+        stm32_get_memory_info(CHIP ${MCU} ${_core_args} FLASH SIZE _length ORIGIN _origin)
+        string(TOUPPER "${_length}" _length)
+    else()
+        return()
+    endif()
+    if(_length MATCHES "^0X")
+        math(EXPR _bytes "${_length}")
+    elseif(_length MATCHES "^([0-9]+)K$")
+        math(EXPR _bytes "${CMAKE_MATCH_1} * 1024")
+    elseif(_length MATCHES "^([0-9]+)M$")
+        math(EXPR _bytes "${CMAKE_MATCH_1} * 1024 * 1024")
+    else()
+        set(_bytes "${_length}")
+    endif()
+    set(${OUT_ORIGIN} "${_origin}" PARENT_SCOPE)
+    set(${OUT_LENGTH} "${_bytes}" PARENT_SCOPE)
+endfunction()
+
+# ==============================================================================
+# BIN-артефакт только из секций ELF с адресом загрузки в регионе FLASH
+# (ТЗ 4.14.2, 4.15.9). objcopy -O binary заполнил бы промежуток до секции вне
+# Flash (резервная SRAM, ITCM без AT> FLASH) и дал бы файл в сотни мегабайт.
+# Для обычного ELF результат побайтно совпадает с objcopy -O binary. Команда
+# добавляется после внедрения CRC, поэтому BIN содержит записанную CRC.
+# Имя файла — как у функций stm32-cmake: OUTPUT_NAME цели или её имя.
+# Если регион FLASH или Python недоступны — функция toolchain с предупреждением.
+# ==============================================================================
+function(stm32_yml_generate_bin_file TARGET)
+    get_target_property(_output_name ${TARGET} OUTPUT_NAME)
+    if(NOT _output_name)
+        set(_output_name "${TARGET}")
+    endif()
+    get_target_property(_output_dir ${TARGET} RUNTIME_OUTPUT_DIRECTORY)
+    if(_output_dir)
+        set(_bin "${_output_dir}/${_output_name}.bin")
+    else()
+        set(_bin "${_output_name}.bin")
+    endif()
+
+    stm32_yml_flash_region(_flash_origin _flash_length)
+    find_package(Python3 COMPONENTS Interpreter QUIET)
+    set(_script "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../scripts/stm32_crc.py")
+    if("${_flash_origin}" STREQUAL "" OR NOT Python3_FOUND OR NOT EXISTS "${_script}")
+        message(WARNING
+            "bin: не удалось определить регион FLASH скрипта компоновщика или найти Python3; "
+            "BIN создаётся objcopy -O binary и может оказаться большим, если в ELF есть "
+            "секции вне Flash.")
+        stm32_generate_binary_file(${TARGET})
+        return()
+    endif()
+
+    add_custom_command(TARGET ${TARGET} POST_BUILD
+        COMMAND ${Python3_EXECUTABLE} ${_script}
+                --elf $<TARGET_FILE:${TARGET}>
+                --flash ${_flash_origin}:${_flash_length}
+                --image ${_bin}
+        BYPRODUCTS ${_bin}
+        COMMENT "Generating binary file ${_output_name}.bin from FLASH sections of the ELF output file."
+        VERBATIM
+    )
+endfunction()

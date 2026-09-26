@@ -24,3 +24,6 @@ profiles:
   crc:
     linker_script_dir: linker
     crc_enable: true
+  sstack:
+    linker_script_dir: linker
+    linker_script: h563-sstack.ld

@@ -24,5 +24,3 @@ profiles:
     mcu: STM32H503CB
     crc_enable: true
     compile_definitions: [SMOKE_BKPSRAM=1]
-    # objcopy -O binary would span 0x08000000..0x40036400 (~900 MB): no BIN.
-    build_artifacts: [hex, map]

@@ -133,6 +133,15 @@ class ElfModeTests(unittest.TestCase):
         self.assertEqual((self.dir / 'crc.bin').read_bytes(), struct.pack('<I', stm32_crc32(self.expected)))
         self.assertIn('Skipped .bkpsram: load address 0x40036400', result.stdout)
 
+    def test_image_only_mode_writes_flash_sections(self):
+        # BIN artifact (spec 4.14.2): FLASH sections only, including .checksum.
+        result = run_script('--elf', self.elf, '--flash', '0x08000000:131072', '--image', self.dir / 'fw.bin')
+        self.assertEqual(result.returncode, 0, result.stderr)
+        image = (self.dir / 'fw.bin').read_bytes()
+        self.assertEqual(image, self.expected[:0x18] + bytes(4) + self.expected[0x18:])
+        self.assertIn('[STM32 BIN] Skipped .bkpsram', result.stdout)
+        self.assertNotEqual(run_script('--elf', self.elf, '--flash', '0x08000000:131072').returncode, 0)
+
     def test_elf_failures_break_the_build(self):
         (self.dir / 'text.elf').write_text('not an ELF file')
         for args in (('--elf', self.dir / 'missing.elf', '--flash', '0x08000000:1024'),

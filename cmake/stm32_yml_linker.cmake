@@ -193,6 +193,8 @@ function(stm32_yml_setup_linker_script TARGET_NAME)
         target_link_libraries(${TARGET_NAME} PRIVATE ${LOCAL_CMSIS_TARGET_TO_LINK})
     endif()
 
+    _stm32_yml_check_stack_limit_symbol("${LOCAL_LINKER_SCRIPT_PATH}")
+
     # =======================================================================
     # 3. ЭКСПОРТ ПЕРЕМЕННЫХ
     # =======================================================================
@@ -220,4 +222,45 @@ function(_stm32_yml_warn_unused_memory_sizes)
     string(REPLACE ";" ", " _values "${_values}")
     string(CONCAT _reason ${ARGN})
     message(WARNING "Заданные размеры памяти (${_values}) не применяются: ${_reason}")
+endfunction()
+
+# ==============================================================================
+# Startup из свежих пакетов STM32Cube для ARMv8-M (например, CubeH5 1.7.0)
+# задаёт границу стека командой msr MSPLIM и ссылается на символ _sstack.
+# Скрипт stm32-cmake и старые шаблоны его не определяют: компоновка упадёт с
+# "undefined reference to _sstack". Предупреждаем на Configure (ТЗ 4.11.10).
+#
+# @param SCRIPT_PATH  Шаблонный или явный скрипт; пусто — скрипт stm32-cmake.
+# ==============================================================================
+function(_stm32_yml_check_stack_limit_symbol SCRIPT_PATH)
+    if(toolchain_backend STREQUAL "arduino" OR NOT use_cmsis)
+        return()
+    endif()
+    if(mcu_core)
+        set(_startup "${CMSIS_${MCU_FAMILY}_${mcu_core}_${MCU_TYPE}_STARTUP}")
+    else()
+        set(_startup "${CMSIS_${MCU_FAMILY}_${MCU_TYPE}_STARTUP}")
+    endif()
+    if(NOT _startup OR NOT EXISTS "${_startup}")
+        return()
+    endif()
+    file(STRINGS "${_startup}" _uses REGEX "_sstack")
+    if(NOT _uses)
+        return()
+    endif()
+    if(SCRIPT_PATH AND EXISTS "${SCRIPT_PATH}")
+        file(STRINGS "${SCRIPT_PATH}" _defines REGEX "_sstack")
+        if(_defines)
+            return()
+        endif()
+        set(_script_text "скрипт компоновщика ${SCRIPT_PATH}")
+    else()
+        set(_script_text "скрипт компоновщика stm32-cmake")
+    endif()
+    message(WARNING
+        "Startup ${_startup} задаёт границу стека (MSPLIM) по символу _sstack, "
+        "но ${_script_text} его не определяет: компоновка завершится ошибкой "
+        "'undefined reference to _sstack'. Добавьте в шаблон .ld.in или явный скрипт "
+        "строку '_sstack = _estack - _Min_Stack_Size;' либо подключите через sources "
+        "собственный startup без MSPLIM.")
 endfunction()

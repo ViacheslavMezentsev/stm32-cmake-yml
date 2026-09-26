@@ -102,8 +102,7 @@ def build_only(root, output):
             with (build / (name + '.log')).open('w') as log:
                 subprocess.run(command, stdout=log, stderr=subprocess.STDOUT, check=True, timeout=180)
         elf = build / 'buildonly_probe.elf'
-        extensions = ('elf', 'hex') if profile == 'h503bkp' else ('elf', 'bin', 'hex')
-        for extension in extensions:
+        for extension in ('elf', 'bin', 'hex'):
             if not (build / ('buildonly_probe.' + extension)).stat().st_size:
                 raise ValueError(f'Empty {extension} artifact: {profile}')
         data = elf.read_bytes()
@@ -128,6 +127,10 @@ def build_only(root, output):
             image = next(build.glob('*_no_crc.bin')).read_bytes()
             if len(image) > length:
                 raise ValueError(f'CRC image larger than FLASH: {profile}')
+            # The BIN artifact holds FLASH sections only (spec 4.14.2): the CRC
+            # image plus the injected checksum, even with backup SRAM data.
+            if (build / 'buildonly_probe.bin').read_bytes() != image + struct.pack('<I', stored):
+                raise ValueError(f'BIN differs from the FLASH image with CRC: {profile}')
             if profile == 'h503':
                 compare_gap_fill(build, elf)
             result['crc'] = f'{stored:08X}'

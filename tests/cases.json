@@ -366,7 +366,8 @@
     "args": ["-DPROJECT_CONFIG_FILE=stm32h7.yml"],
     "observed": {"MCU": "STM32H743ZI"},
     "properties": {"LINK_LIBRARIES": ["HAL::STM32::H7::M7::GPIO", "CMSIS::STM32::H743ZI::M7"]},
-    "log_contains": ["Ядро MCU не задано, используется единственное ядро STM32H743ZI: M7.", "не проверялось (скрипт формирует stm32-cmake)"]
+    "log_contains": ["Ядро MCU не задано, используется единственное ядро STM32H743ZI: M7.", "не проверялось (скрипт формирует stm32-cmake)"],
+    "log_absent": ["MSPLIM"]
   },
   {
     "name": "h7-dual-core",
@@ -399,10 +400,11 @@
     "name": "h5-cmsis-hal-freertos-external",
     "args": ["-DPROJECT_CONFIG_FILE=stm32h5.yml", "-DFREERTOS_PATH=/opt/FreeRTOS-Kernel/11.3.1"],
     "steps": [
-      {"args": ["-DSTM32_YML_PROFILE="], "properties": {"LINK_LIBRARIES": ["HAL::STM32::H5::GPIO", "CMSIS::STM32::H563ZI"]}},
+      {"args": ["-DSTM32_YML_PROFILE="], "properties": {"LINK_LIBRARIES": ["HAL::STM32::H5::GPIO", "CMSIS::STM32::H563ZI"]}, "log_contains": ["Startup /opt/STM32Cube/Repository/STM32Cube_FW_H5_V1.7.0/Drivers/CMSIS/Device/ST/STM32H5xx/Source/Templates/gcc/startup_stm32h563xx.s задаёт границу стека (MSPLIM) по символу _sstack", "но скрипт компоновщика stm32-cmake его не определяет"]},
+      {"args": ["-DSTM32_YML_PROFILE=sstack"], "link_options_contain": "linker/h563-sstack.ld", "log_absent": ["MSPLIM"]},
       {"args": ["-DSTM32_YML_PROFILE=rtos"], "properties": {"LINK_LIBRARIES": ["FreeRTOS::ARM_CM33_NTZ", "FreeRTOS::Heap::4"]}, "absent_properties": {"LINK_LIBRARIES": ["FreeRTOS::ARM_CM33_NTZ::NON_SECURE"]}},
       {"args": ["-DSTM32_YML_PROFILE=rtosv2"], "error": "cmsis_rtos_api: v2: обёртка CMSIS-RTOS не найдена (нет цели CMSIS::STM32::H5::RTOS_V2)"},
-      {"args": ["-DSTM32_YML_PROFILE=crc"], "linker": {"file": "STM32H563ZI_FLASH.ld", "heap": 512, "stack": 1024}, "log_contains": ["Max Flash Size: 2097152", "Соотношение : 640K == 640K"]}
+      {"args": ["-DSTM32_YML_PROFILE=crc"], "linker": {"file": "STM32H563ZI_FLASH.ld", "heap": 512, "stack": 1024}, "log_contains": ["Max Flash Size: 2097152", "Соотношение : 640K == 640K", "Startup /opt/STM32Cube/Repository/STM32Cube_FW_H5_V1.7.0/Drivers/CMSIS/Device/ST/STM32H5xx/Source/Templates/gcc/startup_stm32h563xx.s задаёт границу стека (MSPLIM) по символу _sstack"]}
     ]
   },
   {

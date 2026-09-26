@@ -70,7 +70,9 @@ def verify(case, build, source):
         target = observed("PROJECT_NAME")
         post = "\n".join(line for line in ninja.splitlines()
                          if line.strip().startswith("POST_BUILD = "))
-        for extension, command in (("bin", "arm-none-eabi-objcopy -O binary"),
+        # ТЗ 4.14.2: BIN строится из секций FLASH скриптом, а не objcopy -O binary.
+        require("arm-none-eabi-objcopy -O binary" not in post, "BIN must not use objcopy -O binary")
+        for extension, command in (("bin", f"--image {target}.bin"),
                                    ("hex", "arm-none-eabi-objcopy -O ihex"),
                                    ("srec", "arm-none-eabi-objcopy -O srec"),
                                    ("lss", "arm-none-eabi-objdump -h -S")):
@@ -118,7 +120,8 @@ def verify(case, build, source):
             require(token not in flags, f"Generated link flags unexpectedly contain {token!r}")
 
     if "crc_command" in case:
-        require(("stm32_crc.py" in ninja) == case["crc_command"], "Incorrect CRC command presence")
+        # BIN также строится stm32_crc.py (--image), поэтому признак CRC — --exclude.
+        require(("--exclude" in ninja) == case["crc_command"], "Incorrect CRC command presence")
         if case["crc_command"]:
             # ТЗ 4.15.9: образ из секций ELF в регионе FLASH скрипта, без gap-fill.
             for token in ("--elf", "--flash 0x08000000:524288", "--exclude .checksum",
