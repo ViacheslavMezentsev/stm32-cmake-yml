@@ -2,10 +2,55 @@
 
 [English](../en/testing.md)
 
-Тестирование использует изолированное Linux-окружение и тестовые проекты CTest.
+Тестирование использует изолированное Linux-окружение с закреплёнными версиями.
 Существующие проекты с `include(stm32_yml)` не требуют изменений. Тесты вызывают
-фреймворк из текущего checkout и проверяют результат Configure/Generate;
-компиляция прошивок не выполняется.
+фреймворк из текущего checkout. Эта страница описывает уровни проверок, окружение
+компиляторов и configure-сценарии; сборка и запуск прошивок — на странице
+[тестов прошивок](firmware-testing.md).
+
+## Уровни проверок и где их искать
+
+Проверки делятся на шесть уровней (ТЗ 8.1, приложение F). Числа — для полного
+прогона на трёх GCC × двух CMake.
+
+| Уровень | Что проверяет | Где в дереве | Как запустить | Объём |
+| --- | --- | --- | --- | --- |
+| L0 | Готовность окружения: версии инструментов, исходники из lock-файла, Configure/Generate маленького проекта; наличие QEMU, Renode и машин | `ci/docker/verify.py`, `ci/emulation/check.py` | `docker run --rm --network none stm32-yml-ci:local`; `python ci/emulation/check.py` | 6 пар; 2 эмулятора |
+| L1 | Документация: ссылки, двуязычные карточки `CFG-*`, errata, привязки опций к тестам | `ci/check_reference.py`, `docs/reference-index.json` | `python ci/check_reference.py` | 55 карточек, 8 errata, 75 страниц |
+| L2 | Логика скриптов CI: runner'ы QEMU/Renode, CRC, матрица, бейджи | `tests/test_firmware*.py`, `ci/emulation/test_check.py` | `python -m unittest discover -s tests -p "test_firmware*.py"` | 42 теста |
+| L3 | Поведение фреймворка на Configure/Generate | `tests/cases.json`, `tests/run_case.py`, `tests/CMakeLists.txt`, `tests/fixtures/project/` | `python ci/run_configure_tests.py --output <каталог>` (в образе) | 139 сценариев × 6 = 834 |
+| L4 | Сборка прошивок, проверки ELF, раскладки, CRC, метаданных | `tests/firmware/semihosting/`, `tests/firmware/buildonly/`, `ci/build_firmware_smoke.py`, `ci/firmware_cases.py` | `python ci/firmware_matrix.py build --output <каталог>` | 570 сборок |
+| L5 | Исполнение прошивок в эмуляторах | `ci/run_qemu_smoke.py`, `ci/run_renode_smoke.py`, `tests/firmware/renode/` | `python ci/firmware_matrix.py run [--emulator renode] --build <сборки> --output <логи>` | 336 запусков QEMU, 612 Renode |
+
+```text
+ci/
+├── docker/                    # L0: образ компиляторов, установка и verify.py
+├── emulation/                 # L0: образ QEMU/Renode, check.py и его тест
+├── dependencies.lock.json     # Закреплённые версии и SHA-256
+├── check_reference.py         # L1
+├── run_configure_tests.py     # L3: CTest на всех парах GCC/CMake
+├── firmware_cases.py          # L4–L5: цели, профили, эмуляторы
+├── build_firmware_smoke.py    # L4: сборка и проверки одной пары
+├── firmware_matrix.py         # L4–L5: все пары в отдельных процессах
+├── run_qemu_smoke.py          # L5: QEMU
+├── run_renode_smoke.py        # L5: Renode
+└── firmware_badge.py          # Счётчик Builds (Checks)
+tests/
+├── cases.json                 # L3: описания сценариев
+├── run_case.py                # L3: выполнение одного сценария
+├── fixtures/project/          # L3: тестовый проект, YAML и IOC сценариев
+├── toolchains/                # L3: toolchain-файл Arduino
+├── test_firmware*.py          # L2
+└── firmware/
+    ├── semihosting/           # L4–L5: прошивка на 13 профилей; targets/ — F0, F4, G4, F7
+    ├── buildonly/             # L4–L5: H7/H5 и образ CRC H503
+    └── renode/                # L5: модели *.repl и exit_hook.py
+.github/workflows/             # CI: environment, configure, firmware, emulation, documentation, badges
+```
+
+Подробно: configure-сценарии — раздел [ниже](#проверки-конфигурации-фреймворка),
+прошивки — [тесты прошивок](firmware-testing.md), эмуляторы по семействам и их
+особенности — [окружение эмуляции](emulation.md).
 
 ## Состав
 

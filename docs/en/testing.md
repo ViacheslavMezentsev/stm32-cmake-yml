@@ -2,10 +2,55 @@
 
 [Русский](../ru/testing.md)
 
-Testing uses an isolated Linux environment and CTest configuration fixtures.
-Existing `include(stm32_yml)` projects do not need any changes. The suite invokes
-the framework from the current checkout and checks Configure/Generate results;
-it does not build firmware.
+Testing uses an isolated Linux environment with pinned versions. Existing
+`include(stm32_yml)` projects do not need any changes. The tests invoke the
+framework from the current checkout. This page describes the test levels, the
+compiler environment and the configure scenarios; firmware builds and runs are on
+the [firmware tests](firmware-testing.md) page.
+
+## Test levels and where to find them
+
+Checks are split into six levels (spec 8.1, appendix F). Numbers are for a full run
+on three GCC × two CMake versions.
+
+| Level | What it checks | Where in the tree | How to run | Size |
+| --- | --- | --- | --- | --- |
+| L0 | Environment readiness: tool versions, sources from the lockfile, Configure/Generate of a small project; QEMU, Renode and machines | `ci/docker/verify.py`, `ci/emulation/check.py` | `docker run --rm --network none stm32-yml-ci:local`; `python ci/emulation/check.py` | 6 pairs; 2 emulators |
+| L1 | Documentation: links, bilingual `CFG-*` cards, errata, option-to-test mappings | `ci/check_reference.py`, `docs/reference-index.json` | `python ci/check_reference.py` | 55 cards, 8 errata, 75 pages |
+| L2 | CI script logic: QEMU/Renode runners, CRC, matrix, badges | `tests/test_firmware*.py`, `ci/emulation/test_check.py` | `python -m unittest discover -s tests -p "test_firmware*.py"` | 42 tests |
+| L3 | Framework behaviour at Configure/Generate | `tests/cases.json`, `tests/run_case.py`, `tests/CMakeLists.txt`, `tests/fixtures/project/` | `python ci/run_configure_tests.py --output <dir>` (in the image) | 139 scenarios × 6 = 834 |
+| L4 | Firmware builds; ELF, layout, CRC and metadata checks | `tests/firmware/semihosting/`, `tests/firmware/buildonly/`, `ci/build_firmware_smoke.py`, `ci/firmware_cases.py` | `python ci/firmware_matrix.py build --output <dir>` | 570 builds |
+| L5 | Firmware execution in emulators | `ci/run_qemu_smoke.py`, `ci/run_renode_smoke.py`, `tests/firmware/renode/` | `python ci/firmware_matrix.py run [--emulator renode] --build <builds> --output <logs>` | 336 QEMU, 612 Renode runs |
+
+```text
+ci/
+├── docker/                    # L0: compiler image, installer and verify.py
+├── emulation/                 # L0: QEMU/Renode image, check.py and its test
+├── dependencies.lock.json     # Pinned versions and SHA-256
+├── check_reference.py         # L1
+├── run_configure_tests.py     # L3: CTest on every GCC/CMake pair
+├── firmware_cases.py          # L4–L5: targets, profiles, emulators
+├── build_firmware_smoke.py    # L4: build and checks for one pair
+├── firmware_matrix.py         # L4–L5: every pair in a separate process
+├── run_qemu_smoke.py          # L5: QEMU
+├── run_renode_smoke.py        # L5: Renode
+└── firmware_badge.py          # Builds (Checks) counter
+tests/
+├── cases.json                 # L3: scenario descriptions
+├── run_case.py                # L3: runs one scenario
+├── fixtures/project/          # L3: test project, scenario YAML and IOC files
+├── toolchains/                # L3: Arduino toolchain file
+├── test_firmware*.py          # L2
+└── firmware/
+    ├── semihosting/           # L4–L5: firmware with 13 profiles; targets/ — F0, F4, G4, F7
+    ├── buildonly/             # L4–L5: H7/H5 and the H503 CRC image
+    └── renode/                # L5: *.repl models and exit_hook.py
+.github/workflows/             # CI: environment, configure, firmware, emulation, documentation, badges
+```
+
+Details: configure scenarios — [below](#framework-configuration-tests), firmware —
+[firmware tests](firmware-testing.md), emulators per family and their specifics —
+[emulation environment](emulation.md).
 
 ## Contents
 

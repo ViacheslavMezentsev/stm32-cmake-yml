@@ -96,7 +96,7 @@ is inferred from running this ELF on the F205-based netduino2.
 
 The matrix is read from the shared dependency lockfile, not duplicated in YAML.
 Images are built once; tool pairs run sequentially with separate build/log paths.
-Actual GCC/CMake versions, all thirteen F103 profiles and the four H7/H5 profiles are checked for each pair.
+Actual GCC/CMake versions, all thirteen profiles of every target, the corrupted copies and the four H7/H5 profiles are checked for each pair.
 Failures do not stop collection of other pair results, but the matrix exits nonzero
 if any pair fails. Run selection uses the current lockfile rather than accepting
 whatever manifests happen to exist. Aggregate reports are matrix-summary.json;
@@ -157,9 +157,8 @@ or timeout cannot pass this case. This adds one run per target and pair without 
 
 A separate negative build (TC-52) on each pair configures the `success` profile with `flash_size: 4K` and requires both the build and a rebuild to fail at the CRC step (`[CRC ERROR]`, image larger than the Flash limit). The badge does not count it.
 
-This verifies software CRC over loaded FLASH on netduino2, not the STM32 CRC
-peripheral. Fixes for E004 (algorithm selection) and E006 (post-build error handling) are
-prepared in the 0.9.3 release branch: the CRC image comes from FLASH sections and a failure stops the build. Old manifests must be rebuilt to include CRC expectations.
+This verifies software CRC over loaded FLASH, not the STM32 CRC peripheral.
+Since 0.9.3 (E004, E006) the CRC image comes from FLASH sections and a failure stops the build. Old manifests must be rebuilt to include CRC expectations.
 
 ## Renode and a shared ELF
 
@@ -200,8 +199,8 @@ freertosTasks priority-probe warning documented below and retained in the report
 Artifacts include process.log, firmware.log, guest-exit.json (when reached) and
 renode-summary.json. No downloads, GUI or GDB are needed.
 
-By default (`--mode batch`) all 13 ELFs of one GCC/CMake pair run in a single
-Renode process: 6 processes instead of 78. Before each case `Clear` removes the
+By default (`--mode batch`) all ELFs of one GCC/CMake pair run in a single
+Renode process: 6 processes per matrix instead of one per case. Before each case `Clear` removes the
 machine, which is then recreated and loads the ELF, so CPU, NVIC, SysTick,
 memory and the exit hook never carry over. Output is split by
 `RENODE_CASE_END=<n>` markers: every case keeps its own process.log,
@@ -397,6 +396,11 @@ report. Other warnings, duplicate probe warnings, errors or missing guest exit
 still fail. configASSERT remains enabled.
 
 ## CI duration and timeouts
+
+The measurements below predate the F0, F4, G4 and F7 targets (78 runs per simulator).
+The full matrix is now 570 builds and 948 runs; locally on 2 vCPUs it takes about
+22 minutes (builds about 10, QEMU about 7, Renode about 5), so the Firmware job
+limit is raised to 90 minutes.
 
 In the [main f16eb09 run](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/actions/runs/36136281504), smoke took 13:23:
 

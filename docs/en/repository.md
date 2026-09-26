@@ -5,7 +5,11 @@
 `stm32_yml.cmake` is the consumer entry point. The cmake/ modules handle configuration,
 profiles, Arduino integration, dependencies, sources, linking, post-build actions,
 diagnostics and code quality. scripts/stm32_crc.py computes CRC data for post-build
-processing. tests/ holds configure fixtures and CTest; ci/ holds Docker and checks.
+processing. tests/ holds configure scenarios, test firmware and Renode models; ci/
+holds the Docker images, check runners and the version lockfile
+([test levels and where to find them](testing.md#test-levels-and-where-to-find-them)).
+The changelog exists in Russian ([CHANGELOG.md](../../CHANGELOG.md)) and English
+([CHANGELOG.en.md](../../CHANGELOG.en.md)).
 
 Documentation lives under docs/ru and docs/en. docs/reference-index.json maps
 options to their reference cards, tests and errata. The existing Russian scenario

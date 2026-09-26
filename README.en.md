@@ -16,6 +16,8 @@ A separate Arduino Core STM32 backend uses CMake wrappers supplied by your proje
 `Builds (Checks)` shows built configurations and QEMU/Renode execution checks from
 the last successful Firmware CI run on main. [Reading the counter](docs/en/status.md) ·
 [Test scope and procedure](docs/en/firmware-testing.md).
+Test firmware is built and run for F0, F1, F4, G4, F7, H5 and H7 —
+[which emulator checks each family](docs/en/emulation.md#emulators-per-family).
 Markdown-only changes run the fast Docs check without rebuilding firmware.
 
 ## Why use it?
@@ -100,4 +102,4 @@ your assistant through the mechanism your tool supports; skills are not required
 - [stm32-gdbtest](https://github.com/ViacheslavMezentsev/stm32-gdbtest) — reusable testing infrastructure for firmware on real STM32 hardware through GDB-Python and SWD; test scenarios run on the host PC.
 - [stm32-hwtest-blackpill](https://github.com/ViacheslavMezentsev/stm32-hwtest-blackpill) — firmware, hardware test setups and stm32-gdbtest scenarios for BlackPill, BluePill and other boards.
 
-[Changelog](CHANGELOG.md) · [MIT License](LICENSE)
+[Changelog](CHANGELOG.en.md) · [MIT License](LICENSE)

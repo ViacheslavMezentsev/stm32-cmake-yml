@@ -13,6 +13,6 @@ Instructions for AI agents and new contributors ([English](docs/en/maintenance.m
 2. Требования — в [docs/TECHNICAL_SPECIFICATION.md](docs/TECHNICAL_SPECIFICATION.md);
    текущая ревизия указана в его реквизитах. Копии ТЗ вне репозитория не ведутся.
 3. Работайте в ветке `<агент>/<задача>` от актуального main (`codex/`, `claude/`, …).
-4. Изменение поведения — только с регрессией, карточкой справочника, CHANGELOG и
+4. Изменение поведения — только с регрессией, карточкой справочника, записью в CHANGELOG.md и CHANGELOG.en.md и
    новой ревизией ТЗ (п. 7.4 ТЗ). Перед выпуском — все проверки локально (п. 8.8.7).
 5. Коммиты — Conventional Commits на английском, без ссылок на сессии агентов.

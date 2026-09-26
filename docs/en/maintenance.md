@@ -23,13 +23,14 @@ the technical specification, whose current revision is stated in its header.
    the version's work items (appendix E).
 5. For a specific task — [errata](errata/index.md), [reference](reference/0.9.2/index.md)
    cards, [testing](testing.md), [firmware tests](firmware-testing.md) and the
-   [CHANGELOG](../../CHANGELOG.md).
+   [CHANGELOG](../../CHANGELOG.en.md).
 
 **Work cycle**
 
 1. Branch `<agent>/<task>` from current main (section "Branches without pull requests").
 2. Behaviour changes follow spec 7.4: regression, `CFG-*` card and index,
-   CHANGELOG, new spec revision. Code and tests refer to spec items per
+   an entry in both changelogs ([RU](../../CHANGELOG.md), [EN](../../CHANGELOG.en.md))
+   in the version-section format, new spec revision. Code and tests refer to spec items per
    appendix D (`# ТЗ 4.15.9`).
 3. Local checks of the affected levels L0–L5 (spec 8.1; commands in spec
    appendix F, [testing.md](testing.md), [firmware-testing.md](firmware-testing.md));
