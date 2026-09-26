@@ -92,20 +92,29 @@ synchronization is still required before merging.
 
 ## Docker layer cache
 
-The `ci/docker` image (compilers, CMake, Cube/Arduino/ETL sources) and the
-`ci/emulation` image (QEMU from source, Renode) are built with BuildKit and the
-GitHub Actions layer cache (`type=gha`, scopes `stm32-yml-ci` and
-`stm32-yml-emulation`). A layer key is the Dockerfile instruction plus the content
-of copied files, so any lock file, install script or Dockerfile change rebuilds
-that layer and all later ones. All downloads are SHA-256 pinned, so caching does
-not change image contents.
+The `ci/emulation` image (QEMU from source, Renode) is built with BuildKit and the
+GitHub Actions layer cache (`type=gha`, scope `stm32-yml-emulation`). A layer key
+is the Dockerfile instruction plus the content of copied files, so a lock file,
+install script or Dockerfile change rebuilds that layer and later ones. Downloads
+are SHA-256 pinned, so caching does not change image contents.
 
-Configure and Firmware read and update the cache. CI environment and Emulation
-environment still build from scratch (`no-cache`) and only write a fresh cache:
-they prove the pinned downloads remain available and buildable. A branch cache is
-visible only to that branch and its descendants; branches read main's cache, main
-does not read branch caches. GitHub limits cache size and evicts entries unused
-for 7 days. A miss simply builds from scratch as before.
+Firmware reads and updates the cache. Emulation environment builds from scratch
+(`no-cache`) and only writes a fresh cache, proving the pinned downloads remain
+available and buildable. A branch cache is visible to that branch and its
+descendants; branches read main's cache, main does not read branch caches.
+Entries unused for 7 days are evicted; a miss builds from scratch as before.
+
+The `ci/docker` image (about 8 GB: three GCCs, two CMakes, Cube/Arduino/ETL
+sources) is not cached. Measurements on branch `claude/docker-image-cache`:
+
+| Image | No cache | Build and write cache | From cache |
+| --- | ---: | ---: | ---: |
+| emulation | 3:08 | 6:16 | 0:12 |
+| ci/docker | 2:55–3:01 | 9:02–10:37 | 2:35–2:38 |
+
+For compilers, downloading the cache and loading 8 GB into Docker nearly equals
+building from fast release downloads, while every cache write adds 6–7 minutes.
+Firmware with all images cached took 5:34 instead of 10:04.
 
 ## Documentation-only pushes
 
