@@ -21,11 +21,6 @@ crc_enable: true
 crc_algorithm: STM32_HW_DEFAULT
 linker_script: STM32F103C8_FLASH.ld
 validate_linker_script: true
-# Seed dynamic keys so profile values are exported (E008).
-compile_options_c: []
-compile_options_cxx: []
-compile_definitions_c: []
-compile_definitions_cxx: []
 profiles:
   success:
     compile_definitions: [SMOKE_SUCCESS=1]

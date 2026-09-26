@@ -8,6 +8,7 @@ import shlex
 import shutil
 import subprocess
 import tempfile
+import time
 
 
 def require(condition, message):
@@ -82,6 +83,21 @@ def verify(case, build, source):
         for extension in ("elf", "bin", "hex", "map", "lss"):
             require(not (build / f"{target}.{extension}").exists(),
                     f"Unexpected built artifact: {target}.{extension}")
+
+    if "configure_depends" in case:
+        # ТЗ 3.6.5: изменение YAML, IOC и файла профилей перезапускает Configure.
+        rerun = ninja[ninja.index("build build.ninja"):].split("\n\n", 1)[0]
+        for filename in case["configure_depends"]:
+            path = source / filename
+            require(str(path) in rerun, f"{filename} is not a Configure dependency")
+            stat = path.stat()
+            try:
+                os.utime(path, (stat.st_atime, time.time() + 3600))
+                plan = subprocess.run(["ninja", "-C", str(build), "-n", "build.ninja"],
+                                      capture_output=True, text=True, timeout=60)
+            finally:
+                os.utime(path, (stat.st_atime, stat.st_mtime))
+            require("Re-running CMake" in plan.stdout, f"Changing {filename} does not re-run Configure")
 
     if "cppcheck_rules" in case:
         rules = (build / "CMakeFiles/rules.ninja").read_text(encoding="utf-8")

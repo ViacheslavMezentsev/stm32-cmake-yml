@@ -75,22 +75,18 @@ function(stm32_yml_apply_profile CONFIG_FILE_PATH)
     # ------------------------------------------------------------------
     # Шаг 0: определяем источник профилей.
     # По умолчанию профили берутся из основного конфига (уже распарсен).
-    # Если задан profiles_file — парсим его поверх.
+    # Если задан profiles_file — из него читается только секция profiles:
+    # (ТЗ 3.4.8), и доступны только его профили (ТЗ 3.4.11, как в 0.9.2).
     # ------------------------------------------------------------------
-    if(DEFINED profiles_file AND NOT "${profiles_file}" STREQUAL "")
-        set(_profiles_src_path "${CMAKE_SOURCE_DIR}/${profiles_file}")
-        if(EXISTS "${_profiles_src_path}")
-            message(STATUS "Загрузка профилей из внешнего файла: ${_profiles_src_path}")
-            stm32_yml_parse_config("${_profiles_src_path}")
-        else()
-            message(WARNING "Файл профилей не найден: ${_profiles_src_path}")
-        endif()
-    endif()
+    _stm32_yml_load_profiles_file()
 
     # ------------------------------------------------------------------
     # Шаг 1: применяем именованный профиль.
     # ------------------------------------------------------------------
     set(STM32_YML_PROFILE "" CACHE STRING "Имя профиля сборки из секции profiles: в stm32_config.yml.")
+    # Ключи, заданные профилем или override. prepare_project_data экспортирует
+    # их наравне с ключами YAML, в том числе отсутствующие в корне (ТЗ 3.4.9, E008).
+    set(_applied_keys "")
 
     if(NOT "${STM32_YML_PROFILE}" STREQUAL "")
         message(STATUS "Применение профиля сборки: '${STM32_YML_PROFILE}'")
@@ -129,6 +125,7 @@ function(stm32_yml_apply_profile CONFIG_FILE_PATH)
                 # к исходному списку из yml, а не к списку, заданному профилем.
                 set(${_key} "${_pval}")
                 set(${_key} "${_pval}" PARENT_SCOPE)
+                list(APPEND _applied_keys "${_key}")
                 message(STATUS "  [профиль] ${_key} = ${_pval}")
             endforeach()
 
@@ -146,6 +143,7 @@ function(stm32_yml_apply_profile CONFIG_FILE_PATH)
                 # Объединяем: сначала базовый список, затем дополнение из профиля.
                 list(APPEND _base_val ${_append_val})
                 set(${_base_key} "${_base_val}" PARENT_SCOPE)
+                list(APPEND _applied_keys "${_base_key}")
                 message(STATUS "  [профиль +] ${_base_key} += ${_append_val}")
             endforeach()
         endif()
@@ -165,6 +163,7 @@ function(stm32_yml_apply_profile CONFIG_FILE_PATH)
 
             if(NOT "${_param_val}" STREQUAL "")
                 set(${_param_name} "${_param_val}" PARENT_SCOPE)
+                list(APPEND _applied_keys "${_param_name}")
                 message(STATUS "  [override] ${_param_name} = ${_param_val}")
                 math(EXPR _overrides_applied "${_overrides_applied} + 1")
             endif()
@@ -175,6 +174,9 @@ function(stm32_yml_apply_profile CONFIG_FILE_PATH)
         message(STATUS "Применено точечных cmake-overrides: ${_overrides_applied}.")
     endif()
 
+    list(REMOVE_DUPLICATES _applied_keys)
+    set(STM32_YML_PROFILE_KEYS "${_applied_keys}" PARENT_SCOPE)
+
 endfunction()
 
 # ==============================================================================
@@ -184,14 +186,7 @@ endfunction()
 function(stm32_yml_list_profiles)
     # Ветка list вызывается до apply_profile, поэтому внешний файл ещё не прочитан.
     # Используем тот же источник профилей, что и при выборе конкретного профиля.
-    if(DEFINED profiles_file AND NOT "${profiles_file}" STREQUAL "")
-        set(_profiles_src_path "${CMAKE_SOURCE_DIR}/${profiles_file}")
-        if(EXISTS "${_profiles_src_path}")
-            stm32_yml_parse_config("${_profiles_src_path}")
-        else()
-            message(WARNING "Файл профилей не найден: ${_profiles_src_path}")
-        endif()
-    endif()
+    _stm32_yml_load_profiles_file()
     set(_found_profiles "")
 
     if(DEFINED YAML_PARSED_KEYS)
@@ -217,3 +212,26 @@ function(stm32_yml_list_profiles)
         message(STATUS "Профили сборки не определены в конфигурации.")
     endif()
 endfunction()
+
+# ==============================================================================
+# @brief Загружает профили из profiles_file в область вызывающей функции.
+#
+# Из внешнего файла читается только секция profiles: (ТЗ 3.4.8): остальные
+# ключи файла не создаются и не подменяют базовые параметры, в том числе
+# базовое значение списка для _append. YAML_PARSED_KEYS вызывающей функции
+# заменяется ключами файла, поэтому доступны только профили внешнего файла
+# (ТЗ 3.4.11). Файл регистрируется как зависимость Configure (ТЗ 3.6.5).
+# Отсутствие файла — предупреждение. Без profiles_file ничего не делает.
+# ==============================================================================
+macro(_stm32_yml_load_profiles_file)
+    if(DEFINED profiles_file AND NOT "${profiles_file}" STREQUAL "")
+        set(_profiles_src_path "${CMAKE_SOURCE_DIR}/${profiles_file}")
+        if(EXISTS "${_profiles_src_path}")
+            message(STATUS "Загрузка профилей из внешнего файла: ${_profiles_src_path}")
+            set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${_profiles_src_path}")
+            stm32_yml_parse_config("${_profiles_src_path}" "{\"profiles\": (.profiles // {})}")
+        else()
+            message(WARNING "Файл профилей не найден: ${_profiles_src_path}")
+        endif()
+    endif()
+endmacro()

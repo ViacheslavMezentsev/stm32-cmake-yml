@@ -204,6 +204,12 @@ endfunction()
 # Требования: CMake >= 3.19, 'yq' должен быть установлен и доступен в PATH.
 #
 function(stm32_yml_parse_config config_file)
+    # Необязательный второй аргумент — выражение yq, выбирающее часть файла
+    # (например, только секцию profiles: внешнего файла профилей, ТЗ 3.4.8).
+    set(_yq_expression ".")
+    if(ARGC GREATER 1)
+        set(_yq_expression "${ARGV1}")
+    endif()
     find_program(YQ_EXECUTABLE yq)
     if(NOT YQ_EXECUTABLE)
         message(FATAL_ERROR "Инструмент 'yq' не найден. Пожалуйста, установите его.")
@@ -213,7 +219,7 @@ function(stm32_yml_parse_config config_file)
     endif()
 
     execute_process(
-        COMMAND ${YQ_EXECUTABLE} -o=json "." ${config_file}
+        COMMAND ${YQ_EXECUTABLE} -o=json "${_yq_expression}" ${config_file}
         OUTPUT_VARIABLE YAML_AS_JSON
         RESULT_VARIABLE YQ_RESULT
         OUTPUT_STRIP_TRAILING_WHITESPACE
@@ -240,37 +246,49 @@ endfunction()
 #      ФУНКЦИЯ ДЛЯ НОРМАЛИЗАЦИИ РАЗМЕРОВ ПАМЯТИ В БАЙТЫ
 # ==============================================================================
 # Принимает имя переменной, значение которой нужно вычислить.
-# Поддерживает форматы:
-#   - "1M", "0.25M" (мегабайты)
-#   - "1024K", "1.5K" (килобайты)
-#   - "512" (байты)
+# Допустимые форматы (ТЗ 4.11.4):
+#   - "1536" (целое число байт, в том числе 0)
+#   - "2K"   (целое число килобайт, суффикс только в верхнем регистре)
+#   - "1M"   (целое число мегабайт, суффикс только в верхнем регистре)
+# Иной формат, в том числе дробный ("1.5K") и "1k", — ошибка Configure.
 # Результат (целое число байт) помещается в переменную с тем же именем.
 #
 function(stm32_yml_normalize_memory var_name)
-    set(value_str ${${var_name}})
-    set(result 0)
-
-    # Проверяем на мегабайты (M или m)
-    if(value_str MATCHES "^([0-9.]+)M$")
-        set(numeric_part ${CMAKE_MATCH_1})
-        math(EXPR result "${numeric_part} * 1024 * 1024")
-
-    # Проверяем на килобайты (K или k)
-    elseif(value_str MATCHES "^([0-9.]+)K$")
-        set(numeric_part ${CMAKE_MATCH_1})
-        math(EXPR result "${numeric_part} * 1024")
-
-    # Проверяем на простое число (считаем, что это байты)
-    elseif(value_str MATCHES "^[0-9]+$")
-        set(result ${value_str})
-
-    # Если формат не распознан - выдаем ошибку
-    else()
-        message(FATAL_ERROR "Недопустимый формат размера памяти: '${value_str}'. Используйте целые числа (байты) или числа с суффиксом K/M (например, '1.5K', '256K', '1M').")
-    endif()
-
-    message(STATUS "Размер памяти '${value_str}' нормализован в ${result} байт.")
+    _stm32_yml_memory_bytes(${var_name} result)
+    message(STATUS "Размер памяти '${${var_name}}' нормализован в ${result} байт.")
     set(${var_name} ${result} PARENT_SCOPE)
+endfunction()
+
+# Разбирает значение переменной VAR_NAME по формату ТЗ 4.11.4 в OUT_VAR (байты).
+function(_stm32_yml_memory_bytes VAR_NAME OUT_VAR)
+    set(value_str "${${VAR_NAME}}")
+    if(value_str MATCHES "^([0-9]+)M$")
+        math(EXPR result "${CMAKE_MATCH_1} * 1024 * 1024")
+    elseif(value_str MATCHES "^([0-9]+)K$")
+        math(EXPR result "${CMAKE_MATCH_1} * 1024")
+    elseif(value_str MATCHES "^[0-9]+$")
+        math(EXPR result "${value_str}")
+    else()
+        message(FATAL_ERROR
+            "Недопустимый формат размера памяти '${VAR_NAME}: ${value_str}'. "
+            "Укажите целое число байт или целое число с суффиксом K или M "
+            "в верхнем регистре, например: 0, 1536, 2K, 1M.")
+    endif()
+    set(${OUT_VAR} ${result} PARENT_SCOPE)
+endfunction()
+
+# ==============================================================================
+# Проверяет формат заданных размеров памяти при каждом Configure (ТЗ 4.11.8),
+# не изменяя сами значения. Пустое значение не проверяется.
+#
+# @param ARGN - Имена переменных (heap_size, stack_size).
+# ==============================================================================
+function(stm32_yml_check_memory_format)
+    foreach(_var IN LISTS ARGN)
+        if(NOT "${${_var}}" STREQUAL "")
+            _stm32_yml_memory_bytes(${_var} _bytes)
+        endif()
+    endforeach()
 endfunction()
 
 # ==============================================================================

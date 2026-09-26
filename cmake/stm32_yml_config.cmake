@@ -15,6 +15,8 @@ function(stm32_yml_prepare_project_data OUT_PROJECT_NAME_VAR OUT_LANGUAGES_VAR)
 
     # Парсим конфиг (YAML -> JSON)
     stm32_yml_parse_config("${CONFIG_FILE_PATH}")
+    # Изменение конфигурации перезапускает Configure при следующей сборке (ТЗ 3.6.5).
+    set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${CONFIG_FILE_PATH}")
 
     # --- Баннер версий -------------------------------------------------------
     message(STATUS "Framework : ${STM32_CMAKE_YML_VERSION}")
@@ -24,7 +26,8 @@ function(stm32_yml_prepare_project_data OUT_PROJECT_NAME_VAR OUT_LANGUAGES_VAR)
     if(stm32_cmake_yml_version_check)
         if(NOT DEFINED stm32_cmake_yml_version OR "${stm32_cmake_yml_version}" STREQUAL "")
             message(STATUS "Config    : (stm32_cmake_yml_version не указан в ${PROJECT_CONFIG_FILE})")
-            message(WARNING "В файле '${PROJECT_CONFIG_FILE}' отсутствует обязательный параметр 'stm32_cmake_yml_version'.")
+            message(WARNING "В файле '${PROJECT_CONFIG_FILE}' не указан рекомендуемый параметр 'stm32_cmake_yml_version'. "
+                            "Укажите версию фреймворка, для которой написана конфигурация (ТЗ 4.2.3).")
         else()
             if(stm32_cmake_yml_version VERSION_EQUAL STM32_CMAKE_YML_VERSION)
                 set(_ver_status "совпадают ✓")
@@ -40,10 +43,7 @@ function(stm32_yml_prepare_project_data OUT_PROJECT_NAME_VAR OUT_LANGUAGES_VAR)
             elseif(stm32_cmake_yml_version VERSION_LESS STM32_CMAKE_YML_VERSION)
                 message(WARNING
                     "Версия фреймворка (${STM32_CMAKE_YML_VERSION}) новее, чем указано в конфиге "
-                    "(${stm32_cmake_yml_version}). Рекомендуется обновить stm32_cmake_yml_version. "
-                    "Что нового в 0.9: профили сборки (profiles:), Arduino Core STM32 backend "
-                    "(toolchain_backend: arduino), cmake-overrides (-DSTM32_YML_OVERRIDE_*). "
-                    "Все изменения обратно совместимы — существующий yml работает без правок.")
+                    "(${stm32_cmake_yml_version}). Рекомендуется обновить stm32_cmake_yml_version.")
             endif()
         endif()
     endif()
@@ -69,6 +69,22 @@ function(stm32_yml_prepare_project_data OUT_PROJECT_NAME_VAR OUT_LANGUAGES_VAR)
     set(_YAML_use_freertos       "${use_freertos}")
     set(_YAML_cmsis_rtos_api     "${cmsis_rtos_api}")
     set(_YAML_freertos_components "${freertos_components}")
+
+    # Значения ручного режима для имени проекта и размеров памяти (ТЗ 4.4.6, 4.4.7).
+    # Применяются и при неполном .ioc. До этого запоминаем, заданы ли размеры
+    # явно (YAML, профиль, override, .ioc): только такие размеры дают
+    # предупреждение, если скрипт компоновщика не генерируется из шаблона (ТЗ 4.11.9).
+    macro(_stm32_yml_apply_manual_defaults)
+        set(_explicit_memory_sizes "")
+        foreach(_mem_key IN ITEMS heap_size stack_size)
+            if(NOT "${${_mem_key}}" STREQUAL "")
+                list(APPEND _explicit_memory_sizes "${_mem_key}")
+            endif()
+        endforeach()
+        stm32_yml_ensure_default_value(project_name "auto")
+        stm32_yml_ensure_default_value(heap_size "512")
+        stm32_yml_ensure_default_value(stack_size "1024")
+    endmacro()
 
     # Хелпер: определяет и возвращает метку источника значения переменной.
     # yml_raw  — значение, пришедшее из YAML (до override-логики)
@@ -101,6 +117,7 @@ function(stm32_yml_prepare_project_data OUT_PROJECT_NAME_VAR OUT_LANGUAGES_VAR)
 
         # Вызываем парсер для .ioc файла.
         stm32_yml_parse_ioc_file(${IOC_FILE_PATH} "IOC_")
+        set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${IOC_FILE_PATH}")
 
         # ------------------------------------------------------------------
         # Шаг A: применяем базовые значения из .ioc (они имеют низший приоритет).
@@ -122,6 +139,8 @@ function(stm32_yml_prepare_project_data OUT_PROJECT_NAME_VAR OUT_LANGUAGES_VAR)
         if(NOT DEFINED stack_size OR "${stack_size}" STREQUAL "")
             set(stack_size ${IOC_STACK_SIZE})
         endif()
+        # .ioc без ProjectName, HeapSize или StackSize — значения ручного режима.
+        _stm32_yml_apply_manual_defaults()
 
         # Проекты из CubeMX всегда используют CMSIS и HAL (если не отключено явно)
         if(NOT DEFINED use_cmsis OR "${use_cmsis}" STREQUAL "")
@@ -236,9 +255,7 @@ function(stm32_yml_prepare_project_data OUT_PROJECT_NAME_VAR OUT_LANGUAGES_VAR)
         if(NOT toolchain_backend STREQUAL "arduino")
             message(STATUS "Режим ручной конфигурации (ioc_file не указан).")
         endif()
-        stm32_yml_ensure_default_value(project_name "auto")
-        stm32_yml_ensure_default_value(heap_size "512")
-        stm32_yml_ensure_default_value(stack_size "1024")
+        _stm32_yml_apply_manual_defaults()
 
         if(NOT toolchain_backend STREQUAL "arduino")
             stm32_yml_ensure_default_value(use_cmsis "true")
@@ -339,19 +356,21 @@ function(stm32_yml_prepare_project_data OUT_PROJECT_NAME_VAR OUT_LANGUAGES_VAR)
     else()
         set(_crc_upper "FALSE")
     endif()
+    # Нормализуем и локально: автоматический экспорт ниже передаёт локальные значения.
     if(_crc_upper STREQUAL "TRUE" OR _crc_upper STREQUAL "ON" OR _crc_upper STREQUAL "1" OR _crc_upper STREQUAL "YES")
-        set(crc_enable TRUE PARENT_SCOPE)
+        set(crc_enable TRUE)
     else()
-        set(crc_enable FALSE PARENT_SCOPE)
+        set(crc_enable FALSE)
     endif()
+    set(crc_enable ${crc_enable} PARENT_SCOPE)
     set(crc_section_name ${crc_section_name} PARENT_SCOPE)
     set(crc_algorithm ${crc_algorithm} PARENT_SCOPE)
     set(cppcheck_enable ${cppcheck_enable} PARENT_SCOPE)
     set(cppcheck_args ${cppcheck_args} PARENT_SCOPE)
     set(cppcheck_ignores ${cppcheck_ignores} PARENT_SCOPE)
-    # Проброс переменных профилей — динамические ключи уже пробрасываются
-    # через YAML_PARSED_KEYS ниже, явный проброс не требуется.
     set(STM32_YML_PROFILE "${STM32_YML_PROFILE}" PARENT_SCOPE)
+    # Размеры памяти, заданные явно, для предупреждения ТЗ 4.11.9.
+    set(STM32_YML_EXPLICIT_MEMORY_SIZES "${_explicit_memory_sizes}" PARENT_SCOPE)
     # Параметры toolchain backend.
     set(toolchain_backend ${toolchain_backend} PARENT_SCOPE)
     # Параметр папки поиска скрипта компоновщика.
@@ -367,10 +386,11 @@ function(stm32_yml_prepare_project_data OUT_PROJECT_NAME_VAR OUT_LANGUAGES_VAR)
     # 2. АВТОМАТИЧЕСКИЙ ПРОБРОС ДИНАМИЧЕСКИХ ПАРАМЕТРОВ ИЗ YAML
     # Любой новый ключ (в том числе вложенный), добавленный в yaml, автоматически
     # пробросится в основную цель сборки. Нам больше не нужно писать set() вручную!
-    if(DEFINED YAML_PARSED_KEYS)
-        foreach(yaml_key IN LISTS YAML_PARSED_KEYS)
-            set(${yaml_key} "${${yaml_key}}" PARENT_SCOPE)
-        endforeach()
-    endif()
+    # Ключи профиля и override пробрасываются так же, в том числе отсутствующие
+    # в корне YAML (ТЗ 3.4.9, E008). Значения берутся из этой области, то есть
+    # уже обработанные выше.
+    foreach(yaml_key IN LISTS YAML_PARSED_KEYS STM32_YML_PROFILE_KEYS)
+        set(${yaml_key} "${${yaml_key}}" PARENT_SCOPE)
+    endforeach()
 
 endfunction()

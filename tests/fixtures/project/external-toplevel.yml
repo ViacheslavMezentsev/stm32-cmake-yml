@@ -1,0 +1,10 @@
+stm32_cmake_yml_version: 0.9.2
+project_name: external_probe
+mcu: STM32F411CE
+languages: [C, ASM]
+sources: [main.c]
+compile_definitions: [BASE=1]
+use_cmsis: true
+use_hal: false
+cubefw_package: V1.28.3
+profiles_file: profiles-toplevel.yml

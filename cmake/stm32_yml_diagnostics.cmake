@@ -88,7 +88,7 @@ function(stm32_yml_run_diagnostics TARGET_NAME)
         if(NOT HAL_CONF_FOUND)
             message(FATAL_ERROR "Файл конфигурации HAL '${HAL_CONF_FILENAME}' не найден ни в одной из директорий, "
                                 "указанных в 'include_directories'. Библиотека HAL не сможет скомпилироваться без него. "
-                                "Убедитесь, что путь к этому файлу (например, 'Core/Inc') добавлен в 'include_directories' в project_config.yml.")
+                                "Убедитесь, что путь к этому файлу (например, 'Core/Inc') добавлен в 'include_directories' в ${PROJECT_CONFIG_FILE}.")
         endif()
     endif()
 

@@ -10,7 +10,7 @@ foreach(KEY IN ITEMS PROJECT_NAME MCU STM32_YML_PROFILE heap_size stack_size
         crc_enable use_cmsis use_hal toolchain_backend arduino_mcu_target
         MCU_TARGET USE_CORE_MAIN CMAKE_C_STANDARD CMAKE_CXX_STANDARD
         cubefw_package use_freertos include_directories
-        freertos_version freertos_components cmsis_rtos_api)
+        freertos_version freertos_components cmsis_rtos_api custom_probe_key)
     file(WRITE "${CMAKE_BINARY_DIR}/observed/${KEY}.txt" "${${KEY}}")
 endforeach()
 foreach(KEY IN ITEMS SOURCES COMPILE_DEFINITIONS COMPILE_OPTIONS LINK_OPTIONS LINK_LIBRARIES C_CPPCHECK CXX_CPPCHECK)

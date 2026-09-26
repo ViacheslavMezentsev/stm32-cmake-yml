@@ -113,21 +113,21 @@ package or the resulting image bytes. Ubuntu snapshots are not required.
 
 ## Framework configuration tests
 
-[tests/cases.json](../../tests/cases.json) defines 119 scenarios, run with each of
-the three GCC and two CMake versions from the lockfile: **714 case executions**.
-Fifteen scenarios perform three consecutive configurations in the same build tree.
+[tests/cases.json](../../tests/cases.json) defines 125 scenarios, run with each of
+the three GCC and two CMake versions from the lockfile: **750 case executions**.
+Nineteen scenarios perform two to six consecutive configurations in the same build tree.
 
 | Area | Checks |
 | --- | --- |
 | Defaults and dependencies | F411 (BlackPill) and F103 (BluePill), actual CMSIS/HAL targets, default heap/stack, C/C++ standards |
-| Profiles on the same MCU | List replacement, append, replacement followed by append, sources, external profiles, scalar override priority |
-| IOC and YAML precedence | STM32F103C8T6, IOC-derived defaults, YAML/profile/override precedence, missing IOC |
+| Profiles on the same MCU | List replacement, append, replacement followed by append, sources, external profiles (the `profiles:` section only), profile-only and override-only keys without root declarations, scalar override priority |
+| IOC and YAML precedence | STM32F103C8T6, IOC-derived defaults, YAML/profile/override precedence, manual-mode values for an incomplete IOC, missing IOC |
 | Bare metal | No CMSIS/HAL/FreeRTOS, unavailable Cube repository, explicit CPU flags and local linker template |
 | YAML values | Unquoted scalars, `false`, zero heap, null/empty defaults, empty list replacement and append |
-| Reconfiguration | Profile source/definition replacement and reset, persistent overrides and explicit cache removal with `-U` |
+| Reconfiguration | Profile source/definition replacement and reset, persistent overrides and explicit cache removal with `-U`, Configure re-run after YAML, IOC and profile-file changes |
 | Profile regressions | External profile listing, generated heap/stack updates, MCU and compiler defines after switching profiles |
 | Language flags | Normalization and isolation of C and C++ flags/definitions in `compile_commands.json` |
-| Linker | Explicit `.ld`, template discovery in `linker_script_dir`, heap/stack substitutions, READONLY and checksum section preservation |
+| Linker | Explicit `.ld`, template discovery in `linker_script_dir`, heap/stack substitutions, size format in every mode, warning for unapplied heap/stack, READONLY and checksum section preservation |
 | CRC | Presence/absence of the generated post-build command, section and Flash-size arguments |
 | Arduino | Consumer-owned core/custom-library wrappers, profile parameters, shared compile definitions, `use_core_main: false` |
 | Diagnostics | Missing/malformed YAML, missing linker/core, invalid memory size, HAL without CMSIS, profile listing and unknown-profile warning |

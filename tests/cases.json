@@ -147,7 +147,8 @@
     "name": "ioc-bluepill-defaults",
     "args": ["-DPROJECT_CONFIG_FILE=ioc.yml"],
     "observed": {"MCU": "STM32F103C8T", "PROJECT_NAME": "bluepill_hsi", "heap_size": "512", "stack_size": "1024", "cubefw_package": "V1.8.7"},
-    "properties": {"LINK_LIBRARIES": ["HAL::STM32::F1::GPIO", "CMSIS::STM32::F103C8"]}
+    "properties": {"LINK_LIBRARIES": ["HAL::STM32::F1::GPIO", "CMSIS::STM32::F103C8"]},
+    "log_contains": ["Заданные размеры памяти (heap_size: 512, stack_size: 1024) не применяются: скрипт компоновщика формирует stm32-cmake"]
   },
   {
     "name": "yaml-over-ioc",
@@ -289,6 +290,56 @@
       {"args": ["-DSTM32_YML_PROFILE=external"], "observed": {"stack_size": "4096"}, "properties": {"COMPILE_DEFINITIONS": ["BASE=1", "EXTERNAL=1"]}},
       {"args": ["-DSTM32_YML_PROFILE="], "observed": {"stack_size": "1024"}, "properties": {"COMPILE_DEFINITIONS": ["BASE=1"]}, "absent_properties": {"COMPILE_DEFINITIONS": ["EXTERNAL=1"]}},
       {"args": ["-DSTM32_YML_PROFILE=external"], "observed": {"stack_size": "4096"}, "properties": {"COMPILE_DEFINITIONS": ["BASE=1", "EXTERNAL=1"]}}
+    ]
+  },
+  {
+    "name": "profile-only-keys",
+    "args": ["-DPROJECT_CONFIG_FILE=profile-only.yml"],
+    "steps": [
+      {"args": ["-DSTM32_YML_PROFILE=lang"], "language_flags": true, "observed": {"custom_probe_key": "42"}, "log_contains": ["[профиль] compile_options_c = Wstrict-prototypes", "[профиль] custom_probe_key = 42"]},
+      {"args": ["-DSTM32_YML_PROFILE=", "-DSTM32_YML_OVERRIDE_custom_probe_key=7"], "observed": {"custom_probe_key": "7"}, "command_checks": [{"file": "main.c", "absent": ["-Wstrict-prototypes", "-DONLY_C=1"]}, {"file": "helper.cpp", "absent": ["-fno-exceptions", "-DONLY_CXX=1"]}]}
+    ]
+  },
+  {
+    "name": "external-profile-ignores-top-level",
+    "args": ["-DPROJECT_CONFIG_FILE=external-toplevel.yml", "-DSTM32_YML_PROFILE=external"],
+    "observed": {"PROJECT_NAME": "external_probe", "stack_size": "1024"},
+    "properties": {"COMPILE_DEFINITIONS": ["BASE=1", "EXTERNAL=1"]},
+    "absent_properties": {"COMPILE_DEFINITIONS": ["LEAKED=1"]},
+    "log_contains": ["[профиль +] compile_definitions += EXTERNAL=1"]
+  },
+  {
+    "name": "ioc-missing-values-defaults",
+    "args": ["-DPROJECT_CONFIG_FILE=ioc-minimal.yml", "-DSTM32_YML_PROFILE=template"],
+    "observed": {"MCU": "STM32F103C8T", "PROJECT_NAME": "source", "heap_size": "512", "stack_size": "1024"},
+    "linker": {"file": "STM32F103C8_FLASH.ld", "heap": 512, "stack": 1024},
+    "log_absent": ["не применяются"]
+  },
+  {
+    "name": "configure-depends",
+    "steps": [
+      {"args": ["-DPROJECT_CONFIG_FILE=ioc.yml"], "configure_depends": ["ioc.yml", "bluepill-hsi.ioc"]},
+      {"args": ["-DPROJECT_CONFIG_FILE=external.yml", "-DSTM32_YML_PROFILE=external"], "configure_depends": ["external.yml", "profiles.yml"]}
+    ]
+  },
+  {
+    "name": "memory-size-format",
+    "steps": [
+      {"args": ["-DSTM32_YML_PROFILE=template", "-DSTM32_YML_OVERRIDE_heap_size=1k"], "error": "Недопустимый формат размера памяти 'heap_size: 1k'"},
+      {"args": ["-DSTM32_YML_OVERRIDE_heap_size=1.5K"], "error": "например: 0, 1536, 2K, 1M.", "log_absent": ["'1.5K', '256K'"]},
+      {"args": ["-DSTM32_YML_PROFILE=", "-DSTM32_YML_OVERRIDE_heap_size=-1"], "error": "Недопустимый формат размера памяти 'heap_size: -1'"},
+      {"args": ["-DSTM32_YML_OVERRIDE_linker_script=custom.ld", "-DSTM32_YML_OVERRIDE_linker_script_dir=linker", "-DSTM32_YML_OVERRIDE_heap_size=0x200"], "error": "Недопустимый формат размера памяти 'heap_size: 0x200'"},
+      {"args": ["-DSTM32_YML_OVERRIDE_heap_size=0", "-DSTM32_YML_OVERRIDE_stack_size=1M"], "observed": {"heap_size": "0", "stack_size": "1M"}, "link_options_contain": "linker/custom.ld"},
+      {"args": ["-DSTM32_YML_OVERRIDE_linker_script=auto", "-DSTM32_YML_PROFILE=template", "-DSTM32_YML_OVERRIDE_heap_size=1536", "-DSTM32_YML_OVERRIDE_stack_size=2K"], "linker": {"heap": 1536, "stack": 2048}}
+    ]
+  },
+  {
+    "name": "memory-size-unused-warning",
+    "steps": [
+      {"log_absent": ["не применяются"]},
+      {"args": ["-DSTM32_YML_PROFILE=append"], "log_contains": ["Заданные размеры памяти (stack_size: 2K) не применяются: скрипт компоновщика формирует stm32-cmake с собственными размерами heap 0x200 и stack 0x400 байт."]},
+      {"args": ["-DSTM32_YML_PROFILE=template"], "linker": {"heap": 1024, "stack": 2048}, "log_absent": ["не применяются"]},
+      {"args": ["-DSTM32_YML_PROFILE=", "-DSTM32_YML_OVERRIDE_linker_script=custom.ld", "-DSTM32_YML_OVERRIDE_linker_script_dir=linker", "-DSTM32_YML_OVERRIDE_heap_size=1K"], "log_contains": ["Заданные размеры памяти (heap_size: 1K) не применяются: размеры задаёт явный скрипт компоновщика 'custom.ld'."]}
     ]
   },
   {
@@ -442,7 +493,7 @@
       "Config : 0.9.2 (совпадают"
     ],
     "log_absent": [
-      "отсутствует обязательный параметр 'stm32_cmake_yml_version'",
+      "не указан рекомендуемый параметр 'stm32_cmake_yml_version'",
       "Рекомендуется обновить stm32_cmake_yml_version.",
       "Возможны ошибки."
     ]
@@ -459,7 +510,10 @@
     },
     "log_contains": [
       "Framework : 0.9.2",
-      "отсутствует обязательный параметр 'stm32_cmake_yml_version'"
+      "не указан рекомендуемый параметр 'stm32_cmake_yml_version'"
+    ],
+    "log_absent": [
+      "обязательный параметр"
     ]
   },
   {
@@ -474,7 +528,10 @@
     },
     "log_contains": [
       "Framework : 0.9.2",
-      "отсутствует обязательный параметр 'stm32_cmake_yml_version'"
+      "не указан рекомендуемый параметр 'stm32_cmake_yml_version'"
+    ],
+    "log_absent": [
+      "обязательный параметр"
     ]
   },
   {
@@ -493,8 +550,9 @@
       "Рекомендуется обновить stm32_cmake_yml_version."
     ],
     "log_absent": [
+      "Что нового в 0.9",
       "Возможны ошибки.",
-      "отсутствует обязательный параметр 'stm32_cmake_yml_version'"
+      "не указан рекомендуемый параметр 'stm32_cmake_yml_version'"
     ]
   },
   {
@@ -514,7 +572,7 @@
     ],
     "log_absent": [
       "Рекомендуется обновить stm32_cmake_yml_version.",
-      "отсутствует обязательный параметр 'stm32_cmake_yml_version'"
+      "не указан рекомендуемый параметр 'stm32_cmake_yml_version'"
     ]
   },
   {
@@ -532,7 +590,7 @@
     ],
     "log_absent": [
       "Config :",
-      "отсутствует обязательный параметр 'stm32_cmake_yml_version'",
+      "не указан рекомендуемый параметр 'stm32_cmake_yml_version'",
       "Рекомендуется обновить stm32_cmake_yml_version.",
       "Возможны ошибки."
     ]

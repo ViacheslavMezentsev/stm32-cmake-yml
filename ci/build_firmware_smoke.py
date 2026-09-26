@@ -5,7 +5,6 @@ import json
 import os
 from pathlib import Path
 import re
-import shutil
 import struct
 import subprocess
 import tempfile
@@ -173,29 +172,6 @@ def main():
             report['cases'].append({'profile': profile, 'elf': str(elf.relative_to(output)),
                                     'sources': sources, 'structure': structure, 'metadata': metadata, 'exit_trap': exit_trap})
             print(f'PASS build/ELF: {profile}', flush=True)
-        # E008: profile-only dynamic keys are not exported by prepare_project_data.
-        probe = Path(tempfile.mkdtemp(prefix='profile-only-', dir=output))
-        probe.chmod(0o755)
-        source = probe / 'source'
-        shutil.copytree(root / 'tests/firmware/semihosting', source)
-        yaml = source / 'stm32_config.yml'
-        config = yaml.read_text()
-        for key in ('compile_options_c', 'compile_options_cxx', 'compile_definitions_c', 'compile_definitions_cxx'):
-            config = config.replace(key + ': []\n', '')
-        yaml.write_text(config)
-        command = list(commands[0])
-        command[command.index('-S') + 1] = str(source)
-        command[command.index('-B') + 1] = str(probe / 'build')
-        command = [arg for arg in command if not arg.startswith('-DSTM32_YML_OVERRIDE_arduino_core_path=')]
-        command = ['-DCMAKE_TOOLCHAIN_FILE=/opt/modules/stm32-cmake/cmake/stm32_gcc.cmake' if arg.startswith('-DCMAKE_TOOLCHAIN_FILE=') else arg for arg in command]
-        command = ['-DSTM32_YML_PROFILE=cmsisLibrary' if arg.startswith('-DSTM32_YML_PROFILE=') else arg for arg in command]
-        with (probe / 'configure.log').open('w') as log:
-            subprocess.run(command, stdout=log, stderr=subprocess.STDOUT, check=True, timeout=180)
-        db = json.loads((probe / 'build/compile_commands.json').read_text())
-        app_commands = '\n'.join(c['command'] for c in db if Path(c['file']).name in ('main.cpp', 'language_probe.c'))
-        if any(token in app_commands for token in ('SMOKE_C_ONLY', 'SMOKE_CXX_ONLY', '-Wstrict-prototypes', '-fno-exceptions', '-fno-rtti')):
-            raise ValueError('E008 behavior changed: review regression and workaround')
-        report['profile_only_regression'] = {'status': 'reproduced', 'errata': 'E008'}
         report['status'] = 'passed'
     except (OSError, ValueError, KeyError, struct.error, subprocess.SubprocessError) as error:
         report['error'] = str(error)

@@ -1,0 +1,22 @@
+stm32_cmake_yml_version: 0.9.2
+project_name: configure_probe
+mcu: STM32F411CE
+languages: [C, CXX, ASM]
+c_standard: 11
+cpp_standard: 17
+sources: [main.c, helper.cpp]
+include_directories: [include]
+compile_definitions: [BASE=1]
+compile_options: [Wall]
+use_cmsis: true
+use_hal: true
+hal_components: [GPIO]
+cubefw_package: V1.28.3
+system_library: NoSys
+profiles:
+  lang:
+    compile_options_c: [Wstrict-prototypes]
+    compile_options_cxx: [fno-exceptions]
+    compile_definitions_c: [ONLY_C=1]
+    compile_definitions_cxx: [ONLY_CXX=1]
+    custom_probe_key: 42
