@@ -3,8 +3,8 @@
 [Documentation](index.md) · [Русский](../ru/firmware-testing.md) · [Environment](emulation.md)
 
 The first firmware test adapts the author's F1 [02-semihosting example](../../tests/firmware/semihosting/README.md).
-It is separate from the 139 configure scenarios: **72 builds, 78 QEMU runs and 78 Renode runs**:
-twelve profiles plus one corrupted copy per tool pair; three xPack GCC versions × two CMake versions from the
+It is separate from the 139 configure scenarios: **102 builds, 84 QEMU runs and 84 Renode runs**:
+thirteen run profiles, one corrupted copy and four build-only profiles (H7, H5) per tool pair; three xPack GCC versions × two CMake versions from the
 [lockfile](../../ci/dependencies.lock.json), CubeF1 1.8.7, QEMU 11.0.0.
 The Windows QEMU 11.1.0 installation was also checked locally; CI uses the pinned image.
 
@@ -69,7 +69,7 @@ is inferred from running this ELF on the F205-based netduino2.
 
 The matrix is read from the shared dependency lockfile, not duplicated in YAML.
 Images are built once; tool pairs run sequentially with separate build/log paths.
-Actual GCC/CMake versions and all twelve profiles are checked for each pair.
+Actual GCC/CMake versions, all thirteen run profiles and the four build-only ones are checked for each pair.
 Failures do not stop collection of other pair results, but the matrix exits nonzero
 if any pair fails. Run selection uses the current lockfile rather than accepting
 whatever manifests happen to exist. Aggregate reports are matrix-summary.json;
@@ -126,7 +126,7 @@ For each tool pair, a copy of success ELF has one bit changed in .fw_version.
 Code, startup data and the injected CRC remain unchanged. The derived negative case,
 crc-corrupt, must report CRC_RESULT=FAIL and TEST_RESULT=FAIL and exit 3. A crash
 or timeout cannot pass this case. This adds six runs without extra compilations:
-72 builds, 78 runs per simulator. Reports distinguish twelve profiles from thirteen executions.
+78 run builds, 84 runs per simulator. Reports distinguish thirteen profiles from fourteen executions.
 
 This verifies software CRC over loaded FLASH on netduino2, not the STM32 CRC
 peripheral. Fixes for E004 (algorithm selection) and E006 (post-build error handling) are
@@ -300,7 +300,15 @@ The FreeRTOS heap is a separate 4096-byte BSS array, independent of the newlib
 `heap_size: 512` reservation. compile_commands must contain the kernel, port and
 heap_4 sources. Scheduling, tasks, context switching, tick and CMSIS-RTOS are not
 covered. Real port critical sections execute; SysTick is not started.
-External FreeRTOS/E007 remains a separate regression without a fix.
+The `freertosExternal` profile runs the same scenario with FreeRTOS-Kernel 11.3.1 instead of the CubeF1 tree (`freertos_version: external`, `FREERTOS_PATH` from the lockfile; spec 4.8.6, TC-59). The builder checks that `tasks.c` and `port.c` come from FreeRTOS-Kernel, and the firmware reports RTOS_VERSION=V11.3.1.
+
+## Build-only: H7, H5 and the CRC image
+
+QEMU and Renode have no H7 or H5 models, so `tests/firmware/buildonly` is only built on every pair (spec 8.8.5, TC-57): `h7` (STM32H743ZI, core M7, stm32-cmake script), `h5` (STM32H563ZI, template), `h503` and `h503bkp` (STM32H503CB, template with `.checksum`). The checks cover non-empty ELF/BIN/HEX, ELF32 ARM, the initial SP in SRAM and a Flash reset vector equal to the entry point. Reports mark them build-only, and the badge counts them as builds without simulator checks.
+
+`h503bkp` adds an initialized variable in backup SRAM (`0x40036400`). For both variants the builder recomputes the Flash image CRC from the ELF segments, independently of `scripts/stm32_crc.py`, compares it with `.checksum` and requires the same CRC (spec 4.15.9, TC-63). For all thirteen CRC profiles and `h503` the intermediate image is compared byte for byte with the 0.9.2 `objcopy -O binary --gap-fill 0xFF` image without `.checksum` (TC-64).
+
+Found during the checks. The CubeH5 startup requires the `_sstack` symbol (ARMv8-M stack limit), which the stm32-cmake script lacks: H5 firmware without a template does not link, so the build-only templates define it. The `objcopy -O binary` BIN artifact of an ELF with a section outside Flash is about 900 MB, as the CRC image used to be; `h503bkp` does not request BIN.
 
 ## FreeRTOS: starter task and inter-task exchange
 

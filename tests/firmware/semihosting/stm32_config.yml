@@ -95,6 +95,15 @@ profiles:
     freertos_components: [ARM_CM3, Heap::4]
     sources: [system_stm32f1xx.c, main.cpp, freertos_queue.c]
     compile_definitions: [SMOKE_FREERTOS=1]
+  freertosExternal:
+    # FreeRTOS-Kernel from FREERTOS_PATH instead of STM32Cube (spec 4.8.6, TC-59).
+    use_hal: false
+    use_freertos: true
+    freertos_version: external
+    cmsis_rtos_api: none
+    freertos_components: [ARM_CM3, Heap::4]
+    sources: [system_stm32f1xx.c, main.cpp, freertos_queue.c]
+    compile_definitions: [SMOKE_FREERTOS=1]
   freertosTasks:
     use_hal: false
     use_freertos: true

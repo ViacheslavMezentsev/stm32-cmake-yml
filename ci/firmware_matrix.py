@@ -1,5 +1,5 @@
 """Build or run the locked firmware toolchain matrix in separate containers."""
-from firmware_cases import BUILD_PROFILES, RUN_PROFILES
+from firmware_cases import BUILD_ONLY_PROFILES, BUILD_PROFILES, RUN_PROFILES
 import argparse
 import itertools
 import json
@@ -21,6 +21,8 @@ def pairs(lock):
 def verify_build(report, gcc, cmake):
     if report['status'] != 'passed' or sorted(c['profile'] for c in report['cases']) != sorted(BUILD_PROFILES):
         raise ValueError('Missing or failed build profiles')
+    if sorted(c['profile'] for c in report.get('build_only', [])) != sorted(BUILD_ONLY_PROFILES):
+        raise ValueError('Missing or failed build-only profiles')
     if report['gcc'] != gcc.split('-')[0] or report['cmake'] != 'cmake version ' + cmake:
         raise ValueError('Actual compiler/CMake versions do not match selected pair')
 

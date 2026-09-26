@@ -87,6 +87,12 @@ checks before scheduler startup. No HAL or CMSIS-RTOS wrapper. FreeRTOS owns a
 запуска планировщика. Без HAL и CMSIS-RTOS. Куча FreeRTOS — отдельные 4096 байт BSS.
 Подробности — в контракте прошивочных тестов.
 
+`freertosExternal`: the `freertosQueue` scenario with FreeRTOS-Kernel V11.3.1
+from `FREERTOS_PATH` (`freertos_version: external`) instead of CubeF1.
+
+`freertosExternal`: сценарий `freertosQueue` с FreeRTOS-Kernel V11.3.1 из
+`FREERTOS_PATH` (`freertos_version: external`) вместо CubeF1.
+
 `freertosTasks`: starter creates receiver/sender then deletes itself. Real
 SysTick/PendSV/SVC, two queues, delayed sender, reply 46 and semihosting from a
 task. No HAL; separate 8192-byte FreeRTOS heap. Vector padding is explicit so

@@ -1,5 +1,5 @@
 """Build the semihosting fixtures inside the compiler image (one tool pair)."""
-from firmware_cases import BUILD_PROFILES
+from firmware_cases import BUILD_ONLY_PROFILES, BUILD_PROFILES
 import argparse
 import json
 import os
@@ -8,7 +8,7 @@ import re
 import struct
 import subprocess
 import tempfile
-from firmware_crc import inspect_crc
+from firmware_crc import crc32_words, inspect_crc
 
 
 def inspect_elf(path, vector):
@@ -40,6 +40,105 @@ def inspect_elf(path, vector):
     return {'entry': entry, 'initial_sp': sp, 'reset_vector': reset, 'segments': loads}
 
 
+def compare_gap_fill(build, elf):
+    """TC-64: the CRC image (spec 4.15.9) equals the 0.9.2 objcopy --gap-fill image."""
+    image = next(build.glob('*_no_crc.bin'))
+    reference = build / 'gap-fill.bin'
+    subprocess.run(['arm-none-eabi-objcopy', '-O', 'binary', '--gap-fill', '0xFF', '--remove-section', '.checksum',
+                    str(elf), str(reference)], check=True, timeout=60)
+    if image.read_bytes() != reference.read_bytes():
+        raise ValueError(f'CRC image differs from the objcopy --gap-fill image: {image.name}')
+
+
+def flash_crc(elf, origin, length):
+    """Independent host CRC of the FLASH load image without .checksum (TC-63)."""
+    data = elf.read_bytes()
+    shoff = struct.unpack_from('<I', data, 32)[0]
+    shsize, shcount, names_index = struct.unpack_from('<HHH', data, 46)
+    headers = [struct.unpack_from('<10I', data, shoff + i * shsize) for i in range(shcount)]
+    names = data[headers[names_index][4]:]
+    sections = {names[h[0]:].split(b'\0', 1)[0].decode(): h for h in headers}
+    checksum = sections['.checksum']
+    phoff = struct.unpack_from('<I', data, 28)[0]
+    phsize, phcount = struct.unpack_from('<HH', data, 42)
+    image = bytearray(b'\xFF' * length)
+    top = 0
+    outside = []
+    for i in range(phcount):
+        kind, offset, _, paddr, filesz, _, _, _ = struct.unpack_from('<8I', data, phoff + i * phsize)
+        if kind != 1 or not filesz:
+            continue
+        if not origin <= paddr < paddr + filesz <= origin + length:
+            outside.append(paddr)
+            continue
+        image[paddr - origin:paddr - origin + filesz] = data[offset:offset + filesz]
+        top = max(top, paddr - origin + filesz)
+    end = checksum[3] - origin
+    stored = struct.unpack_from('<I', image, end)[0]
+    if checksum[5] != 4 or end + 4 != top:
+        raise ValueError('The .checksum section is not the last word of the FLASH image')
+    computed = crc32_words(bytes(image[:end]))
+    if stored != computed:
+        raise ValueError(f'Stored CRC {stored:08X} differs from host CRC {computed:08X}')
+    return stored, outside
+
+
+def build_only(root, output):
+    """Build H7/H5 firmware without simulators (TC-57) and the H503 CRC variants (TC-63)."""
+    source = root / 'tests/firmware/buildonly'
+    flash = {'h7': (0x08000000, 2048 * 1024), 'h5': (0x08000000, 2048 * 1024),
+             'h503': (0x08000000, 128 * 1024), 'h503bkp': (0x08000000, 128 * 1024)}
+    results = []
+    for profile in BUILD_ONLY_PROFILES:
+        build = Path(tempfile.mkdtemp(prefix=f'buildonly-{profile}-', dir=output))
+        build.chmod(0o755)
+        commands = [
+            ['cmake', '-S', str(source), '-B', str(build), '-G', 'Ninja', f'-DSTM32_YML_FRAMEWORK_DIR={root}',
+             '-DCMAKE_TOOLCHAIN_FILE=/opt/modules/stm32-cmake/cmake/stm32_gcc.cmake',
+             f'-DSTM32_YML_PROFILE={profile}', '-DCMAKE_BUILD_TYPE=Debug'],
+            ['cmake', '--build', str(build), '--parallel', '4'],
+        ]
+        for name, command in zip(('configure', 'build'), commands):
+            with (build / (name + '.log')).open('w') as log:
+                subprocess.run(command, stdout=log, stderr=subprocess.STDOUT, check=True, timeout=180)
+        elf = build / 'buildonly_probe.elf'
+        extensions = ('elf', 'hex') if profile == 'h503bkp' else ('elf', 'bin', 'hex')
+        for extension in extensions:
+            if not (build / ('buildonly_probe.' + extension)).stat().st_size:
+                raise ValueError(f'Empty {extension} artifact: {profile}')
+        data = elf.read_bytes()
+        if data[:7] != b'\x7fELF\x01\x01\x01' or struct.unpack_from('<HH', data, 16) != (2, 40):
+            raise ValueError(f'Expected a little-endian ELF32 ARM image: {profile}')
+        origin, length = flash[profile]
+        vector = build / 'vectors.bin'
+        subprocess.run(['arm-none-eabi-objcopy', '--dump-section', f'.isr_vector={vector}', str(elf),
+                        str(build / 'inspection.elf')], check=True, timeout=30)
+        sp, reset = struct.unpack_from('<II', vector.read_bytes())
+        entry = struct.unpack_from('<I', data, 24)[0]
+        if not (0x20000000 <= sp < 0x30000000 and sp % 8 == 0):
+            raise ValueError(f'Invalid initial stack pointer {sp:#x}: {profile}')
+        if not (reset & 1 and origin <= (reset & ~1) < origin + length and entry == reset):
+            raise ValueError(f'Invalid reset vector/entry {reset:#x}/{entry:#x}: {profile}')
+        result = {'profile': profile, 'status': 'build-only', 'elf': str(elf.relative_to(output)),
+                  'initial_sp': sp, 'reset_vector': reset}
+        if profile.startswith('h503'):
+            stored, outside = flash_crc(elf, origin, length)
+            if bool(outside) != (profile == 'h503bkp'):
+                raise ValueError(f'Unexpected load segments outside FLASH: {profile}')
+            image = next(build.glob('*_no_crc.bin')).read_bytes()
+            if len(image) > length:
+                raise ValueError(f'CRC image larger than FLASH: {profile}')
+            if profile == 'h503':
+                compare_gap_fill(build, elf)
+            result['crc'] = f'{stored:08X}'
+        results.append(result)
+        print(f'PASS build-only: {profile}', flush=True)
+    crcs = {r['crc'] for r in results if 'crc' in r}
+    if len(crcs) != 1:
+        raise ValueError(f'CRC differs with a section outside FLASH: {sorted(crcs)}')
+    return results
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, required=True)
@@ -60,6 +159,8 @@ def main():
         lock = json.loads((root / 'ci/dependencies.lock.json').read_text())
         etl = next(source for source in lock['sources'] if source['name'].startswith('ETL-'))
         arduino = next(source for source in lock['sources'] if source['name'].startswith('Arduino-'))
+        kernel = next(source for source in lock['sources'] if source['name'].startswith('FreeRTOS-Kernel-'))
+        rtos_profiles = ('freertosQueue', 'freertosTasks', 'freertosExternal')
         for profile in BUILD_PROFILES:
             is_arduino = profile == 'arduinoString'
             toolchain = str(root / 'tests/firmware/semihosting/arduino-toolchain.cmake') if is_arduino else '/opt/modules/stm32-cmake/cmake/stm32_gcc.cmake'
@@ -74,6 +175,9 @@ def main():
             ]
             if is_arduino:
                 commands[0].append(f'-DSTM32_YML_OVERRIDE_arduino_core_path={os.path.relpath(arduino["destination"], root / "tests/firmware/semihosting")}')
+            if profile == 'freertosExternal':
+                # FreeRTOS-Kernel outside STM32Cube (spec 4.8.6, TC-59).
+                commands[0].append(f'-DFREERTOS_PATH={kernel["destination"]}')
             for name, command in zip(('configure', 'build'), commands):
                 with (build / (name + '.log')).open('w') as log:
                     subprocess.run(command, stdout=log, stderr=subprocess.STDOUT, check=True, timeout=180)
@@ -91,7 +195,7 @@ def main():
             metadata = dict(baseline, PROFILE=profile, CMAKE=report['cmake'].removeprefix('cmake version '),
                             GIT_REVISION=report['git_revision'], GIT_DIRTY=report['git_dirty'])
             bare = profile.startswith('bare') or is_arduino
-            cmsis_only = profile.startswith('cmsis') or profile in ('freertosQueue', 'freertosTasks')
+            cmsis_only = profile.startswith('cmsis') or profile in rtos_profiles
             if bare:
                 metadata.update(CMSIS_CORE='none', CMSIS_DEVICE='none')
             if bare or cmsis_only:
@@ -121,14 +225,19 @@ def main():
                 metadata.update(LIB_RESULT='123', C_LANGUAGE='11')
                 if profile == 'cmsisEtl':
                     metadata.update(ETL_RESULT='14', ETL_TEXT='etl:14', ETL_VERSION=etl['name'].removeprefix('ETL-'))
-            if profile in ('freertosQueue', 'freertosTasks'):
-                rtos_source = 'freertos_queue.c' if profile == 'freertosQueue' else 'freertos_tasks.c'
+            if profile in rtos_profiles:
+                rtos_source = 'freertos_tasks.c' if profile == 'freertosTasks' else 'freertos_queue.c'
                 if not {'tasks.c', 'list.c', 'queue.c', 'port.c', 'heap_4.c', rtos_source} <= set(sources):
                     raise ValueError('Missing FreeRTOS kernel/port/heap sources')
                 if any('cmsis_os' in name for name in sources):
                     raise ValueError('Unexpected CMSIS-RTOS wrapper')
-                metadata['RTOS_VERSION'] = 'V10.3.1'
-                if profile == 'freertosQueue':
+                kernel_files = [c['file'] for c in commands_db if Path(c['file']).name in ('tasks.c', 'port.c')]
+                external = all(f.startswith(kernel['destination'] + '/') for f in kernel_files)
+                if external != (profile == 'freertosExternal') or len(kernel_files) != 2:
+                    raise ValueError('FreeRTOS kernel sources come from the wrong distribution')
+                metadata['RTOS_VERSION'] = ('V' + kernel['name'].removeprefix('FreeRTOS-Kernel-')
+                                            if profile == 'freertosExternal' else 'V10.3.1')
+                if profile != 'freertosTasks':
                     metadata.update(RTOS_RESULT='46', RTOS_SCHEDULER='not-started', RTOS_HEAP='restored')
                 else:
                     metadata.update(RTOS_REPLY='46', RTOS_SCHEDULER='running', RTOS_TICK='advanced',
@@ -164,6 +273,7 @@ def main():
             exit_trap = int(trap[1], 16)
             crc_metadata, corrupted, negative = inspect_crc(elf)
             metadata.update(crc_metadata)
+            compare_gap_fill(build, elf)
             if profile == 'success':
                 damaged = build / 'crc-corrupt.elf'
                 damaged.write_bytes(corrupted)
@@ -172,6 +282,7 @@ def main():
             report['cases'].append({'profile': profile, 'elf': str(elf.relative_to(output)),
                                     'sources': sources, 'structure': structure, 'metadata': metadata, 'exit_trap': exit_trap})
             print(f'PASS build/ELF: {profile}', flush=True)
+        report['build_only'] = build_only(root, output)
         report['status'] = 'passed'
     except (OSError, ValueError, KeyError, struct.error, subprocess.SubprocessError) as error:
         report['error'] = str(error)

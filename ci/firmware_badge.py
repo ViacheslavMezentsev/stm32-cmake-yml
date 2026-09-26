@@ -34,7 +34,8 @@ def collect(build, run, lock, revision, emulator="qemu"):
                 or any(c['passed'] is not True or c['metadata_ok'] is not True
                        or c['expected_metadata'] != expected[c['profile']] for c in cases)):
             raise ValueError(f'Missing, failed or mismatched {emulator} cases')
-        builds += len(compiled['cases'])
+        # Build-only firmware (H7/H5, TC-57) counts as builds, not simulator checks.
+        builds += len(compiled['cases']) + len(compiled['build_only'])
         checks += len(cases)
     return {'builds': builds, 'checks': checks, 'emulator': 'QEMU' if emulator == 'qemu' else 'Renode', 'revision': revision}
 

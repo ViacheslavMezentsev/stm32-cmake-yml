@@ -1,0 +1,28 @@
+# Build-only firmware for families without QEMU/Renode models (spec 8.8.5,
+# TC-57) and the CRC image of STM32H503CB (spec 4.15.8, 4.15.9, TC-63).
+stm32_cmake_yml_version: 0.9.2
+project_name: buildonly_probe
+mcu: STM32H743ZI
+languages: [C, ASM]
+sources: [main.c]
+use_cmsis: true
+use_hal: false
+use_freertos: false
+use_newlib_nano: true
+system_library: NoSys
+build_artifacts: [bin, hex, map]
+compile_options: [Os]
+profiles:
+  h7:
+    mcu: STM32H743ZI
+  h5:
+    mcu: STM32H563ZI
+  h503:
+    mcu: STM32H503CB
+    crc_enable: true
+  h503bkp:
+    mcu: STM32H503CB
+    crc_enable: true
+    compile_definitions: [SMOKE_BKPSRAM=1]
+    # objcopy -O binary would span 0x08000000..0x40036400 (~900 MB): no BIN.
+    build_artifacts: [hex, map]

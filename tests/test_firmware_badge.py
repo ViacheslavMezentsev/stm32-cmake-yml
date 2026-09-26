@@ -9,7 +9,7 @@ from unittest.mock import patch
 import xml.etree.ElementTree as ET
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'ci'))
-from firmware_cases import BUILD_PROFILES
+from firmware_cases import BUILD_ONLY_PROFILES, BUILD_PROFILES
 from firmware_badge import collect, svg, main
 from publish_firmware_badge import publish
 
@@ -23,7 +23,8 @@ class BadgeTests(unittest.TestCase):
         cases = [{'profile': p, 'metadata': {'PROFILE': p}} for p in BUILD_PROFILES]
         negative = {'profile': 'crc-corrupt', 'metadata': {'PROFILE': 'success', 'CRC_RESULT': 'FAIL'}}
         compiled = {'status': 'passed', 'gcc': '14.2.1', 'cmake': 'cmake version 3.28.3',
-                    'git_revision': 'abc', 'git_dirty': '0', 'cases': cases, 'crc_negative': negative}
+                    'git_revision': 'abc', 'git_dirty': '0', 'cases': cases, 'crc_negative': negative,
+                    'build_only': [{'profile': p, 'status': 'build-only'} for p in BUILD_ONLY_PROFILES]}
         executed = {'status': 'passed', 'cases': [dict(profile=c['profile'], passed=True,
                     metadata_ok=True, expected_metadata=c['metadata']) for c in cases + [negative]]}
         self.reports = [build, run, compiled, executed]
@@ -34,15 +35,16 @@ class BadgeTests(unittest.TestCase):
 
     def test_counts_builds_separately_from_negative_checks(self):
         result = self.count(self.reports)
-        self.assertEqual((result['builds'], result['checks']), (len(BUILD_PROFILES), len(BUILD_PROFILES) + 1))
+        builds = len(BUILD_PROFILES) + len(BUILD_ONLY_PROFILES)
+        self.assertEqual((result['builds'], result['checks']), (builds, len(BUILD_PROFILES) + 1))
         badge = ET.fromstring(svg(result))
         self.assertEqual(badge.attrib['aria-label'], f"Builds (Checks): {result['builds']} ({result['checks']})")
         self.assertFalse(badge.findall('.//{http://www.w3.org/2000/svg}image'))
         self.assertTrue(all('rx' not in r.attrib for r in badge.findall('{http://www.w3.org/2000/svg}rect')))
-        self.assertIn(f'{len(BUILD_PROFILES)} ({len(BUILD_PROFILES) + 1})', svg(result))
+        self.assertIn(f'{builds} ({len(BUILD_PROFILES) + 1})', svg(result))
 
     def test_rejects_failed_missing_duplicate_or_stale_results(self):
-        for change in ('failed', 'missing', 'duplicate', 'stale', 'dirty', 'metadata', 'matrix'):
+        for change in ('failed', 'missing', 'duplicate', 'stale', 'dirty', 'metadata', 'matrix', 'buildonly'):
             reports = copy.deepcopy(self.reports)
             if change == 'failed': reports[3]['cases'][0]['passed'] = False
             if change == 'missing': reports[3]['cases'].pop()
@@ -51,6 +53,7 @@ class BadgeTests(unittest.TestCase):
             if change == 'dirty': reports[2]['git_dirty'] = '1'
             if change == 'metadata': reports[3]['cases'][0]['expected_metadata'] = {}
             if change == 'matrix': reports[1]['pairs'] = []
+            if change == 'buildonly': reports[2]['build_only'].pop()
             with self.subTest(change=change), self.assertRaises(ValueError):
                 self.count(reports)
 
