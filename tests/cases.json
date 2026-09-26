@@ -362,6 +362,75 @@
     ]
   },
   {
+    "name": "h7-single-core-default",
+    "args": ["-DPROJECT_CONFIG_FILE=stm32h7.yml"],
+    "observed": {"MCU": "STM32H743ZI"},
+    "properties": {"LINK_LIBRARIES": ["HAL::STM32::H7::M7::GPIO", "CMSIS::STM32::H743ZI::M7"]},
+    "log_contains": ["Ядро MCU не задано, используется единственное ядро STM32H743ZI: M7.", "не проверялось (скрипт формирует stm32-cmake)"]
+  },
+  {
+    "name": "h7-dual-core",
+    "args": ["-DPROJECT_CONFIG_FILE=stm32h7.yml"],
+    "steps": [
+      {"args": ["-DSTM32_YML_PROFILE=dual"], "error": "У STM32H745ZI несколько ядер (M7, M4): укажите mcu_core"},
+      {"args": ["-DSTM32_YML_PROFILE=dualM7"], "properties": {"LINK_LIBRARIES": ["HAL::STM32::H7::M7::GPIO", "CMSIS::STM32::H745ZI::M7"]}, "log_contains": ["Ядро MCU: M7"]},
+      {"args": ["-DSTM32_YML_PROFILE=dualM4", "-DSTM32_YML_OVERRIDE_validate_linker_script=true"], "properties": {"LINK_LIBRARIES": ["HAL::STM32::H7::M4::GPIO", "CMSIS::STM32::H745xx::M4"]}, "absent_properties": {"LINK_LIBRARIES": ["HAL::STM32::H7::M7::GPIO"]}, "log_contains": ["Ядро MCU: M4", "Соотношение : 288K == 288K", "Max Flash Size: 1048576"]}
+    ]
+  },
+  {
+    "name": "mcu-core-invalid",
+    "steps": [
+      {"args": ["-DPROJECT_CONFIG_FILE=stm32h7.yml", "-DSTM32_YML_PROFILE=badcore"], "error": "mcu_core: 'M3' недопустим для STM32H743ZI. Допустимые значения: M7."},
+      {"args": ["-DPROJECT_CONFIG_FILE=stm32_config.yml", "-DSTM32_YML_PROFILE=", "-DSTM32_YML_OVERRIDE_mcu_core=M4"], "error": "mcu_core: 'M4' недопустим для STM32F411CE: stm32-cmake не выделяет ядра"}
+    ]
+  },
+  {
+    "name": "h7-freertos-cube",
+    "args": ["-DPROJECT_CONFIG_FILE=stm32h7.yml", "-DSTM32_YML_PROFILE=rtos"],
+    "properties": {"LINK_LIBRARIES": ["FreeRTOS::STM32::H7::M7::ARM_CM7", "FreeRTOS::STM32::H7::M7::Heap::4", "CMSIS::STM32::H7::M7::RTOS_V2"]}
+  },
+  {
+    "name": "hal-missing-component",
+    "args": ["-DPROJECT_CONFIG_FILE=stm32h7.yml", "-DSTM32_YML_PROFILE=badhal"],
+    "error": "Компонент HAL 'NOSUCHDRIVER' (hal_components) не найден для семейства H7 (ядро M7)",
+    "log_absent": ["CMake Generate step failed"]
+  },
+  {
+    "name": "h5-cmsis-hal-freertos-external",
+    "args": ["-DPROJECT_CONFIG_FILE=stm32h5.yml", "-DFREERTOS_PATH=/opt/FreeRTOS-Kernel/11.3.1"],
+    "steps": [
+      {"args": ["-DSTM32_YML_PROFILE="], "properties": {"LINK_LIBRARIES": ["HAL::STM32::H5::GPIO", "CMSIS::STM32::H563ZI"]}},
+      {"args": ["-DSTM32_YML_PROFILE=rtos"], "properties": {"LINK_LIBRARIES": ["FreeRTOS::ARM_CM33_NTZ", "FreeRTOS::Heap::4"]}, "absent_properties": {"LINK_LIBRARIES": ["FreeRTOS::ARM_CM33_NTZ::NON_SECURE"]}},
+      {"args": ["-DSTM32_YML_PROFILE=rtosv2"], "error": "cmsis_rtos_api: v2: обёртка CMSIS-RTOS не найдена (нет цели CMSIS::STM32::H5::RTOS_V2)"},
+      {"args": ["-DSTM32_YML_PROFILE=crc"], "linker": {"file": "STM32H563ZI_FLASH.ld", "heap": 512, "stack": 1024}, "log_contains": ["Max Flash Size: 2097152", "Соотношение : 640K == 640K"]}
+    ]
+  },
+  {
+    "name": "freertos-ioc-port-table",
+    "args": ["-DPROJECT_CONFIG_FILE=freertos-port.yml", "-DFREERTOS_PATH=/opt/FreeRTOS-Kernel/11.3.1"],
+    "steps": [
+      {"args": ["-DSTM32_YML_OVERRIDE_mcu=STM32F103C8", "-DSTM32_YML_OVERRIDE_mcu_core="], "observed": {"freertos_components": "ARM_CM3;Heap::4"}, "properties": {"LINK_LIBRARIES": ["FreeRTOS::ARM_CM3", "FreeRTOS::Heap::4"]}, "log_absent": ["не определён таблицей фреймворка"]},
+      {"args": ["-DSTM32_YML_OVERRIDE_mcu=STM32F411CE", "-DSTM32_YML_OVERRIDE_mcu_core="], "observed": {"freertos_components": "ARM_CM4F;Heap::4"}, "properties": {"LINK_LIBRARIES": ["FreeRTOS::ARM_CM4F", "FreeRTOS::Heap::4"]}, "log_absent": ["не определён таблицей фреймворка"]},
+      {"args": ["-DSTM32_YML_OVERRIDE_mcu=STM32G071RB", "-DSTM32_YML_OVERRIDE_mcu_core="], "observed": {"freertos_components": "ARM_CM0;Heap::4"}, "properties": {"LINK_LIBRARIES": ["FreeRTOS::ARM_CM0", "FreeRTOS::Heap::4"]}, "log_absent": ["не определён таблицей фреймворка"]},
+      {"args": ["-DSTM32_YML_OVERRIDE_mcu=STM32C031C6", "-DSTM32_YML_OVERRIDE_mcu_core="], "observed": {"freertos_components": "ARM_CM0;Heap::4"}, "properties": {"LINK_LIBRARIES": ["FreeRTOS::ARM_CM0", "FreeRTOS::Heap::4"]}, "log_absent": ["не определён таблицей фреймворка"]},
+      {"args": ["-DSTM32_YML_OVERRIDE_mcu=STM32U083RC", "-DSTM32_YML_OVERRIDE_mcu_core="], "observed": {"freertos_components": "ARM_CM0;Heap::4"}, "properties": {"LINK_LIBRARIES": ["FreeRTOS::ARM_CM0", "FreeRTOS::Heap::4"]}, "log_absent": ["не определён таблицей фреймворка"]},
+      {"args": ["-DSTM32_YML_OVERRIDE_mcu=STM32H563ZI", "-DSTM32_YML_OVERRIDE_mcu_core="], "observed": {"freertos_components": "ARM_CM33_NTZ;Heap::4"}, "properties": {"LINK_LIBRARIES": ["FreeRTOS::ARM_CM33_NTZ", "FreeRTOS::Heap::4"]}, "log_absent": ["не определён таблицей фреймворка"]},
+      {"args": ["-DSTM32_YML_OVERRIDE_mcu=STM32L552ZE", "-DSTM32_YML_OVERRIDE_mcu_core="], "observed": {"freertos_components": "ARM_CM33_NTZ;Heap::4"}, "properties": {"LINK_LIBRARIES": ["FreeRTOS::ARM_CM33_NTZ", "FreeRTOS::Heap::4"]}, "log_absent": ["не определён таблицей фреймворка"]},
+      {"args": ["-DSTM32_YML_OVERRIDE_mcu=STM32U575ZI", "-DSTM32_YML_OVERRIDE_mcu_core="], "observed": {"freertos_components": "ARM_CM33_NTZ;Heap::4"}, "properties": {"LINK_LIBRARIES": ["FreeRTOS::ARM_CM33_NTZ", "FreeRTOS::Heap::4"]}, "log_absent": ["не определён таблицей фреймворка"]},
+      {"args": ["-DSTM32_YML_OVERRIDE_mcu=STM32WL55JC", "-DSTM32_YML_OVERRIDE_mcu_core=M4"], "observed": {"freertos_components": "ARM_CM3;Heap::4"}, "properties": {"LINK_LIBRARIES": ["FreeRTOS::ARM_CM3", "FreeRTOS::Heap::4"]}, "log_absent": ["не определён таблицей фреймворка"]},
+      {"args": ["-DSTM32_YML_OVERRIDE_mcu=STM32WL55JC", "-DSTM32_YML_OVERRIDE_mcu_core=M0PLUS"], "observed": {"freertos_components": "ARM_CM0;Heap::4"}, "properties": {"LINK_LIBRARIES": ["FreeRTOS::ARM_CM0", "FreeRTOS::Heap::4"]}, "log_absent": ["не определён таблицей фреймворка"]},
+      {"args": ["-DSTM32_YML_OVERRIDE_mcu=STM32WB55RG", "-DSTM32_YML_OVERRIDE_mcu_core="], "observed": {"freertos_components": "ARM_CM4F;Heap::4"}, "properties": {"LINK_LIBRARIES": ["FreeRTOS::ARM_CM4F", "FreeRTOS::Heap::4"]}, "log_absent": ["не определён таблицей фреймворка"]},
+      {"args": ["-DSTM32_YML_OVERRIDE_mcu=STM32H745ZI", "-DSTM32_YML_OVERRIDE_mcu_core=M7"], "observed": {"freertos_components": "ARM_CM7;Heap::4"}, "properties": {"LINK_LIBRARIES": ["FreeRTOS::ARM_CM7", "FreeRTOS::Heap::4"]}, "log_absent": ["не определён таблицей фреймворка"]},
+      {"args": ["-DSTM32_YML_OVERRIDE_mcu=STM32H745ZI", "-DSTM32_YML_OVERRIDE_mcu_core=M4"], "observed": {"freertos_components": "ARM_CM4F;Heap::4"}, "properties": {"LINK_LIBRARIES": ["FreeRTOS::ARM_CM4F", "FreeRTOS::Heap::4"]}, "log_absent": ["не определён таблицей фреймворка"]}
+    ]
+  },
+  {
+    "name": "freertos-ioc-port-unknown-family",
+    "args": ["-DPROJECT_CONFIG_FILE=freertos-port.yml", "-DFREERTOS_PATH=/opt/FreeRTOS-Kernel/11.3.1", "-DSTM32_YML_OVERRIDE_mcu=STM32N657X0"],
+    "error": "STM32N657X0",
+    "log_contains": ["Порт FreeRTOS для 'STM32N657X0' не определён таблицей фреймворка; используется ARM_CM4F."]
+  },
+  {
     "name": "source-directory-target",
     "args": [
       "-DPROJECT_CONFIG_FILE=source-group.yml"
@@ -773,7 +842,7 @@
       "-DPROJECT_CONFIG_FILE=freertos.yml",
       "-DSTM32_YML_PROFILE=missing"
     ],
-    "error": "FreeRTOS::STM32::F4::MissingComponent"
+    "error": "Компонент FreeRTOS 'MissingComponent' (freertos_components) не найден: нет цели FreeRTOS::STM32::F4::MissingComponent"
   },
   {
     "name": "freertos-disabled",
@@ -1025,37 +1094,42 @@
     ]
   },
   {
-    "name": "freertos-external-cmake-known-failure",
-    "args": [
-      "-DPROJECT_CONFIG_FILE=freertos.yml",
-      "-DSTM32_YML_OVERRIDE_freertos_version=external",
-      "-DSTM32_YML_OVERRIDE_cmsis_rtos_api=none",
-      "-DFREERTOS_PATH=/opt/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3/Middlewares/Third_Party/FreeRTOS"
-    ],
-    "error": "FreeRTOS::ARM_CM4F",
-    "log_contains": [
-      "Search for FreeRTOS families: STM32F4",
-      "Found FreeRTOS:",
-      "CMake Generate step failed."
+    "name": "freertos-external-cmake",
+    "args": ["-DPROJECT_CONFIG_FILE=freertos.yml", "-DSTM32_YML_OVERRIDE_freertos_version=external", "-DSTM32_YML_OVERRIDE_cmsis_rtos_api=none", "-DFREERTOS_PATH=/opt/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3/Middlewares/Third_Party/FreeRTOS"],
+    "properties": {"LINK_LIBRARIES": ["FreeRTOS::ARM_CM4F", "FreeRTOS::Heap::4", "FreeRTOS::Timers", "FreeRTOS::EventGroups", "FreeRTOS::StreamBuffer"]},
+    "absent_properties": {"LINK_LIBRARIES": ["FreeRTOS::STM32::F4::ARM_CM4F", "FreeRTOS::STM32::F4::Heap::4"]},
+    "log_absent": ["Search for FreeRTOS families"]
+  },
+  {
+    "name": "freertos-external-env",
+    "args": ["-DPROJECT_CONFIG_FILE=freertos.yml", "-DSTM32_YML_OVERRIDE_freertos_version=external", "-DSTM32_YML_OVERRIDE_cmsis_rtos_api=none"],
+    "env": {"FREERTOS_PATH": "/opt/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3/Middlewares/Third_Party/FreeRTOS"},
+    "properties": {"LINK_LIBRARIES": ["FreeRTOS::ARM_CM4F", "FreeRTOS::Heap::4"]},
+    "absent_properties": {"LINK_LIBRARIES": ["FreeRTOS::STM32::F4::ARM_CM4F"]},
+    "log_contains": ["ENV FREERTOS_PATH specified, using FREERTOS_PATH: /opt/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3/Middlewares/Third_Party/FreeRTOS"]
+  },
+  {
+    "name": "freertos-external-kernel",
+    "args": ["-DPROJECT_CONFIG_FILE=freertos.yml", "-DSTM32_YML_OVERRIDE_freertos_version=external", "-DFREERTOS_PATH=/opt/FreeRTOS-Kernel/11.3.1"],
+    "steps": [
+      {"args": ["-DSTM32_YML_OVERRIDE_cmsis_rtos_api=none"], "properties": {"LINK_LIBRARIES": ["FreeRTOS::ARM_CM4F", "FreeRTOS::Heap::4"]}, "absent_properties": {"LINK_LIBRARIES": ["CMSIS::STM32::F4::RTOS_V2"]}},
+      {"args": ["-DSTM32_YML_OVERRIDE_cmsis_rtos_api=v2"], "properties": {"LINK_LIBRARIES": ["FreeRTOS::ARM_CM4F", "FreeRTOS::Heap::4", "CMSIS::STM32::F4::RTOS_V2"]}}
     ]
   },
   {
-    "name": "freertos-external-env-known-failure",
-    "args": [
-      "-DPROJECT_CONFIG_FILE=freertos.yml",
-      "-DSTM32_YML_OVERRIDE_freertos_version=external",
-      "-DSTM32_YML_OVERRIDE_cmsis_rtos_api=none"
-    ],
-    "error": "FreeRTOS::ARM_CM4F",
-    "log_contains": [
-      "Search for FreeRTOS families: STM32F4",
-      "Found FreeRTOS:",
-      "CMake Generate step failed.",
-      "ENV FREERTOS_PATH specified, using FREERTOS_PATH: /opt/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3/Middlewares/Third_Party/FreeRTOS"
-    ],
-    "env": {
-      "FREERTOS_PATH": "/opt/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3/Middlewares/Third_Party/FreeRTOS"
-    }
+    "name": "freertos-external-no-path",
+    "args": ["-DPROJECT_CONFIG_FILE=freertos.yml", "-DSTM32_YML_OVERRIDE_freertos_version=external", "-DSTM32_YML_OVERRIDE_cmsis_rtos_api=none"],
+    "error": "freertos_version: external требует путь к FreeRTOS: задайте FREERTOS_PATH"
+  },
+  {
+    "name": "freertos-external-missing-port",
+    "args": ["-DPROJECT_CONFIG_FILE=freertos.yml", "-DSTM32_YML_OVERRIDE_freertos_version=external", "-DSTM32_YML_OVERRIDE_cmsis_rtos_api=none", "-DFREERTOS_PATH=/opt/FreeRTOS-Kernel/11.3.1", "-DSTM32_YML_OVERRIDE_freertos_components=ARM_CM7_MPU;Heap::4"],
+    "error": "файлы порта 'ARM_CM7_MPU' не найдены"
+  },
+  {
+    "name": "freertos-external-missing-component",
+    "args": ["-DPROJECT_CONFIG_FILE=freertos.yml", "-DSTM32_YML_OVERRIDE_freertos_version=external", "-DSTM32_YML_OVERRIDE_cmsis_rtos_api=none", "-DFREERTOS_PATH=/opt/FreeRTOS-Kernel/11.3.1", "-DSTM32_YML_PROFILE=missing"],
+    "error": "Компонент FreeRTOS 'MissingComponent' (freertos_components) не найден: нет цели FreeRTOS::MissingComponent в пространстве FreeRTOS."
   },
   {
     "name": "stm32f0-cmsis-hal",

@@ -3,7 +3,7 @@
 [Documentation](index.md) · [Русский](../ru/firmware-testing.md) · [Environment](emulation.md)
 
 The first firmware test adapts the author's F1 [02-semihosting example](../../tests/firmware/semihosting/README.md).
-It is separate from the 127 configure scenarios: **72 builds, 78 QEMU runs and 78 Renode runs**:
+It is separate from the 139 configure scenarios: **72 builds, 78 QEMU runs and 78 Renode runs**:
 twelve profiles plus one corrupted copy per tool pair; three xPack GCC versions × two CMake versions from the
 [lockfile](../../ci/dependencies.lock.json), CubeF1 1.8.7, QEMU 11.0.0.
 The Windows QEMU 11.1.0 installation was also checked locally; CI uses the pinned image.

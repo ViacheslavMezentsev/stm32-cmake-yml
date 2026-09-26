@@ -113,9 +113,9 @@ package or the resulting image bytes. Ubuntu snapshots are not required.
 
 ## Framework configuration tests
 
-[tests/cases.json](../../tests/cases.json) defines 127 scenarios, run with each of
-the three GCC and two CMake versions from the lockfile: **762 case executions**.
-Twenty scenarios perform two to six consecutive configurations in the same build tree.
+[tests/cases.json](../../tests/cases.json) defines 139 scenarios, run with each of
+the three GCC and two CMake versions from the lockfile: **834 case executions**.
+Twenty-six scenarios perform two to thirteen consecutive configurations in the same build tree.
 
 | Area | Checks |
 | --- | --- |
@@ -274,11 +274,19 @@ Seven `freertos-ioc-*` cases extend the manual configuration group above. Reduce
 
 YAML and profiles can replace components with Heap::2 and the API with none. Empty use_freertos, freertos_version, cmsis_rtos_api and component lists fall back to IOC/automatic values. An override of false suppresses IOC activation. `freertos-ioc-reconfigure` checks enabled → disabled by profile → enabled across Configure runs sharing a cache; it supplements the usual clean-cache reconfiguration workflow.
 
-Assertions cover exported values, direct target dependencies and successful Generate. Other families, external FreeRTOS, port/core compatibility, task execution and clock setup are not tested. No firmware is built.
+Assertions cover exported values, direct target dependencies and successful Generate. Other families and external FreeRTOS are covered by the cases below; port/core compatibility, task execution and clock setup are not tested here. No firmware is built.
 
-### Known external FreeRTOS failure
+### External FreeRTOS
 
-Two `freertos-external-*-known-failure` tests reproduce [E007](errata/E007.md) with FREERTOS_PATH passed through CMake or the environment. Passing means the expected Generate failure occurred. External mode remains unfixed and has no positive integration test.
+`freertos_version: external` ([E007](errata/E007.md) is fixed on the 0.9.3 branch) is checked on two layouts. `freertos-external-cmake` and `freertos-external-env` take the CubeF4 FreeRTOS tree through `-DFREERTOS_PATH` and the environment; `freertos-external-kernel` uses FreeRTOS-Kernel 11.3.1 with `cmsis_rtos_api: none` and `v2`. The expected targets are `FreeRTOS::<port>` and `FreeRTOS::<component>` without the `FreeRTOS::STM32::F4` namespace. Negative cases: no `FREERTOS_PATH`, the `ARM_CM7_MPU` port that FreeRTOS-Kernel lacks, and an unknown component. The CMSIS-RTOS v2 wrapper with FreeRTOS-Kernel 11.3.1 and CubeF1 was also built manually (the `freertosQueue` firmware with the FreeRTOSConfig.h options the wrapper requires); running such firmware was not checked.
+
+### MCU core, H7 and H5
+
+`h7-single-core-default` checks that the single-core STM32H743ZI gets core M7 and the `CMSIS::STM32::H743ZI::M7`, `HAL::STM32::H7::M7::*` targets. `h7-dual-core` checks STM32H745ZI: no core is an error listing the cores; M7 and M4 select that core's targets, and for M4 the RAM total and the CRC Flash limit follow the core (288K, 1024K). `mcu-core-invalid` checks a core outside the list and a core for F4. `h7-freertos-cube` checks CubeH7 FreeRTOS with the v2 wrapper in the M7 namespace. `h5-cmsis-hal-freertos-external` checks H5: CMSIS/HAL, FreeRTOS-Kernel with the `ARM_CM33_NTZ` port, the v2 wrapper refusal (CubeH5 has no FreeRTOS) and CRC with a template. `hal-missing-component` expects a Configure error before Generate.
+
+### FreeRTOS port from an IOC
+
+`freertos-ioc-port-table` checks the port table in thirteen steps for F1, F4, G0, C0, U0, H5, L5, U5, WL (M4, M0PLUS), WB and H7 (M7, M4): an override replaces the MCU and FreeRTOS-Kernel is used as external, so those families' Cube packages are not needed. `freertos-ioc-port-unknown-family` checks the warning and `ARM_CM4F` for a family outside the table.
 
 ### Additional F0, F3, F7 and G4 families
 

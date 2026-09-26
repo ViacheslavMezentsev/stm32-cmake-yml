@@ -106,11 +106,23 @@ function(stm32_yml_setup_frameworks TARGET_NAME)
             endif()
 
             set(HAL_TARGET_PREFIX "HAL::STM32::${MCU_FAMILY}")
+            set(_core_text "")
             if(mcu_core)
                 set(HAL_TARGET_PREFIX "${HAL_TARGET_PREFIX}::${mcu_core}")
+                set(_core_text " (ядро ${mcu_core})")
             endif()
 
             list(TRANSFORM hal_components PREPEND "${HAL_TARGET_PREFIX}::" OUTPUT_VARIABLE LOCAL_HAL_TARGETS)
+
+            # Каждый компонент проверяется сразу, а не на стадии Generate (ТЗ 4.7.9).
+            foreach(_component IN LISTS hal_components)
+                if(NOT TARGET "${HAL_TARGET_PREFIX}::${_component}")
+                    message(FATAL_ERROR
+                        "Компонент HAL '${_component}' (hal_components) не найден для семейства "
+                        "${MCU_FAMILY}${_core_text}: нет цели ${HAL_TARGET_PREFIX}::${_component}. "
+                        "Проверьте имя драйвера в пакете STM32Cube ${MCU_FAMILY}.")
+                endif()
+            endforeach()
 
             # Привязываем библиотеки сразу к цели!
             target_link_libraries(${TARGET_NAME} PRIVATE ${LOCAL_HAL_TARGETS})
@@ -159,29 +171,83 @@ function(stm32_yml_setup_frameworks TARGET_NAME)
         endif()
         message(STATUS "Используется порт FreeRTOS: ${FREERTOS_PORT}")
 
-        find_package(FreeRTOS COMPONENTS ${FREERTOS_PORT} STM32${MCU_FAMILY} REQUIRED)
-
-        set(FREERTOS_TARGET_PREFIX "FreeRTOS")
         if(freertos_version STREQUAL "cube")
+            find_package(FreeRTOS COMPONENTS ${FREERTOS_PORT} STM32${MCU_FAMILY} REQUIRED)
             set(FREERTOS_TARGET_PREFIX "FreeRTOS::STM32::${MCU_FAMILY}")
             if(mcu_core)
                 set(FREERTOS_TARGET_PREFIX "${FREERTOS_TARGET_PREFIX}::${mcu_core}")
             endif()
+        else()
+            # external: FreeRTOS не из STM32Cube (ТЗ 4.8.6, E007). Без компонента
+            # семейства stm32-cmake ищет FreeRTOS в FREERTOS_PATH и создаёт цели
+            # FreeRTOS::<порт> и FreeRTOS::<компонент>. REQUIRED не используется:
+            # в этом режиме stm32-cmake не отмечает компоненты найденными, а при
+            # отсутствии файлов лишь предупреждает — проверяем сами.
+            find_package(FreeRTOS COMPONENTS ${FREERTOS_PORT})
+            if(NOT FREERTOS_PATH)
+                message(FATAL_ERROR
+                    "freertos_version: external требует путь к FreeRTOS: задайте FREERTOS_PATH "
+                    "(-DFREERTOS_PATH=... или переменная окружения) — каталог FreeRTOS-Kernel "
+                    "или Middlewares/Third_Party/FreeRTOS пакета STM32Cube.")
+            endif()
+            if(NOT FreeRTOS_COMMON_INCLUDE OR NOT FreeRTOS_SOURCE_DIR)
+                message(FATAL_ERROR
+                    "freertos_version: external: в FREERTOS_PATH '${FREERTOS_PATH}' не найдены "
+                    "FreeRTOS.h и tasks.c. Ожидается раскладка FreeRTOS-Kernel (include/, "
+                    "portable/GCC/<порт>) или дерева Cube (Source/...).")
+            endif()
+            if(NOT FreeRTOS_${FREERTOS_PORT}_PATH OR NOT FreeRTOS_${FREERTOS_PORT}_SOURCE)
+                message(FATAL_ERROR
+                    "freertos_version: external: файлы порта '${FREERTOS_PORT}' не найдены в "
+                    "FREERTOS_PATH '${FREERTOS_PATH}' (portable/GCC/${FREERTOS_PORT}).")
+            endif()
+            set(FREERTOS_TARGET_PREFIX "FreeRTOS")
         endif()
 
-        set(LOCAL_FREERTOS_TARGETS "")
-        list(APPEND LOCAL_FREERTOS_TARGETS "${FREERTOS_TARGET_PREFIX}::${FREERTOS_PORT}")
+        # Порт ARMv8 с TrustZone stm32-cmake создаёт как <порт>::NON_SECURE.
+        set(_port_target "${FREERTOS_TARGET_PREFIX}::${FREERTOS_PORT}")
+        if(NOT TARGET "${_port_target}" AND TARGET "${_port_target}::NON_SECURE")
+            set(_port_target "${_port_target}::NON_SECURE")
+        endif()
 
+        set(LOCAL_FREERTOS_TARGETS "${_port_target}")
         foreach(component IN LISTS OTHER_FREERTOS_COMPONENTS)
             list(APPEND LOCAL_FREERTOS_TARGETS "${FREERTOS_TARGET_PREFIX}::${component}")
         endforeach()
 
+        # Каждый компонент проверяется сразу, а не на стадии Generate (ТЗ 4.8.7).
+        foreach(_target IN LISTS LOCAL_FREERTOS_TARGETS)
+            if(NOT TARGET "${_target}")
+                string(REPLACE "${FREERTOS_TARGET_PREFIX}::" "" _component "${_target}")
+                message(FATAL_ERROR
+                    "Компонент FreeRTOS '${_component}' (freertos_components) не найден: нет цели "
+                    "${_target} в пространстве ${FREERTOS_TARGET_PREFIX}.")
+            endif()
+        endforeach()
+
+        # Обёртка CMSIS-RTOS создаётся целью CMSIS семейства с учётом ядра (ТЗ 4.7.8).
+        # С внешним FreeRTOS исходники обёртки берутся из пакета CMSIS семейства,
+        # заголовки FreeRTOS — из целей внешнего FreeRTOS (ТЗ 4.8.8).
+        set(_cmsis_family_prefix "CMSIS::STM32::${MCU_FAMILY}")
+        if(mcu_core)
+            set(_cmsis_family_prefix "${_cmsis_family_prefix}::${mcu_core}")
+        endif()
+        set(_rtos_target "")
         if(cmsis_rtos_api STREQUAL "v1")
-            list(APPEND LOCAL_FREERTOS_TARGETS "CMSIS::STM32::${MCU_FAMILY}::RTOS")
-            message(STATUS "Подключена обертка CMSIS-RTOS API v1.")
+            set(_rtos_target "${_cmsis_family_prefix}::RTOS")
         elseif(cmsis_rtos_api STREQUAL "v2")
-            list(APPEND LOCAL_FREERTOS_TARGETS "CMSIS::STM32::${MCU_FAMILY}::RTOS_V2")
-            message(STATUS "Подключена обертка CMSIS-RTOS API v2.")
+            set(_rtos_target "${_cmsis_family_prefix}::RTOS_V2")
+        endif()
+        if(_rtos_target)
+            if(NOT TARGET "${_rtos_target}")
+                message(FATAL_ERROR
+                    "cmsis_rtos_api: ${cmsis_rtos_api}: обёртка CMSIS-RTOS не найдена (нет цели ${_rtos_target}). "
+                    "Её исходники берутся из Middlewares/Third_Party/FreeRTOS пакета STM32Cube ${MCU_FAMILY} "
+                    "и требуют use_cmsis: true; в пакете может не быть FreeRTOS (например, H5, U5). "
+                    "Используйте cmsis_rtos_api: none.")
+            endif()
+            list(APPEND LOCAL_FREERTOS_TARGETS "${_rtos_target}")
+            message(STATUS "Подключена обертка CMSIS-RTOS API ${cmsis_rtos_api}.")
         endif()
 
         # Привязываем библиотеки сразу к цели!

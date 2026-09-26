@@ -184,17 +184,30 @@ function(stm32_yml_prepare_project_data OUT_PROJECT_NAME_VAR OUT_LANGUAGES_VAR)
 
                 # freertos_components: YAML имеет приоритет; автоопределение если не задано
                 if(NOT DEFINED freertos_components OR "${freertos_components}" STREQUAL "")
-                    if(mcu MATCHES "^STM32(F1|F2|L1)")
-                        set(freertos_components "ARM_CM3" "Heap::4")
-                    elseif(mcu MATCHES "^STM32(F3|F4|G4|L4)")
-                        set(freertos_components "ARM_CM4F" "Heap::4")
-                    elseif(mcu MATCHES "^STM32(F0|G0|L0)")
-                        set(freertos_components "ARM_CM0" "Heap::4")
+                    # Порт по семейству и ядру MCU (ТЗ 4.4.4, приложение A).
+                    # Ядро ещё не проверено (п. 4.7.8): для H7 и WL без mcu_core
+                    # берётся основное ядро (M7, M4).
+                    if(mcu MATCHES "^STM32WL" AND mcu_core STREQUAL "M0PLUS")
+                        set(_freertos_port "ARM_CM0")
+                    elseif(mcu MATCHES "^STM32(F1|F2|L1|WL)")
+                        set(_freertos_port "ARM_CM3")
+                    elseif(mcu MATCHES "^STM32H7" AND mcu_core STREQUAL "M4")
+                        set(_freertos_port "ARM_CM4F")
                     elseif(mcu MATCHES "^STM32(F7|H7)")
-                        set(freertos_components "ARM_CM7" "Heap::4")
+                        set(_freertos_port "ARM_CM7")
+                    elseif(mcu MATCHES "^STM32(F3|F4|G4|L4|WB|MP1)")
+                        set(_freertos_port "ARM_CM4F")
+                    elseif(mcu MATCHES "^STM32(F0|G0|L0|C0|U0)")
+                        set(_freertos_port "ARM_CM0")
+                    elseif(mcu MATCHES "^STM32(H5|L5|U5)")
+                        set(_freertos_port "ARM_CM33_NTZ")
                     else()
-                        set(freertos_components "ARM_CM4F" "Heap::4")
+                        set(_freertos_port "ARM_CM4F")
+                        message(WARNING
+                            "Порт FreeRTOS для '${mcu}' не определён таблицей фреймворка; "
+                            "используется ARM_CM4F. Задайте freertos_components явно.")
                     endif()
+                    set(freertos_components "${_freertos_port}" "Heap::4")
                 endif()
             endif()
         endif()

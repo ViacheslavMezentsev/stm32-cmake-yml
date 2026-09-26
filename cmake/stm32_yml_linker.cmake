@@ -139,7 +139,12 @@ function(stm32_yml_setup_linker_script TARGET_NAME)
                         "STM32${_mcu_type_concrete}_FLASH.ld.in (в корень проекта или linker_script_dir) "
                         "или задайте размеры в явном linker_script.")
                 endif()
-                message(STATUS "Подключение встроенного скрипта компоновщика: ${CMAKE_CURRENT_BINARY_DIR}/${MCU_DEVICE}.ld")
+                if(mcu_core)
+                    set(_ld_name "${MCU_DEVICE}_${mcu_core}.ld")
+                else()
+                    set(_ld_name "${MCU_DEVICE}.ld")
+                endif()
+                message(STATUS "Подключение встроенного скрипта компоновщика: ${CMAKE_CURRENT_BINARY_DIR}/${_ld_name}")
             endif()
         endif()
 

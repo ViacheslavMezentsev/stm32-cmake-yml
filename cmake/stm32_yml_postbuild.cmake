@@ -40,7 +40,8 @@ function(stm32_yml_setup_postbuild TARGET_NAME)
         else()
             if(NOT toolchain_backend STREQUAL "arduino")
                 # 2. Бэкенд stm32-cmake: берем из внутренней базы данных тулчейна
-                stm32_get_memory_info(CHIP ${mcu} FLASH SIZE EXPECTED_FLASH_SIZE_STR)
+                # С учётом ядра (ТЗ 4.15.4): у двухъядерных H7 Flash делится между ядрами.
+                stm32_yml_mcu_memory_size(FLASH _flash_bytes EXPECTED_FLASH_SIZE_STR)
             else()
                 # 3. Бэкенд arduino: парсим размер прямо из скрипта компоновщика (.ld)
                 set(EXPECTED_FLASH_SIZE_STR "")

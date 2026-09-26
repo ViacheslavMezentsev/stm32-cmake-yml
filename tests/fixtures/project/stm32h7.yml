@@ -1,0 +1,32 @@
+# Synthetic configure-only H7 scenarios (spec 4.7.8, TC-54, TC-55).
+stm32_cmake_yml_version: 0.9.2
+project_name: stm32h7_probe
+mcu: STM32H743ZI
+languages: [C, ASM]
+sources: [main.c]
+include_directories: [include]
+use_cmsis: true
+use_hal: true
+hal_components: [GPIO]
+cubefw_package: V1.13.0
+profiles:
+  dual:
+    mcu: STM32H745ZI
+  dualM7:
+    mcu: STM32H745ZI
+    mcu_core: M7
+  dualM4:
+    mcu: STM32H745ZI
+    mcu_core: M4
+    linker_script_dir: linker
+    linker_script: h745-m4.ld
+    crc_enable: true
+  badcore:
+    mcu_core: M3
+  rtos:
+    use_freertos: true
+    freertos_version: cube
+    cmsis_rtos_api: v2
+    freertos_components: [ARM_CM7, Heap::4]
+  badhal:
+    hal_components: [GPIO, NOSUCHDRIVER]

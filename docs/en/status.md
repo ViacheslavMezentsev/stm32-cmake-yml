@@ -9,7 +9,7 @@ for current `main` results. The three status badges show latest completed workfl
 ## Configuration
 
 <!-- configure-counts -->
-**127 scenarios × 6 tool pairs = 762 configure executions**
+**139 scenarios × 6 tool pairs = 834 configure executions**
 <!-- /configure-counts -->
 
 This is suite size, not the number of passing runs. CI verifies it against the

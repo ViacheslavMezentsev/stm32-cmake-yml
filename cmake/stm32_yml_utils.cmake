@@ -545,3 +545,69 @@ function(stm32_yml_generate_lss_file TARGET)
         COMMENT "Generating extended listing file ${OUTPUT_FILE_NAME} from ELF output file."
     )
 endfunction()
+
+# ==============================================================================
+# Определяет ядро MCU по списку stm32-cmake (ТЗ 4.7.8) и записывает его в
+# mcu_core вызывающей области:
+#   нет ядер       — mcu_core должен быть пуст;
+#   одно ядро      — используется оно, если mcu_core не задан;
+#   несколько ядер — mcu_core обязателен.
+# mcu_core вне списка — ошибка Configure со списком допустимых значений.
+# ==============================================================================
+function(stm32_yml_resolve_mcu_core)
+    stm32_get_cores(_cores CHIP ${MCU})
+    string(REPLACE ";" ", " _cores_text "${_cores}")
+    if(NOT _cores)
+        if(NOT "${mcu_core}" STREQUAL "")
+            message(FATAL_ERROR
+                "mcu_core: '${mcu_core}' недопустим для ${MCU}: stm32-cmake не выделяет ядра "
+                "для этого MCU. Удалите mcu_core из конфигурации.")
+        endif()
+        return()
+    endif()
+    if("${mcu_core}" STREQUAL "")
+        list(LENGTH _cores _count)
+        if(_count GREATER 1)
+            message(FATAL_ERROR
+                "У ${MCU} несколько ядер (${_cores_text}): укажите mcu_core, "
+                "например 'mcu_core: ${_cores}'.")
+        endif()
+        message(STATUS "Ядро MCU не задано, используется единственное ядро ${MCU}: ${_cores}.")
+        set(mcu_core "${_cores}" PARENT_SCOPE)
+    elseif(NOT "${mcu_core}" IN_LIST _cores)
+        message(FATAL_ERROR
+            "mcu_core: '${mcu_core}' недопустим для ${MCU}. Допустимые значения: ${_cores_text}.")
+    else()
+        message(STATUS "Ядро MCU: ${mcu_core}")
+    endif()
+endfunction()
+
+# ==============================================================================
+# Размер области памяти MCU в байтах по stm32_get_memory_info с учётом ядра
+# (ТЗ 4.7.8). KIND: RAM, CCRAM, RAM_SHARE, FLASH. Неизвестный размер — 0.
+#
+# @param KIND       - Область памяти.
+# @param OUT_BYTES  - Переменная для размера в байтах.
+# @param ARGV2      - Необязательная переменная для исходной строки stm32-cmake.
+# ==============================================================================
+function(stm32_yml_mcu_memory_size KIND OUT_BYTES)
+    set(_core_args "")
+    if(NOT "${mcu_core}" STREQUAL "")
+        set(_core_args CORE ${mcu_core})
+    endif()
+    stm32_get_memory_info(CHIP ${MCU} ${_core_args} ${KIND} SIZE _size)
+    if("${_size}" STREQUAL "" OR _size MATCHES "NOTFOUND")
+        set(_bytes 0)
+    else()
+        # Строки вида "64K", "1M", "0x400" или "64K-4" (WB) приводятся к выражению.
+        string(TOUPPER "${_size}" _expr)
+        string(REGEX REPLACE "([0-9]+)K" "(\\1*1024)" _expr "${_expr}")
+        string(REGEX REPLACE "([0-9]+)M" "(\\1*1048576)" _expr "${_expr}")
+        string(REPLACE "0X" "0x" _expr "${_expr}")
+        math(EXPR _bytes "${_expr}")
+    endif()
+    set(${OUT_BYTES} ${_bytes} PARENT_SCOPE)
+    if(ARGC GREATER 2)
+        set(${ARGV2} "${_size}" PARENT_SCOPE)
+    endif()
+endfunction()

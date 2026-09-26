@@ -551,8 +551,8 @@
         "configure.freertos-ioc-f4-v2",
         "configure.freertos-ioc-f1-v1",
         "configure.freertos-ioc-empty-fallback",
-        "configure.freertos-external-cmake-known-failure",
-        "configure.freertos-external-env-known-failure",
+        "configure.freertos-external-cmake",
+        "configure.freertos-external-env",
         "configure.freertos-unknown-enums",
         "configure.empty-and-null-defaults"
       ],

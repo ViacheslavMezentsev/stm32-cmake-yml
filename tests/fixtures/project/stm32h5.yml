@@ -1,0 +1,26 @@
+# Synthetic configure-only H5 scenarios (TC-56). STM32CubeH5 has no FreeRTOS:
+# FreeRTOS-Kernel is connected with freertos_version: external.
+stm32_cmake_yml_version: 0.9.2
+project_name: stm32h5_probe
+mcu: STM32H563ZI
+languages: [C, ASM]
+sources: [main.c]
+include_directories: [include]
+use_cmsis: true
+use_hal: true
+hal_components: [GPIO]
+cubefw_package: V1.7.0
+profiles:
+  rtos:
+    use_freertos: true
+    freertos_version: external
+    cmsis_rtos_api: none
+    freertos_components: [ARM_CM33_NTZ, Heap::4]
+  rtosv2:
+    use_freertos: true
+    freertos_version: external
+    cmsis_rtos_api: v2
+    freertos_components: [ARM_CM33_NTZ, Heap::4]
+  crc:
+    linker_script_dir: linker
+    crc_enable: true
