@@ -78,7 +78,10 @@ workflow status on main.
 
 ## Branches without pull requests
 
-From 2026-09-24, create `codex/<task>` or `claude/<task>` (by agent) from current main. After local validation,
+From 2026-09-24, create a `<agent>/<task>` branch from current main. The prefix
+names the AI agent that creates the branch: `codex/` for Codex, `claude/` for
+Claude. For a new agent, choose its prefix and add `<agent>/**` to the workflows'
+`on.push.branches`, otherwise pushing the branch does not run CI. After local validation,
 push the branch: Configure and documentation checks run on push; environment
 checks run when their paths change. Match CI results to the branch's latest
 commit. Update main and merge the tested branch with git merge, resolving
