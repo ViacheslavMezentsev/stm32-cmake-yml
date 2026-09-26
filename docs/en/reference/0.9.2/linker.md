@@ -125,6 +125,8 @@ linker_directives: [--print-memory-usage]
 
 Links STM32::Nano; the toolchain must provide that target, including with Arduino. Does not automatically enable float printf.
 
+**Note for 0.9.3** (spec 4.10.4): floating-point `printf`/`scanf` support in newlib-nano is linked through the stm32-cmake targets `link_libraries: [STM32::Nano::FloatPrint]` and `STM32::Nano::FloatScan`; there is no separate YAML key.
+
 **Omission and emptiness:** see [shared rules](semantics.md#empty-values); exceptions are stated above. Profiles/overrides apply before defaults. Backend/path restrictions are stated in the description.
 
 ```yaml

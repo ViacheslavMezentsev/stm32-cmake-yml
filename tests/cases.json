@@ -579,8 +579,8 @@
       "MCU": "STM32F103C8T6"
     },
     "log_contains": [
-      "Framework : 0.9.3",
-      "Config : 0.9.3 (совпадают"
+      "stm32-cmake-yml версия: 0.9.3",
+      "Версия в конфигурации: 0.9.3 (совпадают"
     ],
     "log_absent": [
       "не указан рекомендуемый параметр 'stm32_cmake_yml_version'",
@@ -599,7 +599,7 @@
       "MCU": "STM32F103C8T6"
     },
     "log_contains": [
-      "Framework : 0.9.3",
+      "stm32-cmake-yml версия: 0.9.3",
       "не указан рекомендуемый параметр 'stm32_cmake_yml_version'"
     ],
     "log_absent": [
@@ -617,7 +617,7 @@
       "MCU": "STM32F103C8T6"
     },
     "log_contains": [
-      "Framework : 0.9.3",
+      "stm32-cmake-yml версия: 0.9.3",
       "не указан рекомендуемый параметр 'stm32_cmake_yml_version'"
     ],
     "log_absent": [
@@ -635,8 +635,8 @@
       "MCU": "STM32F103C8T6"
     },
     "log_contains": [
-      "Framework : 0.9.3",
-      "Config : 0.9.1",
+      "stm32-cmake-yml версия: 0.9.3",
+      "Версия в конфигурации: 0.9.1",
       "Рекомендуется обновить stm32_cmake_yml_version."
     ],
     "log_absent": [
@@ -656,8 +656,8 @@
       "MCU": "STM32F103C8T6"
     },
     "log_contains": [
-      "Framework : 0.9.3",
-      "Config : 0.9.4",
+      "stm32-cmake-yml версия: 0.9.3",
+      "Версия в конфигурации: 0.9.4",
       "Возможны ошибки."
     ],
     "log_absent": [
@@ -676,10 +676,10 @@
       "MCU": "STM32F103C8T6"
     },
     "log_contains": [
-      "Framework : 0.9.3"
+      "stm32-cmake-yml версия: 0.9.3"
     ],
     "log_absent": [
-      "Config :",
+      "Версия в конфигурации:",
       "не указан рекомендуемый параметр 'stm32_cmake_yml_version'",
       "Рекомендуется обновить stm32_cmake_yml_version.",
       "Возможны ошибки."
@@ -693,7 +693,7 @@
     ],
     "no_st_dependencies": true,
     "log_contains": [
-      "Config : 0.9.4",
+      "Версия в конфигурации: 0.9.4",
       "Возможны ошибки."
     ]
   },
@@ -706,7 +706,7 @@
     ],
     "no_st_dependencies": true,
     "log_contains": [
-      "Config : 0.9.4",
+      "Версия в конфигурации: 0.9.4",
       "Возможны ошибки."
     ]
   },

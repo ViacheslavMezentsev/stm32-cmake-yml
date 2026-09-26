@@ -24,7 +24,8 @@ class BadgeTests(unittest.TestCase):
         negative = {'profile': 'crc-corrupt', 'metadata': {'PROFILE': 'success', 'CRC_RESULT': 'FAIL'}}
         compiled = {'status': 'passed', 'gcc': '14.2.1', 'cmake': 'cmake version 3.28.3',
                     'git_revision': 'abc', 'git_dirty': '0', 'cases': cases, 'crc_negative': negative,
-                    'build_only': [{'profile': p, 'status': 'build-only'} for p in BUILD_ONLY_PROFILES]}
+                    'build_only': [{'profile': p, 'status': 'build-only'} for p in BUILD_ONLY_PROFILES],
+                    'crc_limit_negative': {'status': 'failed-as-expected'}}
         executed = {'status': 'passed', 'cases': [dict(profile=c['profile'], passed=True,
                     metadata_ok=True, expected_metadata=c['metadata']) for c in cases + [negative]]}
         self.reports = [build, run, compiled, executed]

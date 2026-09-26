@@ -83,6 +83,28 @@ def flash_crc(elf, origin, length):
     return stored, outside
 
 
+def crc_limit_negative(root, output, report):
+    """TC-52: an undersized flash_size fails the build at the CRC step, also on rebuild."""
+    build = Path(tempfile.mkdtemp(prefix='crc-limit-', dir=output))
+    build.chmod(0o755)
+    configure = ['cmake', '-S', str(root / 'tests/firmware/semihosting'), '-B', str(build), '-G', 'Ninja',
+                 f'-DSTM32_YML_FRAMEWORK_DIR={root}', '-DCMAKE_TOOLCHAIN_FILE=/opt/modules/stm32-cmake/cmake/stm32_gcc.cmake',
+                 f'-DSMOKE_GIT_REVISION={report["git_revision"]}', f'-DSMOKE_GIT_DIRTY={report["git_dirty"]}',
+                 '-DSTM32_YML_PROFILE=success', '-DSTM32_YML_OVERRIDE_flash_size=4K', '-DCMAKE_BUILD_TYPE=Debug']
+    with (build / 'configure.log').open('w') as log:
+        subprocess.run(configure, stdout=log, stderr=subprocess.STDOUT, check=True, timeout=180)
+    results = []
+    for attempt in ('build', 'rebuild'):
+        completed = subprocess.run(['cmake', '--build', str(build)], capture_output=True, text=True, timeout=180)
+        (build / f'{attempt}.log').write_text(completed.stdout + completed.stderr)
+        text = completed.stdout + completed.stderr
+        if completed.returncode == 0 or '[CRC ERROR]' not in text or 'larger than the FLASH limit' not in text:
+            raise ValueError(f'Undersized flash_size did not fail the {attempt} with a CRC error')
+        results.append({'attempt': attempt, 'returncode': completed.returncode})
+    print('PASS negative build: flash_size 4K fails at the CRC step', flush=True)
+    return {'profile': 'success', 'flash_size': '4K', 'status': 'failed-as-expected', 'runs': results}
+
+
 def build_only(root, output):
     """Build H7/H5 firmware without simulators (TC-57) and the H503 CRC variants (TC-63)."""
     source = root / 'tests/firmware/buildonly'
@@ -290,6 +312,7 @@ def main():
             report['cases'].append({'profile': profile, 'elf': str(elf.relative_to(output)),
                                     'sources': sources, 'structure': structure, 'metadata': metadata, 'exit_trap': exit_trap})
             print(f'PASS build/ELF: {profile}', flush=True)
+        report['crc_limit_negative'] = crc_limit_negative(root, output, report)
         report['build_only'] = build_only(root, output)
         report['status'] = 'passed'
     except (OSError, ValueError, KeyError, struct.error, subprocess.SubprocessError) as error:

@@ -37,12 +37,14 @@ class MatrixTests(unittest.TestCase):
     def test_wrong_tools_and_incomplete_profiles_fail(self):
         good = {'status': 'passed', 'gcc': '14.2.1', 'cmake': 'cmake version 3.19.8',
                 'cases': [{'profile': p} for p in BUILD_PROFILES],
-                'build_only': [{'profile': p} for p in BUILD_ONLY_PROFILES]}
+                'build_only': [{'profile': p} for p in BUILD_ONLY_PROFILES],
+                'crc_limit_negative': {'status': 'failed-as-expected'}}
         verify_build(good, '14.2.1-1.1', '3.19.8')
         for key, value in [('gcc', '13.3.1'), ('cmake', 'cmake version 3.28.3'),
                            ('status', 'failed'), ('cases', []), ('cases', [{'profile': p} for p in BUILD_PROFILES[:-2]]), ('cases', [{'profile': p} for p in ('success', 'failure', 'hang')]),
                            ('cases', [{'profile': 'success'}] * 3), ('build_only', []),
-                           ('build_only', [{'profile': p} for p in BUILD_ONLY_PROFILES[:-1]])]:
+                           ('build_only', [{'profile': p} for p in BUILD_ONLY_PROFILES[:-1]]),
+                           ('crc_limit_negative', {'status': 'built'})]:
             report = copy.deepcopy(good)
             report[key] = value
             with self.assertRaises(ValueError):

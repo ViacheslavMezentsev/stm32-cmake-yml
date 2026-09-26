@@ -128,6 +128,8 @@ crc-corrupt, must report CRC_RESULT=FAIL and TEST_RESULT=FAIL and exit 3. A cras
 or timeout cannot pass this case. This adds six runs without extra compilations:
 78 run builds, 84 runs per simulator. Reports distinguish thirteen profiles from fourteen executions.
 
+A separate negative build (TC-52) on each pair configures the `success` profile with `flash_size: 4K` and requires both the build and a rebuild to fail at the CRC step (`[CRC ERROR]`, image larger than the Flash limit). The badge does not count it.
+
 This verifies software CRC over loaded FLASH on netduino2, not the STM32 CRC
 peripheral. Fixes for E004 (algorithm selection) and E006 (post-build error handling) are
 prepared in the 0.9.3 release branch: the CRC image comes from FLASH sections and a failure stops the build. Old manifests must be rebuilt to include CRC expectations.

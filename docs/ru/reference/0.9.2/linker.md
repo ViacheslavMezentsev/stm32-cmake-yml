@@ -125,6 +125,8 @@ linker_directives: [--print-memory-usage]
 
 Подключает STM32::Nano; этот target должен предоставить toolchain, в том числе при Arduino. Не включает float printf автоматически.
 
+**Примечание 0.9.3** (ТЗ 4.10.4): вывод и ввод чисел с плавающей точкой в `printf`/`scanf` newlib-nano подключается целями stm32-cmake через `link_libraries: [STM32::Nano::FloatPrint]` и `STM32::Nano::FloatScan`; отдельного ключа YAML нет.
+
 **Пропуск и пустота:** см. [общие правила](semantics.md#empty-values); исключения указаны выше. Профиль/override применяется до выбора defaults. Ограничения backend и путей указаны в описании.
 
 ```yaml

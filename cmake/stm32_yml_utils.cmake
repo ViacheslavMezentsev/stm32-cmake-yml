@@ -517,10 +517,11 @@ endfunction()
 # ==============================================================================
 #      ФОЛБЕК-ОПРЕДЕЛЕНИЕ ЦЕЛИ STM32::Semihosting
 # ==============================================================================
-# Оба штатных toolchain-файла (stm32_gcc.cmake из stm32-cmake и кастомный
-# gcc-arm-none-eabi.cmake) уже определяют эту цель. Определение здесь —
-# страховка для проектов с собственным toolchain, где её может не быть.
-# Проверка if(NOT TARGET) гарантирует отсутствие конфликта.
+# stm32-cmake (stm32/common.cmake) определяет STM32::NoSys, STM32::Nano,
+# STM32::Nano::FloatPrint и STM32::Nano::FloatScan, но не STM32::Semihosting.
+# Поэтому для system_library: Semihosting цель определяет фреймворк
+# (ТЗ 4.10.2); toolchain проекта может определить её раньше — тогда
+# проверка if(NOT TARGET) оставляет его определение.
 # ==============================================================================
 if(NOT (TARGET STM32::Semihosting))
     add_library(STM32::Semihosting INTERFACE IMPORTED)

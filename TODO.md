@@ -130,6 +130,28 @@ PR больше не требуются; старые ссылки остают�
 Сборки и эмуляция дополняют конфигурационные тесты. Изменение публичных путей или
 обязательная реструктуризация проектов-потребителей в этот план не входят.
 
+### Предложения для 0.10.x — на рассмотрение
+
+В ТЗ не внесены; решение принимается при планировании 0.10.x.
+
+- [ ] Коды сообщений: у каждого диагностического сообщения Configure постоянный код
+  (например, `[SCY-W012]`); тесты проверяют коды, а не текст (сейчас 128 из 159 проверок
+  лога в `tests/cases.json` сравнивают русский текст). Предварительное условие локализации.
+- [ ] Локализация RU/EN: язык по локали (`LC_ALL`, `LC_MESSAGES`, `LANG`; на Windows —
+  `LocaleName` из реестра через `get_filename_component`, работает в CMake 3.19),
+  явный выбор `STM32_YML_LANG=auto|ru|en`. Встроенной функции локализации в CMake нет.
+- [ ] TOML как альтернатива YAML: `stm32_config.toml` по расширению; `yq -p toml` (4.44.3)
+  читает вложенные таблицы в тот же JSON. В TOML нет `null` — пустое значение только
+  пустой строкой или массивом.
+- [ ] CMakePresets (вместе с переходом на CMake ≥ 3.21): папка сборки на профиль
+  (`binaryDir: ${sourceDir}/build/${presetName}`, `STM32_YML_PROFILE` в `cacheVariables`),
+  генератор `CMakePresets.json` по секции `profiles:`.
+- [ ] Имена папок в build без идентификаторов YAML: повторять относительный путь источника
+  (`Arduino/libraries/EEPROM`, `cli`), для путей вне проекта заменять `..` согласованным
+  маркером (например, `-`). Требует чистой сборки после обновления; вместе с прямым
+  подключением Arduino Core.
+- [ ] Имена всех артефактов по итоговому имени ELF (`OUTPUT_NAME`) с учётом нескольких backend.
+
 ## English
 
 Status as of 2026-09-25. Work is grouped into five stages, which may overlap.
@@ -257,3 +279,25 @@ keep defect details in errata.
 
 Builds and emulation supplement configure tests. Public path changes or mandatory
 restructuring of consumer projects are outside this plan.
+
+### Proposals for 0.10.x — for consideration
+
+Not in the spec; to be decided when 0.10.x is planned.
+
+- [ ] Message codes: every Configure diagnostic gets a permanent code (e.g. `[SCY-W012]`);
+  tests check codes rather than text (128 of 159 log checks in `tests/cases.json` compare
+  Russian text today). A prerequisite for localization.
+- [ ] RU/EN localization: language from the locale (`LC_ALL`, `LC_MESSAGES`, `LANG`; on
+  Windows the registry `LocaleName` via `get_filename_component`, which works in CMake 3.19),
+  explicit `STM32_YML_LANG=auto|ru|en`. CMake has no built-in localization.
+- [ ] TOML as an alternative to YAML: `stm32_config.toml` by extension; `yq -p toml` (4.44.3)
+  reads nested tables into the same JSON. TOML has no `null`, so empty values are only
+  empty strings or arrays.
+- [ ] CMakePresets (with the move to CMake ≥ 3.21): one build tree per profile
+  (`binaryDir: ${sourceDir}/build/${presetName}`, `STM32_YML_PROFILE` in `cacheVariables`),
+  a `CMakePresets.json` generator from the `profiles:` section.
+- [ ] Build-tree folder names without YAML identifiers: mirror the source's relative path
+  (`Arduino/libraries/EEPROM`, `cli`); for paths outside the project replace `..` with an
+  agreed marker (e.g. `-`). Needs a clean build after upgrading; together with the direct
+  Arduino Core integration.
+- [ ] Name every artifact after the final ELF name (`OUTPUT_NAME`), considering several backends.
