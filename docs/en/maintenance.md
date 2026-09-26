@@ -1,4 +1,4 @@
-# Reference maintenance
+# Project and reference maintenance
 
 [Documentation](index.md) → Maintenance · [Русский](../ru/maintenance.md)
 
@@ -6,6 +6,60 @@ Edit Markdown directly. No documentation generator is required;
 `docs/reference-index.json` is a navigation/coverage index, not a YAML Schema
 or a second set of defaults. RU/EN cards are the shared specification for people
 and agents. The skill links to them rather than copying tables.
+
+## Working with the project
+
+This is the shared procedure for people and AI agents; the entry point is
+[AGENTS.md](../../AGENTS.md). Requirements are not repeated here: their source is
+the technical specification, whose current revision is stated in its header.
+
+**Reading order**
+
+1. [README](../../README.en.md) — purpose of the framework and its limits.
+2. This section and the sections below on branches, CI and the reference.
+3. [TODO.md](../../TODO.md) — current branch, merged changes and next steps.
+4. [Technical specification](../TECHNICAL_SPECIFICATION.md) (Russian): revision
+   history, the latest revision's change block, open questions (section 10) and
+   the version's work items (appendix E).
+5. For a specific task — [errata](errata/index.md), [reference](reference/0.9.2/index.md)
+   cards, [testing](testing.md), [firmware tests](firmware-testing.md) and the
+   [CHANGELOG](../../CHANGELOG.md).
+
+**Work cycle**
+
+1. Branch `<agent>/<task>` from current main (section "Branches without pull requests").
+2. Behaviour changes follow spec 7.4: regression, `CFG-*` card and index,
+   CHANGELOG, new spec revision. Code and tests refer to spec items per
+   appendix D (`# ТЗ 4.15.9`).
+3. Local checks of the affected levels L0–L5 (spec 8.1; commands in spec
+   appendix F, [testing.md](testing.md), [firmware-testing.md](firmware-testing.md));
+   documentation — `python ci/check_reference.py`.
+4. Commit, push the branch, match CI to its latest commit, merge into main.
+   Before a release all checks are repeated locally on the final commit of the
+   release branch (spec 8.8.7).
+5. Record branch, commit and status in TODO.md.
+
+**Technical specification**
+
+- Maintained with the [embedded-tech-spec](https://github.com/ViacheslavMezentsev/demo-stm32-skills/tree/main/embedded-tech-spec)
+  skill: every edit is a new revision with `(р.X.Y)` marks, a change block and
+  updated questions, test cases, matrix and appendices.
+- After editing: `python3 check_spec.py docs/TECHNICAL_SPECIFICATION.md --strict`
+  (the skill's `scripts/check_spec.py`) — no errors or warnings.
+- A customer answer goes into a requirement, not only into the question table.
+  Verified and unverified statements are distinguished explicitly.
+- No copies of the specification are kept outside the repository: read the file
+  in the working branch.
+
+**Practical rules**
+
+- Commit messages: Conventional Commits in English (`ci:`, `docs:`, `test:`,
+  `fix:`) explaining what and why; no links to agent sessions.
+- `ci/**`, `tests/**`, `tools/**`, `.github/workflows/**` are stored with LF
+  (`.gitattributes`); other files may be CRLF in a Windows working copy —
+  keep the edited file's line endings.
+- Binary archives (`tools/qemu`) are pinned by SHA-256 in lock files and change
+  only together with the checksum.
 
 ## Changing an option
 
