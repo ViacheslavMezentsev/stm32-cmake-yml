@@ -18,6 +18,27 @@
   the resolved configuration; use the `STM32_YML_OVERRIDE_*` inputs instead.
 - `STM32_YML_PROFILE=list` читает `profiles_file` так же, как выбор профиля.
   Profile listing now reads the external profile file as profile selection does.
+- Промежуточный образ CRC строится из секций ELF с адресом загрузки в регионе
+  `FLASH` скрипта компоновщика, без `objcopy --gap-fill`: секция вне Flash
+  (например, в резервной SRAM STM32H5) больше не раздувает образ до сотен МБ.
+  Для обычных проектов образ и CRC не меняются. Ограничение CRC для H5 снято.
+  The CRC image is built from ELF sections loaded into the linker-script `FLASH`
+  region instead of `objcopy --gap-fill`; sections outside FLASH no longer inflate
+  it. Images and CRC of ordinary projects are unchanged; the H5 limitation is gone.
+- Сбой расчёта CRC завершает сборку ошибкой `[CRC ERROR]`; нулевая заглушка
+  больше не записывается (E006). Со скриптом, который формирует stm32-cmake,
+  `crc_enable: true` — ошибка Configure; отсутствие секции `crc_section_name`
+  в шаблоне или явном скрипте — предупреждение. Неизвестный `crc_algorithm`
+  вызывает предупреждение, применяется `STM32_HW_DEFAULT` (E004).
+  **Совместимость:** сборки, которые раньше завершались успешно с заглушкой
+  `0x00000000`, теперь завершаются ошибкой; проекты с CRC без шаблона `.ld.in`
+  или явного скрипта должны добавить его либо отключить CRC.
+  A CRC failure now fails the build with `[CRC ERROR]` instead of writing a zero
+  stub (E006). `crc_enable: true` with the stm32-cmake-generated linker script is
+  a Configure error; a template or explicit script without the CRC section warns.
+  An unknown `crc_algorithm` warns and `STM32_HW_DEFAULT` is applied (E004).
+  **Compatibility:** builds that used to pass with a zero stub now fail; CRC
+  projects without a `.ld.in` template or explicit script must add one or disable CRC.
 
 ## [0.9.2] - 2026-09-19
 

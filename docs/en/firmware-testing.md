@@ -129,8 +129,8 @@ or timeout cannot pass this case. This adds six runs without extra compilations:
 72 builds, 78 runs per simulator. Reports distinguish twelve profiles from thirteen executions.
 
 This verifies software CRC over loaded FLASH on netduino2, not the STM32 CRC
-peripheral. E004 (algorithm selection) and E006 (post-build error handling) remain
-open and unchanged. Old manifests must be rebuilt to include CRC expectations.
+peripheral. Fixes for E004 (algorithm selection) and E006 (post-build error handling) are
+prepared in the 0.9.3 release branch: the CRC image comes from FLASH sections and a failure stops the build. Old manifests must be rebuilt to include CRC expectations.
 
 ## Renode and a shared ELF
 

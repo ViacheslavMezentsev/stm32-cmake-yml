@@ -41,8 +41,8 @@ The validator checks links, bilingual option cards, errata and test mappings.
 An option-to-test mapping identifies documented coverage, not proof of every
 possible use. [Machine-readable index](../reference-index.json).
 
-[Errata](errata/index.md) records limitations and workarounds; E004 (CRC algorithm
-selection), E006 (CRC errors), E007 (external FreeRTOS) and E008 (profile-only language settings) remain open.
+[Errata](errata/index.md) records limitations and workarounds; fixes for E004 (CRC algorithm
+selection) and E006 (CRC errors) are prepared in the 0.9.3 release branch; E007 (external FreeRTOS) and E008 (profile-only language settings) remain open.
 [TODO](../../TODO.md) tracks planned work and completed stages;
 [maintenance rules](maintenance.md) explain how to update documentation and checks.
 Public framework entry paths remain stable; tests are added without requiring
