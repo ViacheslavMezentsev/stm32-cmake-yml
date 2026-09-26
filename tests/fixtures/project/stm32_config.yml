@@ -36,6 +36,16 @@ profiles:
     crc_enable: true
     crc_section_name: .checksum
     crc_algorithm: STM32_HW_DEFAULT
+  crcnoscript:
+    crc_enable: true
+  crcexplicit:
+    linker_script_dir: linker
+    linker_script: custom.ld
+    crc_enable: true
+  crcnoflash:
+    linker_script_dir: linker
+    linker_script: diagnostic-no-ram.ld
+    crc_enable: true
   bluepill:
     mcu: STM32F103C8
     cubefw_package: V1.8.7

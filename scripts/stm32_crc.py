@@ -1,123 +1,175 @@
-# Этот скрипт реализует стандартный алгоритм аппаратного CRC32 STM32 (MPEG-2 style).
-import sys
-import struct
+# Расчёт CRC-32 аппаратного блока STM32 для внедрения в прошивку (ТЗ 4.15).
+#
+# Режимы (ТЗ 5.6.2):
+#   stm32_crc.py <вход.bin> <выход.bin> [предел_байт]
+#       CRC готового двоичного образа.
+#   stm32_crc.py --elf <вход.elf> --flash <начало>:<длина> --exclude <секция>
+#                [--image <образ.bin>] <выход.bin> [предел_байт]
+#       Образ Flash строится из секций ELF с адресом загрузки в регионе FLASH
+#       (ТЗ 4.15.9) и не раздувается секциями вне Flash.
+#
+# Выход — 4 байта CRC little-endian. Любой сбой завершает скрипт с ненулевым
+# кодом и сообщением [CRC ERROR]; нулевая заглушка не записывается (ТЗ 4.15.7).
+import argparse
 import os
+import struct
+import sys
+
+SHT_NULL = 0
+SHT_NOBITS = 8
+SHF_ALLOC = 0x2
+PT_LOAD = 1
+
+
+class CrcError(Exception):
+    """Ошибка расчёта, прерывающая сборку."""
+
 
 def stm32_crc32(data):
-    """
-    Эмуляция аппаратного CRC32 STM32 (Poly 0x04C11DB7, Init 0xFFFFFFFF, Input/Output not reflected).
-    STM32 читает данные словами по 32 бита (Little Endian в памяти, но регистр CRC работает со словами).
+    """CRC-32 блока STM32 по умолчанию (ТЗ 4.15.3).
+
+    Полином 0x04C11DB7, начальное значение 0xFFFFFFFF, 32-битные слова
+    little-endian, без отражений и финального XOR; неполное последнее слово
+    дополняется 0xFF, как незаписанная Flash.
     """
     crc = 0xFFFFFFFF
-
-    # Обрабатываем данные по 4 байта (1 слово)
     for i in range(0, len(data), 4):
-        chunk = data[i:i+4]
-        # Если в конце меньше 4 байт, дополняем 0xFF (стандартное поведение заполнения Flash)
+        chunk = data[i:i + 4]
         if len(chunk) < 4:
             chunk += b'\xFF' * (4 - len(chunk))
-
-        # STM32 (Little Endian) читает слово из памяти. Преобразуем bytes -> uint32
-        val = struct.unpack('<I', chunk)[0]
-
-        # Эмуляция регистра CRC
-        xbit = 0x80000000
-        poly = 0x04C11DB7
-        crc = crc ^ val
+        crc ^= struct.unpack('<I', chunk)[0]
         for _ in range(32):
-            if crc & xbit:
-                crc = (crc << 1) ^ poly
+            if crc & 0x80000000:
+                crc = ((crc << 1) ^ 0x04C11DB7) & 0xFFFFFFFF
             else:
-                crc <<= 1
-            crc &= 0xFFFFFFFF
-
+                crc = (crc << 1) & 0xFFFFFFFF
     return crc
 
-def graceful_exit(message, output_bin_path=None):
-    """
-    Завершение без прерывания сборки CMake/Ninja.
-    Печатает предупреждение, записывает нулевой CRC (заглушку),
-    чтобы следующая команда objcopy не упала из-за отсутствия файла.
-    """
-    print(f"\n[CRC WARNING] {message}")
-    print("[CRC WARNING] Checksum calculation skipped. Firmware will contain 0x00000000.")
-    if output_bin_path is not None:
-        print(f"[CRC WARNING] Stub CRC file written to: {output_bin_path}")
-    print()
 
-    if output_bin_path is not None:
-        try:
-            # Записываем нулевой CRC (4 байта), чтобы сборка продолжилась
-            with open(output_bin_path, 'wb') as f:
-                f.write(struct.pack('<I', 0))
-        except Exception:
-            pass # Игнорируем ошибки при попытке создать заглушку
+def flash_image(elf_path, origin, length, exclude):
+    """Образ Flash из секций ELF (ТЗ 4.15.9).
 
-    # Возвращаем 0, чтобы Ninja считал шаг успешным
-    sys.exit(0)
+    Берутся размещаемые секции с содержимым (все, кроме NULL и NOBITS), кроме
+    исключённых, чей адрес загрузки лежит в [origin, origin + length). Образ
+    начинается с наименьшего адреса загрузки и заканчивается концом последней
+    секции; промежутки заполняются 0xFF. Результат совпадает с образом
+    'objcopy -O binary --gap-fill 0xFF' для ELF без секций вне Flash.
+    Возвращает (начальный адрес, образ, пропущенные секции).
+    """
+    with open(elf_path, 'rb') as stream:
+        data = stream.read()
+    if data[:4] != b'\x7fELF' or data[4] != 1 or data[5] != 1:
+        raise CrcError(f"'{elf_path}' is not a 32-bit little-endian ELF file")
+    phoff, shoff = struct.unpack_from('<II', data, 0x1C)
+    phentsize, phnum, shentsize, shnum, shstrndx = struct.unpack_from('<HHHHH', data, 0x2A)
+    segments = [struct.unpack_from('<8I', data, phoff + i * phentsize) for i in range(phnum)]
+    sections = [struct.unpack_from('<10I', data, shoff + i * shentsize) for i in range(shnum)]
+    names_offset = sections[shstrndx][4]
+
+    def name_of(section):
+        start = names_offset + section[0]
+        return data[start:data.index(b'\0', start)].decode('ascii', 'replace')
+
+    chunks, skipped = [], []
+    for section in sections:
+        _, kind, flags, address, offset, size = section[:6]
+        name = name_of(section)
+        if kind in (SHT_NULL, SHT_NOBITS) or not flags & SHF_ALLOC or size == 0 or name in exclude:
+            continue
+        # Адрес загрузки: по сегменту, в файловом диапазоне которого лежит секция.
+        load = address
+        for p_type, p_offset, _, p_paddr, p_filesz, _, _, _ in segments:
+            if p_type == PT_LOAD and p_offset <= offset < p_offset + p_filesz:
+                load = p_paddr + (offset - p_offset)
+                break
+        if origin <= load and load + size <= origin + length:
+            chunks.append((load, data[offset:offset + size]))
+        else:
+            skipped.append((name, load, size))
+    if not chunks:
+        raise CrcError(f"No loadable sections inside FLASH 0x{origin:08X}+0x{length:X} in '{elf_path}'")
+    start = min(load for load, _ in chunks)
+    end = max(load + len(chunk) for load, chunk in chunks)
+    image = bytearray(b'\xFF' * (end - start))
+    for load, chunk in chunks:
+        image[load - start:load - start + len(chunk)] = chunk
+    return start, bytes(image), skipped
+
+
+def parse_int(text, what):
+    try:
+        return int(text, 0)
+    except ValueError:
+        raise CrcError(f"Invalid {what}: '{text}'") from None
+
+
+def parse_flash(text):
+    origin, sep, length = text.partition(':')
+    if not sep:
+        raise CrcError(f"Invalid --flash value '{text}', expected <origin>:<length>")
+    return parse_int(origin, 'FLASH origin'), parse_int(length, 'FLASH length')
+
+
+def check_limit(size, limit):
+    if limit is not None and size > limit:
+        raise CrcError(
+            f"CRC image is larger than the FLASH limit: {size:,} > {limit:,} bytes.\n"
+            f"[CRC ERROR]   Check 'flash_size' and the FLASH region of the linker script.")
+
+
+def write_crc(path, data):
+    crc = stm32_crc32(data)
+    with open(path, 'wb') as stream:
+        stream.write(struct.pack('<I', crc))
+    return crc
+
+
+def run(argv):
+    if argv and argv[0] == '--elf':
+        parser = argparse.ArgumentParser(prog='stm32_crc.py')
+        parser.add_argument('--elf', required=True)
+        parser.add_argument('--flash', required=True, type=str)
+        parser.add_argument('--exclude', action='append', default=[])
+        parser.add_argument('--image')
+        parser.add_argument('output')
+        parser.add_argument('limit', nargs='?')
+        args = parser.parse_args(argv)
+        if not os.path.exists(args.elf):
+            raise CrcError(f"Input file '{args.elf}' not found.")
+        origin, length = parse_flash(args.flash)
+        limit = parse_int(args.limit, 'FLASH limit') if args.limit is not None else None
+        start, image, skipped = flash_image(args.elf, origin, length, set(args.exclude))
+        for name, load, size in skipped:
+            print(f"[STM32 CRC32] Skipped {name}: load address 0x{load:08X} ({size} bytes) is outside FLASH")
+        check_limit(len(image), limit)
+        if args.image:
+            with open(args.image, 'wb') as stream:
+                stream.write(image)
+        crc = write_crc(args.output, image)
+        print(f"[STM32 CRC32] Calculated: 0x{crc:08X} (Size: {len(image)} bytes from 0x{start:08X})")
+        return
+
+    if len(argv) not in (2, 3):
+        raise CrcError("Usage: stm32_crc.py <input.bin> <output.bin> [limit] | "
+                       "--elf <input.elf> --flash <origin>:<length> --exclude <section> <output.bin> [limit]")
+    input_bin, output_bin = argv[0], argv[1]
+    if not os.path.exists(input_bin):
+        raise CrcError(f"Input file '{input_bin}' not found.")
+    limit = parse_int(argv[2], 'FLASH limit') if len(argv) == 3 else None
+    with open(input_bin, 'rb') as stream:
+        data = stream.read()
+    check_limit(len(data), limit)
+    crc = write_crc(output_bin, data)
+    print(f"[STM32 CRC32] Calculated: 0x{crc:08X} (Size: {len(data)} bytes)")
+
 
 def main():
-    # Проверка минимального количества аргументов
-    if len(sys.argv) < 3:
-        graceful_exit("Invalid arguments. Usage: python stm32_crc.py <input.bin> <output.bin> [max_flash_size]")
-
-    input_bin = sys.argv[1]
-    output_crc_bin = sys.argv[2]
-
-    # Проверка существования входного файла
-    if not os.path.exists(input_bin):
-        graceful_exit(f"Input file '{input_bin}' not found.", output_crc_bin)
-
-    # Защита от дурака: проверка на гигантский бинарный файл (проблема gap-fill)
-    if len(sys.argv) >= 4:
-        try:
-            max_flash_size = int(sys.argv[3])
-            file_size = os.path.getsize(input_bin)
-
-            if file_size > max_flash_size:
-                # Типичная причина на H5/H7: секции DTCM, ITCM или SRAM, начинающиеся
-                # с адреса 0x00000000, из-за gap-fill раздувают бинарный образ.
-                # Решение: убедитесь, что в скрипте компоновщика такие секции расположены
-                # только во внутренней RAM и не попадают в образ Flash. В postbuild.cmake
-                # команда objcopy использует --remove-section для их исключения.
-                msg = (
-                    f"Intermediate binary '{input_bin}' is abnormally large!\n"
-                    f"[CRC WARNING]   Actual size : {file_size:,} bytes"
-                    f" ({file_size / 1024:.1f} KiB / {file_size / 1024 / 1024:.2f} MiB)\n"
-                    f"[CRC WARNING]   Max Flash   : {max_flash_size:,} bytes"
-                    f" ({max_flash_size / 1024:.1f} KiB / {max_flash_size / 1024 / 1024:.2f} MiB)\n"
-                    f"[CRC WARNING]   Likely cause: a section (e.g. DTCM/ITCM on H5/H7) starts at\n"
-                    f"[CRC WARNING]                 address 0x00000000 and triggers gap-fill.\n"
-                    f"[CRC WARNING]   Fix hint    : add --remove-section=<section> to the objcopy\n"
-                    f"[CRC WARNING]                 call in stm32_yml_postbuild.cmake, or check\n"
-                    f"[CRC WARNING]                 your linker script for DTCM/ITCM placement."
-                )
-                graceful_exit(msg, output_crc_bin)
-        except ValueError:
-            pass # Если третий аргумент по какой-то причине не число, просто игнорируем проверку
-
-    # Основной блок расчета контрольной суммы
     try:
-        with open(input_bin, 'rb') as f:
-            data = f.read()
+        run(sys.argv[1:])
+    except (CrcError, OSError) as error:
+        print(f"\n[CRC ERROR] {error}\n[CRC ERROR] Build failed: CRC was not calculated.", file=sys.stderr)
+        sys.exit(1)
 
-        # Выравнивание длины данных на 4 байта (заполнение 0xFF)
-        # Это важно, так как HAL_CRC_Calculate работает словами
-        remainder = len(data) % 4
-        if remainder != 0:
-            data += b'\xFF' * (4 - remainder)
-
-        # Расчет CRC
-        crc_val = stm32_crc32(data)
-        print(f"[STM32 CRC32] Calculated: 0x{crc_val:08X} (Size: {len(data)} bytes)")
-
-        # Запись результата в файл (4 байта, Little Endian, чтобы лечь в память МК)
-        with open(output_crc_bin, 'wb') as f:
-            f.write(struct.pack('<I', crc_val))
-
-    except Exception as e:
-        # Перехват любых неожиданных ошибок Python
-        graceful_exit(f"Unexpected Python error: {str(e)}", output_crc_bin)
 
 if __name__ == '__main__':
     main()

@@ -113,8 +113,8 @@ package or the resulting image bytes. Ubuntu snapshots are not required.
 
 ## Framework configuration tests
 
-[tests/cases.json](../../tests/cases.json) defines 115 scenarios, run with each of
-the three GCC and two CMake versions from the lockfile: **690 case executions**.
+[tests/cases.json](../../tests/cases.json) defines 119 scenarios, run with each of
+the three GCC and two CMake versions from the lockfile: **714 case executions**.
 Fifteen scenarios perform three consecutive configurations in the same build tree.
 
 | Area | Checks |

@@ -53,6 +53,32 @@
     "crc_command": true
   },
   {
+    "name": "crc-stm32cmake-script-error",
+    "args": ["-DSTM32_YML_PROFILE=crcnoscript"],
+    "error": "скрипт компоновщика формирует stm32-cmake, секции '.checksum' (crc_section_name) в нём нет"
+  },
+  {
+    "name": "crc-explicit-script-without-section",
+    "args": ["-DSTM32_YML_PROFILE=crcexplicit"],
+    "observed": {"crc_enable": "TRUE"},
+    "log_contains": ["секция '.checksum' (crc_section_name) не найдена", "Регион FLASH скрипта: ORIGIN 0x08000000, LENGTH 524288 байт"],
+    "crc_command": true
+  },
+  {
+    "name": "crc-flash-region-missing",
+    "args": ["-DSTM32_YML_PROFILE=crcnoflash"],
+    "observed": {"crc_enable": "TRUE"},
+    "log_contains": ["Расчет CRC отключен. Не удалось определить регион FLASH (ORIGIN, LENGTH)"],
+    "crc_command": false
+  },
+  {
+    "name": "crc-unknown-algorithm",
+    "args": ["-DSTM32_YML_PROFILE=crc", "-DSTM32_YML_OVERRIDE_crc_algorithm=CRC32_MPEG"],
+    "observed": {"crc_enable": "TRUE"},
+    "log_contains": ["Неизвестное значение 'CRC32_MPEG' параметра 'crc_algorithm'", "Применяется: 'STM32_HW_DEFAULT'", "Алгоритм: STM32_HW_DEFAULT"],
+    "crc_command": true
+  },
+  {
     "name": "bluepill",
     "args": ["-DSTM32_YML_PROFILE=bluepill"],
     "observed": {"MCU": "STM32F103C8"},

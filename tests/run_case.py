@@ -103,8 +103,11 @@ def verify(case, build, source):
     if "crc_command" in case:
         require(("stm32_crc.py" in ninja) == case["crc_command"], "Incorrect CRC command presence")
         if case["crc_command"]:
-            for token in ("--remove-section=.checksum", "--update-section", "524288"):
+            # ТЗ 4.15.9: образ из секций ELF в регионе FLASH скрипта, без gap-fill.
+            for token in ("--elf", "--flash 0x08000000:524288", "--exclude .checksum",
+                          "--update-section", " 524288"):
                 require(token in ninja, f"CRC command missing {token!r}")
+            require("--gap-fill" not in ninja, "CRC image must not use objcopy --gap-fill")
 
     commands = json.loads((build / "compile_commands.json").read_text(encoding="utf-8"))
     for filename in case.get("absent_commands", []):
