@@ -90,6 +90,23 @@ of new changes. Record branch, commit and status in TODO; preserve historical
 PR links. If fetch/push is unavailable, an API check does not update local refs:
 synchronization is still required before merging.
 
+## Docker layer cache
+
+The `ci/docker` image (compilers, CMake, Cube/Arduino/ETL sources) and the
+`ci/emulation` image (QEMU from source, Renode) are built with BuildKit and the
+GitHub Actions layer cache (`type=gha`, scopes `stm32-yml-ci` and
+`stm32-yml-emulation`). A layer key is the Dockerfile instruction plus the content
+of copied files, so any lock file, install script or Dockerfile change rebuilds
+that layer and all later ones. All downloads are SHA-256 pinned, so caching does
+not change image contents.
+
+Configure and Firmware read and update the cache. CI environment and Emulation
+environment still build from scratch (`no-cache`) and only write a fresh cache:
+they prove the pinned downloads remain available and buildable. A branch cache is
+visible only to that branch and its descendants; branches read main's cache, main
+does not read branch caches. GitHub limits cache size and evicts entries unused
+for 7 days. A miss simply builds from scratch as before.
+
 ## Documentation-only pushes
 
 Pushes that change only `.md` files at any depth run Docs, skipping Configure,
