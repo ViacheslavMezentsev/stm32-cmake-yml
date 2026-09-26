@@ -27,7 +27,7 @@ branch heads. BSP and unrelated middleware submodules are not initialized.
 Git metadata and licenses are retained for inspection. The image records Ubuntu
 package versions in `/opt/stm32-yml-ci/packages.txt`.
 
-QEMU **11.0.0**, built from source, and Renode are planned for the later emulation
+QEMU **11.0.0** (prebuilt from source, [tools/qemu](../../tools/qemu/README.md)) and Renode are planned for the later emulation
 stage; neither is installed in this image. Arduino projects still need their own
 CMake core/library wrappers. The image does not contain a copy of stm32-cmake-yml.
 

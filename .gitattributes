@@ -2,3 +2,6 @@
 ci/** text eol=lf
 tests/** text eol=lf
 .github/workflows/** text eol=lf
+tools/** text eol=lf
+# Prebuilt archives are stored verbatim; their SHA-256 is pinned in the lock file.
+*.tar.xz binary

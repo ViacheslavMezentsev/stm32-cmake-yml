@@ -16,6 +16,10 @@ python ci/emulation/check.py --qemu "C:/path/qemu-system-arm.exe" --renode "C:/P
 python -m unittest discover -s ci/emulation -p test_check.py
 ```
 
+On Windows, `scoop install qemu` is convenient; for exactly 11.0.0 use the
+[20260422 installer](https://qemu.weilnetz.de/w64/2026/qemu-w64-setup-20260422.exe)
+([details](../../tools/qemu/README.md)).
+
 Resolution order: CLI option → QEMU_BINARY/RENODE_BINARY → PATH. On Windows,
 Renode also falls back to Program Files/Renode. An invalid explicit path fails
 instead of silently selecting another installation. Arguments bypass the shell;
@@ -31,16 +35,19 @@ is additionally controlled by archive SHA-256 verification.
 ## Linux CI
 
 ```sh
-docker build --platform linux/amd64 -t stm32-yml-emulation:local ci/emulation
+docker build --platform linux/amd64 -f ci/emulation/Dockerfile -t stm32-yml-emulation:local .
 docker run --rm --network none stm32-yml-emulation:local
 ```
 
 The [lockfile](../../ci/emulation/versions.lock.json) pins QEMU 11.0.0 and Renode
-1.16.1. QEMU is built from its official release archive for arm-softmmu without a
-GUI; Renode uses the portable .NET archive. Required machines are netduino2 and
+1.16.1. QEMU is not compiled during the image build: it comes from the prebuilt
+[tools/qemu](../../tools/qemu/README.md) archive (arm-softmmu without a GUI, built
+from the official release archive; both SHA-256 values are pinned). Renode uses
+the portable .NET archive. Required machines are netduino2 and
 netduinoplus2. Ubuntu is pinned by digest; OS packages receive updates and their
 versions are recorded in /opt/emulation/packages.txt. The image is not claimed
-to be bit-reproducible. QEMU configure disallows additional dependency downloads.
+to be bit-reproducible. The build context is the repository root; `.dockerignore`
+excludes `.git` and `build`.
 
 The [workflow](../../.github/workflows/emulation.yml) builds a separate image,
 checks it offline and uploads logs, JSON and installed package versions. Compiler
