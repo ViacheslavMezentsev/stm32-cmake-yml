@@ -8,6 +8,7 @@ on:
       - cmake/**
       - scripts/**
       - ci/**
+      - tools/qemu/**
       - tests/firmware/**
       - tests/toolchains/**
       - tests/test_firmware*.py
@@ -44,7 +45,8 @@ jobs:
         uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
         with:
           builder: ${{ steps.buildx.outputs.name }}
-          context: ci/emulation
+          context: .
+          file: ci/emulation/Dockerfile
           platforms: linux/amd64
           tags: stm32-yml-emulation:firmware
           load: true

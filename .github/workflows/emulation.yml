@@ -5,6 +5,8 @@ on:
     branches: [main, 'codex/**', 'claude/**']
     paths:
       - ci/emulation/**
+      - tools/qemu/**
+      - .dockerignore
       - .github/workflows/emulation.yml
   workflow_dispatch:
 
@@ -31,7 +33,8 @@ jobs:
         uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
         with:
           builder: ${{ steps.buildx.outputs.name }}
-          context: ci/emulation
+          context: .
+          file: ci/emulation/Dockerfile
           platforms: linux/amd64
           tags: stm32-yml-emulation:check
           load: true

@@ -16,6 +16,10 @@ python ci/emulation/check.py --qemu "C:/path/qemu-system-arm.exe" --renode "C:/P
 python -m unittest discover -s ci/emulation -p test_check.py
 ```
 
+В Windows QEMU удобно установить через `scoop install qemu`; точная 11.0.0 —
+[установщик 20260422](https://qemu.weilnetz.de/w64/2026/qemu-w64-setup-20260422.exe)
+([подробнее](../../tools/qemu/README.md)).
+
 Приоритет: аргумент командной строки → QEMU_BINARY/RENODE_BINARY → PATH.
 Для Renode в Windows дополнительно проверяется каталог Program Files/Renode.
 Неверный явно заданный путь вызывает ошибку, а не незаметную подмену программы.
@@ -31,16 +35,17 @@ python -m unittest discover -s ci/emulation -p test_check.py
 ## Linux CI
 
 ```sh
-docker build --platform linux/amd64 -t stm32-yml-emulation:local ci/emulation
+docker build --platform linux/amd64 -f ci/emulation/Dockerfile -t stm32-yml-emulation:local .
 docker run --rm --network none stm32-yml-emulation:local
 ```
 
 [Lock-файл](../../ci/emulation/versions.lock.json) закрепляет QEMU 11.0.0 и Renode
-1.16.1. QEMU собирается из официального release-архива для arm-softmmu без GUI;
-Renode устанавливается из portable .NET-архива. Требуются netduino2 и
+1.16.1. QEMU не компилируется при сборке образа: берётся заранее собранный архив
+[tools/qemu](../../tools/qemu/README.md) (arm-softmmu без GUI, из официального
+release-архива; SHA-256 обоих закреплён). Renode устанавливается из portable .NET-архива. Требуются netduino2 и
 netduinoplus2. Образ Ubuntu закреплён digest, системные пакеты получают обновления;
 их версии записаны в /opt/emulation/packages.txt. Это не побитово воспроизводимый
-образ. QEMU configure запрещает дополнительные загрузки зависимостей.
+образ. Контекст сборки — корень репозитория; `.dockerignore` исключает `.git` и `build`.
 
 [Workflow](../../.github/workflows/emulation.yml) собирает отдельный образ,
 проверяет его без сети и сохраняет логи/JSON/список пакетов. Окружение компиляторов

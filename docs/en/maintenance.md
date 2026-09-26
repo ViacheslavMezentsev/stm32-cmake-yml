@@ -78,7 +78,10 @@ workflow status on main.
 
 ## Branches without pull requests
 
-From 2026-09-24, create `codex/<task>` or `claude/<task>` (by agent) from current main. After local validation,
+From 2026-09-24, create a `<agent>/<task>` branch from current main. The prefix
+names the AI agent that creates the branch: `codex/` for Codex, `claude/` for
+Claude. For a new agent, choose its prefix and add `<agent>/**` to the workflows'
+`on.push.branches`, otherwise pushing the branch does not run CI. After local validation,
 push the branch: Configure and documentation checks run on push; environment
 checks run when their paths change. Match CI results to the branch's latest
 commit. Update main and merge the tested branch with git merge, resolving
@@ -92,7 +95,7 @@ synchronization is still required before merging.
 
 ## Docker layer cache
 
-The `ci/emulation` image (QEMU from source, Renode) is built with BuildKit and the
+The `ci/emulation` image (QEMU from the [tools/qemu](../../tools/qemu/README.md) archive, Renode) is built with BuildKit and the
 GitHub Actions layer cache (`type=gha`, scope `stm32-yml-emulation`). A layer key
 is the Dockerfile instruction plus the content of copied files, so a lock file,
 install script or Dockerfile change rebuilds that layer and later ones. Downloads
@@ -114,7 +117,9 @@ sources) is not cached. Measurements on branch `claude/docker-image-cache`:
 
 For compilers, downloading the cache and loading 8 GB into Docker nearly equals
 building from fast release downloads, while every cache write adds 6–7 minutes.
-Firmware with all images cached took 5:34 instead of 10:04.
+Firmware with all images cached took 5:34 instead of 10:04. QEMU compilation in
+the image was later replaced by the prebuilt [tools/qemu](../../tools/qemu/README.md)
+archive, so uncached emulator image builds no longer compile QEMU either.
 
 ## Documentation-only pushes
 
