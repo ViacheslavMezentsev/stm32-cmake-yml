@@ -93,6 +93,8 @@ With CRC, limits intermediate BIN size. auto uses the MCU database or a FLASH...
 
 **Change in 0.9.3** (`4cd3404`; spec 4.15.7, 4.15.9): an image larger than `flash_size` fails the build with `[CRC ERROR]` instead of a zero stub (E006).
 
+**Change in 0.9.3** (`3c6bfa3`; spec 4.15.4): with `auto` the Flash size follows the core: 1024K for the `M4` core of a dual-core H745.
+
 **Omission and emptiness:** see [shared rules](semantics.md#empty-values); exceptions are stated above. Profiles/overrides apply before defaults. Backend/path restrictions are stated in the description.
 
 ```yaml
@@ -101,6 +103,6 @@ flash_size: 64K
 
 [0.9.2 implementation](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_postbuild.cmake) · [Index](index.md)
 
-**Checks (partial coverage):** `configure.crc-command-generation`. [Test manifest](../../../../tests/cases.json).
+**Checks (partial coverage):** `configure.crc-command-generation`, `configure.h7-dual-core`, `configure.h5-cmsis-hal-freertos-external`. [Test manifest](../../../../tests/cases.json).
 
 **Errata:** [E006](../../errata/E006.md).

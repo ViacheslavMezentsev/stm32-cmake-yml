@@ -11,6 +11,8 @@
 
 При Configure выводит сравнение суммы распознанных RAM-секций с базой MCU. Несовпадение размеров само по себе не ошибка. Нераспознанные секции предупреждают; Arduino пропускается. Не проверяет пересечения, стек, CRC или фактическую линковку.
 
+**Изменение в 0.9.3** (`3c6bfa3`; ТЗ 4.13.4): эталон — сумма RAM, CCRAM и RAM_SHARE MCU с учётом ядра, поэтому CCM-память F3 и G4 не даёт ложного превышения. Для скрипта, который формирует stm32-cmake, выводится «не проверялось» вместо равенства без проверки; если RAM-областей не найдено — только предупреждение.
+
 **Пропуск и пустота:** см. [общие правила](semantics.md#empty-values); исключения указаны выше. Профиль/override применяется до выбора defaults. Ограничения backend и путей указаны в описании.
 
 ```yaml
@@ -19,7 +21,7 @@ validate_linker_script: true
 
 [Реализация 0.9.2](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_diagnostics.cmake) · [Index](index.md)
 
-**Проверки (частичное покрытие):** `configure.linker-template`, `configure.diagnostics-toggle`, `configure.diagnostics-unrecognized-ram`. [Test manifest](../../../../tests/cases.json).
+**Проверки (частичное покрытие):** `configure.linker-template`, `configure.diagnostics-toggle`, `configure.diagnostics-unrecognized-ram`, `configure.h7-single-core-default`, `configure.h7-dual-core`, `configure.h5-cmsis-hal-freertos-external`. [Test manifest](../../../../tests/cases.json).
 
 <a id="log-target-properties"></a>
 ## `log_target_properties`

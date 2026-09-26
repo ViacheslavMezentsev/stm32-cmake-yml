@@ -123,6 +123,8 @@ mcu: STM32F103C8T6
 
 Core suffix for CMSIS/HAL/FreeRTOS components and linker targets, e.g. M7 or M4 for a supported multicore MCU. Not required for every STM32; identifiers come from stm32-cmake. Arduino does not use this branch.
 
+**Change in 0.9.3** (`3c6bfa3`; spec 4.7.8): the core follows the stm32-cmake list (`stm32_get_cores`): a single-core MCU gets its core automatically (every H7, including single-core ones, gets `M7`; WB and MP1 get `M4`) with a log message; dual-core MCUs (H745, WL55) require `mcu_core`; a value outside the list and a core for an MCU without cores (e.g. F4) are Configure errors listing the valid values. The core applies to the CMSIS, HAL, FreeRTOS and CMSIS-RTOS wrapper targets, startup/system files and RAM/Flash queries.
+
 **Omission and emptiness:** see [shared rules](semantics.md#empty-values); exceptions are stated above. Profiles/overrides apply before defaults. Backend/path restrictions are stated in the description.
 
 ```yaml
@@ -131,7 +133,7 @@ mcu_core: M4
 
 [0.9.2 implementation](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_config.cmake) · [Index](index.md)
 
-**Checks (partial coverage):** no automated check of this contract. [Test manifest](../../../../tests/cases.json).
+**Checks (partial coverage):** `configure.h7-single-core-default`, `configure.h7-dual-core`, `configure.mcu-core-invalid`, `configure.h7-freertos-cube`. [Test manifest](../../../../tests/cases.json).
 
 <a id="languages"></a>
 ## `languages`

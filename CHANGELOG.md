@@ -78,6 +78,25 @@
   проверяются. Unknown values of these keys and `build_artifacts` elements now warn
   with the known values; the default behaviour applies, `external` for
   `freertos_version` as in 0.9.2. Empty values are not checked.
+- Ядро MCU определяется по списку stm32-cmake: у одноядерных MCU (все H7 —
+  `M7`) выбирается автоматически, у двухъядерных `mcu_core` обязателен, значение
+  вне списка — ошибка со списком ядер. Ядро применяется к обёртке CMSIS-RTOS и к
+  размерам RAM/Flash. The MCU core follows stm32-cmake: selected automatically
+  for single-core MCUs (every H7 gets `M7`), required for dual-core ones, and
+  validated; it now also reaches the CMSIS-RTOS wrapper and RAM/Flash sizes.
+- `freertos_version: external` работает: FreeRTOS ищется в `FREERTOS_PATH`
+  (дерево Cube или FreeRTOS-Kernel), подключаются цели `FreeRTOS::<порт>` (E007).
+  External FreeRTOS from `FREERTOS_PATH` now works (E007).
+- Отсутствующие компоненты `hal_components` и `freertos_components`, а также
+  отсутствующая обёртка CMSIS-RTOS — ошибка Configure с именем компонента вместо
+  ошибки Generate. Missing HAL/FreeRTOS components and CMSIS-RTOS wrappers fail
+  Configure with the component name instead of failing Generate.
+- Таблица портов FreeRTOS по IOC дополнена C0, U0, H5, L5, U5, WL и ядрами H7/WL;
+  для неизвестного семейства — предупреждение. The IOC FreeRTOS port table covers
+  the remaining families and cores and warns for an unknown family.
+- Проверка RAM скрипта компоновщика учитывает CCRAM и RAM_SHARE и ядро; для
+  скрипта stm32-cmake выводится «не проверялось». The RAM check includes CCRAM,
+  RAM_SHARE and the core, and reports the stm32-cmake script as not checked.
 
 ### Добавлено / Added
 

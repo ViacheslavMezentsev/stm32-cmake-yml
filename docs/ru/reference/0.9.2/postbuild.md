@@ -93,6 +93,8 @@ crc_algorithm: STM32_HW_DEFAULT
 
 **Изменение в 0.9.3** (`4cd3404`; ТЗ 4.15.7, 4.15.9): образ больше `flash_size` завершает сборку ошибкой `[CRC ERROR]` вместо нулевой заглушки (E006).
 
+**Изменение в 0.9.3** (`3c6bfa3`; ТЗ 4.15.4): при `auto` объём Flash берётся с учётом ядра: у двухъядерного H745 для `M4` — 1024K.
+
 **Пропуск и пустота:** см. [общие правила](semantics.md#empty-values); исключения указаны выше. Профиль/override применяется до выбора defaults. Ограничения backend и путей указаны в описании.
 
 ```yaml
@@ -101,6 +103,6 @@ flash_size: 64K
 
 [Реализация 0.9.2](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_postbuild.cmake) · [Index](index.md)
 
-**Проверки (частичное покрытие):** `configure.crc-command-generation`. [Test manifest](../../../../tests/cases.json).
+**Проверки (частичное покрытие):** `configure.crc-command-generation`, `configure.h7-dual-core`, `configure.h5-cmsis-hal-freertos-external`. [Test manifest](../../../../tests/cases.json).
 
 **Errata:** [E006](../../errata/E006.md).

@@ -123,6 +123,8 @@ mcu: STM32F103C8T6
 
 Уточнение ядра для компонентов CMSIS/HAL/FreeRTOS и linker target, например M7 или M4 для поддерживаемого многоядерного MCU. Не требуется для каждого STM32; точные имена определяет stm32-cmake. Arduino эту ветку не использует.
 
+**Изменение в 0.9.3** (`3c6bfa3`; ТЗ 4.7.8): ядро определяется по списку stm32-cmake (`stm32_get_cores`): у MCU с одним ядром оно выбирается автоматически (все H7, включая одноядерные, — `M7`; WB, MP1 — `M4`) с сообщением в журнале; у двухъядерных (H745, WL55) `mcu_core` обязателен; значение вне списка и ядро для MCU без ядер (например, F4) — ошибка Configure со списком допустимых значений. Ядро применяется к целям CMSIS, HAL, FreeRTOS, обёртке CMSIS-RTOS, startup/system и к запросам RAM/Flash.
+
 **Пропуск и пустота:** см. [общие правила](semantics.md#empty-values); исключения указаны выше. Профиль/override применяется до выбора defaults. Ограничения backend и путей указаны в описании.
 
 ```yaml
@@ -131,7 +133,7 @@ mcu_core: M4
 
 [Реализация 0.9.2](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_config.cmake) · [Index](index.md)
 
-**Проверки (частичное покрытие):** нет автоматической проверки этого контракта. [Test manifest](../../../../tests/cases.json).
+**Проверки (частичное покрытие):** `configure.h7-single-core-default`, `configure.h7-dual-core`, `configure.mcu-core-invalid`, `configure.h7-freertos-cube`. [Test manifest](../../../../tests/cases.json).
 
 <a id="languages"></a>
 ## `languages`

@@ -64,6 +64,8 @@ cubefw_package: V1.8.7
 
 Имена суффиксов HAL::STM32::<family>::..., например GPIO, UART, LL_USART. Точный набор определяется stm32-cmake и Cube, а не этим справочником. LL_ включает USE_FULL_LL_DRIVER. Пустой список не означает все драйверы.
 
+**Изменение в 0.9.3** (`3c6bfa3`; ТЗ 4.7.9): каждый компонент проверяется сразу после подключения HAL: отсутствующий — ошибка Configure с именем компонента и семейства, а не ошибка Generate.
+
 **Пропуск и пустота:** см. [общие правила](semantics.md#empty-values); исключения указаны выше. Профиль/override применяется до выбора defaults. Ограничения backend и путей указаны в описании.
 
 ```yaml
@@ -72,7 +74,7 @@ hal_components: [GPIO]
 
 [Реализация 0.9.2](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_frameworks.cmake) · [Index](index.md)
 
-**Проверки (частичное покрытие):** `configure.defaults-blackpill`, `configure.bluepill`, `configure.stm32f0-cmsis-hal`, `configure.stm32f3-cmsis-hal`, `configure.stm32f7-cmsis-hal`, `configure.stm32g4-cmsis-hal`, `configure.stm32f0-ll-profile`. [Test manifest](../../../../tests/cases.json).
+**Проверки (частичное покрытие):** `configure.defaults-blackpill`, `configure.bluepill`, `configure.stm32f0-cmsis-hal`, `configure.stm32f3-cmsis-hal`, `configure.stm32f7-cmsis-hal`, `configure.stm32g4-cmsis-hal`, `configure.stm32f0-ll-profile`, `configure.hal-missing-component`, `configure.h7-single-core-default`, `configure.h5-cmsis-hal-freertos-external`. [Test manifest](../../../../tests/cases.json).
 
 <a id="use-freertos"></a>
 ## `use_freertos`
@@ -100,6 +102,8 @@ cube выбирает targets FreeRTOS::STM32::<family>. Иное непусто
 
 **Изменение в 0.9.3** (`b9a6cd3`; ТЗ 3.7.3): неизвестное непустое значение вызывает предупреждение со списком известных (`cube`, `external`), применяется `external` — так же, как фактически работала 0.9.2.
 
+**Изменение в 0.9.3** (`3c6bfa3`; ТЗ 4.8.6): `external` работает (E007): FreeRTOS ищется в `FREERTOS_PATH` (переменная CMake или окружения) без компонента семейства, подключаются цели `FreeRTOS::<порт>` и `FreeRTOS::<компонент>`. Поддерживаются дерево FreeRTOS из пакета Cube и FreeRTOS-Kernel (в том числе для H5 и U5, в пакетах которых FreeRTOS нет). Нет `FREERTOS_PATH`, `FreeRTOS.h`/`tasks.c` или файлов порта — ошибка Configure.
+
 **Пропуск и пустота:** см. [общие правила](semantics.md#empty-values); исключения указаны выше. Профиль/override применяется до выбора defaults. Ограничения backend и путей указаны в описании.
 
 ```yaml
@@ -108,7 +112,7 @@ freertos_version: cube
 
 [Реализация 0.9.2](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_frameworks.cmake) · [Index](index.md)
 
-**Проверки (частичное покрытие):** `configure.freertos-defaults`, `configure.freertos-gcs-v2`, `configure.freertos-demo-heap2`, `configure.freertos-ioc-f4-v2`, `configure.freertos-ioc-f1-v1`, `configure.freertos-ioc-empty-fallback`, `configure.freertos-external-cmake`, `configure.freertos-external-env`, `configure.freertos-unknown-enums`, `configure.empty-and-null-defaults`. [Test manifest](../../../../tests/cases.json).
+**Проверки (частичное покрытие):** `configure.freertos-defaults`, `configure.freertos-gcs-v2`, `configure.freertos-demo-heap2`, `configure.freertos-ioc-f4-v2`, `configure.freertos-ioc-f1-v1`, `configure.freertos-ioc-empty-fallback`, `configure.freertos-external-cmake`, `configure.freertos-external-env`, `configure.freertos-unknown-enums`, `configure.empty-and-null-defaults`, `configure.freertos-external-kernel`, `configure.freertos-external-no-path`, `configure.freertos-external-missing-port`, `configure.h5-cmsis-hal-freertos-external`. [Test manifest](../../../../tests/cases.json).
 
 **Отклонение:** [E007](../../errata/E007.md) — со штатным закреплённым upstream external завершается ошибкой Generate даже при корректном FREERTOS_PATH. Тесты фиксируют известную ошибку, а не подтверждают поддержку.
 
@@ -119,6 +123,8 @@ freertos_version: cube
 
 При включении нужен ровно один элемент ARM_*. IOC-ветка выводит порт по семейству (F1: ARM_CM3) и Heap::4; ручная настройка этого fallback не имеет. Остальные имена превращаются в targets, например Heap::4, Timers. Список не проверяет совместимость порта с MCU.
 
+**Изменение в 0.9.3** (`3c6bfa3`; ТЗ 4.4.4, 4.8.7): порт по IOC выбирается по таблице для всех семейств stm32-cmake, включая C0, U0, H5, L5, U5 (`ARM_CM33_NTZ`), WL и ядра H7/WL; семейство вне таблицы — предупреждение и `ARM_CM4F`. Каждый компонент проверяется сразу после подключения FreeRTOS: отсутствующий — ошибка Configure с именем компонента и пространством целей.
+
 **Пропуск и пустота:** см. [общие правила](semantics.md#empty-values); исключения указаны выше. Профиль/override применяется до выбора defaults. Ограничения backend и путей указаны в описании.
 
 ```yaml
@@ -127,7 +133,7 @@ freertos_components: [ARM_CM3, Heap::4]
 
 [Реализация 0.9.2](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_frameworks.cmake) · [Index](index.md)
 
-**Проверки (частичное покрытие):** `configure.freertos-defaults`, `configure.freertos-demo-heap2`, `configure.freertos-no-port`, `configure.freertos-multiple-ports`, `configure.freertos-missing-component`, `configure.freertos-ioc-f4-v2`, `configure.freertos-ioc-f1-v1`, `configure.freertos-ioc-profile-precedence`, `configure.freertos-ioc-yaml-precedence`, `configure.freertos-ioc-empty-fallback`, `configure.freertos-ioc-override-disable`, `configure.freertos-ioc-reconfigure`, `configure.stm32f0-ioc-freertos`, `configure.stm32f3-ioc-freertos`, `configure.stm32f7-ioc-freertos`, `configure.stm32g4-ioc-freertos`. [Test manifest](../../../../tests/cases.json).
+**Проверки (частичное покрытие):** `configure.freertos-defaults`, `configure.freertos-demo-heap2`, `configure.freertos-no-port`, `configure.freertos-multiple-ports`, `configure.freertos-missing-component`, `configure.freertos-ioc-f4-v2`, `configure.freertos-ioc-f1-v1`, `configure.freertos-ioc-profile-precedence`, `configure.freertos-ioc-yaml-precedence`, `configure.freertos-ioc-empty-fallback`, `configure.freertos-ioc-override-disable`, `configure.freertos-ioc-reconfigure`, `configure.stm32f0-ioc-freertos`, `configure.stm32f3-ioc-freertos`, `configure.stm32f7-ioc-freertos`, `configure.stm32g4-ioc-freertos`, `configure.freertos-ioc-port-table`, `configure.freertos-ioc-port-unknown-family`, `configure.freertos-external-missing-component`. [Test manifest](../../../../tests/cases.json).
 
 <a id="cmsis-rtos-api"></a>
 ## `cmsis_rtos_api`
@@ -138,6 +144,8 @@ freertos_components: [ARM_CM3, Heap::4]
 
 **Изменение в 0.9.3** (`b9a6cd3`; ТЗ 3.7.3): неизвестное непустое значение вызывает предупреждение со списком известных (`none`, `v1`, `v2`), применяется `none` (без обёртки).
 
+**Изменение в 0.9.3** (`3c6bfa3`; ТЗ 4.7.8, 4.8.8): обёртка подключается в пространстве ядра (`CMSIS::STM32::H7::M7::RTOS_V2`) и работает с внешним FreeRTOS: исходники обёртки — из пакета Cube семейства, заголовки — из внешнего FreeRTOS. Если обёртки нет (например, в CubeH5 нет FreeRTOS), Configure завершается ошибкой с рекомендацией `cmsis_rtos_api: none`.
+
 **Пропуск и пустота:** см. [общие правила](semantics.md#empty-values); исключения указаны выше. Профиль/override применяется до выбора defaults. Ограничения backend и путей указаны в описании.
 
 ```yaml
@@ -146,4 +154,4 @@ cmsis_rtos_api: none
 
 [Реализация 0.9.2](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_frameworks.cmake) · [Index](index.md)
 
-**Проверки (частичное покрытие):** `configure.freertos-defaults`, `configure.freertos-gcs-v2`, `configure.freertos-demo-heap2`, `configure.freertos-v1`, `configure.freertos-disabled`, `configure.freertos-ioc-f4-v2`, `configure.freertos-ioc-f1-v1`, `configure.freertos-ioc-profile-precedence`, `configure.freertos-ioc-yaml-precedence`, `configure.freertos-ioc-empty-fallback`, `configure.freertos-ioc-override-disable`, `configure.freertos-ioc-reconfigure`, `configure.stm32f0-ioc-freertos`, `configure.stm32f3-ioc-freertos`, `configure.stm32f7-ioc-freertos`, `configure.stm32g4-ioc-freertos`, `configure.freertos-unknown-enums`, `configure.empty-and-null-defaults`. [Test manifest](../../../../tests/cases.json).
+**Проверки (частичное покрытие):** `configure.freertos-defaults`, `configure.freertos-gcs-v2`, `configure.freertos-demo-heap2`, `configure.freertos-v1`, `configure.freertos-disabled`, `configure.freertos-ioc-f4-v2`, `configure.freertos-ioc-f1-v1`, `configure.freertos-ioc-profile-precedence`, `configure.freertos-ioc-yaml-precedence`, `configure.freertos-ioc-empty-fallback`, `configure.freertos-ioc-override-disable`, `configure.freertos-ioc-reconfigure`, `configure.stm32f0-ioc-freertos`, `configure.stm32f3-ioc-freertos`, `configure.stm32f7-ioc-freertos`, `configure.stm32g4-ioc-freertos`, `configure.freertos-unknown-enums`, `configure.empty-and-null-defaults`, `configure.freertos-external-kernel`, `configure.h7-freertos-cube`, `configure.h5-cmsis-hal-freertos-external`. [Test manifest](../../../../tests/cases.json).
