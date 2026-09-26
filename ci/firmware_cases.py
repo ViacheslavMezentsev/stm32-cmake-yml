@@ -30,9 +30,19 @@ TARGETS = {
                  cpu_flags='-mcpu=cortex-m4;-mthumb;-mfpu=fpv4-sp-d16;-mfloat-abi=hard', bare_cpu='-mcpu=cortex-m4',
                  qemu='netduinoplus2', qemu_part='0xC24 -> Cortex-M4', renode='f4-smoke.repl', renode_part='0xC24 -> Cortex-M4',
                  flash=(0x08000000, 256 * 1024), ram=(0x20000000, 64 * 1024), rtos_version='V10.3.1'),
+    # G4 runs in Renode only, as recommended for this family; RAM counts SRAM1, SRAM2
+    # and the CCM SRAM alias, contiguous from 0x20000000.
+    'g431': dict(mcu='STM32G431CBU6', config='targets/g431/stm32_config.yml', family='g4', platform='cortex-m4-smoke',
+                 cpu_flags='-mcpu=cortex-m4;-mthumb;-mfpu=fpv4-sp-d16;-mfloat-abi=hard', bare_cpu='-mcpu=cortex-m4',
+                 qemu=None, qemu_part=None, renode='g4-smoke.repl', renode_part='0xC24 -> Cortex-M4',
+                 flash=(0x08000000, 128 * 1024), ram=(0x20000000, 32 * 1024), rtos_version='V10.3.1'),
+    'g474': dict(mcu='STM32G474CEU6', config='targets/g474/stm32_config.yml', family='g4', platform='cortex-m4-smoke',
+                 cpu_flags='-mcpu=cortex-m4;-mthumb;-mfpu=fpv4-sp-d16;-mfloat-abi=hard', bare_cpu='-mcpu=cortex-m4',
+                 qemu=None, qemu_part=None, renode='g4-smoke.repl', renode_part='0xC24 -> Cortex-M4',
+                 flash=(0x08000000, 512 * 1024), ram=(0x20000000, 128 * 1024), rtos_version='V10.3.1'),
 }
 # Targets are enabled one family at a time, each with a full local check.
-ENABLED_TARGETS = ('f103', 'f030', 'f411', 'f401')
+ENABLED_TARGETS = ('f103', 'f030', 'f411', 'f401', 'g431', 'g474')
 DEFAULT_TARGET = 'f103'
 
 
