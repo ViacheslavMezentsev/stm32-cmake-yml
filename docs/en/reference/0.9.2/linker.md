@@ -140,6 +140,8 @@ use_newlib_nano: false
 
 Links the matching STM32 target. Unknown/empty values add nothing. NoSys must come from the toolchain; Semihosting has a fallback. Execution needs debugger/simulator support (the QEMU example uses -semihosting).
 
+**Change in 0.9.3** (`b9a6cd3`; spec 3.7.3): an unknown non-empty value (e.g. `nosys`) warns with the known values (`NoSys`, `Semihosting`); no library is linked. An empty value does not warn.
+
 **Omission and emptiness:** see [shared rules](semantics.md#empty-values); exceptions are stated above. Profiles/overrides apply before defaults. Backend/path restrictions are stated in the description.
 
 ```yaml
@@ -148,4 +150,4 @@ system_library: NoSys
 
 [0.9.2 implementation](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_frameworks.cmake) · [Index](index.md)
 
-**Checks (partial coverage):** `configure.defaults-blackpill`, `configure.system-nosys-nano`, `configure.system-semihost-nano`, `configure.system-disabled`, `configure.system-reconfigure`. [Test manifest](../../../../tests/cases.json).
+**Checks (partial coverage):** `configure.defaults-blackpill`, `configure.system-nosys-nano`, `configure.system-semihost-nano`, `configure.system-disabled`, `configure.system-reconfigure`, `configure.enum-unknown-values`, `configure.empty-and-null-defaults`. [Test manifest](../../../../tests/cases.json).

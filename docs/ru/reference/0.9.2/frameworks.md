@@ -98,6 +98,8 @@ use_freertos: false
 
 cube выбирает targets FreeRTOS::STM32::<family>. Иное непустое значение выбирает префикс FreeRTOS (обычно пишут external); не выбирает номер релиза и не скачивает пакет. Внешний поиск/targets должен обеспечить upstream toolchain.
 
+**Изменение в 0.9.3** (`b9a6cd3`; ТЗ 3.7.3): неизвестное непустое значение вызывает предупреждение со списком известных (`cube`, `external`), применяется `external` — так же, как фактически работала 0.9.2.
+
 **Пропуск и пустота:** см. [общие правила](semantics.md#empty-values); исключения указаны выше. Профиль/override применяется до выбора defaults. Ограничения backend и путей указаны в описании.
 
 ```yaml
@@ -106,7 +108,7 @@ freertos_version: cube
 
 [Реализация 0.9.2](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_frameworks.cmake) · [Index](index.md)
 
-**Проверки (частичное покрытие):** `configure.freertos-defaults`, `configure.freertos-gcs-v2`, `configure.freertos-demo-heap2`, `configure.freertos-ioc-f4-v2`, `configure.freertos-ioc-f1-v1`, `configure.freertos-ioc-empty-fallback`, `configure.freertos-external-cmake-known-failure`, `configure.freertos-external-env-known-failure`. [Test manifest](../../../../tests/cases.json).
+**Проверки (частичное покрытие):** `configure.freertos-defaults`, `configure.freertos-gcs-v2`, `configure.freertos-demo-heap2`, `configure.freertos-ioc-f4-v2`, `configure.freertos-ioc-f1-v1`, `configure.freertos-ioc-empty-fallback`, `configure.freertos-external-cmake-known-failure`, `configure.freertos-external-env-known-failure`, `configure.freertos-unknown-enums`, `configure.empty-and-null-defaults`. [Test manifest](../../../../tests/cases.json).
 
 **Отклонение:** [E007](../../errata/E007.md) — со штатным закреплённым upstream external завершается ошибкой Generate даже при корректном FREERTOS_PATH. Тесты фиксируют известную ошибку, а не подтверждают поддержку.
 
@@ -134,6 +136,8 @@ freertos_components: [ARM_CM3, Heap::4]
 
 При use_freertos подключает CMSIS RTOS или RTOS_V2 target. Иные значения не добавляют обёртку; enum явно не проверяется. Зависимости соответствующей обёртки должны быть доступны.
 
+**Изменение в 0.9.3** (`b9a6cd3`; ТЗ 3.7.3): неизвестное непустое значение вызывает предупреждение со списком известных (`none`, `v1`, `v2`), применяется `none` (без обёртки).
+
 **Пропуск и пустота:** см. [общие правила](semantics.md#empty-values); исключения указаны выше. Профиль/override применяется до выбора defaults. Ограничения backend и путей указаны в описании.
 
 ```yaml
@@ -142,4 +146,4 @@ cmsis_rtos_api: none
 
 [Реализация 0.9.2](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_frameworks.cmake) · [Index](index.md)
 
-**Проверки (частичное покрытие):** `configure.freertos-defaults`, `configure.freertos-gcs-v2`, `configure.freertos-demo-heap2`, `configure.freertos-v1`, `configure.freertos-disabled`, `configure.freertos-ioc-f4-v2`, `configure.freertos-ioc-f1-v1`, `configure.freertos-ioc-profile-precedence`, `configure.freertos-ioc-yaml-precedence`, `configure.freertos-ioc-empty-fallback`, `configure.freertos-ioc-override-disable`, `configure.freertos-ioc-reconfigure`, `configure.stm32f0-ioc-freertos`, `configure.stm32f3-ioc-freertos`, `configure.stm32f7-ioc-freertos`, `configure.stm32g4-ioc-freertos`. [Test manifest](../../../../tests/cases.json).
+**Проверки (частичное покрытие):** `configure.freertos-defaults`, `configure.freertos-gcs-v2`, `configure.freertos-demo-heap2`, `configure.freertos-v1`, `configure.freertos-disabled`, `configure.freertos-ioc-f4-v2`, `configure.freertos-ioc-f1-v1`, `configure.freertos-ioc-profile-precedence`, `configure.freertos-ioc-yaml-precedence`, `configure.freertos-ioc-empty-fallback`, `configure.freertos-ioc-override-disable`, `configure.freertos-ioc-reconfigure`, `configure.stm32f0-ioc-freertos`, `configure.stm32f3-ioc-freertos`, `configure.stm32f7-ioc-freertos`, `configure.stm32g4-ioc-freertos`, `configure.freertos-unknown-enums`, `configure.empty-and-null-defaults`. [Test manifest](../../../../tests/cases.json).

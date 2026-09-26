@@ -98,6 +98,8 @@ use_freertos: false
 
 cube selects FreeRTOS::STM32::<family> targets. Any other nonempty value selects the FreeRTOS prefix (conventionally external); it neither chooses a release number nor downloads a package. Upstream toolchain discovery/targets must supply the external dependency.
 
+**Change in 0.9.3** (`b9a6cd3`; spec 3.7.3): an unknown non-empty value warns with the known values (`cube`, `external`) and `external` applies, matching the actual 0.9.2 behaviour.
+
 **Omission and emptiness:** see [shared rules](semantics.md#empty-values); exceptions are stated above. Profiles/overrides apply before defaults. Backend/path restrictions are stated in the description.
 
 ```yaml
@@ -106,7 +108,7 @@ freertos_version: cube
 
 [0.9.2 implementation](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_frameworks.cmake) · [Index](index.md)
 
-**Checks (partial coverage):** `configure.freertos-defaults`, `configure.freertos-gcs-v2`, `configure.freertos-demo-heap2`, `configure.freertos-ioc-f4-v2`, `configure.freertos-ioc-f1-v1`, `configure.freertos-ioc-empty-fallback`, `configure.freertos-external-cmake-known-failure`, `configure.freertos-external-env-known-failure`. [Test manifest](../../../../tests/cases.json).
+**Checks (partial coverage):** `configure.freertos-defaults`, `configure.freertos-gcs-v2`, `configure.freertos-demo-heap2`, `configure.freertos-ioc-f4-v2`, `configure.freertos-ioc-f1-v1`, `configure.freertos-ioc-empty-fallback`, `configure.freertos-external-cmake-known-failure`, `configure.freertos-external-env-known-failure`, `configure.freertos-unknown-enums`, `configure.empty-and-null-defaults`. [Test manifest](../../../../tests/cases.json).
 
 **Deviation:** [E007](../../errata/E007.md) — with the pinned standard upstream, external fails Generate even with a valid FREERTOS_PATH. Tests reproduce the known failure rather than demonstrate support.
 
@@ -134,6 +136,8 @@ freertos_components: [ARM_CM3, Heap::4]
 
 With use_freertos, adds the CMSIS RTOS or RTOS_V2 target. Other values add no wrapper; the enum is not explicitly validated. Required wrapper dependencies must be available.
 
+**Change in 0.9.3** (`b9a6cd3`; spec 3.7.3): an unknown non-empty value warns with the known values (`none`, `v1`, `v2`) and `none` applies (no wrapper).
+
 **Omission and emptiness:** see [shared rules](semantics.md#empty-values); exceptions are stated above. Profiles/overrides apply before defaults. Backend/path restrictions are stated in the description.
 
 ```yaml
@@ -142,4 +146,4 @@ cmsis_rtos_api: none
 
 [0.9.2 implementation](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_frameworks.cmake) · [Index](index.md)
 
-**Checks (partial coverage):** `configure.freertos-defaults`, `configure.freertos-gcs-v2`, `configure.freertos-demo-heap2`, `configure.freertos-v1`, `configure.freertos-disabled`, `configure.freertos-ioc-f4-v2`, `configure.freertos-ioc-f1-v1`, `configure.freertos-ioc-profile-precedence`, `configure.freertos-ioc-yaml-precedence`, `configure.freertos-ioc-empty-fallback`, `configure.freertos-ioc-override-disable`, `configure.freertos-ioc-reconfigure`, `configure.stm32f0-ioc-freertos`, `configure.stm32f3-ioc-freertos`, `configure.stm32f7-ioc-freertos`, `configure.stm32g4-ioc-freertos`. [Test manifest](../../../../tests/cases.json).
+**Checks (partial coverage):** `configure.freertos-defaults`, `configure.freertos-gcs-v2`, `configure.freertos-demo-heap2`, `configure.freertos-v1`, `configure.freertos-disabled`, `configure.freertos-ioc-f4-v2`, `configure.freertos-ioc-f1-v1`, `configure.freertos-ioc-profile-precedence`, `configure.freertos-ioc-yaml-precedence`, `configure.freertos-ioc-empty-fallback`, `configure.freertos-ioc-override-disable`, `configure.freertos-ioc-reconfigure`, `configure.stm32f0-ioc-freertos`, `configure.stm32f3-ioc-freertos`, `configure.stm32f7-ioc-freertos`, `configure.stm32g4-ioc-freertos`, `configure.freertos-unknown-enums`, `configure.empty-and-null-defaults`. [Test manifest](../../../../tests/cases.json).

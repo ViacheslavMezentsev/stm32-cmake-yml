@@ -71,6 +71,18 @@
   `K`/`M`), and explicit sizes warn when the stm32-cmake or explicit linker script
   ignores them. **Compatibility:** values such as `1k` or `0x200` used to be ignored
   silently without a template and are now a Configure error.
+- Неизвестные значения `toolchain_backend`, `system_library`, `cmsis_rtos_api`,
+  `freertos_version` и элементов `build_artifacts` вызывают предупреждение со
+  списком известных значений; применяется поведение по умолчанию (для
+  `freertos_version` — `external`, как фактически в 0.9.2). Пустые значения не
+  проверяются. Unknown values of these keys and `build_artifacts` elements now warn
+  with the known values; the default behaviour applies, `external` for
+  `freertos_version` as in 0.9.2. Empty values are not checked.
+
+### Добавлено / Added
+
+- `build_artifacts: [srec]` — файл Motorola S-record через
+  `stm32_generate_srec_file`. The `srec` artifact generates a Motorola S-record file.
 
 ## [0.9.2] - 2026-09-19
 

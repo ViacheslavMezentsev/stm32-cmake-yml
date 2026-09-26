@@ -140,6 +140,8 @@ use_newlib_nano: false
 
 Подключает одноимённый STM32 target. Неизвестное/пустое значение ничего не добавляет. NoSys должен предоставить toolchain; Semihosting имеет fallback. Для выполнения semihosting нужна поддержка отладчика/симулятора (в примере QEMU используется -semihosting).
 
+**Изменение в 0.9.3** (`b9a6cd3`; ТЗ 3.7.3): неизвестное непустое значение (например, `nosys`) вызывает предупреждение со списком известных (`NoSys`, `Semihosting`); библиотека не подключается. Пустое значение — без предупреждения.
+
 **Пропуск и пустота:** см. [общие правила](semantics.md#empty-values); исключения указаны выше. Профиль/override применяется до выбора defaults. Ограничения backend и путей указаны в описании.
 
 ```yaml
@@ -148,4 +150,4 @@ system_library: NoSys
 
 [Реализация 0.9.2](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_frameworks.cmake) · [Index](index.md)
 
-**Проверки (частичное покрытие):** `configure.defaults-blackpill`, `configure.system-nosys-nano`, `configure.system-semihost-nano`, `configure.system-disabled`, `configure.system-reconfigure`. [Test manifest](../../../../tests/cases.json).
+**Проверки (частичное покрытие):** `configure.defaults-blackpill`, `configure.system-nosys-nano`, `configure.system-semihost-nano`, `configure.system-disabled`, `configure.system-reconfigure`, `configure.enum-unknown-values`, `configure.empty-and-null-defaults`. [Test manifest](../../../../tests/cases.json).

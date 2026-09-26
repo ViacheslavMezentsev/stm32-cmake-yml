@@ -47,6 +47,8 @@ stm32_cmake_yml_version_check: true
 
 Выбирает настройку CMSIS/HAL/FreeRTOS либо Arduino-обёрток. Toolchain задаёт потребитель до project(). В 0.9.2 неизвестная непустая строка не отвергается и попадает в ветку stm32-cmake; это не дополнительный backend.
 
+**Изменение в 0.9.3** (`b9a6cd3`; ТЗ 3.7.3, 4.1.6): неизвестное непустое значение вызывает предупреждение со списком известных (`stm32-cmake`, `arduino`), применяется `stm32-cmake`. Пустое значение по-прежнему означает `stm32-cmake` без предупреждения.
+
 **Пропуск и пустота:** см. [общие правила](semantics.md#empty-values); исключения указаны выше. Профиль/override применяется до выбора defaults. Ограничения backend и путей указаны в описании.
 
 ```yaml
@@ -55,7 +57,7 @@ toolchain_backend: stm32-cmake
 
 [Реализация 0.9.2](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_config.cmake) · [Index](index.md)
 
-**Проверки (частичное покрытие):** `configure.arduino-defaults`, `configure.baremetal-no-cube`. [Test manifest](../../../../tests/cases.json).
+**Проверки (частичное покрытие):** `configure.arduino-defaults`, `configure.baremetal-no-cube`, `configure.enum-unknown-values`, `configure.empty-and-null-defaults`. [Test manifest](../../../../tests/cases.json).
 
 <a id="ioc-file"></a>
 ## `ioc_file`

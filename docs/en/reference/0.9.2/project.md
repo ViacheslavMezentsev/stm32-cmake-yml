@@ -47,6 +47,8 @@ stm32_cmake_yml_version_check: true
 
 Selects CMSIS/HAL/FreeRTOS or Arduino wrappers. The consumer sets the toolchain before project(). In 0.9.2 an unknown nonempty string falls through to stm32-cmake; it is not another supported backend.
 
+**Change in 0.9.3** (`b9a6cd3`; spec 3.7.3, 4.1.6): an unknown non-empty value warns with the known values (`stm32-cmake`, `arduino`) and `stm32-cmake` applies. An empty value still means `stm32-cmake` without a warning.
+
 **Omission and emptiness:** see [shared rules](semantics.md#empty-values); exceptions are stated above. Profiles/overrides apply before defaults. Backend/path restrictions are stated in the description.
 
 ```yaml
@@ -55,7 +57,7 @@ toolchain_backend: stm32-cmake
 
 [0.9.2 implementation](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_config.cmake) · [Index](index.md)
 
-**Checks (partial coverage):** `configure.arduino-defaults`, `configure.baremetal-no-cube`. [Test manifest](../../../../tests/cases.json).
+**Checks (partial coverage):** `configure.arduino-defaults`, `configure.baremetal-no-cube`, `configure.enum-unknown-values`, `configure.empty-and-null-defaults`. [Test manifest](../../../../tests/cases.json).
 
 <a id="ioc-file"></a>
 ## `ioc_file`

@@ -76,7 +76,9 @@
       },
       "tests": [
         "configure.arduino-defaults",
-        "configure.baremetal-no-cube"
+        "configure.baremetal-no-cube",
+        "configure.enum-unknown-values",
+        "configure.empty-and-null-defaults"
       ],
       "errata": []
     },
@@ -550,7 +552,9 @@
         "configure.freertos-ioc-f1-v1",
         "configure.freertos-ioc-empty-fallback",
         "configure.freertos-external-cmake-known-failure",
-        "configure.freertos-external-env-known-failure"
+        "configure.freertos-external-env-known-failure",
+        "configure.freertos-unknown-enums",
+        "configure.empty-and-null-defaults"
       ],
       "errata": [
         "E007"
@@ -614,7 +618,9 @@
         "configure.stm32f0-ioc-freertos",
         "configure.stm32f3-ioc-freertos",
         "configure.stm32f7-ioc-freertos",
-        "configure.stm32g4-ioc-freertos"
+        "configure.stm32g4-ioc-freertos",
+        "configure.freertos-unknown-enums",
+        "configure.empty-and-null-defaults"
       ],
       "errata": []
     },
@@ -773,7 +779,9 @@
         "configure.system-nosys-nano",
         "configure.system-semihost-nano",
         "configure.system-disabled",
-        "configure.system-reconfigure"
+        "configure.system-reconfigure",
+        "configure.enum-unknown-values",
+        "configure.empty-and-null-defaults"
       ],
       "errata": []
     },
@@ -944,7 +952,8 @@
         "configure.artifacts-map-only",
         "configure.artifacts-empty",
         "configure.artifacts-unknown",
-        "configure.artifacts-reconfigure"
+        "configure.artifacts-reconfigure",
+        "configure.empty-and-null-defaults"
       ],
       "errata": []
     },

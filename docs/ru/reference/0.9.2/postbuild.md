@@ -11,6 +11,8 @@
 
 bin/hex/lss добавляют post-build преобразования, map — флаг линкера. Пустой список не запрещает основную цель и вывод размера. Неизвестные элементы игнорируются. Toolchain должен предоставить функции bin/hex/size и необходимые утилиты.
 
+**Изменение в 0.9.3** (`b9a6cd3`; ТЗ 3.7.3, 4.14.2): добавлен элемент `srec` (`stm32_generate_srec_file`). Неизвестный элемент вызывает предупреждение со списком известных (`bin`, `hex`, `srec`, `map`, `lss`) и пропускается.
+
 **Пропуск и пустота:** см. [общие правила](semantics.md#empty-values); исключения указаны выше. Профиль/override применяется до выбора defaults. Ограничения backend и путей указаны в описании.
 
 ```yaml
@@ -19,7 +21,7 @@ build_artifacts: [bin, hex, map, lss]
 
 [Реализация 0.9.2](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_postbuild.cmake) · [Index](index.md)
 
-**Проверки (частичное покрытие):** `configure.artifacts-defaults`, `configure.artifacts-all`, `configure.artifacts-map-only`, `configure.artifacts-empty`, `configure.artifacts-unknown`, `configure.artifacts-reconfigure`. [Test manifest](../../../../tests/cases.json).
+**Проверки (частичное покрытие):** `configure.artifacts-defaults`, `configure.artifacts-all`, `configure.artifacts-map-only`, `configure.artifacts-empty`, `configure.artifacts-unknown`, `configure.artifacts-reconfigure`, `configure.empty-and-null-defaults`. [Test manifest](../../../../tests/cases.json).
 
 <a id="crc-enable"></a>
 ## `crc_enable`

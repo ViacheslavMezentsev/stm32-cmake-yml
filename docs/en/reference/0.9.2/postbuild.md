@@ -11,6 +11,8 @@ Shared rules: [semantics](semantics.md). Baseline: `f8ef5200fc7a4a96d6f3fe9111af
 
 bin/hex/lss add post-build conversions; map adds a linker flag. An empty list does not disable the main target or size output. Unknown items are ignored. The toolchain must provide bin/hex/size helpers and required utilities.
 
+**Change in 0.9.3** (`b9a6cd3`; spec 3.7.3, 4.14.2): the `srec` element is added (`stm32_generate_srec_file`). An unknown element warns with the known values (`bin`, `hex`, `srec`, `map`, `lss`) and is skipped.
+
 **Omission and emptiness:** see [shared rules](semantics.md#empty-values); exceptions are stated above. Profiles/overrides apply before defaults. Backend/path restrictions are stated in the description.
 
 ```yaml
@@ -19,7 +21,7 @@ build_artifacts: [bin, hex, map, lss]
 
 [0.9.2 implementation](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_postbuild.cmake) · [Index](index.md)
 
-**Checks (partial coverage):** `configure.artifacts-defaults`, `configure.artifacts-all`, `configure.artifacts-map-only`, `configure.artifacts-empty`, `configure.artifacts-unknown`, `configure.artifacts-reconfigure`. [Test manifest](../../../../tests/cases.json).
+**Checks (partial coverage):** `configure.artifacts-defaults`, `configure.artifacts-all`, `configure.artifacts-map-only`, `configure.artifacts-empty`, `configure.artifacts-unknown`, `configure.artifacts-reconfigure`, `configure.empty-and-null-defaults`. [Test manifest](../../../../tests/cases.json).
 
 <a id="crc-enable"></a>
 ## `crc_enable`
