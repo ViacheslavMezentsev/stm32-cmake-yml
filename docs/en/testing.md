@@ -24,6 +24,10 @@ it does not build firmware.
 checksums and source commits. Selected Cube submodules (CMSIS device, HAL and
 FreeRTOS where it is a submodule) use the gitlinks of those commits, never remote
 branch heads. BSP and unrelated middleware submodules are not initialized.
+Cube `Projects` and `Utilities` example directories are not downloaded: a partial
+clone (`--filter=blob:none`) and sparse checkout driven by the lock file's
+`sparse_exclude` shrink Cube from 3.9 to 1.3 GB. Archives and sources install
+in 4 parallel threads; each item's log is printed as one block.
 Git metadata and licenses are retained for inspection. The image records Ubuntu
 package versions in `/opt/stm32-yml-ci/packages.txt`.
 
@@ -288,7 +292,7 @@ Ten cases check real imported targets and cortex-m0/m4/m7 flags in compile_comma
 
 F0, F7 and G4 MCUs follow local demos `stm32f0xx/03-blink`, `stm32f7xx/03-blink` and `stm32g4xx/03-blink`; F3 uses a synthetic F303VC case. Reduced IOC fixtures add FreeRTOS/v1 markers. Full demo IOC files are not copied; the HSI field does not generate a clock implementation. Minimal HAL headers are for configuration only.
 
-CubeF0/F3/F7 are pinned by commit in the lockfile; CubeG4 was already pinned. Only CMSIS device/HAL submodules are initialized, plus FreeRTOS for F0. Selected F3/F7 packages contain FreeRTOS in the parent repository. BSP and unrelated submodules are not initialized. The parent repository is still downloaded in full; this is selective submodule initialization, not sparse checkout.
+CubeF0/F3/F7 are pinned by commit in the lockfile; CubeG4 was already pinned. Only CMSIS device/HAL submodules are initialized, plus FreeRTOS for F0. Selected F3/F7 packages contain FreeRTOS in the parent repository. BSP and unrelated submodules are not initialized. The parent repository is fetched as a partial clone with sparse checkout that omits `Projects` and `Utilities`.
 
 ### System libraries and linker options
 
