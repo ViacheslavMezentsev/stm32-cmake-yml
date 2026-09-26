@@ -112,10 +112,12 @@
 
 - `build_artifacts: [srec]` — файл Motorola S-record через
   `stm32_generate_srec_file`. The `srec` artifact generates a Motorola S-record file.
-- Матрица прошивок проверяет цели по семействам: к F103 добавлен F0
-  `STM32F030R8T6` (QEMU `netduino2`, Renode на модели с Cortex-M0).
-  The firmware matrix checks targets per family: F0 `STM32F030R8T6` joins F103
-  (QEMU `netduino2`, Renode on a Cortex-M0 model).
+- Матрица прошивок проверяет цели по семействам: к F103 добавлены F0
+  `STM32F030R8T6` (QEMU `netduino2`, Renode на модели с Cortex-M0) и F4
+  `STM32F411CEU6`, `STM32F401CCU6` (QEMU `netduinoplus2`, Renode на модели с Cortex-M4).
+  The firmware matrix checks targets per family: F0 `STM32F030R8T6` (QEMU
+  `netduino2`, Renode on a Cortex-M0 model) and F4 `STM32F411CEU6`, `STM32F401CCU6`
+  (QEMU `netduinoplus2`, Renode on a Cortex-M4 model) join F103.
 
 ## [0.9.2] - 2026-09-19
 

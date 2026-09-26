@@ -92,7 +92,7 @@ def prepare_case(root, build, output, case):
     commands = [
         'Clear',
         f'mach create "{target_name}-smoke"',
-        f'machine LoadPlatformDescription {resc_path(root / "tests/firmware/renode" / (target_name + "-smoke.repl"))}',
+        f'machine LoadPlatformDescription {resc_path(root / "tests/firmware/renode" / target["renode"])}',
         f'sysbus.cpu.uart CreateFileBackend {resc_path(directory / "firmware.log")}',
         f'sysbus LoadELF {resc_path(elf)}',
         f'sysbus.cpu AddHook 0x{trap:X} """{hook_code}"""',
