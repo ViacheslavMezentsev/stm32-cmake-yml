@@ -17,7 +17,8 @@ it does not build firmware.
 | CMake | 3.19.8 (minimum compatibility), 3.28.3 (reference environment) |
 | Ninja / Mike Farah yq | 1.12.1 / 4.44.3 |
 | stm32-cmake | Commit recorded in the lockfile |
-| STM32Cube | F0 1.11.6, F1 1.8.7, F3 1.11.5, F4 1.28.3, F7 1.17.3, G4 1.6.3 |
+| STM32Cube | F0 1.11.6, F1 1.8.7, F3 1.11.5, F4 1.28.3, F7 1.17.3, G4 1.6.3, H5 1.7.0, H7 1.13.0 |
+| FreeRTOS-Kernel | 11.3.1 (`/opt/FreeRTOS-Kernel/11.3.1`, for `freertos_version: external`) |
 | Arduino Core STM32 / ETL | 2.12.0 / 20.47.1 |
 
 [dependencies.lock.json](../../ci/dependencies.lock.json) records archive SHA-256
@@ -31,8 +32,8 @@ in 4 parallel threads; each item's log is printed as one block.
 Git metadata and licenses are retained for inspection. The image records Ubuntu
 package versions in `/opt/stm32-yml-ci/packages.txt`.
 
-QEMU **11.0.0** (prebuilt from source, [tools/qemu](../../tools/qemu/README.md)) and Renode are planned for the later emulation
-stage; neither is installed in this image. Arduino projects still need their own
+QEMU **11.0.0** (prebuilt from source, [tools/qemu](../../tools/qemu/README.md)) and Renode
+are part of the separate emulation image ([ci/emulation](../../ci/emulation/Dockerfile)); neither is installed in this image. Arduino projects still need their own
 CMake core/library wrappers. The image does not contain a copy of stm32-cmake-yml.
 
 ## Build and verify

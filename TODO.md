@@ -106,6 +106,7 @@ PR больше не требуются; старые ссылки остают�
 - [x] `claude/renode-batch` слита в main (`aa58116`): один процесс Renode на пару GCC/CMake, `Clear` между сценариями, синхронный лог; Renode в CI 3:42 → 0:33.
 - [x] `claude/docker-image-cache` слита в main (`c65a7ed`): кэш слоёв BuildKit (`type=gha`) только для образа эмуляторов (3:08 → 0:12); образ компиляторов без кэша — выигрыша нет.
 - [x] `claude/qemu-prebuilt` слита в main (`5fade06`): готовый QEMU 11.0.0 в `tools/qemu` (3,7 МБ, скрипт сборки, SHA-256 в lock) вместо компиляции в образе; Windows — scoop/установщик.
+- [ ] Текущая ветка `claude/release-0.9.3` (ТЗ 1.2): в lock и образ CI добавлены STM32CubeH7 1.13.0, STM32CubeH5 1.7.0, FreeRTOS-Kernel 11.3.1 (ТЗ 8.8.1); далее регрессии TC-22, TC-54…TC-59 и доработки приложения E.
 - [x] `claude/faster-ci-image` слита в main (`955b09b`): параллельная установка и Cube без `Projects`/`Utilities` (3,9 → 1,3 ГБ); образ компиляторов в CI 2:45 → 1:09–1:29, Configure 4:47, Firmware 4:39. Разнесение пар по job — не принято, см. [сопровождение](docs/ru/maintenance.md).
 - [ ] Затем оценить ограниченное распараллеливание.
 - [ ] Далее согласовать полный Arduino runtime и расширение ядер/ABI; группа 3 — [план](docs/ru/firmware-plan.md).
@@ -233,6 +234,7 @@ keep defect details in errata.
 - [x] `claude/renode-batch` merged into main (`aa58116`): one Renode process per GCC/CMake pair, `Clear` between cases, synchronous logging; Renode in CI 3:42 → 0:33.
 - [x] `claude/docker-image-cache` merged into main (`c65a7ed`): BuildKit layer cache (`type=gha`) for the emulator image only (3:08 → 0:12); the compiler image stays uncached — no gain.
 - [x] `claude/qemu-prebuilt` merged into main (`5fade06`): prebuilt QEMU 11.0.0 in `tools/qemu` (3.7 MB, build script, SHA-256 in the lock) instead of compiling it in the image; Windows via scoop/installer.
+- [ ] Current branch `claude/release-0.9.3` (spec 1.2): STM32CubeH7 1.13.0, STM32CubeH5 1.7.0 and FreeRTOS-Kernel 11.3.1 added to the lock and CI image (spec 8.8.1); next: regressions TC-22, TC-54…TC-59 and appendix E work.
 - [x] `claude/faster-ci-image` merged into main (`955b09b`): parallel installation and Cube without `Projects`/`Utilities` (3.9 → 1.3 GB); compiler image in CI 2:45 → 1:09–1:29, Configure 4:47, Firmware 4:39. Splitting pairs across jobs — not adopted, see [maintenance](docs/en/maintenance.md).
 - [ ] Then evaluate bounded parallelism.
 - [ ] Next agree full Arduino runtime and core/ABI coverage; group 3 — [plan](docs/en/firmware-plan.md).

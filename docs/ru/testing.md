@@ -17,7 +17,8 @@
 | CMake | 3.19.8 (минимальная совместимость), 3.28.3 (опорное окружение) |
 | Ninja / Mike Farah yq | 1.12.1 / 4.44.3 |
 | stm32-cmake | Коммит указан в lock-файле |
-| STM32Cube | F0 1.11.6, F1 1.8.7, F3 1.11.5, F4 1.28.3, F7 1.17.3, G4 1.6.3 |
+| STM32Cube | F0 1.11.6, F1 1.8.7, F3 1.11.5, F4 1.28.3, F7 1.17.3, G4 1.6.3, H5 1.7.0, H7 1.13.0 |
+| FreeRTOS-Kernel | 11.3.1 (`/opt/FreeRTOS-Kernel/11.3.1`, для `freertos_version: external`) |
 | Arduino Core STM32 / ETL | 2.12.0 / 20.47.1 |
 
 [dependencies.lock.json](../../ci/dependencies.lock.json) содержит SHA-256 архивов
@@ -31,8 +32,8 @@
 сохраняются для проверки. Версии пакетов Ubuntu записываются в образе в
 `/opt/stm32-yml-ci/packages.txt`.
 
-QEMU **11.0.0** (заранее собранный из исходников, [tools/qemu](../../tools/qemu/README.md)) и Renode запланированы для следующего
-этапа эмуляции; в этот образ они не включены. Arduino-проектам по-прежнему нужны
+QEMU **11.0.0** (заранее собранный из исходников, [tools/qemu](../../tools/qemu/README.md)) и Renode
+входят в отдельный образ эмуляции ([ci/emulation](../../ci/emulation/Dockerfile)); в этот образ они не включены. Arduino-проектам по-прежнему нужны
 свои CMake-обёртки ядра и библиотек. Образ не содержит копию stm32-cmake-yml.
 
 ## Сборка и проверка
