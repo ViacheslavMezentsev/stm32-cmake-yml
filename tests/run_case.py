@@ -72,6 +72,7 @@ def verify(case, build, source):
                          if line.strip().startswith("POST_BUILD = "))
         for extension, command in (("bin", "arm-none-eabi-objcopy -O binary"),
                                    ("hex", "arm-none-eabi-objcopy -O ihex"),
+                                   ("srec", "arm-none-eabi-objcopy -O srec"),
                                    ("lss", "arm-none-eabi-objdump -h -S")):
             require((command in post) == (extension in selected),
                     f"Incorrect {extension} conversion command presence")
@@ -80,7 +81,7 @@ def verify(case, build, source):
         require(f"{target}_always_display_size" in ninja and "arm-none-eabi-size" in ninja,
                 "Size reporting command missing")
         require(f"{target}.elf" in ninja, "Primary ELF target missing")
-        for extension in ("elf", "bin", "hex", "map", "lss"):
+        for extension in ("elf", "bin", "hex", "srec", "map", "lss"):
             require(not (build / f"{target}.{extension}").exists(),
                     f"Unexpected built artifact: {target}.{extension}")
 

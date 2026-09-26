@@ -182,7 +182,7 @@ function(stm32_yml_setup_postbuild TARGET_NAME)
     endif()
 
     # =======================================================================
-    # 2. ГЕНЕРАЦИЯ АРТЕФАКТОВ СБОРКИ (BIN, HEX, LSS, SIZE)
+    # 2. ГЕНЕРАЦИЯ АРТЕФАКТОВ СБОРКИ (BIN, HEX, SREC, LSS, SIZE; ТЗ 4.14.2)
     # =======================================================================
 
     # Выводим размер потребляемой памяти (RAM/FLASH)
@@ -195,6 +195,10 @@ function(stm32_yml_setup_postbuild TARGET_NAME)
 
     if("hex" IN_LIST build_artifacts)
         stm32_generate_hex_file(${TARGET_NAME})
+    endif()
+
+    if("srec" IN_LIST build_artifacts)
+        stm32_generate_srec_file(${TARGET_NAME})
     endif()
 
     if("lss" IN_LIST build_artifacts)

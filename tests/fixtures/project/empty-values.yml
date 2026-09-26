@@ -11,3 +11,10 @@ compile_definitions: []
 include_directories: []
 linker_script_dir: linker
 compile_options: [mcpu=cortex-m3, mthumb]
+# Empty enumerated keys use defaults without warnings (spec 3.7.4).
+toolchain_backend:
+system_library: ""
+cmsis_rtos_api: null
+freertos_version:
+build_artifacts: []
+crc_algorithm:

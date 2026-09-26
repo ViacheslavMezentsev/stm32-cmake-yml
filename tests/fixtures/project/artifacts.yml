@@ -16,7 +16,7 @@ compile_definitions: [BAREMETAL=1]
 include_directories: []
 profiles:
   all:
-    build_artifacts: [bin, hex, map, lss]
+    build_artifacts: [bin, hex, srec, map, lss]
   maponly:
     build_artifacts: [map]
   empty:

@@ -471,6 +471,7 @@ endfunction()
 # Пустое значение не проверяется (ТЗ 3.7.4). Неизвестное непустое значение даёт
 # предупреждение с именем параметра, заданным и фактически применяемым значением
 # и заменяется на FALLBACK (ТЗ 3.7.1, 3.7.2); Configure продолжается.
+# Пустой FALLBACK означает, что значение не используется (system_library).
 #
 # @param VAR_NAME  - Имя параметра.
 # @param FALLBACK  - Значение, применяемое вместо неизвестного.
@@ -482,9 +483,35 @@ function(stm32_yml_check_enum_value VAR_NAME FALLBACK)
         return()
     endif()
     string(REPLACE ";" ", " _known "${ARGN}")
+    if("${FALLBACK}" STREQUAL "")
+        set(_applied "значение не используется")
+    else()
+        set(_applied "применяется '${FALLBACK}'")
+    endif()
     message(WARNING "Неизвестное значение '${_value}' параметра '${VAR_NAME}'. "
-                    "Известные значения: ${_known}. Применяется: '${FALLBACK}'.")
+                    "Известные значения: ${_known}. ${_applied}.")
     set(${VAR_NAME} "${FALLBACK}" PARENT_SCOPE)
+endfunction()
+
+# ==============================================================================
+# Проверяет элементы перечислимого списка (ТЗ 3.7): неизвестный элемент даёт
+# предупреждение и удаляется из списка; Configure продолжается.
+#
+# @param VAR_NAME  - Имя параметра-списка.
+# @param ARGN      - Известные значения элементов.
+# ==============================================================================
+function(stm32_yml_check_enum_list VAR_NAME)
+    set(_result "")
+    string(REPLACE ";" ", " _known "${ARGN}")
+    foreach(_item IN LISTS ${VAR_NAME})
+        if("${_item}" IN_LIST ARGN)
+            list(APPEND _result "${_item}")
+        else()
+            message(WARNING "Неизвестный элемент '${_item}' параметра '${VAR_NAME}'. "
+                            "Известные значения: ${_known}. Элемент пропускается.")
+        endif()
+    endforeach()
+    set(${VAR_NAME} "${_result}" PARENT_SCOPE)
 endfunction()
 
 # ==============================================================================

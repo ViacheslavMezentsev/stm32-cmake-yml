@@ -113,9 +113,9 @@ package or the resulting image bytes. Ubuntu snapshots are not required.
 
 ## Framework configuration tests
 
-[tests/cases.json](../../tests/cases.json) defines 125 scenarios, run with each of
-the three GCC and two CMake versions from the lockfile: **750 case executions**.
-Nineteen scenarios perform two to six consecutive configurations in the same build tree.
+[tests/cases.json](../../tests/cases.json) defines 127 scenarios, run with each of
+the three GCC and two CMake versions from the lockfile: **762 case executions**.
+Twenty scenarios perform two to six consecutive configurations in the same build tree.
 
 | Area | Checks |
 | --- | --- |
@@ -130,7 +130,7 @@ Nineteen scenarios perform two to six consecutive configurations in the same bui
 | Linker | Explicit `.ld`, template discovery in `linker_script_dir`, heap/stack substitutions, size format in every mode, warning for unapplied heap/stack, READONLY and checksum section preservation |
 | CRC | Presence/absence of the generated post-build command, section and Flash-size arguments |
 | Arduino | Consumer-owned core/custom-library wrappers, profile parameters, shared compile definitions, `use_core_main: false` |
-| Diagnostics | Missing/malformed YAML, missing linker/core, invalid memory size, HAL without CMSIS, profile listing and unknown-profile warning |
+| Diagnostics | Missing/malformed YAML, missing linker/core, invalid memory size, HAL without CMSIS, profile listing and unknown-profile warning, warnings for unknown enumerated values and none for empty values |
 
 These are small **configure-only fixtures**, not ready-to-flash board examples.
 The Arduino wrapper references a real pinned core source but does not describe a

@@ -101,6 +101,9 @@ function(stm32_yml_prepare_project_data OUT_PROJECT_NAME_VAR OUT_LANGUAGES_VAR)
         endif()
     endmacro()
 
+    # Перечислимые значения (ТЗ 3.7.3): неизвестное — предупреждение и замена.
+    stm32_yml_check_enum_value(toolchain_backend "stm32-cmake" stm32-cmake arduino)
+
     if(toolchain_backend STREQUAL "arduino")
         # В режиме Arduino игнорируем IOC-файл, принудительно направляя скрипт в ветку else()
         set(ioc_file "")
@@ -280,6 +283,13 @@ function(stm32_yml_prepare_project_data OUT_PROJECT_NAME_VAR OUT_LANGUAGES_VAR)
         stm32_yml_ensure_default_value(crc_section_name ".checksum")
         stm32_yml_ensure_default_value(crc_algorithm "STM32_HW_DEFAULT")
     endif()
+
+    # Остальные перечислимые ключи (ТЗ 3.7.3). Пустые значения не проверяются.
+    stm32_yml_check_enum_value(system_library "" NoSys Semihosting)
+    stm32_yml_check_enum_value(cmsis_rtos_api "none" none v1 v2)
+    # Неизвестная версия ведёт себя как external, как в 0.9.2.
+    stm32_yml_check_enum_value(freertos_version "external" cube external)
+    stm32_yml_check_enum_list(build_artifacts bin hex srec map lss)
 
     # --- Значения по умолчанию для Cppcheck ---
     if(NOT DEFINED cppcheck_ignores OR "${cppcheck_ignores}" STREQUAL "")

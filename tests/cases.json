@@ -76,7 +76,7 @@
     "name": "crc-unknown-algorithm",
     "args": ["-DSTM32_YML_PROFILE=crc", "-DSTM32_YML_OVERRIDE_crc_algorithm=CRC32_MPEG"],
     "observed": {"crc_enable": "TRUE"},
-    "log_contains": ["Неизвестное значение 'CRC32_MPEG' параметра 'crc_algorithm'", "Применяется: 'STM32_HW_DEFAULT'", "Алгоритм: STM32_HW_DEFAULT"],
+    "log_contains": ["Неизвестное значение 'CRC32_MPEG' параметра 'crc_algorithm'", "применяется 'STM32_HW_DEFAULT'", "Алгоритм: STM32_HW_DEFAULT"],
     "crc_command": true
   },
   {
@@ -209,7 +209,8 @@
     "args": ["-DPROJECT_CONFIG_FILE=empty-values.yml"],
     "observed": {"heap_size": "512", "stack_size": "1024"},
     "linker": {"file": "STM32F103C8_FLASH.ld", "heap": 512, "stack": 1024},
-    "no_st_dependencies": true
+    "no_st_dependencies": true,
+    "log_absent": ["Неизвестное значение", "Неизвестный элемент"]
   },
   {
     "name": "missing-ioc",
@@ -341,6 +342,23 @@
       {"args": ["-DSTM32_YML_PROFILE=append"], "log_contains": ["Заданные размеры памяти (stack_size: 2K) не применяются: скрипт компоновщика формирует stm32-cmake с собственными размерами heap 0x200 и stack 0x400 байт."]},
       {"args": ["-DSTM32_YML_PROFILE=template"], "linker": {"heap": 1024, "stack": 2048}, "log_absent": ["не применяются"]},
       {"args": ["-DSTM32_YML_PROFILE=", "-DSTM32_YML_OVERRIDE_linker_script=custom.ld", "-DSTM32_YML_OVERRIDE_linker_script_dir=linker", "-DSTM32_YML_OVERRIDE_heap_size=1K"], "log_contains": ["Заданные размеры памяти (heap_size: 1K) не применяются: размеры задаёт явный скрипт компоновщика 'custom.ld'."]}
+    ]
+  },
+  {
+    "name": "enum-unknown-values",
+    "args": ["-DPROJECT_CONFIG_FILE=system-libraries.yml", "-DSTM32_YML_PROFILE=nosys", "-DSTM32_YML_OVERRIDE_toolchain_backend=stm32cmake", "-DSTM32_YML_OVERRIDE_system_library=nosys"],
+    "observed": {"toolchain_backend": "stm32-cmake"},
+    "properties": {"LINK_LIBRARIES": ["STM32::Nano"]},
+    "absent_properties": {"LINK_LIBRARIES": ["STM32::NoSys", "STM32::Semihosting"]},
+    "no_st_dependencies": true,
+    "log_contains": ["Неизвестное значение 'stm32cmake' параметра 'toolchain_backend'. Известные значения: stm32-cmake, arduino. применяется 'stm32-cmake'.", "Неизвестное значение 'nosys' параметра 'system_library'. Известные значения: NoSys, Semihosting. значение не используется."]
+  },
+  {
+    "name": "freertos-unknown-enums",
+    "args": ["-DPROJECT_CONFIG_FILE=freertos.yml"],
+    "steps": [
+      {"args": ["-DSTM32_YML_OVERRIDE_cmsis_rtos_api=v3"], "observed": {"cmsis_rtos_api": "none"}, "properties": {"LINK_LIBRARIES": ["FreeRTOS::STM32::F4::ARM_CM4F"]}, "absent_properties": {"LINK_LIBRARIES": ["CMSIS::STM32::F4::RTOS", "CMSIS::STM32::F4::RTOS_V2"]}, "log_contains": ["Неизвестное значение 'v3' параметра 'cmsis_rtos_api'. Известные значения: none, v1, v2. применяется 'none'."]},
+      {"args": ["-DSTM32_YML_PROFILE=disabled", "-USTM32_YML_OVERRIDE_cmsis_rtos_api", "-DSTM32_YML_OVERRIDE_freertos_version=cubeide"], "observed": {"use_freertos": "FALSE", "freertos_version": "external"}, "log_contains": ["Неизвестное значение 'cubeide' параметра 'freertos_version'. Известные значения: cube, external. применяется 'external'."]}
     ]
   },
   {
@@ -1746,6 +1764,7 @@
     "generated_artifacts": [
       "bin",
       "hex",
+      "srec",
       "map",
       "lss"
     ],
@@ -1819,6 +1838,9 @@
       "-DPROJECT_CONFIG_FILE=artifacts.yml",
       "-DSTM32_YML_PROFILE=unknown"
     ],
+    "log_contains": [
+      "Неизвестный элемент 'unsupported-format' параметра 'build_artifacts'. Известные значения: bin, hex, srec, map, lss. Элемент пропускается."
+    ],
     "generated_artifacts": [
       "bin"
     ],
@@ -1851,6 +1873,7 @@
         "generated_artifacts": [
           "bin",
           "hex",
+          "srec",
           "map",
           "lss"
         ],
