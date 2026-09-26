@@ -30,6 +30,7 @@
   {
     "name": "external-profile",
     "args": ["-DPROJECT_CONFIG_FILE=external.yml", "-DSTM32_YML_PROFILE=external"],
+    "log_absent": ["Встроенная секция 'profiles:' игнорируется"],
     "observed": {"PROJECT_NAME": "external_probe", "stack_size": "4096", "use_hal": "FALSE"},
     "properties": {"COMPILE_DEFINITIONS": ["BASE=1", "EXTERNAL=1"]},
     "absent_properties": {"COMPILE_DEFINITIONS": ["USE_HAL_DRIVER"]},
@@ -302,11 +303,11 @@
   },
   {
     "name": "external-profile-ignores-top-level",
-    "args": ["-DPROJECT_CONFIG_FILE=external-toplevel.yml", "-DSTM32_YML_PROFILE=external"],
-    "observed": {"PROJECT_NAME": "external_probe", "stack_size": "1024"},
-    "properties": {"COMPILE_DEFINITIONS": ["BASE=1", "EXTERNAL=1"]},
-    "absent_properties": {"COMPILE_DEFINITIONS": ["LEAKED=1"]},
-    "log_contains": ["[профиль +] compile_definitions += EXTERNAL=1"]
+    "args": ["-DPROJECT_CONFIG_FILE=external-toplevel.yml"],
+    "steps": [
+      {"args": ["-DSTM32_YML_PROFILE=external"], "observed": {"PROJECT_NAME": "external_probe", "stack_size": "1024"}, "properties": {"COMPILE_DEFINITIONS": ["BASE=1", "EXTERNAL=1"]}, "absent_properties": {"COMPILE_DEFINITIONS": ["LEAKED=1", "INLINE=1"]}, "log_contains": ["[профиль +] compile_definitions += EXTERNAL=1", "Встроенная секция 'profiles:' игнорируется (профили: external, inline): задан profiles_file 'profiles-toplevel.yml'"]},
+      {"args": ["-DSTM32_YML_PROFILE=inline"], "properties": {"COMPILE_DEFINITIONS": ["BASE=1"]}, "absent_properties": {"COMPILE_DEFINITIONS": ["INLINE=1", "EXTERNAL=1"]}, "log_contains": ["Профиль 'inline' не найден"]}
+    ]
   },
   {
     "name": "ioc-missing-values-defaults",

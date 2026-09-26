@@ -76,7 +76,7 @@ function(stm32_yml_apply_profile CONFIG_FILE_PATH)
     # Шаг 0: определяем источник профилей.
     # По умолчанию профили берутся из основного конфига (уже распарсен).
     # Если задан profiles_file — из него читается только секция profiles:
-    # (ТЗ 3.4.8), и доступны только его профили (ТЗ 3.4.11, как в 0.9.2).
+    # (ТЗ 3.4.8), и доступны только его профили (ТЗ 3.4.11).
     # ------------------------------------------------------------------
     _stm32_yml_load_profiles_file()
 
@@ -219,8 +219,9 @@ endfunction()
 # Из внешнего файла читается только секция profiles: (ТЗ 3.4.8): остальные
 # ключи файла не создаются и не подменяют базовые параметры, в том числе
 # базовое значение списка для _append. YAML_PARSED_KEYS вызывающей функции
-# заменяется ключами файла, поэтому доступны только профили внешнего файла
-# (ТЗ 3.4.11). Файл регистрируется как зависимость Configure (ТЗ 3.6.5).
+# заменяется ключами файла, поэтому доступны только профили внешнего файла,
+# а о встроенных профилях выводится предупреждение (ТЗ 3.4.11, вопрос 10.2.16).
+# Файл регистрируется как зависимость Configure (ТЗ 3.6.5).
 # Отсутствие файла — предупреждение. Без profiles_file ничего не делает.
 # ==============================================================================
 macro(_stm32_yml_load_profiles_file)
@@ -228,6 +229,22 @@ macro(_stm32_yml_load_profiles_file)
         set(_profiles_src_path "${CMAKE_SOURCE_DIR}/${profiles_file}")
         if(EXISTS "${_profiles_src_path}")
             message(STATUS "Загрузка профилей из внешнего файла: ${_profiles_src_path}")
+            # При заданном profiles_file встроенные профили не используются
+            # (ТЗ 3.4.11, решение вопроса 10.2.16) — предупреждаем о них.
+            set(_inline_profiles "")
+            foreach(_k IN LISTS YAML_PARSED_KEYS)
+                if(_k MATCHES "^profiles_([^_]+)_")
+                    list(APPEND _inline_profiles "${CMAKE_MATCH_1}")
+                endif()
+            endforeach()
+            if(_inline_profiles)
+                list(REMOVE_DUPLICATES _inline_profiles)
+                string(REPLACE ";" ", " _inline_profiles "${_inline_profiles}")
+                message(WARNING
+                    "Встроенная секция 'profiles:' игнорируется (профили: ${_inline_profiles}): "
+                    "задан profiles_file '${profiles_file}', профили берутся только из него. "
+                    "Перенесите нужные профили во внешний файл или удалите встроенную секцию.")
+            endif()
             set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${_profiles_src_path}")
             stm32_yml_parse_config("${_profiles_src_path}" "{\"profiles\": (.profiles // {})}")
         else()

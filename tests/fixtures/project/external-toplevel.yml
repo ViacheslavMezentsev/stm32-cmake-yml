@@ -8,3 +8,9 @@ use_cmsis: true
 use_hal: false
 cubefw_package: V1.28.3
 profiles_file: profiles-toplevel.yml
+# Ignored with a warning because profiles_file is set (spec 3.4.11).
+profiles:
+  external:
+    compile_definitions_append: [INLINE=1]
+  inline:
+    compile_definitions_append: [INLINE=1]

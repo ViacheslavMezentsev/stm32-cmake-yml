@@ -48,6 +48,10 @@
   больше не подменяют базовое значение для `_append`.
   Only the `profiles:` section of `profiles_file` is read; its other keys no longer
   replace the base value for `_append`.
+- При заданном `profiles_file` встроенная секция `profiles:` по-прежнему не
+  используется, но выводится предупреждение со списком её профилей.
+  With `profiles_file` set, an inline `profiles:` section is still unused, and a
+  warning now lists its profiles.
 - Изменение YAML, IOC-файла или `profiles_file` перезапускает Configure при
   следующей сборке. Changing the YAML, IOC or profile file re-runs Configure on
   the next build.
