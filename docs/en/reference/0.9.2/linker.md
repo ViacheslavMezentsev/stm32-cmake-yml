@@ -55,6 +55,8 @@ auto searches local .ld.in names: concrete MCU type, package replaced by X, then
 
 **Change in 0.9.3** (`d8708b4`; spec 4.11.9): with an explicit script or the stm32-cmake script, explicitly set `heap_size`/`stack_size` warn that they are not applied.
 
+**Change in 0.9.3** (`2625f19`; spec 4.11.10): if the startup file (from the STM32Cube package or `sources`) sets the stack limit with `msr MSPLIM` from `_sstack`, as in CubeH5 1.7.0, and the final script does not define that symbol (stm32-cmake script, older templates), Configure warns in advance and suggests `_sstack = _estack - _Min_Stack_Size;`. Without it linking fails with `undefined reference to _sstack`.
+
 **Omission and emptiness:** see [shared rules](semantics.md#empty-values); exceptions are stated above. Profiles/overrides apply before defaults. Backend/path restrictions are stated in the description.
 
 ```yaml
@@ -63,7 +65,7 @@ linker_script: auto
 
 [0.9.2 implementation](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_linker.cmake) · [Index](index.md)
 
-**Checks (partial coverage):** `configure.linker-template`, `configure.explicit-linker`, `configure.missing-linker`, `configure.memory-size-unused-warning`. [Test manifest](../../../../tests/cases.json).
+**Checks (partial coverage):** `configure.linker-template`, `configure.explicit-linker`, `configure.missing-linker`, `configure.memory-size-unused-warning`, `configure.h5-cmsis-hal-freertos-external`. [Test manifest](../../../../tests/cases.json).
 
 <a id="linker-script-dir"></a>
 ## `linker_script_dir`

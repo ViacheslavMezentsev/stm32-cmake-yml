@@ -308,7 +308,7 @@ QEMU and Renode have no H7 or H5 models, so `tests/firmware/buildonly` is only b
 
 `h503bkp` adds an initialized variable in backup SRAM (`0x40036400`). For both variants the builder recomputes the Flash image CRC from the ELF segments, independently of `scripts/stm32_crc.py`, compares it with `.checksum` and requires the same CRC (spec 4.15.9, TC-63). For all thirteen CRC profiles and `h503` the intermediate image is compared byte for byte with the 0.9.2 `objcopy -O binary --gap-fill 0xFF` image without `.checksum` (TC-64).
 
-Found during the checks. The CubeH5 startup requires the `_sstack` symbol (ARMv8-M stack limit), which the stm32-cmake script lacks: H5 firmware without a template does not link, so the build-only templates define it. The `objcopy -O binary` BIN artifact of an ELF with a section outside Flash is about 900 MB, as the CRC image used to be; `h503bkp` does not request BIN.
+Found during the checks and fixed (`2625f19`). The CubeH5 1.7.0 startup sets MSPLIM from `_sstack`, which the stm32-cmake script and older templates lack; Configure now warns before the link error, and the build-only templates define the symbol. BIN used to come from `objcopy -O binary` and was about 900 MB for an ELF with a section outside Flash; it is now built from FLASH sections, and for `h503bkp` the builder requires the BIN to equal the Flash image with the injected CRC (1036 bytes).
 
 ## FreeRTOS: starter task and inter-task exchange
 

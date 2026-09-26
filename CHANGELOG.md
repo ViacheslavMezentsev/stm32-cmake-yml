@@ -97,6 +97,13 @@
 - Проверка RAM скрипта компоновщика учитывает CCRAM и RAM_SHARE и ядро; для
   скрипта stm32-cmake выводится «не проверялось». The RAM check includes CCRAM,
   RAM_SHARE and the core, and reports the stm32-cmake script as not checked.
+- `build_artifacts: [bin]` строится из секций ELF в регионе FLASH, как образ CRC:
+  секция вне Flash (например, в резервной SRAM) больше не раздувает BIN до сотен
+  мегабайт; для обычных проектов файл не меняется. The BIN artifact is built from
+  FLASH sections only, like the CRC image; ordinary BINs are unchanged.
+- Предупреждение Configure, если startup задаёт MSPLIM по `_sstack` (CubeH5 1.7.0),
+  а скрипт компоновщика символ не определяет. Configure warns when the startup
+  needs `_sstack` and the linker script does not define it.
 
 ### Добавлено / Added
 

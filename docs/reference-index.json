@@ -709,7 +709,8 @@
         "configure.linker-template",
         "configure.explicit-linker",
         "configure.missing-linker",
-        "configure.memory-size-unused-warning"
+        "configure.memory-size-unused-warning",
+        "configure.h5-cmsis-hal-freertos-external"
       ],
       "errata": []
     },

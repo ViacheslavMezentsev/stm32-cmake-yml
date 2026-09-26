@@ -55,6 +55,8 @@ auto ищет локальный .ld.in: конкретный тип MCU, зам
 
 **Изменение в 0.9.3** (`d8708b4`; ТЗ 4.11.9): с явным скриптом или скриптом stm32-cmake явно заданные `heap_size`/`stack_size` вызывают предупреждение, что они не применяются.
 
+**Изменение в 0.9.3** (`2625f19`; ТЗ 4.11.10): если startup (из пакета STM32Cube или из `sources`) задаёт границу стека командой `msr MSPLIM` по символу `_sstack`, как в CubeH5 1.7.0, а итоговый скрипт этот символ не определяет (скрипт stm32-cmake, старые шаблоны), Configure предупреждает заранее и подсказывает строку `_sstack = _estack - _Min_Stack_Size;`. Без неё компоновка завершается ошибкой `undefined reference to _sstack`.
+
 **Пропуск и пустота:** см. [общие правила](semantics.md#empty-values); исключения указаны выше. Профиль/override применяется до выбора defaults. Ограничения backend и путей указаны в описании.
 
 ```yaml
@@ -63,7 +65,7 @@ linker_script: auto
 
 [Реализация 0.9.2](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_linker.cmake) · [Index](index.md)
 
-**Проверки (частичное покрытие):** `configure.linker-template`, `configure.explicit-linker`, `configure.missing-linker`, `configure.memory-size-unused-warning`. [Test manifest](../../../../tests/cases.json).
+**Проверки (частичное покрытие):** `configure.linker-template`, `configure.explicit-linker`, `configure.missing-linker`, `configure.memory-size-unused-warning`, `configure.h5-cmsis-hal-freertos-external`. [Test manifest](../../../../tests/cases.json).
 
 <a id="linker-script-dir"></a>
 ## `linker_script_dir`

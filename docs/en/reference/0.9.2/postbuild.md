@@ -13,6 +13,8 @@ bin/hex/lss add post-build conversions; map adds a linker flag. An empty list do
 
 **Change in 0.9.3** (`b9a6cd3`; spec 3.7.3, 4.14.2): the `srec` element is added (`stm32_generate_srec_file`). An unknown element warns with the known values (`bin`, `hex`, `srec`, `map`, `lss`) and is skipped.
 
+**Change in 0.9.3** (`2625f19`; spec 4.14.2): `bin` is built by the framework from ELF sections loaded into the FLASH region, like the CRC image (4.15.9), instead of `objcopy -O binary`: a section outside Flash (backup SRAM, ITCM without `AT> FLASH`) no longer inflates the BIN to hundreds of megabytes. For an ordinary ELF the file is byte-identical to the old one. The FLASH region comes from the template or explicit script, or from `stm32_get_memory_info` for the stm32-cmake script; if it cannot be found, `stm32_generate_binary_file` is used with a warning.
+
 **Omission and emptiness:** see [shared rules](semantics.md#empty-values); exceptions are stated above. Profiles/overrides apply before defaults. Backend/path restrictions are stated in the description.
 
 ```yaml
