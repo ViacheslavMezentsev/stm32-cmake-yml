@@ -3,8 +3,8 @@
 [Documentation](index.md) · [Русский](../ru/firmware-testing.md) · [Environment](emulation.md)
 
 The first firmware test adapts the author's F1 [02-semihosting example](../../tests/firmware/semihosting/README.md).
-It is separate from the 139 configure scenarios: **102 builds, 84 QEMU runs and 84 Renode runs**:
-thirteen run profiles, one corrupted copy and four build-only profiles (H7, H5) per tool pair; three xPack GCC versions × two CMake versions from the
+It is separate from the 139 configure scenarios: **102 builds, 84 QEMU runs and 108 Renode runs**:
+thirteen F103 profiles, one corrupted copy and four H7/H5 profiles (Renode only) per tool pair; three xPack GCC versions × two CMake versions from the
 [lockfile](../../ci/dependencies.lock.json), CubeF1 1.8.7, QEMU 11.0.0.
 The Windows QEMU 11.1.0 installation was also checked locally; CI uses the pinned image.
 
@@ -69,7 +69,7 @@ is inferred from running this ELF on the F205-based netduino2.
 
 The matrix is read from the shared dependency lockfile, not duplicated in YAML.
 Images are built once; tool pairs run sequentially with separate build/log paths.
-Actual GCC/CMake versions, all thirteen run profiles and the four build-only ones are checked for each pair.
+Actual GCC/CMake versions, all thirteen F103 profiles and the four H7/H5 profiles are checked for each pair.
 Failures do not stop collection of other pair results, but the matrix exits nonzero
 if any pair fails. Run selection uses the current lockfile rather than accepting
 whatever manifests happen to exist. Aggregate reports are matrix-summary.json;
@@ -302,11 +302,13 @@ heap_4 sources. Scheduling, tasks, context switching, tick and CMSIS-RTOS are no
 covered. Real port critical sections execute; SysTick is not started.
 The `freertosExternal` profile runs the same scenario with FreeRTOS-Kernel 11.3.1 instead of the CubeF1 tree (`freertos_version: external`, `FREERTOS_PATH` from the lockfile; spec 4.8.6, TC-59). The builder checks that `tasks.c` and `port.c` come from FreeRTOS-Kernel, and the firmware reports RTOS_VERSION=V11.3.1.
 
-## Build-only: H7, H5 and the CRC image
+## H7, H5 and the CRC image (Renode only)
 
-QEMU and Renode have no H7 or H5 models, so `tests/firmware/buildonly` is only built on every pair (spec 8.8.5, TC-57): `h7` (STM32H743ZI, core M7, stm32-cmake script), `h5` (STM32H563ZI, template), `h503` and `h503bkp` (STM32H503CB, template with `.checksum`). The checks cover non-empty ELF/BIN/HEX, ELF32 ARM, the initial SP in SRAM and a Flash reset vector equal to the entry point. Reports mark them build-only, and the badge counts them as builds without simulator checks.
+`tests/firmware/buildonly` is built on every pair (spec 8.8.5, TC-57): `h7` (STM32H743ZI, core M7, stm32-cmake script), `h5` (STM32H563ZI, template), `h503` and `h503bkp` (STM32H503CB, template with `.checksum`). The builder checks non-empty ELF/BIN/HEX, ELF32 ARM, the initial SP in SRAM and a Flash reset vector equal to the entry point.
 
-`h503bkp` adds an initialized variable in backup SRAM (`0x40036400`). For both variants the builder recomputes the Flash image CRC from the ELF segments, independently of `scripts/stm32_crc.py`, compares it with `.checksum` and requires the same CRC (spec 4.15.9, TC-63). For all thirteen CRC profiles and `h503` the intermediate image is compared byte for byte with the 0.9.2 `objcopy -O binary --gap-fill 0xFF` image without `.checksum` (TC-64).
+QEMU has no machine with a Cortex-M7 or Cortex-M33 and Flash at `0x08000000` (only MPS2 boards with another memory map), so these firmwares do not run in QEMU. Renode has no H5 platform, and its `stm32h743.repl` carries unrelated peripherals; following `f103-smoke.repl`, minimal `h7-smoke.repl` (Cortex-M7, Flash, DTCM) and `h5-smoke.repl` (Cortex-M33, Flash, SRAM, backup SRAM) models were added with RAM stubs for the registers SystemInit touches. The firmware prints the profile, CPUID (Cortex-M7 `0x411FC27x`, Cortex-M33 `0x411FD21x`) and a `.data` check over semihosting and exits through SYS_EXIT_EXTENDED. Peripherals, clocks and interrupts are not modelled.
+
+`h503bkp` differs only by an initialized variable in backup SRAM (`0x40036400`); both variants have the same code. The builder recomputes the Flash image CRC from the ELF segments, independently of `scripts/stm32_crc.py`, compares it with `.checksum` and requires the same CRC; in Renode the firmware recomputes the CRC over Flash and prints CRC_RESULT=PASS, and for `h503bkp` the loaded word BKPSRAM=B007B007 (spec 4.15.9, TC-63). For all thirteen CRC profiles and `h503` the intermediate image is compared byte for byte with the 0.9.2 `objcopy -O binary --gap-fill 0xFF` image without `.checksum` (TC-64).
 
 Found during the checks and fixed (`2625f19`). The CubeH5 1.7.0 startup sets MSPLIM from `_sstack`, which the stm32-cmake script and older templates lack; Configure now warns before the link error, and the build-only templates define the symbol. BIN used to come from `objcopy -O binary` and was about 900 MB for an ELF with a section outside Flash; it is now built from FLASH sections, and for `h503bkp` the builder requires the BIN to equal the Flash image with the injected CRC (1036 bytes).
 

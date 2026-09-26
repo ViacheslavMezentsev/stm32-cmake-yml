@@ -37,6 +37,13 @@ def collect(build, run, lock, revision, emulator="qemu"):
         # Build-only firmware (H7/H5, TC-57) counts as builds, not simulator checks.
         builds += len(compiled['cases']) + len(compiled['build_only'])
         checks += len(cases)
+        if emulator == 'renode':
+            # H7/H5 firmware runs in Renode only; QEMU has no matching machine.
+            runs = executed.get('build_only', [])
+            if (sorted(c['profile'] for c in runs) != sorted(c['profile'] for c in compiled['build_only'])
+                    or any(c['passed'] is not True for c in runs)):
+                raise ValueError('Missing or failed Renode build-only runs')
+            checks += len(runs)
     return {'builds': builds, 'checks': checks, 'emulator': 'QEMU' if emulator == 'qemu' else 'Renode', 'revision': revision}
 
 

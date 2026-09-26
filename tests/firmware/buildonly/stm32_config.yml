@@ -15,12 +15,15 @@ compile_options: [Os]
 profiles:
   h7:
     mcu: STM32H743ZI
+    compile_definitions: ['SMOKE_PROFILE="h7"']
   h5:
     mcu: STM32H563ZI
+    compile_definitions: ['SMOKE_PROFILE="h5"']
   h503:
     mcu: STM32H503CB
     crc_enable: true
+    compile_definitions: ['SMOKE_PROFILE="h503"', SMOKE_CRC=1]
   h503bkp:
     mcu: STM32H503CB
     crc_enable: true
-    compile_definitions: [SMOKE_BKPSRAM=1]
+    compile_definitions: ['SMOKE_PROFILE="h503"', SMOKE_CRC=1, SMOKE_BKPSRAM=1]

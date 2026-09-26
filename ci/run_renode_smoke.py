@@ -1,5 +1,5 @@
 """Run the same smoke ELFs on a bounded Cortex-M3/RAM-stub Renode platform."""
-from firmware_cases import BUILD_PROFILES
+from firmware_cases import BUILD_ONLY_PROFILES, BUILD_PROFILES
 import argparse
 import json
 import os
@@ -83,7 +83,8 @@ def prepare_case(root, build, output, case):
         raise ValueError('Invalid exit trap address')
     hook = root / 'tests/firmware/renode/exit_hook.py'
     # Python repr quotes paths inside the Renode triple-quoted hook body.
-    hook_code = f'result_path = {(directory / "guest-exit.json").as_posix()!r}\nexecfile({hook.as_posix()!r})'
+    hook_code = (f'result_path = {(directory / "guest-exit.json").as_posix()!r}\n'
+                 f'ram_low = 0x20000000\nram_high = 0x20004FF8\nexecfile({hook.as_posix()!r})')
     commands = [
         'Clear',
         'mach create "f103-smoke"',
@@ -95,6 +96,76 @@ def prepare_case(root, build, output, case):
         'log "RENODE_RUN_COMPLETED"',
     ]
     return directory, commands
+
+
+# Build-only firmware (tests/firmware/buildonly) on minimal H7/H5 models (TC-57).
+# QEMU has no machine with these cores and FLASH at 0x08000000, so they run in
+# Renode only. Expected lines are fixed per profile; h503 and h503bkp share the
+# same code, and only the loaded backup SRAM word differs (TC-63).
+BUILD_ONLY_MODELS = {
+    'h7': ('h7-smoke.repl', 0x20000000, 0x2001FFF8, ['PROFILE=h7', 'CPUID=411FC27']),
+    'h5': ('h5-smoke.repl', 0x20000000, 0x2009FFF8, ['PROFILE=h5', 'CPUID=411FD21']),
+    'h503': ('h5-smoke.repl', 0x20000000, 0x20007FF8,
+             ['PROFILE=h503', 'CPUID=411FD21', 'CRC_RESULT=PASS', 'BKPSRAM=00000000']),
+    'h503bkp': ('h5-smoke.repl', 0x20000000, 0x20007FF8,
+                ['PROFILE=h503', 'CPUID=411FD21', 'CRC_RESULT=PASS', 'BKPSRAM=B007B007']),
+}
+
+
+def run_build_only(renode, root, build, output, cases):
+    """Run each build-only ELF in its own Renode process on its family model."""
+    results = []
+    for case in cases:
+        profile = case['profile']
+        model, ram_low, ram_high, expected = BUILD_ONLY_MODELS[profile]
+        directory = Path(tempfile.mkdtemp(prefix='buildonly-' + profile + '-', dir=output))
+        elf = (build / case['elf']).resolve()
+        trap = case['exit_trap']
+        if not elf.is_relative_to(build) or not elf.is_file():
+            raise ValueError('Invalid ELF path')
+        if not isinstance(trap, int) or trap % 2 or not 0x08000000 <= trap < 0x08200000:
+            raise ValueError('Invalid exit trap address')
+        hook = root / 'tests/firmware/renode/exit_hook.py'
+        hook_code = (f'result_path = {(directory / "guest-exit.json").as_posix()!r}\n'
+                     f'ram_low = {ram_low}\nram_high = {ram_high}\nexecfile({hook.as_posix()!r})')
+        commands = [
+            f'mach create "{profile}-smoke"',
+            f'machine LoadPlatformDescription {resc_path(root / "tests/firmware/renode" / model)}',
+            f'sysbus.cpu.uart CreateFileBackend {resc_path(directory / "firmware.log")}',
+            f'sysbus LoadELF {resc_path(elf)}',
+            f'sysbus.cpu AddHook 0x{trap:X} """{hook_code}"""',
+            'emulation RunFor "0.1"',
+            'log "RENODE_RUN_COMPLETED"',
+            'quit',
+        ]
+        script = directory / 'run.resc'
+        script.write_text('\n'.join(commands) + '\n', encoding='utf-8')
+        command = renode_command(renode, directory / 'renode.config', script)
+        started = time.monotonic()
+        host_timeout = False
+        try:
+            process = subprocess.run(command, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
+                                     stderr=subprocess.STDOUT, timeout=CASE_TIMEOUT)
+            code, raw = process.returncode, process.stdout
+        except subprocess.TimeoutExpired as error:
+            host_timeout, code, raw = True, None, error.stdout or b''
+        log = split_log(raw.decode('utf-8', errors='replace'))
+        (directory / 'process.log').write_text(log, encoding='utf-8')
+        firmware = directory / 'firmware.log'
+        text = firmware.read_text(encoding='utf-8') if firmware.exists() else ''
+        guest_path = directory / 'guest-exit.json'
+        guest = json.loads(guest_path.read_text()) if guest_path.exists() else None
+        lines = text.splitlines()
+        completed = process_completed(log, profile)
+        output_ok = ('SMOKE_BUILDONLY=1' in lines and 'TEST_RESULT=PASS' in lines
+                     and all(any(line.startswith(item) for line in lines) for item in expected))
+        passed = (not host_timeout and code == 0 and completed and output_ok and guest is not None
+                  and guest.get('operation') == 0x20 and guest.get('reason') == 0x20026 and guest.get('status') == 0)
+        results.append({'profile': profile, 'model': model, 'passed': passed, 'returncode': code,
+                        'host_timeout': host_timeout, 'guest_exit': guest, 'completed': completed,
+                        'output_ok': output_ok, 'expected_lines': expected,
+                        'duration_seconds': round(time.monotonic() - started, 3), 'command': command})
+    return results
 
 
 def case_result(case, directory, code, log, host_timeout, duration, command, gcc):
@@ -254,10 +325,14 @@ def main():
             random.Random(args.shuffle).shuffle(cases)
         run = run_batch_mode if args.mode == 'batch' else run_process_mode
         report['cases'] = run(renode, root, build, output, cases, manifest['gcc'])
-        for case in report['cases']:
+        if sorted(c['profile'] for c in manifest['build_only']) != sorted(BUILD_ONLY_PROFILES):
+            raise ValueError('Expected complete build-only firmware')
+        report['build_only'] = run_build_only(renode, root, build, output, manifest['build_only'])
+        for case in report['cases'] + report['build_only']:
             print(f'{"PASS" if case["passed"] else "FAIL"}: {case["profile"]}; guest={case["guest_exit"]}; '
                   f'host={case["returncode"]}', flush=True)
-        report['status'] = 'passed' if report['cases'] and all(c['passed'] for c in report['cases']) else 'failed'
+        report['status'] = ('passed' if report['cases'] and all(c['passed'] for c in report['cases'] + report['build_only'])
+                            else 'failed')
     except (OSError, ValueError, KeyError, subprocess.SubprocessError) as error:
         report['error'] = str(error)
     report['duration_seconds'] = round(time.monotonic() - started, 3)

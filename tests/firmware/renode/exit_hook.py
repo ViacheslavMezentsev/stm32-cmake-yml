@@ -5,7 +5,8 @@ from Antmicro.Renode.Peripherals.CPU import RegisterValue
 
 operation = int(self.GetRegister(0).RawValue)
 arguments = int(self.GetRegister(1).RawValue)
-if operation != 0x20 or arguments % 4 or not 0x20000000 <= arguments <= 0x20004FF8:
+# ram_low/ram_high come from the calling hook: F103 SRAM or the build-only models.
+if operation != 0x20 or arguments % 4 or not ram_low <= arguments <= ram_high:
     result = {'error': 'Invalid SYS_EXIT_EXTENDED operation or RAM argument block'}
 else:
     result = {'operation': operation,

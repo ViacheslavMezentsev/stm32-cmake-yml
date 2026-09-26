@@ -118,8 +118,13 @@ def build_only(root, output):
             raise ValueError(f'Invalid initial stack pointer {sp:#x}: {profile}')
         if not (reset & 1 and origin <= (reset & ~1) < origin + length and entry == reset):
             raise ValueError(f'Invalid reset vector/entry {reset:#x}/{entry:#x}: {profile}')
-        result = {'profile': profile, 'status': 'build-only', 'elf': str(elf.relative_to(output)),
-                  'initial_sp': sp, 'reset_vector': reset}
+        symbols = subprocess.check_output(['arm-none-eabi-nm', '--defined-only', str(elf)], text=True, timeout=30)
+        trap = re.search(r'^([0-9a-fA-F]+)\s+T\s+smoke_exit_trap$', symbols, re.M)
+        if not trap:
+            raise ValueError(f'Missing semihosting exit trap: {profile}')
+        # Runs only in Renode on a minimal model (QEMU has no such machine).
+        result = {'profile': profile, 'status': 'renode-only', 'elf': str(elf.relative_to(output)),
+                  'initial_sp': sp, 'reset_vector': reset, 'exit_trap': int(trap[1], 16)}
         if profile.startswith('h503'):
             stored, outside = flash_crc(elf, origin, length)
             if bool(outside) != (profile == 'h503bkp'):

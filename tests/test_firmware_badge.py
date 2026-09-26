@@ -43,6 +43,21 @@ class BadgeTests(unittest.TestCase):
         self.assertTrue(all('rx' not in r.attrib for r in badge.findall('{http://www.w3.org/2000/svg}rect')))
         self.assertIn(f'{builds} ({len(BUILD_PROFILES) + 1})', svg(result))
 
+    def test_renode_counts_build_only_runs(self):
+        reports = copy.deepcopy(self.reports)
+        reports[3]['build_only'] = [{'profile': p, 'passed': True} for p in BUILD_ONLY_PROFILES]
+        with patch('firmware_badge.read', side_effect=reports):
+            result = collect(Path('build'), Path('run'), self.lock, 'abc', 'renode')
+        self.assertEqual(result['checks'], len(BUILD_PROFILES) + 1 + len(BUILD_ONLY_PROFILES))
+        for change in ('missing', 'failed'):
+            reports = copy.deepcopy(self.reports)
+            reports[3]['build_only'] = [{'profile': p, 'passed': True} for p in BUILD_ONLY_PROFILES]
+            if change == 'missing': reports[3]['build_only'].pop()
+            if change == 'failed': reports[3]['build_only'][0]['passed'] = False
+            with self.subTest(change=change), self.assertRaises(ValueError), \
+                    patch('firmware_badge.read', side_effect=reports):
+                collect(Path('build'), Path('run'), self.lock, 'abc', 'renode')
+
     def test_rejects_failed_missing_duplicate_or_stale_results(self):
         for change in ('failed', 'missing', 'duplicate', 'stale', 'dirty', 'metadata', 'matrix', 'buildonly'):
             reports = copy.deepcopy(self.reports)

@@ -104,6 +104,12 @@ def main():
             item.update(status='passed', profiles=len(BUILD_PROFILES))
             if args.phase == 'run':
                 item['executions'] = len(report['cases'])
+                if args.emulator == 'renode':
+                    # H7/H5 firmware runs on minimal Renode models only (TC-57).
+                    runs = report.get('build_only', [])
+                    if sorted(c['profile'] for c in runs) != sorted(BUILD_ONLY_PROFILES) or not all(c['passed'] for c in runs):
+                        raise ValueError('Missing or failed Renode build-only runs')
+                    item['executions'] += len(runs)
         except (OSError, ValueError, KeyError, subprocess.SubprocessError) as error:
             item['error'] = str(error)
         summary['pairs'].append(item)

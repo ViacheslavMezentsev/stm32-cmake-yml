@@ -1,0 +1,24 @@
+// STM32H743 (Cortex-M7) smoke model for the build-only firmware (TC-57).
+// CPU, NVIC/SysTick, FLASH and DTCM; RAM stubs for registers SystemInit touches.
+cpu: CPU.CortexM @ sysbus
+    cpuType: "cortex-m7"
+    nvic: nvic
+uart: UART.SemihostingUart @ cpu
+nvic: IRQControllers.NVIC @ sysbus 0xE000E000
+    -> cpu@0
+    priorityMask: 0xF0
+    systickFrequency: 64000000
+flash: Memory.MappedMemory @ sysbus 0x08000000
+    size: 0x200000
+dtcm: Memory.MappedMemory @ sysbus 0x20000000
+    size: 0x20000
+axi_gpv: Memory.MappedMemory @ sysbus 0x51000000
+    size: 0x100000
+flash_ctrl: Memory.MappedMemory @ sysbus 0x52002000
+    size: 0x1000
+fmc: Memory.MappedMemory @ sysbus 0x52004000
+    size: 0x1000
+rcc: Memory.MappedMemory @ sysbus 0x58024400
+    size: 0x400
+dbgmcu: Memory.MappedMemory @ sysbus 0x5C001000
+    size: 0x1000
