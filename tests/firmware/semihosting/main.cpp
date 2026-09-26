@@ -2,8 +2,7 @@
 #include <stdarg.h>
 #include <stdint.h>
 #ifndef SMOKE_BARE
-#include <stm32f1xx.h>
-#include <core_cm3.h>
+#include "smoke_target.h"
 #endif
 #include "version.h"
 #include "build_metadata.h"
@@ -196,15 +195,15 @@ void print_firmware_info( void )
 
 #ifndef SMOKE_BARE
     // 2. Версия CMSIS Core.
-    // Эти макросы определены в файле 'core_cm3.h' (или аналогичном для вашего ядра).
-    smoke_printf( "  CMSIS Core:  v%d.%d\n", __CM3_CMSIS_VERSION_MAIN, __CM3_CMSIS_VERSION_SUB );
+    // Эти макросы определены в файле 'cmsis_version.h' (CMSIS 5, все ядра).
+    smoke_printf( "  CMSIS Core:  v%d.%d\n", __CM_CMSIS_VERSION_MAIN, __CM_CMSIS_VERSION_SUB );
 
     // 3. Версия CMSIS Device (специфично для вендора, в нашем случае ST).
     // Эти макросы определены в файле 'stm32f1xx.h'.
     smoke_printf( "  CMSIS Device:  v%d.%d.%d\n",
-            __STM32F1_CMSIS_VERSION_MAIN,
-            __STM32F1_CMSIS_VERSION_SUB1,
-            __STM32F1_CMSIS_VERSION_SUB2 );
+            SMOKE_DEVICE_VERSION_MAIN,
+            SMOKE_DEVICE_VERSION_SUB1,
+            SMOKE_DEVICE_VERSION_SUB2 );
 
 #endif
 #ifdef USE_HAL_DRIVER
@@ -291,9 +290,9 @@ int main()
     smoke_printf("PROFILE=%s\nCMAKE=%s\nFRAMEWORK=%s\n", SMOKE_PROFILE, SMOKE_CMAKE, SMOKE_FRAMEWORK);
     smoke_printf("GIT_REVISION=%s\nGIT_DIRTY=%s\n", SMOKE_GIT, SMOKE_DIRTY);
 #ifndef SMOKE_BARE
-    smoke_printf("CMSIS_CORE=%u.%u\n", __CM3_CMSIS_VERSION_MAIN, __CM3_CMSIS_VERSION_SUB);
-    smoke_printf("CMSIS_DEVICE=%u.%u.%u\n", __STM32F1_CMSIS_VERSION_MAIN,
-           __STM32F1_CMSIS_VERSION_SUB1, __STM32F1_CMSIS_VERSION_SUB2);
+    smoke_printf("CMSIS_CORE=%u.%u\n", __CM_CMSIS_VERSION_MAIN, __CM_CMSIS_VERSION_SUB);
+    smoke_printf("CMSIS_DEVICE=%u.%u.%u\n", SMOKE_DEVICE_VERSION_MAIN,
+           SMOKE_DEVICE_VERSION_SUB1, SMOKE_DEVICE_VERSION_SUB2);
 #else
     smoke_printf("CMSIS_CORE=none\nCMSIS_DEVICE=none\n");
 #endif
@@ -309,7 +308,7 @@ int main()
     smoke_printf("DATA_INIT=%08lX\nBSS_INIT=%08lX\nCTOR_INIT=%08lX\n", initial_data, initial_bss, initial_ctor);
     smoke_printf("DATA_ADDRESS=%08lX\nBSS_ADDRESS=%08lX\nCTOR_ADDRESS=%08lX\n",
            (uint32_t)&smoke_data_probe, (uint32_t)&smoke_bss_probe, (uint32_t)&smoke_ctor_probe);
-    smoke_printf("TEST_PLATFORM=cortex-m3-smoke\n");
+    smoke_printf("TEST_PLATFORM=%s\n", SMOKE_PLATFORM);
 
     if (initial_data != 0x12345678u || initial_bss != 0 || initial_ctor != 0xC0DEC0DEu) {
         smoke_printf("TEST_RESULT=FAIL\n");

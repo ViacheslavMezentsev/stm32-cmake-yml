@@ -1,9 +1,43 @@
 {
   "FRAMEWORK": "0.9.3",
-  "CMSIS_CORE": "5.1",
-  "CMSIS_DEVICE": "4.3.5",
-  "HAL_VERSION": "1.1.10",
   "DATA_INIT": "12345678",
   "BSS_INIT": "00000000",
-  "CTOR_INIT": "C0DEC0DE"
+  "CTOR_INIT": "C0DEC0DE",
+  "targets": {
+    "STM32F103C8T6": {
+      "CMSIS_CORE": "5.1",
+      "CMSIS_DEVICE": "4.3.5",
+      "HAL_VERSION": "1.1.10"
+    },
+    "STM32F030R8T6": {
+      "CMSIS_CORE": "5.1",
+      "CMSIS_DEVICE": "2.3.7",
+      "HAL_VERSION": "1.7.8"
+    },
+    "STM32F411CEU6": {
+      "CMSIS_CORE": "5.6",
+      "CMSIS_DEVICE": "2.6.11",
+      "HAL_VERSION": "1.8.5"
+    },
+    "STM32F401CCU6": {
+      "CMSIS_CORE": "5.6",
+      "CMSIS_DEVICE": "2.6.11",
+      "HAL_VERSION": "1.8.5"
+    },
+    "STM32G431CBU6": {
+      "CMSIS_CORE": "5.3",
+      "CMSIS_DEVICE": "1.2.6",
+      "HAL_VERSION": "1.2.7"
+    },
+    "STM32G474CEU6": {
+      "CMSIS_CORE": "5.3",
+      "CMSIS_DEVICE": "1.2.6",
+      "HAL_VERSION": "1.2.7"
+    },
+    "STM32F746ZGT6": {
+      "CMSIS_CORE": "5.1",
+      "CMSIS_DEVICE": "1.2.10",
+      "HAL_VERSION": "1.3.2"
+    }
+  }
 }

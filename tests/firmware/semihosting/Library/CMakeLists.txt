@@ -3,7 +3,12 @@ add_library(smoke_library STATIC weighted.c transform.cpp)
 add_library(Smoke::Library ALIAS smoke_library)
 target_include_directories(smoke_library PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
 target_compile_definitions(smoke_library PUBLIC SMOKE_LIBRARY_PUBLIC=1 PRIVATE SMOKE_LIBRARY_PRIVATE=1)
-target_compile_options(smoke_library PRIVATE -mcpu=cortex-m3 -mthumb -mfloat-abi=soft
+# The builder passes the target's CPU/ABI flags (SMOKE_CPU_FLAGS); objects of
+# another CPU or float ABI would not link with the executable.
+if(NOT SMOKE_CPU_FLAGS)
+    set(SMOKE_CPU_FLAGS -mcpu=cortex-m3 -mthumb -mfloat-abi=soft)
+endif()
+target_compile_options(smoke_library PRIVATE ${SMOKE_CPU_FLAGS}
     -ffunction-sections -fdata-sections
     "$<$<COMPILE_LANGUAGE:C>:-Wstrict-prototypes>"
     "$<$<COMPILE_LANGUAGE:CXX>:-fno-exceptions;-fno-rtti>")

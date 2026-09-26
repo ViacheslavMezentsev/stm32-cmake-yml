@@ -1,5 +1,5 @@
 """Run previously built semihosting fixtures; distinguish guest failure and timeout."""
-from firmware_cases import BUILD_PROFILES, RUN_PROFILES, PASS_PROFILES
+from firmware_cases import BUILD_CASES, RUN_PROFILES, PASS_PROFILES, TARGETS, split_case
 import argparse
 import json
 from pathlib import Path
@@ -20,13 +20,18 @@ def metadata_matches(output, expected):
     return bool(expected) and fields == expected
 
 
-def verdict(profile, code, timed_out, output, gcc):
-    if profile not in RUN_PROFILES or 'TRANSPORT_ERROR=' in output:
+def verdict(name, code, timed_out, output, gcc, emulator='qemu'):
+    """Classify one run. name is a case name (profile or target:profile)."""
+    target_name, profile = split_case(name)
+    target = TARGETS.get(target_name)
+    if target is None or profile not in RUN_PROFILES or 'TRANSPORT_ERROR=' in output:
         return False
     lines = {line.strip() for line in output.splitlines()}
-    if not {'BUILD_TARGET=STM32F103C8T6', 'TEST_PLATFORM=cortex-m3-smoke'} <= lines:
+    if not {f'BUILD_TARGET={target["mcu"]}', f'TEST_PLATFORM={target["platform"]}'} <= lines:
         return False
-    if f'Compiler:    GCC {gcc}' not in lines or '0xC23 -> Cortex-M3' not in output:
+    # The emulated core: QEMU runs Cortex-M0 code on the Cortex-M3 netduino2.
+    part = target['qemu_part'] if emulator == 'qemu' else target['renode_part']
+    if f'Compiler:    GCC {gcc}' not in lines or part not in output:
         return False
     if profile == 'hang':
         return timed_out and not ({'TEST_RESULT=PASS', 'TEST_RESULT=FAIL'} & lines)
@@ -48,20 +53,23 @@ def main():
     try:
         build = args.build.resolve()
         manifest = json.loads((build / 'build-summary.json').read_text(encoding='utf-8'))
-        if manifest['status'] != 'passed' or sorted(c['profile'] for c in manifest['cases']) != sorted(BUILD_PROFILES):
+        if manifest['status'] != 'passed' or sorted(c['profile'] for c in manifest['cases']) != sorted(BUILD_CASES):
             raise ValueError('Expected successful build manifest with all expected profiles')
         qemu = shutil.which(args.qemu)
         if not qemu:
             raise ValueError(f'QEMU not found: {args.qemu}')
         report['qemu'] = subprocess.check_output([qemu, '--version'], text=True, timeout=30).strip()
-        if manifest['crc_negative']['profile'] != 'crc-corrupt':
-            raise ValueError('Missing CRC negative image')
-        for case in manifest['cases'] + [manifest['crc_negative']]:
+        if not manifest.get('crc_negatives'):
+            raise ValueError('Missing CRC negative images')
+        for case in manifest['cases'] + manifest['crc_negatives']:
             profile = case['profile']
+            machine = TARGETS[split_case(profile)[0]]['qemu']
+            if not machine:
+                continue  # No QEMU machine for this core and memory map: Renode only.
             elf = (build / case['elf']).resolve()
             if not elf.is_relative_to(build) or not elf.is_file():
                 raise ValueError(f'Invalid ELF path: {elf}')
-            command = [qemu, '-M', 'netduino2', '-nographic', '-monitor', 'none', '-serial', 'none',
+            command = [qemu, '-M', machine, '-nographic', '-monitor', 'none', '-serial', 'none',
                        '-no-reboot', '-semihosting-config', 'enable=on,target=native', '-kernel', str(elf)]
             started = time.monotonic()
             timeout_seconds = 2 if profile == 'hang' else 15
@@ -73,7 +81,7 @@ def main():
             except subprocess.TimeoutExpired as error:
                 timed_out, code, raw = True, None, error.stdout or b''
             output = raw.decode('utf-8', errors='replace')
-            (args.output / (profile + '.log')).write_text(output, encoding='utf-8')
+            (args.output / (profile.replace(':', '-') + '.log')).write_text(output, encoding='utf-8')
             metadata_ok = metadata_matches(output, case['metadata'])
             passed = metadata_ok and verdict(profile, code, timed_out, output, manifest['gcc'])
             report['cases'].append({'profile': profile, 'passed': passed, 'returncode': code,

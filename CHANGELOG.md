@@ -87,6 +87,9 @@
 - `freertos_version: external` работает: FreeRTOS ищется в `FREERTOS_PATH`
   (дерево Cube или FreeRTOS-Kernel), подключаются цели `FreeRTOS::<порт>` (E007).
   External FreeRTOS from `FREERTOS_PATH` now works (E007).
+  Если stm32-cmake не подключил `portasm.c` порта (`ARM_CM0` в FreeRTOS-Kernel 11),
+  фреймворк добавляет его к цели порта. The port's `portasm.c` is added when
+  stm32-cmake omits it (`ARM_CM0` in FreeRTOS-Kernel 11).
 - Отсутствующие компоненты `hal_components` и `freertos_components`, а также
   отсутствующая обёртка CMSIS-RTOS — ошибка Configure с именем компонента вместо
   ошибки Generate. Missing HAL/FreeRTOS components and CMSIS-RTOS wrappers fail
@@ -109,6 +112,10 @@
 
 - `build_artifacts: [srec]` — файл Motorola S-record через
   `stm32_generate_srec_file`. The `srec` artifact generates a Motorola S-record file.
+- Матрица прошивок проверяет цели по семействам: к F103 добавлен F0
+  `STM32F030R8T6` (QEMU `netduino2`, Renode на модели с Cortex-M0).
+  The firmware matrix checks targets per family: F0 `STM32F030R8T6` joins F103
+  (QEMU `netduino2`, Renode on a Cortex-M0 model).
 
 ## [0.9.2] - 2026-09-19
 

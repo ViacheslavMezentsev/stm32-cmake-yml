@@ -24,14 +24,14 @@ working firmware. [Coverage and commands](testing.md).
 
 ## Building and execution
 
-A separate matrix contains **102 builds, 84 QEMU runs and 108 Renode runs**: thirteen F103 profiles
-and four H7/H5 ones (Renode only) across six tool pairs, plus one corrupted ELF copy per pair. It checks ELF layout,
+A separate matrix contains **180 builds, 168 QEMU runs and 192 Renode runs**: thirteen profiles for each of the F103 and F030 targets
+and four H7/H5 ones (Renode only) across six tool pairs, plus one corrupted ELF copy per target and pair. It checks ELF layout,
 initial data, C++ construction, metadata, software CRC and controlled termination;
 negative cases distinguish guest failure from timeout.
 
-The firmware targets STM32F103C8T6 and runs on QEMU 11.0.0 `netduino2`
+The firmware targets STM32F103C8T6 and STM32F030R8T6 and runs on QEMU 11.0.0 `netduino2`
 (Cortex-M3/F205). This checks the selected startup path and image contents,
-not F1 peripheral emulation. Renode checks the same ELFs on the f103-smoke CPU/NVIC/SysTick/memory model
+not F1 peripheral emulation. Renode checks the same ELFs on the f103-smoke and f030-smoke (Cortex-M0 core) CPU/NVIC/SysTick/memory models
 with RCC/FLASH controller stubs and a semihosting exit adapter. [Firmware contract](firmware-testing.md) ·
 [QEMU/Renode environment](emulation.md).
 
@@ -52,9 +52,9 @@ consumer projects to be restructured.
 
 The README `Builds (Checks)` badge reports built configurations and completed checks from the
 last successful Firmware run on main. A full run currently gives
-`Builds (Checks): 102 (192)`. Expected failure, timeout and CRC rejection count as
-successful contract checks; this does not mean 192 normally exiting firmwares
-or 102 different MCUs. Builds are counted once; QEMU and Renode checks are added (84 + 108).
+`Builds (Checks): 180 (360)`. Expected failure, timeout and CRC rejection count as
+successful contract checks; this does not mean 360 normally exiting firmwares
+or 180 different MCUs. Builds are counted once; QEMU and Renode checks are added (168 + 192).
 
 Counts come from complete matching build/QEMU/Renode reports, checked for clean checkout
 SHA, matrix membership, results and metadata. Codex branches produce a preview

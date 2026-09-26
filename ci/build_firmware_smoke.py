@@ -1,5 +1,5 @@
 """Build the semihosting fixtures inside the compiler image (one tool pair)."""
-from firmware_cases import BUILD_ONLY_PROFILES, BUILD_PROFILES
+from firmware_cases import BUILD_ONLY_PROFILES, BUILD_PROFILES, ENABLED_TARGETS, TARGETS, case_name
 import argparse
 import json
 import os
@@ -11,15 +11,18 @@ import tempfile
 from firmware_crc import crc32_words, inspect_crc
 
 
-def inspect_elf(path, vector):
+def inspect_elf(path, vector, target):
+    flash_low, flash_size = target['flash']
+    ram_low, ram_size = target['ram']
+    flash_high, ram_high = flash_low + flash_size, ram_low + ram_size
     data = path.read_bytes()
     if data[:7] != b'\x7fELF\x01\x01\x01' or struct.unpack_from('<HH', data, 16) != (2, 40):
         raise ValueError('Expected a little-endian ELF32 ARM image')
     entry = struct.unpack_from('<I', data, 24)[0]
     sp, reset = struct.unpack_from('<II', vector.read_bytes())
-    if not (0x20000000 < sp <= 0x20005000 and sp % 8 == 0):
+    if not (ram_low < sp <= ram_high and sp % 8 == 0):
         raise ValueError(f'Invalid initial stack pointer: {sp:#x}')
-    if not (reset & 1 and 0x08000000 <= (reset & ~1) < 0x08010000 and entry == reset):
+    if not (reset & 1 and flash_low <= (reset & ~1) < flash_high and entry == reset):
         raise ValueError(f'Invalid reset vector/entry: {reset:#x}/{entry:#x}')
     # Physical load addresses include the FLASH copy of initialized RAM data.
     offset = struct.unpack_from('<I', data, 28)[0]
@@ -29,11 +32,11 @@ def inspect_elf(path, vector):
         kind, _, vaddr, paddr, filesz, memsz, _, _ = struct.unpack_from('<8I', data, offset + index * size)
         if kind != 1:
             continue
-        if filesz and not (0x08000000 <= paddr < paddr + filesz <= 0x08010000):
-            raise ValueError(f'Load image outside 64 KiB FLASH: {paddr:#x}/{filesz}')
+        if filesz and not (flash_low <= paddr < paddr + filesz <= flash_high):
+            raise ValueError(f'Load image outside FLASH: {paddr:#x}/{filesz}')
         if memsz and not any(low <= vaddr < vaddr + memsz <= high for low, high in
-                            ((0x08000000, 0x08010000), (0x20000000, 0x20005000))):
-            raise ValueError(f'Segment outside F103C8 memory: {vaddr:#x}/{memsz}')
+                            ((flash_low, flash_high), (ram_low, ram_high))):
+            raise ValueError(f'Segment outside the target memory: {vaddr:#x}/{memsz}')
         loads.append({'vaddr': vaddr, 'paddr': paddr, 'filesz': filesz, 'memsz': memsz})
     if not any(segment['vaddr'] <= (entry & ~1) < segment['vaddr'] + segment['filesz'] for segment in loads):
         raise ValueError('Entry point is not backed by a loadable segment')
@@ -90,7 +93,8 @@ def crc_limit_negative(root, output, report):
     configure = ['cmake', '-S', str(root / 'tests/firmware/semihosting'), '-B', str(build), '-G', 'Ninja',
                  f'-DSTM32_YML_FRAMEWORK_DIR={root}', '-DCMAKE_TOOLCHAIN_FILE=/opt/modules/stm32-cmake/cmake/stm32_gcc.cmake',
                  f'-DSMOKE_GIT_REVISION={report["git_revision"]}', f'-DSMOKE_GIT_DIRTY={report["git_dirty"]}',
-                 '-DSTM32_YML_PROFILE=success', '-DSTM32_YML_OVERRIDE_flash_size=4K', '-DCMAKE_BUILD_TYPE=Debug']
+                 '-DSTM32_YML_PROFILE=success', '-DSTM32_YML_OVERRIDE_flash_size=4K', '-DCMAKE_BUILD_TYPE=Debug',
+                 f'-DSMOKE_PLATFORM={TARGETS["f103"]["platform"]}']
     with (build / 'configure.log').open('w') as log:
         subprocess.run(configure, stdout=log, stderr=subprocess.STDOUT, check=True, timeout=180)
     results = []
@@ -191,127 +195,10 @@ def main():
         arduino = next(source for source in lock['sources'] if source['name'].startswith('Arduino-'))
         kernel = next(source for source in lock['sources'] if source['name'].startswith('FreeRTOS-Kernel-'))
         rtos_profiles = ('freertosQueue', 'freertosTasks', 'freertosExternal')
-        for profile in BUILD_PROFILES:
-            is_arduino = profile == 'arduinoString'
-            toolchain = str(root / 'tests/firmware/semihosting/arduino-toolchain.cmake') if is_arduino else '/opt/modules/stm32-cmake/cmake/stm32_gcc.cmake'
-            build = Path(tempfile.mkdtemp(prefix=profile + '-', dir=output))
-            build.chmod(0o755)  # Artifacts may be consumed by another container user.
-            commands = [
-                ['cmake', '-S', str(root / 'tests/firmware/semihosting'), '-B', str(build), '-G', 'Ninja',
-                 f'-DSTM32_YML_FRAMEWORK_DIR={root}', f'-DCMAKE_TOOLCHAIN_FILE={toolchain}',
-                 f'-DSMOKE_GIT_REVISION={report["git_revision"]}', f'-DSMOKE_GIT_DIRTY={report["git_dirty"]}',
-                 f'-DSTM32_YML_PROFILE={profile}', f'-DSMOKE_ETL_INCLUDE={etl["destination"]}/include', '-DCMAKE_BUILD_TYPE=Debug', '-DCMAKE_EXPORT_COMPILE_COMMANDS=ON'],
-                ['cmake', '--build', str(build), '--parallel', '4'],
-            ]
-            if is_arduino:
-                commands[0].append(f'-DSTM32_YML_OVERRIDE_arduino_core_path={os.path.relpath(arduino["destination"], root / "tests/firmware/semihosting")}')
-            if profile == 'freertosExternal':
-                # FreeRTOS-Kernel outside STM32Cube (spec 4.8.6, TC-59).
-                commands[0].append(f'-DFREERTOS_PATH={kernel["destination"]}')
-            for name, command in zip(('configure', 'build'), commands):
-                with (build / (name + '.log')).open('w') as log:
-                    subprocess.run(command, stdout=log, stderr=subprocess.STDOUT, check=True, timeout=180)
-            elf = build / 'semihosting_smoke.elf'
-            for extension in ('elf', 'bin', 'hex', 'map', 'lss'):
-                if not (build / ('semihosting_smoke.' + extension)).stat().st_size:
-                    raise ValueError(f'Empty {extension} artifact')
-            with (build / 'readelf.log').open('w') as log:
-                subprocess.run(['arm-none-eabi-readelf', '-h', '-l', '-S', '-A', str(elf)], stdout=log, stderr=subprocess.STDOUT, check=True, timeout=30)
-            vector = build / 'vectors.bin'
-            subprocess.run(['arm-none-eabi-objcopy', '--dump-section', f'.isr_vector={vector}', str(elf), str(build / 'inspection.elf')], check=True, timeout=30)
-            structure = inspect_elf(elf, vector)
-            symbols = subprocess.check_output(['arm-none-eabi-nm', '-S', '--defined-only', str(elf)], text=True, timeout=30)
-            (build / 'symbols.log').write_text(symbols)
-            metadata = dict(baseline, PROFILE=profile, CMAKE=report['cmake'].removeprefix('cmake version '),
-                            GIT_REVISION=report['git_revision'], GIT_DIRTY=report['git_dirty'])
-            bare = profile.startswith('bare') or is_arduino
-            cmsis_only = profile.startswith('cmsis') or profile in rtos_profiles
-            if bare:
-                metadata.update(CMSIS_CORE='none', CMSIS_DEVICE='none')
-            if bare or cmsis_only:
-                metadata['HAL_VERSION'] = 'none'
-            commands_db = json.loads((build / 'compile_commands.json').read_text())
-            sources = [Path(c['file']).name for c in commands_db]
-            all_commands = '\n'.join(c['command'] for c in commands_db)
-            if bare:
-                expected_sources = {'bare_startup.S', 'main.cpp'} | ({'arduino_string.cpp', 'heap.c', 'WString.cpp', 'itoa.c'} if is_arduino else set())
-                if set(sources) != expected_sources or 'CMSIS' in all_commands or 'HAL_Driver' in all_commands:
-                    raise ValueError('Bare mode unexpectedly includes CMSIS/HAL or vendor startup')
-                if not all(flag in all_commands for flag in ('-mcpu=cortex-m3', '-mthumb', '-mfloat-abi=soft')):
-                    raise ValueError('Missing explicit bare-metal CPU flags')
-            else:
-                if not any(name.startswith('startup_stm32f103') for name in sources):
-                    raise ValueError('Missing CMSIS device startup')
-                has_hal = any(name.startswith('stm32f1xx_hal') for name in sources)
-                if has_hal == cmsis_only:
-                    raise ValueError('Unexpected HAL source selection')
-            if profile in ('cmsisLibrary', 'cmsisEtl'):
-                required = {'weighted.c', 'transform.cpp', 'language_probe.c'}
-                if not required <= set(sources) or ('etl_probe.cpp' in sources) != (profile == 'cmsisEtl'):
-                    raise ValueError('Missing or unexpected library sources')
-                for name in ('smoke_weighted', 'smoke_transform', 'smoke_language'):
-                    if not re.search(rf'^.*\sT\s+{name}$', symbols, re.M):
-                        raise ValueError(f'Missing linked library function: {name}')
-                metadata.update(LIB_RESULT='123', C_LANGUAGE='11')
-                if profile == 'cmsisEtl':
-                    metadata.update(ETL_RESULT='14', ETL_TEXT='etl:14', ETL_VERSION=etl['name'].removeprefix('ETL-'))
-            if profile in rtos_profiles:
-                rtos_source = 'freertos_tasks.c' if profile == 'freertosTasks' else 'freertos_queue.c'
-                if not {'tasks.c', 'list.c', 'queue.c', 'port.c', 'heap_4.c', rtos_source} <= set(sources):
-                    raise ValueError('Missing FreeRTOS kernel/port/heap sources')
-                if any('cmsis_os' in name for name in sources):
-                    raise ValueError('Unexpected CMSIS-RTOS wrapper')
-                kernel_files = [c['file'] for c in commands_db if Path(c['file']).name in ('tasks.c', 'port.c')]
-                external = all(f.startswith(kernel['destination'] + '/') for f in kernel_files)
-                if external != (profile == 'freertosExternal') or len(kernel_files) != 2:
-                    raise ValueError('FreeRTOS kernel sources come from the wrong distribution')
-                metadata['RTOS_VERSION'] = ('V' + kernel['name'].removeprefix('FreeRTOS-Kernel-')
-                                            if profile == 'freertosExternal' else 'V10.3.1')
-                if profile != 'freertosTasks':
-                    metadata.update(RTOS_RESULT='46', RTOS_SCHEDULER='not-started', RTOS_HEAP='restored')
-                else:
-                    metadata.update(RTOS_REPLY='46', RTOS_SCHEDULER='running', RTOS_TICK='advanced',
-                                    RTOS_TASK_MESSAGE='hello from sender')
-                    # CMSIS vectors must select the real FreeRTOS exception handlers.
-                    vectors = vector.read_bytes()
-                    for slot, name in ((11, 'SVC_Handler'), (14, 'PendSV_Handler'), (15, 'SysTick_Handler')):
-                        match = re.search(rf'^([0-9a-fA-F]+)(?:\s+[0-9a-fA-F]+)?\s+T\s+{name}$', symbols, re.M)
-                        if not match or struct.unpack_from('<I', vectors, slot * 4)[0] != (int(match[1], 16) | 1):
-                            raise ValueError(f'Incorrect RTOS vector: {name}')
-            if is_arduino:
-                metadata.update(ARDUINO_TEXT='arm32:123', ARDUINO_LENGTH='9')
-                if any('/opt/modules/stm32-cmake' in c['command'] for c in commands_db):
-                    raise ValueError('Arduino build unexpectedly uses stm32-cmake')
-            for symbol, key, expected in [('_Min_Heap_Size', 'HEAP_SIZE', 0 if profile.endswith('Template') else 512),
-                                          ('_Min_Stack_Size', 'STACK_SIZE', 2048 if profile.endswith('Template') else 1024)]:
-                match = re.search(rf'^([0-9a-fA-F]+)\s+A\s+{symbol}$', symbols, re.M)
-                if not match or int(match[1], 16) != expected:
-                    raise ValueError(f'Incorrect linker reservation: {symbol}')
-                metadata[key] = str(expected)
-            if profile.endswith('Template'):
-                generated = (build / 'STM32F103C8_FLASH.ld').read_text()
-                if '@HEAP_SIZE@' in generated or '@STACK_SIZE@' in generated:
-                    raise ValueError('Unexpanded linker template')
-            for kind, section in [('data', 'D'), ('bss', 'B'), ('ctor', 'B')]:
-                match = re.search(rf'^([0-9a-fA-F]+)\s+([0-9a-fA-F]+)\s+{section}\s+smoke_{kind}_probe$', symbols, re.M)
-                if not match or int(match[2], 16) != 4:
-                    raise ValueError(f'Missing four-byte {section} symbol: smoke_{kind}_probe')
-                metadata[kind.upper() + '_ADDRESS'] = f'{int(match[1], 16):08X}'
-            trap = re.search(r'^([0-9a-fA-F]+)\s+T\s+smoke_exit_trap$', symbols, re.M)
-            if not trap:
-                raise ValueError('Missing semihosting exit trap')
-            exit_trap = int(trap[1], 16)
-            crc_metadata, corrupted, negative = inspect_crc(elf)
-            metadata.update(crc_metadata)
-            compare_gap_fill(build, elf)
-            if profile == 'success':
-                damaged = build / 'crc-corrupt.elf'
-                damaged.write_bytes(corrupted)
-                report['crc_negative'] = {'profile': 'crc-corrupt', 'elf': str(damaged.relative_to(output)),
-                                          'metadata': dict(metadata, **negative), 'exit_trap': exit_trap}
-            report['cases'].append({'profile': profile, 'elf': str(elf.relative_to(output)),
-                                    'sources': sources, 'structure': structure, 'metadata': metadata, 'exit_trap': exit_trap})
-            print(f'PASS build/ELF: {profile}', flush=True)
+        report['crc_negatives'] = []
+        for target_name in ENABLED_TARGETS:
+            target = TARGETS[target_name]
+            build_target(root, output, report, target_name, target, baseline, lock, etl, arduino, kernel, rtos_profiles)
         report['crc_limit_negative'] = crc_limit_negative(root, output, report)
         report['build_only'] = build_only(root, output)
         report['status'] = 'passed'
@@ -320,6 +207,139 @@ def main():
     manifest.write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8')
     print(json.dumps(report, indent=2))
     return 0 if report['status'] == 'passed' else 1
+
+
+def build_target(root, output, report, target_name, target, baseline, lock, etl, arduino, kernel, rtos_profiles):
+    """Build and inspect every profile of one firmware target (spec 8.8.8)."""
+    common = {k: v for k, v in baseline.items() if k != 'targets'}
+    base = dict(common, **baseline['targets'][target['mcu']])
+    family = target['family']
+    device = target['mcu'][5:11].lower()
+    for profile in BUILD_PROFILES:
+        case = case_name(target_name, profile)
+        is_arduino = profile == 'arduinoString'
+        toolchain = str(root / 'tests/firmware/semihosting/arduino-toolchain.cmake') if is_arduino else '/opt/modules/stm32-cmake/cmake/stm32_gcc.cmake'
+        build = Path(tempfile.mkdtemp(prefix=case.replace(':', '-') + '-', dir=output))
+        build.chmod(0o755)  # Artifacts may be consumed by another container user.
+        commands = [
+            ['cmake', '-S', str(root / 'tests/firmware/semihosting'), '-B', str(build), '-G', 'Ninja',
+             f'-DSTM32_YML_FRAMEWORK_DIR={root}', f'-DCMAKE_TOOLCHAIN_FILE={toolchain}',
+             f'-DSMOKE_GIT_REVISION={report["git_revision"]}', f'-DSMOKE_GIT_DIRTY={report["git_dirty"]}',
+             f'-DSTM32_YML_PROFILE={profile}', f'-DSMOKE_ETL_INCLUDE={etl["destination"]}/include', '-DCMAKE_BUILD_TYPE=Debug', '-DCMAKE_EXPORT_COMPILE_COMMANDS=ON',
+             f'-DPROJECT_CONFIG_FILE={target["config"]}', f'-DSMOKE_PLATFORM={target["platform"]}',
+             f'-DSMOKE_CPU_FLAGS={target["cpu_flags"]}'],
+            ['cmake', '--build', str(build), '--parallel', '4'],
+        ]
+        if is_arduino:
+            commands[0].append(f'-DSTM32_YML_OVERRIDE_arduino_core_path={os.path.relpath(arduino["destination"], root / "tests/firmware/semihosting")}')
+        if profile == 'freertosExternal':
+            # FreeRTOS-Kernel outside STM32Cube (spec 4.8.6, TC-59).
+            commands[0].append(f'-DFREERTOS_PATH={kernel["destination"]}')
+        for name, command in zip(('configure', 'build'), commands):
+            with (build / (name + '.log')).open('w') as log:
+                subprocess.run(command, stdout=log, stderr=subprocess.STDOUT, check=True, timeout=180)
+        elf = build / 'semihosting_smoke.elf'
+        for extension in ('elf', 'bin', 'hex', 'map', 'lss'):
+            if not (build / ('semihosting_smoke.' + extension)).stat().st_size:
+                raise ValueError(f'Empty {extension} artifact')
+        with (build / 'readelf.log').open('w') as log:
+            subprocess.run(['arm-none-eabi-readelf', '-h', '-l', '-S', '-A', str(elf)], stdout=log, stderr=subprocess.STDOUT, check=True, timeout=30)
+        vector = build / 'vectors.bin'
+        subprocess.run(['arm-none-eabi-objcopy', '--dump-section', f'.isr_vector={vector}', str(elf), str(build / 'inspection.elf')], check=True, timeout=30)
+        structure = inspect_elf(elf, vector, target)
+        symbols = subprocess.check_output(['arm-none-eabi-nm', '-S', '--defined-only', str(elf)], text=True, timeout=30)
+        (build / 'symbols.log').write_text(symbols)
+        metadata = dict(base, PROFILE=profile, CMAKE=report['cmake'].removeprefix('cmake version '),
+                        GIT_REVISION=report['git_revision'], GIT_DIRTY=report['git_dirty'])
+        bare = profile.startswith('bare') or is_arduino
+        cmsis_only = profile.startswith('cmsis') or profile in rtos_profiles
+        if bare:
+            metadata.update(CMSIS_CORE='none', CMSIS_DEVICE='none')
+        if bare or cmsis_only:
+            metadata['HAL_VERSION'] = 'none'
+        commands_db = json.loads((build / 'compile_commands.json').read_text())
+        sources = [Path(c['file']).name for c in commands_db]
+        all_commands = '\n'.join(c['command'] for c in commands_db)
+        if bare:
+            expected_sources = {'bare_startup.S', 'main.cpp'} | ({'arduino_string.cpp', 'heap.c', 'WString.cpp', 'itoa.c'} if is_arduino else set())
+            if set(sources) != expected_sources or 'CMSIS' in all_commands or 'HAL_Driver' in all_commands:
+                raise ValueError('Bare mode unexpectedly includes CMSIS/HAL or vendor startup')
+            if not all(flag in all_commands for flag in (target['bare_cpu'], '-mthumb', '-mfloat-abi=soft')):
+                raise ValueError('Missing explicit bare-metal CPU flags')
+        else:
+            if not any(source.startswith(f'startup_stm32{device[:4]}') for source in sources):
+                raise ValueError('Missing CMSIS device startup')
+            has_hal = any(source.startswith(f'stm32{family}xx_hal') for source in sources)
+            if has_hal == cmsis_only:
+                raise ValueError('Unexpected HAL source selection')
+        if profile in ('cmsisLibrary', 'cmsisEtl'):
+            required = {'weighted.c', 'transform.cpp', 'language_probe.c'}
+            if not required <= set(sources) or ('etl_probe.cpp' in sources) != (profile == 'cmsisEtl'):
+                raise ValueError('Missing or unexpected library sources')
+            for name in ('smoke_weighted', 'smoke_transform', 'smoke_language'):
+                if not re.search(rf'^.*\sT\s+{name}$', symbols, re.M):
+                    raise ValueError(f'Missing linked library function: {name}')
+            metadata.update(LIB_RESULT='123', C_LANGUAGE='11')
+            if profile == 'cmsisEtl':
+                metadata.update(ETL_RESULT='14', ETL_TEXT='etl:14', ETL_VERSION=etl['name'].removeprefix('ETL-'))
+        if profile in rtos_profiles:
+            rtos_source = 'freertos_tasks.c' if profile == 'freertosTasks' else 'freertos_queue.c'
+            if not {'tasks.c', 'list.c', 'queue.c', 'port.c', 'heap_4.c', rtos_source} <= set(sources):
+                raise ValueError('Missing FreeRTOS kernel/port/heap sources')
+            if any('cmsis_os' in name for name in sources):
+                raise ValueError('Unexpected CMSIS-RTOS wrapper')
+            kernel_files = [c['file'] for c in commands_db if Path(c['file']).name in ('tasks.c', 'port.c')]
+            external = all(f.startswith(kernel['destination'] + '/') for f in kernel_files)
+            if external != (profile == 'freertosExternal') or len(kernel_files) != 2:
+                raise ValueError('FreeRTOS kernel sources come from the wrong distribution')
+            metadata['RTOS_VERSION'] = ('V' + kernel['name'].removeprefix('FreeRTOS-Kernel-')
+                                        if profile == 'freertosExternal' else target['rtos_version'])
+            if profile != 'freertosTasks':
+                metadata.update(RTOS_RESULT='46', RTOS_SCHEDULER='not-started', RTOS_HEAP='restored')
+            else:
+                metadata.update(RTOS_REPLY='46', RTOS_SCHEDULER='running', RTOS_TICK='advanced',
+                                RTOS_TASK_MESSAGE='hello from sender')
+                # CMSIS vectors must select the real FreeRTOS exception handlers.
+                vectors = vector.read_bytes()
+                for slot, name in ((11, 'SVC_Handler'), (14, 'PendSV_Handler'), (15, 'SysTick_Handler')):
+                    match = re.search(rf'^([0-9a-fA-F]+)(?:\s+[0-9a-fA-F]+)?\s+T\s+{name}$', symbols, re.M)
+                    if not match or struct.unpack_from('<I', vectors, slot * 4)[0] != (int(match[1], 16) | 1):
+                        raise ValueError(f'Incorrect RTOS vector: {name}')
+        if is_arduino:
+            metadata.update(ARDUINO_TEXT='arm32:123', ARDUINO_LENGTH='9')
+            if any('/opt/modules/stm32-cmake' in c['command'] for c in commands_db):
+                raise ValueError('Arduino build unexpectedly uses stm32-cmake')
+        for symbol, key, expected in [('_Min_Heap_Size', 'HEAP_SIZE', 0 if profile.endswith('Template') else 512),
+                                      ('_Min_Stack_Size', 'STACK_SIZE', 2048 if profile.endswith('Template') else 1024)]:
+            match = re.search(rf'^([0-9a-fA-F]+)\s+A\s+{symbol}$', symbols, re.M)
+            if not match or int(match[1], 16) != expected:
+                raise ValueError(f'Incorrect linker reservation: {symbol}')
+            metadata[key] = str(expected)
+        if profile.endswith('Template'):
+            generated = (build / f'STM32{device.upper()}_FLASH.ld').read_text()
+            if '@HEAP_SIZE@' in generated or '@STACK_SIZE@' in generated:
+                raise ValueError('Unexpanded linker template')
+        for kind, section in [('data', 'D'), ('bss', 'B'), ('ctor', 'B')]:
+            match = re.search(rf'^([0-9a-fA-F]+)\s+([0-9a-fA-F]+)\s+{section}\s+smoke_{kind}_probe$', symbols, re.M)
+            if not match or int(match[2], 16) != 4:
+                raise ValueError(f'Missing four-byte {section} symbol: smoke_{kind}_probe')
+            metadata[kind.upper() + '_ADDRESS'] = f'{int(match[1], 16):08X}'
+        trap = re.search(r'^([0-9a-fA-F]+)\s+T\s+smoke_exit_trap$', symbols, re.M)
+        if not trap:
+            raise ValueError('Missing semihosting exit trap')
+        exit_trap = int(trap[1], 16)
+        crc_metadata, corrupted, negative = inspect_crc(elf, sum(target['flash']))
+        metadata.update(crc_metadata)
+        compare_gap_fill(build, elf)
+        if profile == 'success':
+            damaged = build / 'crc-corrupt.elf'
+            damaged.write_bytes(corrupted)
+            report['crc_negatives'].append({'profile': case_name(target_name, 'crc-corrupt'), 'target': target_name,
+                                            'elf': str(damaged.relative_to(output)),
+                                            'metadata': dict(metadata, **negative), 'exit_trap': exit_trap})
+        report['cases'].append({'profile': case, 'target': target_name, 'elf': str(elf.relative_to(output)),
+                                'sources': sources, 'structure': structure, 'metadata': metadata, 'exit_trap': exit_trap})
+        print(f'PASS build/ELF: {case}', flush=True)
 
 
 if __name__ == '__main__':

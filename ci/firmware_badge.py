@@ -3,6 +3,7 @@ import argparse
 from datetime import datetime, timezone
 import json
 from pathlib import Path
+from firmware_cases import run_cases
 from firmware_matrix import pairs, verify_build, verify_matrix
 
 
@@ -27,7 +28,9 @@ def collect(build, run, lock, revision, emulator="qemu"):
         if compiled['git_revision'] != revision or compiled['git_dirty'] != '0':
             raise ValueError('Build provenance differs from the clean CI checkout')
         executed = read(run / name / f'{emulator}-summary.json')
-        expected = {c['profile']: c['metadata'] for c in compiled['cases'] + [compiled['crc_negative']]}
+        runnable = set(run_cases(emulator))
+        expected = {c['profile']: c['metadata'] for c in compiled['cases'] + compiled['crc_negatives']
+                    if c['profile'] in runnable}
         cases = executed['cases']
         if (executed['status'] != 'passed' or len(cases) != len(expected)
                 or sorted(c['profile'] for c in cases) != sorted(expected)

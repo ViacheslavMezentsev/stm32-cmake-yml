@@ -1,0 +1,32 @@
+/* Device header and CMSIS device version for the selected smoke target.
+   The device define comes from stm32-cmake (STM32<type>); one source serves
+   every family of the firmware matrix. */
+#pragma once
+#if defined(STM32F103xB)
+#include <stm32f1xx.h>
+#define SMOKE_DEVICE_VERSION_MAIN __STM32F1_CMSIS_VERSION_MAIN
+#define SMOKE_DEVICE_VERSION_SUB1 __STM32F1_CMSIS_VERSION_SUB1
+#define SMOKE_DEVICE_VERSION_SUB2 __STM32F1_CMSIS_VERSION_SUB2
+#elif defined(STM32F030x8)
+#include <stm32f0xx.h>
+#define SMOKE_DEVICE_VERSION_MAIN __STM32F0_DEVICE_VERSION_MAIN
+#define SMOKE_DEVICE_VERSION_SUB1 __STM32F0_DEVICE_VERSION_SUB1
+#define SMOKE_DEVICE_VERSION_SUB2 __STM32F0_DEVICE_VERSION_SUB2
+#elif defined(STM32F411xE) || defined(STM32F401xC)
+#include <stm32f4xx.h>
+#define SMOKE_DEVICE_VERSION_MAIN __STM32F4xx_CMSIS_VERSION_MAIN
+#define SMOKE_DEVICE_VERSION_SUB1 __STM32F4xx_CMSIS_VERSION_SUB1
+#define SMOKE_DEVICE_VERSION_SUB2 __STM32F4xx_CMSIS_VERSION_SUB2
+#elif defined(STM32G431xx) || defined(STM32G474xx)
+#include <stm32g4xx.h>
+#define SMOKE_DEVICE_VERSION_MAIN __STM32G4_CMSIS_VERSION_MAIN
+#define SMOKE_DEVICE_VERSION_SUB1 __STM32G4_CMSIS_VERSION_SUB1
+#define SMOKE_DEVICE_VERSION_SUB2 __STM32G4_CMSIS_VERSION_SUB2
+#elif defined(STM32F746xx)
+#include <stm32f7xx.h>
+#define SMOKE_DEVICE_VERSION_MAIN __STM32F7_CMSIS_VERSION_MAIN
+#define SMOKE_DEVICE_VERSION_SUB1 __STM32F7_CMSIS_VERSION_SUB1
+#define SMOKE_DEVICE_VERSION_SUB2 __STM32F7_CMSIS_VERSION_SUB2
+#else
+#error "Unsupported smoke target: add its device header to smoke_target.h"
+#endif

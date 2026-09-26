@@ -202,6 +202,17 @@ function(stm32_yml_setup_frameworks TARGET_NAME)
                     "FREERTOS_PATH '${FREERTOS_PATH}' (portable/GCC/${FREERTOS_PORT}).")
             endif()
             set(FREERTOS_TARGET_PREFIX "FreeRTOS")
+            # FreeRTOS-Kernel 11 разделяет порт ARM_CM0 на port.c и portasm.c
+            # (ulSetInterruptMask и др.), а stm32-cmake добавляет portasm.c только
+            # для портов ARMv8-M: без него компоновка завершается ошибкой.
+            set(_portasm "${FreeRTOS_${FREERTOS_PORT}_PATH}/portasm.c")
+            if(EXISTS "${_portasm}" AND TARGET "FreeRTOS::${FREERTOS_PORT}")
+                get_target_property(_port_sources "FreeRTOS::${FREERTOS_PORT}" INTERFACE_SOURCES)
+                if(NOT "${_portasm}" IN_LIST _port_sources)
+                    set_property(TARGET "FreeRTOS::${FREERTOS_PORT}" APPEND PROPERTY INTERFACE_SOURCES "${_portasm}")
+                    message(STATUS "FreeRTOS: к порту ${FREERTOS_PORT} добавлен ${_portasm}")
+                endif()
+            endif()
         endif()
 
         # Порт ARMv8 с TrustZone stm32-cmake создаёт как <порт>::NON_SECURE.

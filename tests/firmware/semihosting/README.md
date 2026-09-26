@@ -18,6 +18,11 @@ supplied SystemInit does not configure PLL in this configuration. Its software
 SystemCoreClock value is 16 MHz; no clock frequency or HAL tick accuracy is asserted.
 CRC is enabled with a test-local linker script; metadata, initial memory and loaded FLASH CRC are checked.
 
+Other targets (spec 8.8.8) reuse the same sources with `targets/<target>/stm32_config.yml`,
+a generated linker script and a minimal HAL configuration (`targets/make_targets.py`).
+`smoke_target.h` selects the device header by the device define. The target list and
+emulators are in `ci/firmware_cases.py`.
+
 Адаптировано из примера автора; исходный проект не изменялся. Хеши входных файлов
 сохранены до адаптации. system_stm32f1xx.c, stm32f1xx_hal_conf.h и version.h
 скопированы без изменения логики; нормализованы пробелы и окончания строк.
@@ -28,7 +33,11 @@ CMake получает пути извне, YAML закрепляет верси
 Собирается STM32F103C8T6, запускается на netduino2 (F205/Cortex-M3). Периферия F1
 не проверяется. PLL в выбранном пути SystemInit не настраивается; программное
 SystemCoreClock равно 16 МГц, точность частоты и HAL tick не проверяется. CRC
-включён с тестовым скриптом линкера; проверяются метаданные, начальное состояние памяти и CRC загруженной FLASH. Подробный контракт запуска: [RU](../../../docs/ru/firmware-testing.md) /
+включён с тестовым скриптом линкера; проверяются метаданные, начальное состояние памяти и CRC загруженной FLASH.
+Другие цели (ТЗ 8.8.8) используют те же исходники с `targets/<цель>/stm32_config.yml`,
+сгенерированным скриптом компоновщика и минимальной конфигурацией HAL
+(`targets/make_targets.py`); `smoke_target.h` выбирает заголовок устройства. Список
+целей и эмуляторов — в `ci/firmware_cases.py`. Подробный контракт запуска: [RU](../../../docs/ru/firmware-testing.md) /
 [EN](../../../docs/en/firmware-testing.md).
 
 Matrix compatibility: C11 for CMake 3.19; C++17 retained.

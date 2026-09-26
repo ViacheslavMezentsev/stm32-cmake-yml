@@ -9,7 +9,7 @@ from unittest.mock import patch
 import xml.etree.ElementTree as ET
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'ci'))
-from firmware_cases import BUILD_ONLY_PROFILES, BUILD_PROFILES
+from firmware_cases import BUILD_CASES, BUILD_ONLY_PROFILES, ENABLED_TARGETS, case_name, run_cases
 from firmware_badge import collect, svg, main
 from publish_firmware_badge import publish
 
@@ -17,17 +17,19 @@ from publish_firmware_badge import publish
 class BadgeTests(unittest.TestCase):
     def setUp(self):
         self.lock = {'gcc_versions': ['14.2.1-1.1'], 'cmake_versions': ['3.28.3']}
-        pair = {'gcc': '14.2.1-1.1', 'cmake': '3.28.3', 'status': 'passed', 'profiles': len(BUILD_PROFILES)}
+        pair = {'gcc': '14.2.1-1.1', 'cmake': '3.28.3', 'status': 'passed', 'profiles': len(BUILD_CASES)}
         build = {'status': 'passed', 'phase': 'build', 'pairs': [pair]}
         run = dict(build, phase='run')
-        cases = [{'profile': p, 'metadata': {'PROFILE': p}} for p in BUILD_PROFILES]
-        negative = {'profile': 'crc-corrupt', 'metadata': {'PROFILE': 'success', 'CRC_RESULT': 'FAIL'}}
+        cases = [{'profile': p, 'metadata': {'PROFILE': p}} for p in BUILD_CASES]
+        negatives = [{'profile': case_name(t, 'crc-corrupt'), 'metadata': {'PROFILE': 'success', 'CRC_RESULT': 'FAIL'}}
+                     for t in ENABLED_TARGETS]
         compiled = {'status': 'passed', 'gcc': '14.2.1', 'cmake': 'cmake version 3.28.3',
-                    'git_revision': 'abc', 'git_dirty': '0', 'cases': cases, 'crc_negative': negative,
+                    'git_revision': 'abc', 'git_dirty': '0', 'cases': cases, 'crc_negatives': negatives,
                     'build_only': [{'profile': p, 'status': 'build-only'} for p in BUILD_ONLY_PROFILES],
                     'crc_limit_negative': {'status': 'failed-as-expected'}}
         executed = {'status': 'passed', 'cases': [dict(profile=c['profile'], passed=True,
-                    metadata_ok=True, expected_metadata=c['metadata']) for c in cases + [negative]]}
+                    metadata_ok=True, expected_metadata=c['metadata']) for c in cases + negatives
+                    if c['profile'] in run_cases('qemu')]}
         self.reports = [build, run, compiled, executed]
 
     def count(self, reports):
@@ -36,20 +38,24 @@ class BadgeTests(unittest.TestCase):
 
     def test_counts_builds_separately_from_negative_checks(self):
         result = self.count(self.reports)
-        builds = len(BUILD_PROFILES) + len(BUILD_ONLY_PROFILES)
-        self.assertEqual((result['builds'], result['checks']), (builds, len(BUILD_PROFILES) + 1))
+        builds = len(BUILD_CASES) + len(BUILD_ONLY_PROFILES)
+        checks = len(run_cases('qemu'))
+        self.assertEqual((result['builds'], result['checks']), (builds, checks))
         badge = ET.fromstring(svg(result))
         self.assertEqual(badge.attrib['aria-label'], f"Builds (Checks): {result['builds']} ({result['checks']})")
         self.assertFalse(badge.findall('.//{http://www.w3.org/2000/svg}image'))
         self.assertTrue(all('rx' not in r.attrib for r in badge.findall('{http://www.w3.org/2000/svg}rect')))
-        self.assertIn(f'{builds} ({len(BUILD_PROFILES) + 1})', svg(result))
+        self.assertIn(f'{builds} ({checks})', svg(result))
 
     def test_renode_counts_build_only_runs(self):
         reports = copy.deepcopy(self.reports)
+        expected = {c['profile']: c['metadata'] for c in reports[2]['cases'] + reports[2]['crc_negatives']}
+        reports[3]['cases'] = [dict(profile=p, passed=True, metadata_ok=True, expected_metadata=expected[p])
+                               for p in run_cases('renode')]
         reports[3]['build_only'] = [{'profile': p, 'passed': True} for p in BUILD_ONLY_PROFILES]
         with patch('firmware_badge.read', side_effect=reports):
             result = collect(Path('build'), Path('run'), self.lock, 'abc', 'renode')
-        self.assertEqual(result['checks'], len(BUILD_PROFILES) + 1 + len(BUILD_ONLY_PROFILES))
+        self.assertEqual(result['checks'], len(run_cases('renode')) + len(BUILD_ONLY_PROFILES))
         for change in ('missing', 'failed'):
             reports = copy.deepcopy(self.reports)
             reports[3]['build_only'] = [{'profile': p, 'passed': True} for p in BUILD_ONLY_PROFILES]

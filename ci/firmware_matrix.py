@@ -1,5 +1,5 @@
 """Build or run the locked firmware toolchain matrix in separate containers."""
-from firmware_cases import BUILD_ONLY_PROFILES, BUILD_PROFILES, RUN_PROFILES
+from firmware_cases import BUILD_CASES, BUILD_ONLY_PROFILES, ENABLED_TARGETS, case_name, run_cases
 import argparse
 import itertools
 import json
@@ -19,8 +19,10 @@ def pairs(lock):
 
 
 def verify_build(report, gcc, cmake):
-    if report['status'] != 'passed' or sorted(c['profile'] for c in report['cases']) != sorted(BUILD_PROFILES):
+    if report['status'] != 'passed' or sorted(c['profile'] for c in report['cases']) != sorted(BUILD_CASES):
         raise ValueError('Missing or failed build profiles')
+    if sorted(c['profile'] for c in report.get('crc_negatives', [])) != sorted(case_name(t, 'crc-corrupt') for t in ENABLED_TARGETS):
+        raise ValueError('Missing corrupted CRC copies')
     if sorted(c['profile'] for c in report.get('build_only', [])) != sorted(BUILD_ONLY_PROFILES):
         raise ValueError('Missing or failed build-only profiles')
     if report.get('crc_limit_negative', {}).get('status') != 'failed-as-expected':
@@ -33,7 +35,7 @@ def verify_matrix(report, combinations):
     actual = [(item['gcc'], item['cmake']) for item in report['pairs']]
     if (report['status'] != 'passed' or report['phase'] != 'build'
             or len(actual) != len(combinations) or set(actual) != set(combinations)
-            or any(item['status'] != 'passed' or item['profiles'] != len(BUILD_PROFILES) for item in report['pairs'])):
+            or any(item['status'] != 'passed' or item['profiles'] != len(BUILD_CASES) for item in report['pairs'])):
         raise ValueError('Expected a complete successful build matrix matching the current lockfile')
 
 
@@ -101,9 +103,9 @@ def main():
             report = json.loads((directory / filename).read_text(encoding='utf-8'))
             if args.phase == 'build':
                 verify_build(report, gcc, cmake)
-            elif report['status'] != 'passed' or sorted(c['profile'] for c in report['cases']) != sorted(RUN_PROFILES) or not all(c['passed'] for c in report['cases']):
+            elif report['status'] != 'passed' or sorted(c['profile'] for c in report['cases']) != sorted(run_cases(args.emulator)) or not all(c['passed'] for c in report['cases']):
                 raise ValueError(f'Missing or failed {args.emulator} profiles')
-            item.update(status='passed', profiles=len(BUILD_PROFILES))
+            item.update(status='passed', profiles=len(BUILD_CASES))
             if args.phase == 'run':
                 item['executions'] = len(report['cases'])
                 if args.emulator == 'renode':

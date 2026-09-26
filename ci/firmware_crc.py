@@ -13,7 +13,7 @@ def crc32_words(data):
     return crc
 
 
-def inspect_crc(elf):
+def inspect_crc(elf, flash_end=0x08010000):
     data = elf.read_bytes()
     shoff = struct.unpack_from('<I', data, 32)[0]
     shsize, shcount, names_index = struct.unpack_from('<HHH', data, 46)
@@ -23,7 +23,7 @@ def inspect_crc(elf):
     sections = {names[h[0]:].split(b'\0', 1)[0].decode(): h for h in headers}
     checksum, version, ram = (sections[key] for key in ('.checksum', '.fw_version', '.data'))
     start, end = 0x08000000, checksum[3]
-    if checksum[5] != 4 or version[5] != 4 or end % 4 or not start < end < 0x08010000:
+    if checksum[5] != 4 or version[5] != 4 or end % 4 or not start < end < flash_end:
         raise ValueError('Invalid checksum/version section bounds')
     image = bytearray(end + 4 - start)
     covered = bytearray(len(image))

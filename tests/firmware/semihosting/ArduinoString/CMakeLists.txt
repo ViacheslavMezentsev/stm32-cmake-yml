@@ -1,6 +1,6 @@
 # Deliberately selected software components, not the complete board core.
-if(USE_CORE_MAIN OR NOT MCU_TARGET STREQUAL "F103")
-    message(FATAL_ERROR "Arduino String smoke requires own main and F103")
+if(USE_CORE_MAIN OR NOT MCU_TARGET)
+    message(FATAL_ERROR "Arduino String smoke requires own main and arduino.mcu_target")
 endif()
 add_library(ArduinoCore STATIC
     "${ARDUINO_CORE_DIR}/cores/arduino/WString.cpp"

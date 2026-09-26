@@ -1,5 +1,5 @@
 """Run the same smoke ELFs on a bounded Cortex-M3/RAM-stub Renode platform."""
-from firmware_cases import BUILD_ONLY_PROFILES, BUILD_PROFILES
+from firmware_cases import BUILD_CASES, BUILD_ONLY_PROFILES, TARGETS, split_case
 import argparse
 import json
 import os
@@ -27,11 +27,11 @@ def classify(profile, process_code, host_timeout, completed, guest, output, expe
         return False
     if not metadata_matches(output, expected):
         return False
-    if profile == 'hang':
-        return guest is None and verdict(profile, None, True, output, gcc)
+    if split_case(profile)[1] == 'hang':
+        return guest is None and verdict(profile, None, True, output, gcc, 'renode')
     if not guest or guest.get('operation') != 0x20 or guest.get('reason') != 0x20026:
         return False
-    return verdict(profile, guest.get('status'), False, output, gcc)
+    return verdict(profile, guest.get('status'), False, output, gcc, 'renode')
 
 
 PRIORITY_PROBE_WARNING = 'nvic: Trying to set the priority for interrupt 16 to 0xFF, but it should be maskable with 0xF0'
@@ -39,7 +39,7 @@ PRIORITY_PROBE_WARNING = 'nvic: Trying to set the priority for interrupt 16 to 0
 
 def process_completed(log, profile):
     warnings = [line.partition('[WARNING] ')[2] for line in log.splitlines() if '[WARNING]' in line]
-    allowed = (not warnings or (profile == 'freertosTasks' and warnings == [PRIORITY_PROBE_WARNING]))
+    allowed = (not warnings or (split_case(profile)[1] == 'freertosTasks' and warnings == [PRIORITY_PROBE_WARNING]))
     return (log.splitlines().count('RENODE_RUN_COMPLETED') == 1 and allowed
             and not any(marker in log for marker in ('There was an error', '[ERROR]')))
 
@@ -73,22 +73,26 @@ def prepare_case(root, build, output, case):
     SysTick, memories and the exit hook are recreated even inside one process.
     """
     profile = case['profile']
-    directory = Path(tempfile.mkdtemp(prefix=profile + '-', dir=output))
+    target_name = split_case(profile)[0]
+    target = TARGETS[target_name]
+    flash_low, flash_size = target['flash']
+    ram_low, ram_size = target['ram']
+    directory = Path(tempfile.mkdtemp(prefix=profile.replace(':', '-') + '-', dir=output))
     directory.chmod(0o755)
     elf = (build / case['elf']).resolve()
     if not elf.is_relative_to(build) or not elf.is_file():
         raise ValueError('Invalid ELF path')
     trap = case['exit_trap']
-    if not isinstance(trap, int) or trap % 2 or not 0x08000000 <= trap < 0x08010000:
+    if not isinstance(trap, int) or trap % 2 or not flash_low <= trap < flash_low + flash_size:
         raise ValueError('Invalid exit trap address')
     hook = root / 'tests/firmware/renode/exit_hook.py'
     # Python repr quotes paths inside the Renode triple-quoted hook body.
     hook_code = (f'result_path = {(directory / "guest-exit.json").as_posix()!r}\n'
-                 f'ram_low = 0x20000000\nram_high = 0x20004FF8\nexecfile({hook.as_posix()!r})')
+                 f'ram_low = {ram_low}\nram_high = {ram_low + ram_size - 8}\nexecfile({hook.as_posix()!r})')
     commands = [
         'Clear',
-        'mach create "f103-smoke"',
-        f'machine LoadPlatformDescription {resc_path(root / "tests/firmware/renode/f103-smoke.repl")}',
+        f'mach create "{target_name}-smoke"',
+        f'machine LoadPlatformDescription {resc_path(root / "tests/firmware/renode" / (target_name + "-smoke.repl"))}',
         f'sysbus.cpu.uart CreateFileBackend {resc_path(directory / "firmware.log")}',
         f'sysbus LoadELF {resc_path(elf)}',
         f'sysbus.cpu AddHook 0x{trap:X} """{hook_code}"""',
@@ -302,7 +306,7 @@ def main():
                         help='Run cases in a seeded random order to check order independence')
     args = parser.parse_args()
     args.output.mkdir(parents=True, exist_ok=True)
-    report = {'status': 'failed', 'model': 'f103-smoke', 'exit_adapter': 'SYS_EXIT_EXTENDED hook',
+    report = {'status': 'failed', 'model': '<target>-smoke', 'exit_adapter': 'SYS_EXIT_EXTENDED hook',
               'mode': args.mode, 'shuffle_seed': args.shuffle, 'cases': []}
     root = Path(__file__).resolve().parent.parent
     started = time.monotonic()
@@ -310,17 +314,17 @@ def main():
         build = args.build.resolve()
         output = args.output.resolve()
         manifest = json.loads((build / 'build-summary.json').read_text(encoding='utf-8'))
-        if manifest['status'] != 'passed' or sorted(c['profile'] for c in manifest['cases']) != sorted(BUILD_PROFILES):
+        if manifest['status'] != 'passed' or sorted(c['profile'] for c in manifest['cases']) != sorted(BUILD_CASES):
             raise ValueError('Expected complete successful build')
-        if manifest['crc_negative']['profile'] != 'crc-corrupt':
-            raise ValueError('Missing CRC negative image')
+        if not manifest.get('crc_negatives'):
+            raise ValueError('Missing CRC negative images')
         renode = shutil.which(args.renode)
         if not renode and args.renode == 'renode' and os.name == 'nt':
             renode = str(Path(os.environ.get('ProgramFiles', 'C:/Program Files')) / 'Renode/renode.exe')
         if not renode or not Path(renode).is_file():
             raise ValueError('Renode executable not found')
         report['renode'] = subprocess.check_output([renode, '--version'], text=True, timeout=30).strip()
-        cases = manifest['cases'] + [manifest['crc_negative']]
+        cases = manifest['cases'] + manifest['crc_negatives']
         if args.shuffle is not None:
             random.Random(args.shuffle).shuffle(cases)
         run = run_batch_mode if args.mode == 'batch' else run_process_mode
