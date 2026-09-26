@@ -579,8 +579,8 @@
       "MCU": "STM32F103C8T6"
     },
     "log_contains": [
-      "Framework : 0.9.2",
-      "Config : 0.9.2 (совпадают"
+      "Framework : 0.9.3",
+      "Config : 0.9.3 (совпадают"
     ],
     "log_absent": [
       "не указан рекомендуемый параметр 'stm32_cmake_yml_version'",
@@ -599,7 +599,7 @@
       "MCU": "STM32F103C8T6"
     },
     "log_contains": [
-      "Framework : 0.9.2",
+      "Framework : 0.9.3",
       "не указан рекомендуемый параметр 'stm32_cmake_yml_version'"
     ],
     "log_absent": [
@@ -617,7 +617,7 @@
       "MCU": "STM32F103C8T6"
     },
     "log_contains": [
-      "Framework : 0.9.2",
+      "Framework : 0.9.3",
       "не указан рекомендуемый параметр 'stm32_cmake_yml_version'"
     ],
     "log_absent": [
@@ -635,7 +635,7 @@
       "MCU": "STM32F103C8T6"
     },
     "log_contains": [
-      "Framework : 0.9.2",
+      "Framework : 0.9.3",
       "Config : 0.9.1",
       "Рекомендуется обновить stm32_cmake_yml_version."
     ],
@@ -656,8 +656,8 @@
       "MCU": "STM32F103C8T6"
     },
     "log_contains": [
-      "Framework : 0.9.2",
-      "Config : 0.9.3",
+      "Framework : 0.9.3",
+      "Config : 0.9.4",
       "Возможны ошибки."
     ],
     "log_absent": [
@@ -676,7 +676,7 @@
       "MCU": "STM32F103C8T6"
     },
     "log_contains": [
-      "Framework : 0.9.2"
+      "Framework : 0.9.3"
     ],
     "log_absent": [
       "Config :",
@@ -693,7 +693,7 @@
     ],
     "no_st_dependencies": true,
     "log_contains": [
-      "Config : 0.9.3",
+      "Config : 0.9.4",
       "Возможны ошибки."
     ]
   },
@@ -701,12 +701,12 @@
     "name": "version-before-override",
     "args": [
       "-DPROJECT_CONFIG_FILE=version-newer.yml",
-      "-DSTM32_YML_OVERRIDE_stm32_cmake_yml_version=0.9.2",
+      "-DSTM32_YML_OVERRIDE_stm32_cmake_yml_version=0.9.3",
       "-DSTM32_YML_OVERRIDE_stm32_cmake_yml_version_check=false"
     ],
     "no_st_dependencies": true,
     "log_contains": [
-      "Config : 0.9.3",
+      "Config : 0.9.4",
       "Возможны ошибки."
     ]
   },

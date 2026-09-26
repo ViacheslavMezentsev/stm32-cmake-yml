@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.19)
 # ==============================================================================
 
 # Определяем текущую версию фреймворка.
-set(STM32_CMAKE_YML_VERSION "0.9.2")
+set(STM32_CMAKE_YML_VERSION "0.9.3")
 
 # Подключаем функциональные модули фреймворка.
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/stm32_yml_utils.cmake)

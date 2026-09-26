@@ -7,7 +7,7 @@ ST copyright/license notices in copied files are retained.
 
 Inputs with unchanged logic (whitespace normalized): system_stm32f1xx.c, stm32f1xx_hal_conf.h, version.h. The test
 CMakeLists accepts external framework/toolchain paths. YAML is reduced to the
-same essential settings, explicitly selects framework 0.9.2 and CubeF1 1.8.7,
+same essential settings, explicitly selects framework 0.9.3 and CubeF1 1.8.7,
 and adds success/failure/hang profiles. main.cpp retains formatted semihosting output,
 HAL_Init, version and CPUID output. Its endless HAL_Delay loop is replaced with
 immediate SYS_WRITE0 protocol markers and SYS_EXIT_EXTENDED, or an intentional hang.

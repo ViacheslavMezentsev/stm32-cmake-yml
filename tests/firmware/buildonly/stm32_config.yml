@@ -1,6 +1,6 @@
 # Build-only firmware for families without QEMU/Renode models (spec 8.8.5,
 # TC-57) and the CRC image of STM32H503CB (spec 4.15.8, 4.15.9, TC-63).
-stm32_cmake_yml_version: 0.9.2
+stm32_cmake_yml_version: 0.9.3
 project_name: buildonly_probe
 mcu: STM32H743ZI
 languages: [C, ASM]

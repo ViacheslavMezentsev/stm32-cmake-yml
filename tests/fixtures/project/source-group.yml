@@ -1,4 +1,4 @@
-stm32_cmake_yml_version: 0.9.2
+stm32_cmake_yml_version: 0.9.3
 project_name: source_group_probe
 mcu: STM32F103C8T6
 languages: [C, CXX, ASM]

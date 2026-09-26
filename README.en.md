@@ -71,7 +71,7 @@ Reading `.ioc` does not run CubeMX or generate peripheral initialization code.
 MCU support depends on the backend, toolchain and libraries. Successful
 configuration alone does not establish that firmware works on a board.
 
-In 0.9.2, avoid `_` in profile names: flattening the YAML tree into CMake variable
+In 0.9.x, avoid `_` in profile names: flattening the YAML tree into CMake variable
 names introduces ambiguity. Overrides and cached values also have defined
 precedence. Check [semantics](docs/en/reference/0.9.2/semantics.md) and
 [errata](docs/en/errata/index.md) before adapting an unusual configuration.
@@ -80,7 +80,7 @@ precedence. Check [semantics](docs/en/reference/0.9.2/semantics.md) and
 ## Documentation and skills
 
 [Documentation map](docs/en/index.md) · [Scenarios](docs/en/scenarios.md) ·
-[Reference 0.9.2](docs/en/reference/0.9.2/index.md) · [Manual (Russian)](docs/user_manual.md) ·
+[Reference 0.9.2 with 0.9.3 changes](docs/en/reference/0.9.2/index.md) · [Manual (Russian)](docs/user_manual.md) ·
 [Troubleshooting](docs/en/troubleshooting.md) · [Roadmap](TODO.md)
 
 The `skills/` directory contains instructions for AI agents. Provide a skill to

@@ -1,5 +1,5 @@
 {
-  "FRAMEWORK": "0.9.2",
+  "FRAMEWORK": "0.9.3",
   "CMSIS_CORE": "5.1",
   "CMSIS_DEVICE": "4.3.5",
   "HAL_VERSION": "1.1.10",
