@@ -40,9 +40,15 @@ TARGETS = {
                  cpu_flags='-mcpu=cortex-m4;-mthumb;-mfpu=fpv4-sp-d16;-mfloat-abi=hard', bare_cpu='-mcpu=cortex-m4',
                  qemu=None, qemu_part=None, renode='g4-smoke.repl', renode_part='0xC24 -> Cortex-M4',
                  flash=(0x08000000, 512 * 1024), ram=(0x20000000, 128 * 1024), rtos_version='V10.3.1'),
+    # F7 runs in Renode only: QEMU has no Cortex-M7 machine with FLASH at 0x08000000.
+    # RAM is DTCM, SRAM1 and SRAM2, contiguous from 0x20000000.
+    'f746': dict(mcu='STM32F746ZGT6', config='targets/f746/stm32_config.yml', family='f7', platform='cortex-m7-smoke',
+                 cpu_flags='-mcpu=cortex-m7;-mthumb;-mfpu=fpv5-sp-d16;-mfloat-abi=hard', bare_cpu='-mcpu=cortex-m7',
+                 qemu=None, qemu_part=None, renode='f7-smoke.repl', renode_part='0xC27 -> Cortex-M7',
+                 flash=(0x08000000, 1024 * 1024), ram=(0x20000000, 320 * 1024), rtos_version='V10.2.0'),
 }
 # Targets are enabled one family at a time, each with a full local check.
-ENABLED_TARGETS = ('f103', 'f030', 'f411', 'f401', 'g431', 'g474')
+ENABLED_TARGETS = ('f103', 'f030', 'f411', 'f401', 'g431', 'g474', 'f746')
 DEFAULT_TARGET = 'f103'
 
 

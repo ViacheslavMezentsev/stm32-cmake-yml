@@ -3,9 +3,9 @@
 [Документация](index.md) · [English](../en/firmware-testing.md) · [Окружение](emulation.md)
 
 Первый тест адаптирует [пример автора 02-semihosting для F1](../../tests/firmware/semihosting/README.md).
-Он отделён от 139 configure-сценариев: **492 сборки, 336 запусков QEMU и 528 запусков Renode**:
-тринадцать профилей на каждую цель (F103, F030, F411, F401, G431, G474; G4 — только Renode), повреждённая копия на цель и четыре профиля H7/H5 (только Renode) для каждой пары инструментов; три версии xPack GCC × два CMake из
-[lock-файла](../../ci/dependencies.lock.json), CubeF1 1.8.7, CubeF0 1.11.6, CubeF4 1.28.3, CubeG4 1.6.3, QEMU 11.0.0.
+Он отделён от 139 configure-сценариев: **570 сборок, 336 запусков QEMU и 612 запусков Renode**:
+тринадцать профилей на каждую цель (F103, F030, F411, F401, G431, G474, F746; G4 и F7 — только Renode), повреждённая копия на цель и четыре профиля H7/H5 (только Renode) для каждой пары инструментов; три версии xPack GCC × два CMake из
+[lock-файла](../../ci/dependencies.lock.json), CubeF1 1.8.7, CubeF0 1.11.6, CubeF4 1.28.3, CubeG4 1.6.3, CubeF7 1.17.3, QEMU 11.0.0.
 Локально проверен также Windows QEMU 11.1.0; CI использует закреплённый образ.
 
 ## Цели
@@ -22,13 +22,16 @@ F103 не меняются, у остальных целей есть префи
 | f401 | STM32F401CCU6 | 256/64 КиБ | Cortex-M4F | netduinoplus2 | f4-smoke (cortex-m4) | V10.3.1 |
 | g431 | STM32G431CBU6 | 128/32 КиБ | Cortex-M4F | — | g4-smoke (cortex-m4) | V10.3.1 |
 | g474 | STM32G474CEU6 | 512/128 КиБ | Cortex-M4F | — | g4-smoke (cortex-m4) | V10.3.1 |
+| f746 | STM32F746ZGT6 | 1024/320 КиБ | Cortex-M7F | — | f7-smoke (cortex-m7) | V10.2.0 |
 
 F030 в QEMU запускается на Cortex-M3 машины netduino2: код Thumb-1 совместим, карта
 памяти подходит. Проверка ядра M0 — только в Renode. F4 запускается на netduinoplus2
 (STM32F405, Cortex-M4F): её FLASH и SRAM покрывают обе цели. Профили CMSIS, HAL и FreeRTOS
-для F4 и G4 используют аппаратную плавающую точку, `bare` и `arduinoString` — программную.
+для F4, G4 и F7 используют аппаратную плавающую точку, `bare` и `arduinoString` — программную.
 G4 запускается только в Renode: в QEMU нет машины этого семейства. RAM G4 в таблице —
-SRAM1, SRAM2 и псевдоним CCM SRAM, непрерывно от `0x20000000`. Скрипты компоновщика и минимальные
+SRAM1, SRAM2 и псевдоним CCM SRAM, непрерывно от `0x20000000`. F7 тоже запускается только
+в Renode: в QEMU нет машины с Cortex-M7 и Flash по адресу `0x08000000`. RAM F7 — DTCM,
+SRAM1 и SRAM2, непрерывно от `0x20000000`. Скрипты компоновщика и минимальные
 `hal_conf.h` для целей кроме F103 генерирует `tests/firmware/semihosting/targets/make_targets.py`.
 
 ## Контракт
@@ -150,7 +153,7 @@ Builder отвергает разрывы/перекрытия загрузоч�
 Код, начальные данные и внедрённая CRC остаются прежними. Производный отрицательный сценарий,
 crc-corrupt, обязан выдать CRC_RESULT=FAIL и TEST_RESULT=FAIL и завершиться кодом 3.
 Авария или таймаут не засчитываются. Это по одному дополнительному запуску на цель и пару без новых
-компиляций: 468 сборок с запуском, 336 запусков QEMU и 504 запуска Renode. Отчёты различают тринадцать профилей и четырнадцать исполнений на цель.
+компиляций: 546 сборок с запуском, 336 запусков QEMU и 588 запусков Renode. Отчёты различают тринадцать профилей и четырнадцать исполнений на цель.
 
 Отдельная отрицательная сборка (TC-52) на каждой паре конфигурирует профиль `success` с `flash_size: 4K` и требует, чтобы сборка и повторная сборка завершились ошибкой шага CRC (`[CRC ERROR]`, образ больше предела Flash). В бейдже она не учитывается.
 
@@ -175,7 +178,8 @@ Renode не используется: её широкая память и заг
 512 KiB FLASH, 128 KiB RAM и заглушки RCC/FLASH controller F4. Тип `cortex-m4f` в Renode 1.16.1
 возвращает CPUID Cortex-M7 (0x411FC272), поэтому используется `cortex-m4`; FPU в нём есть.
 [g4-smoke.repl](../../tests/firmware/renode/g4-smoke.repl) — та же модель с заглушками RCC/FLASH
-controller по адресам G4.
+controller по адресам G4. [f7-smoke.repl](../../tests/firmware/renode/f7-smoke.repl) —
+Cortex-M7, 1 MiB FLASH, 320 KiB RAM и заглушки RCC/FLASH controller F7.
 
 Порт ARM_CM0 FreeRTOS V10.0.1 (CubeF0) настраивает SysTick своей функцией, без слабого
 `vPortSetupTimerInterrupt`, и обнуляет VAL до записи LOAD. Renode при этом перезагружает
