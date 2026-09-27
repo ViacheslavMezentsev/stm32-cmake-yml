@@ -399,7 +399,7 @@ still fail. configASSERT remains enabled.
 
 The measurements below predate the F0, F4, G4 and F7 targets (78 runs per simulator).
 The full matrix is now 570 builds and 948 runs; locally on 2 vCPUs it takes about
-22 minutes (builds about 10, QEMU about 7, Renode about 5), so the Firmware job
+23 minutes (builds 15, QEMU 5, Renode 3.5), so the Firmware job
 limit is raised to 90 minutes.
 
 In the [main f16eb09 run](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/actions/runs/36136281504), smoke took 13:23:
