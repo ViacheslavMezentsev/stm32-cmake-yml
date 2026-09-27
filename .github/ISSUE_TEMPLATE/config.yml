@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Техподдержка в Telegram / Telegram support channel
+    url: https://t.me/mcu_cicd_hil
+    about: Вопросы по сборке, отладке и тестированию MCU / Questions about building, debugging and testing MCUs
+  - name: Диагностика ошибок / Troubleshooting
+    url: https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/main/docs/ru/troubleshooting.md
+    about: Разбор типичных ошибок по стадиям / Common failures by stage

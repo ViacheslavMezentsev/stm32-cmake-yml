@@ -218,7 +218,8 @@ Firmware — 4:39 (ветка `claude/faster-ci-image`, `f3f1309`).
 
 Если push меняет только `.md` на любой глубине, запускается Docs, а Configure,
 Firmware, CI environment и Emulation environment пропускаются. Configure также не
-запускается при изменении только `.github/FUNDING.yml` или `LICENSE`. Смешанный push с Markdown и кодом
+запускается при изменении только `.github/FUNDING.yml`, `.github/ISSUE_TEMPLATE/`
+или `LICENSE`. Смешанный push с Markdown и кодом
 по-прежнему запускает соответствующие тяжёлые workflow. CI environment и Firmware
 сохраняют прежние включающие фильтры путей; исключение Markdown стоит последним.
 Emulation environment устроен так же.
