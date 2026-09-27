@@ -2,7 +2,7 @@
   "Configure": {
     "run_url": "https://github.com/ViacheslavMezentsev/stm32-cmake-yml/actions/runs/36321690296",
     "revision": "dc7beb80f47e91868d1e09a0f9e796e34b2c6f81",
-    "conclusion": "failure"
+    "conclusion": "success"
   },
   "Firmware": {
     "run_url": "https://github.com/ViacheslavMezentsev/stm32-cmake-yml/actions/runs/36304929906",
