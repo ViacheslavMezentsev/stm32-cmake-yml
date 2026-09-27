@@ -218,7 +218,7 @@ in every job.
 
 Pushes that change only `.md` files at any depth run Docs, skipping Configure,
 Firmware, CI environment and Emulation environment. Configure is also skipped when
-only `.github/FUNDING.yml` or `LICENSE` changes. A mixed Markdown/code push still triggers the
+only `.github/FUNDING.yml`, `.github/ISSUE_TEMPLATE/` or `LICENSE` changes. A mixed Markdown/code push still triggers the
 relevant heavy workflows. CI environment and Firmware retain their existing positive
 path filters, with the Markdown exclusion last. Emulation environment works the same way. `workflow_dispatch` still allows
 manual runs. A workflow/filter change itself is not documentation-only.

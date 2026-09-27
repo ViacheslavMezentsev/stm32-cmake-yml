@@ -1,0 +1,113 @@
+name: Сообщить об ошибке / Bug report
+description: Ошибка Configure, сборки, post-build или запуска прошивки / A Configure, build, post-build or firmware run failure
+title: "[bug]: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Перед отправкой проверьте [errata](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/main/docs/ru/errata/index.md) и [диагностику](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/main/docs/ru/troubleshooting.md). Удалите из логов и конфигурации пароли, токены и внутренние пути, которые нельзя публиковать.
+
+        Before submitting, check the [errata](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/main/docs/en/errata/index.md) and [troubleshooting](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/main/docs/en/troubleshooting.md). Remove passwords, tokens and private paths from logs and configuration.
+  - type: input
+    id: version
+    attributes:
+      label: Версия stm32-cmake-yml / stm32-cmake-yml version
+      description: Строка «stm32-cmake-yml версия:» в начале лога Configure, тег или коммит / The «stm32-cmake-yml версия:» line at the start of the Configure log, a tag or a commit
+      placeholder: 0.9.3 (67562c0)
+    validations:
+      required: true
+  - type: dropdown
+    id: stage
+    attributes:
+      label: Стадия / Stage
+      description: Где возникла ошибка / Where the failure happens
+      options:
+        - Configure
+        - Generate
+        - Compile
+        - Link
+        - Post-build (CRC, bin/hex/srec)
+        - Запуск на плате или в эмуляторе / Run on hardware or in an emulator
+        - Другое / Other
+    validations:
+      required: true
+  - type: dropdown
+    id: backend
+    attributes:
+      label: Backend (toolchain_backend)
+      options:
+        - stm32-cmake
+        - arduino
+    validations:
+      required: true
+  - type: input
+    id: mcu
+    attributes:
+      label: МК и плата / MCU and board
+      placeholder: STM32F103C8T6, BluePill
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: ОС / OS
+      placeholder: Windows 11 / Ubuntu 24.04 / Docker (образ CI / CI image)
+    validations:
+      required: true
+  - type: textarea
+    id: tools
+    attributes:
+      label: Версии инструментов / Tool versions
+      description: |
+        Вывод команд / Output of:
+        `arm-none-eabi-gcc --version`, `cmake --version`, `yq --version`, `ninja --version` (или make), `python --version` (для CRC / for CRC).
+        Укажите версию пакета STM32Cube или Arduino_Core_STM32 и IDE, если используется / Add the STM32Cube or Arduino_Core_STM32 package version and IDE, if any.
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: command
+    attributes:
+      label: Команда / Command
+      description: Полная команда Configure и сборки, включая `-D` (профиль, `STM32_YML_OVERRIDE_*`, toolchain) / The full Configure and build commands, including `-D` options (profile, `STM32_YML_OVERRIDE_*`, toolchain)
+      placeholder: |
+        cmake -S . -B build/Debug -G Ninja -DCMAKE_TOOLCHAIN_FILE=... -DSTM32_YML_PROFILE=...
+        cmake --build build/Debug
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: config
+    attributes:
+      label: stm32_config.yml
+      description: Конфигурация (и файл профилей, если есть). Для больших проектов — минимальный воспроизводящий пример / The configuration (and the profiles file, if any). For large projects, a minimal reproducing example
+      render: yaml
+    validations:
+      required: true
+  - type: textarea
+    id: log
+    attributes:
+      label: Полный лог / Full log
+      description: Лог с первой строки Configure до ошибки, без сокращений. Длинный лог можно приложить файлом / The log from the first Configure line to the error, untrimmed. A long log can be attached as a file
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Ожидалось и получилось / Expected and actual behavior
+      placeholder: |
+        Ожидалось / Expected:
+        Получилось / Actual:
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Проверки / Checks
+      options:
+        - label: Я проверил errata и диагностику / I checked the errata and troubleshooting
+          required: true
+        - label: Ошибка воспроизводится в чистой папке сборки / The failure reproduces in a clean build directory
+          required: false

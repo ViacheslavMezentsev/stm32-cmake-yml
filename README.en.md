@@ -99,6 +99,8 @@ your assistant through the mechanism your tool supports; skills are not required
 
 Questions about building, debugging and testing MCUs with this and the author's other
 repositories: Telegram support channel [MCU CI/CD & HIL](https://t.me/mcu_cicd_hil).
+Report bugs through [Issues](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/issues/new/choose):
+the form asks for the version, MCU and board, OS, tool versions, command and full log.
 
 ## Related projects by the same author
 

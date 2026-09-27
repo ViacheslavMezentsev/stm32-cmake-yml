@@ -6,6 +6,7 @@ on:
     paths-ignore:
       - '**/*.md'
       - .github/FUNDING.yml
+      - .github/ISSUE_TEMPLATE/**
       - LICENSE
   workflow_dispatch:
 
