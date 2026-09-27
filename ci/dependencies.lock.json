@@ -212,6 +212,59 @@
         "Projects",
         "Utilities"
       ]
+    },
+    {
+      "name": "CubeH7-1.13.0",
+      "url": "https://github.com/STMicroelectronics/STM32CubeH7.git",
+      "commit": "5abb9764b32e11a6557b90bf39531528019b5761",
+      "destination": "/opt/STM32Cube/Repository/STM32Cube_FW_H7_V1.13.0",
+      "submodules": [
+        "Drivers/CMSIS/Device/ST/STM32H7xx",
+        "Drivers/STM32H7xx_HAL_Driver",
+        "Middlewares/Third_Party/FreeRTOS"
+      ],
+      "required_files": [
+        "Drivers/CMSIS/Device/ST/STM32H7xx/Include/stm32h7xx.h",
+        "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal.h",
+        "Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h",
+        "Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM7/r0p1/port.c"
+      ],
+      "sparse_exclude": [
+        "Projects",
+        "Utilities"
+      ]
+    },
+    {
+      "name": "CubeH5-1.7.0",
+      "url": "https://github.com/STMicroelectronics/STM32CubeH5.git",
+      "commit": "4e039436d8561003a1d88b78a1520f3f81eadd24",
+      "destination": "/opt/STM32Cube/Repository/STM32Cube_FW_H5_V1.7.0",
+      "submodules": [
+        "Drivers/CMSIS/Device/ST/STM32H5xx",
+        "Drivers/STM32H5xx_HAL_Driver"
+      ],
+      "required_files": [
+        "Drivers/CMSIS/Device/ST/STM32H5xx/Include/stm32h5xx.h",
+        "Drivers/STM32H5xx_HAL_Driver/Inc/stm32h5xx_hal.h"
+      ],
+      "sparse_exclude": [
+        "Projects",
+        "Utilities"
+      ]
+    },
+    {
+      "name": "FreeRTOS-Kernel-11.3.1",
+      "url": "https://github.com/FreeRTOS/FreeRTOS-Kernel.git",
+      "commit": "3a22924e0a9ddbbc8b0758881c33b3422a5cc20d",
+      "destination": "/opt/FreeRTOS-Kernel/11.3.1",
+      "submodules": [],
+      "required_files": [
+        "include/FreeRTOS.h",
+        "portable/GCC/ARM_CM3/port.c",
+        "portable/GCC/ARM_CM4F/port.c",
+        "portable/GCC/ARM_CM33_NTZ/non_secure/port.c",
+        "portable/MemMang/heap_4.c"
+      ]
     }
   ]
 }

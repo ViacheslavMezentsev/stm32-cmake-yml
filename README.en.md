@@ -16,6 +16,8 @@ A separate Arduino Core STM32 backend uses CMake wrappers supplied by your proje
 `Builds (Checks)` shows built configurations and QEMU/Renode execution checks from
 the last successful Firmware CI run on main. [Reading the counter](docs/en/status.md) ·
 [Test scope and procedure](docs/en/firmware-testing.md).
+Test firmware is built and run for F0, F1, F4, G4, F7, H5 and H7 —
+[which emulator checks each family](docs/en/emulation.md#emulators-per-family).
 Markdown-only changes run the fast Docs check without rebuilding firmware.
 
 ## Why use it?
@@ -71,7 +73,7 @@ Reading `.ioc` does not run CubeMX or generate peripheral initialization code.
 MCU support depends on the backend, toolchain and libraries. Successful
 configuration alone does not establish that firmware works on a board.
 
-In 0.9.2, avoid `_` in profile names: flattening the YAML tree into CMake variable
+In 0.9.x, avoid `_` in profile names: flattening the YAML tree into CMake variable
 names introduces ambiguity. Overrides and cached values also have defined
 precedence. Check [semantics](docs/en/reference/0.9.2/semantics.md) and
 [errata](docs/en/errata/index.md) before adapting an unusual configuration.
@@ -80,7 +82,7 @@ precedence. Check [semantics](docs/en/reference/0.9.2/semantics.md) and
 ## Documentation and skills
 
 [Documentation map](docs/en/index.md) · [Scenarios](docs/en/scenarios.md) ·
-[Reference 0.9.2](docs/en/reference/0.9.2/index.md) · [Manual (Russian)](docs/user_manual.md) ·
+[Reference 0.9.2 with 0.9.3 changes](docs/en/reference/0.9.2/index.md) · [Manual (Russian)](docs/user_manual.md) ·
 [Troubleshooting](docs/en/troubleshooting.md) · [Roadmap](TODO.md)
 
 The `skills/` directory contains instructions for AI agents. Provide a skill to
@@ -100,4 +102,4 @@ your assistant through the mechanism your tool supports; skills are not required
 - [stm32-gdbtest](https://github.com/ViacheslavMezentsev/stm32-gdbtest) — reusable testing infrastructure for firmware on real STM32 hardware through GDB-Python and SWD; test scenarios run on the host PC.
 - [stm32-hwtest-blackpill](https://github.com/ViacheslavMezentsev/stm32-hwtest-blackpill) — firmware, hardware test setups and stm32-gdbtest scenarios for BlackPill, BluePill and other boards.
 
-[Changelog](CHANGELOG.md) · [MIT License](LICENSE)
+[Changelog](CHANGELOG.en.md) · [MIT License](LICENSE)

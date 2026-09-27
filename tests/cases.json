@@ -30,6 +30,7 @@
   {
     "name": "external-profile",
     "args": ["-DPROJECT_CONFIG_FILE=external.yml", "-DSTM32_YML_PROFILE=external"],
+    "log_absent": ["Встроенная секция 'profiles:' игнорируется"],
     "observed": {"PROJECT_NAME": "external_probe", "stack_size": "4096", "use_hal": "FALSE"},
     "properties": {"COMPILE_DEFINITIONS": ["BASE=1", "EXTERNAL=1"]},
     "absent_properties": {"COMPILE_DEFINITIONS": ["USE_HAL_DRIVER"]},
@@ -50,6 +51,32 @@
     "args": ["-DSTM32_YML_PROFILE=crc"],
     "observed": {"crc_enable": "TRUE"},
     "linker": {"heap": 512, "stack": 1024},
+    "crc_command": true
+  },
+  {
+    "name": "crc-stm32cmake-script-error",
+    "args": ["-DSTM32_YML_PROFILE=crcnoscript"],
+    "error": "скрипт компоновщика формирует stm32-cmake, секции '.checksum' (crc_section_name) в нём нет"
+  },
+  {
+    "name": "crc-explicit-script-without-section",
+    "args": ["-DSTM32_YML_PROFILE=crcexplicit"],
+    "observed": {"crc_enable": "TRUE"},
+    "log_contains": ["секция '.checksum' (crc_section_name) не найдена", "Регион FLASH скрипта: ORIGIN 0x08000000, LENGTH 524288 байт"],
+    "crc_command": true
+  },
+  {
+    "name": "crc-flash-region-missing",
+    "args": ["-DSTM32_YML_PROFILE=crcnoflash"],
+    "observed": {"crc_enable": "TRUE"},
+    "log_contains": ["Расчет CRC отключен. Не удалось определить регион FLASH (ORIGIN, LENGTH)"],
+    "crc_command": false
+  },
+  {
+    "name": "crc-unknown-algorithm",
+    "args": ["-DSTM32_YML_PROFILE=crc", "-DSTM32_YML_OVERRIDE_crc_algorithm=CRC32_MPEG"],
+    "observed": {"crc_enable": "TRUE"},
+    "log_contains": ["Неизвестное значение 'CRC32_MPEG' параметра 'crc_algorithm'", "применяется 'STM32_HW_DEFAULT'", "Алгоритм: STM32_HW_DEFAULT"],
     "crc_command": true
   },
   {
@@ -121,7 +148,8 @@
     "name": "ioc-bluepill-defaults",
     "args": ["-DPROJECT_CONFIG_FILE=ioc.yml"],
     "observed": {"MCU": "STM32F103C8T", "PROJECT_NAME": "bluepill_hsi", "heap_size": "512", "stack_size": "1024", "cubefw_package": "V1.8.7"},
-    "properties": {"LINK_LIBRARIES": ["HAL::STM32::F1::GPIO", "CMSIS::STM32::F103C8"]}
+    "properties": {"LINK_LIBRARIES": ["HAL::STM32::F1::GPIO", "CMSIS::STM32::F103C8"]},
+    "log_contains": ["Заданные размеры памяти (heap_size: 512, stack_size: 1024) не применяются: скрипт компоновщика формирует stm32-cmake"]
   },
   {
     "name": "yaml-over-ioc",
@@ -181,7 +209,8 @@
     "args": ["-DPROJECT_CONFIG_FILE=empty-values.yml"],
     "observed": {"heap_size": "512", "stack_size": "1024"},
     "linker": {"file": "STM32F103C8_FLASH.ld", "heap": 512, "stack": 1024},
-    "no_st_dependencies": true
+    "no_st_dependencies": true,
+    "log_absent": ["Неизвестное значение", "Неизвестный элемент"]
   },
   {
     "name": "missing-ioc",
@@ -264,6 +293,144 @@
       {"args": ["-DSTM32_YML_PROFILE="], "observed": {"stack_size": "1024"}, "properties": {"COMPILE_DEFINITIONS": ["BASE=1"]}, "absent_properties": {"COMPILE_DEFINITIONS": ["EXTERNAL=1"]}},
       {"args": ["-DSTM32_YML_PROFILE=external"], "observed": {"stack_size": "4096"}, "properties": {"COMPILE_DEFINITIONS": ["BASE=1", "EXTERNAL=1"]}}
     ]
+  },
+  {
+    "name": "profile-only-keys",
+    "args": ["-DPROJECT_CONFIG_FILE=profile-only.yml"],
+    "steps": [
+      {"args": ["-DSTM32_YML_PROFILE=lang"], "language_flags": true, "observed": {"custom_probe_key": "42"}, "log_contains": ["[профиль] compile_options_c = Wstrict-prototypes", "[профиль] custom_probe_key = 42"]},
+      {"args": ["-DSTM32_YML_PROFILE=", "-DSTM32_YML_OVERRIDE_custom_probe_key=7"], "observed": {"custom_probe_key": "7"}, "command_checks": [{"file": "main.c", "absent": ["-Wstrict-prototypes", "-DONLY_C=1"]}, {"file": "helper.cpp", "absent": ["-fno-exceptions", "-DONLY_CXX=1"]}]}
+    ]
+  },
+  {
+    "name": "external-profile-ignores-top-level",
+    "args": ["-DPROJECT_CONFIG_FILE=external-toplevel.yml"],
+    "steps": [
+      {"args": ["-DSTM32_YML_PROFILE=external"], "observed": {"PROJECT_NAME": "external_probe", "stack_size": "1024"}, "properties": {"COMPILE_DEFINITIONS": ["BASE=1", "EXTERNAL=1"]}, "absent_properties": {"COMPILE_DEFINITIONS": ["LEAKED=1", "INLINE=1"]}, "log_contains": ["[профиль +] compile_definitions += EXTERNAL=1", "Встроенная секция 'profiles:' игнорируется (профили: external, inline): задан profiles_file 'profiles-toplevel.yml'"]},
+      {"args": ["-DSTM32_YML_PROFILE=inline"], "properties": {"COMPILE_DEFINITIONS": ["BASE=1"]}, "absent_properties": {"COMPILE_DEFINITIONS": ["INLINE=1", "EXTERNAL=1"]}, "log_contains": ["Профиль 'inline' не найден"]}
+    ]
+  },
+  {
+    "name": "ioc-missing-values-defaults",
+    "args": ["-DPROJECT_CONFIG_FILE=ioc-minimal.yml", "-DSTM32_YML_PROFILE=template"],
+    "observed": {"MCU": "STM32F103C8T", "PROJECT_NAME": "source", "heap_size": "512", "stack_size": "1024"},
+    "linker": {"file": "STM32F103C8_FLASH.ld", "heap": 512, "stack": 1024},
+    "log_absent": ["не применяются"]
+  },
+  {
+    "name": "configure-depends",
+    "steps": [
+      {"args": ["-DPROJECT_CONFIG_FILE=ioc.yml"], "configure_depends": ["ioc.yml", "bluepill-hsi.ioc"]},
+      {"args": ["-DPROJECT_CONFIG_FILE=external.yml", "-DSTM32_YML_PROFILE=external"], "configure_depends": ["external.yml", "profiles.yml"]}
+    ]
+  },
+  {
+    "name": "memory-size-format",
+    "steps": [
+      {"args": ["-DSTM32_YML_PROFILE=template", "-DSTM32_YML_OVERRIDE_heap_size=1k"], "error": "Недопустимый формат размера памяти 'heap_size: 1k'"},
+      {"args": ["-DSTM32_YML_OVERRIDE_heap_size=1.5K"], "error": "например: 0, 1536, 2K, 1M.", "log_absent": ["'1.5K', '256K'"]},
+      {"args": ["-DSTM32_YML_PROFILE=", "-DSTM32_YML_OVERRIDE_heap_size=-1"], "error": "Недопустимый формат размера памяти 'heap_size: -1'"},
+      {"args": ["-DSTM32_YML_OVERRIDE_linker_script=custom.ld", "-DSTM32_YML_OVERRIDE_linker_script_dir=linker", "-DSTM32_YML_OVERRIDE_heap_size=0x200"], "error": "Недопустимый формат размера памяти 'heap_size: 0x200'"},
+      {"args": ["-DSTM32_YML_OVERRIDE_heap_size=0", "-DSTM32_YML_OVERRIDE_stack_size=1M"], "observed": {"heap_size": "0", "stack_size": "1M"}, "link_options_contain": "linker/custom.ld"},
+      {"args": ["-DSTM32_YML_OVERRIDE_linker_script=auto", "-DSTM32_YML_PROFILE=template", "-DSTM32_YML_OVERRIDE_heap_size=1536", "-DSTM32_YML_OVERRIDE_stack_size=2K"], "linker": {"heap": 1536, "stack": 2048}}
+    ]
+  },
+  {
+    "name": "memory-size-unused-warning",
+    "steps": [
+      {"log_absent": ["не применяются"]},
+      {"args": ["-DSTM32_YML_PROFILE=append"], "log_contains": ["Заданные размеры памяти (stack_size: 2K) не применяются: скрипт компоновщика формирует stm32-cmake с собственными размерами heap 0x200 и stack 0x400 байт."]},
+      {"args": ["-DSTM32_YML_PROFILE=template"], "linker": {"heap": 1024, "stack": 2048}, "log_absent": ["не применяются"]},
+      {"args": ["-DSTM32_YML_PROFILE=", "-DSTM32_YML_OVERRIDE_linker_script=custom.ld", "-DSTM32_YML_OVERRIDE_linker_script_dir=linker", "-DSTM32_YML_OVERRIDE_heap_size=1K"], "log_contains": ["Заданные размеры памяти (heap_size: 1K) не применяются: размеры задаёт явный скрипт компоновщика 'custom.ld'."]}
+    ]
+  },
+  {
+    "name": "enum-unknown-values",
+    "args": ["-DPROJECT_CONFIG_FILE=system-libraries.yml", "-DSTM32_YML_PROFILE=nosys", "-DSTM32_YML_OVERRIDE_toolchain_backend=stm32cmake", "-DSTM32_YML_OVERRIDE_system_library=nosys"],
+    "observed": {"toolchain_backend": "stm32-cmake"},
+    "properties": {"LINK_LIBRARIES": ["STM32::Nano"]},
+    "absent_properties": {"LINK_LIBRARIES": ["STM32::NoSys", "STM32::Semihosting"]},
+    "no_st_dependencies": true,
+    "log_contains": ["Неизвестное значение 'stm32cmake' параметра 'toolchain_backend'. Известные значения: stm32-cmake, arduino. применяется 'stm32-cmake'.", "Неизвестное значение 'nosys' параметра 'system_library'. Известные значения: NoSys, Semihosting. значение не используется."]
+  },
+  {
+    "name": "freertos-unknown-enums",
+    "args": ["-DPROJECT_CONFIG_FILE=freertos.yml"],
+    "steps": [
+      {"args": ["-DSTM32_YML_OVERRIDE_cmsis_rtos_api=v3"], "observed": {"cmsis_rtos_api": "none"}, "properties": {"LINK_LIBRARIES": ["FreeRTOS::STM32::F4::ARM_CM4F"]}, "absent_properties": {"LINK_LIBRARIES": ["CMSIS::STM32::F4::RTOS", "CMSIS::STM32::F4::RTOS_V2"]}, "log_contains": ["Неизвестное значение 'v3' параметра 'cmsis_rtos_api'. Известные значения: none, v1, v2. применяется 'none'."]},
+      {"args": ["-DSTM32_YML_PROFILE=disabled", "-USTM32_YML_OVERRIDE_cmsis_rtos_api", "-DSTM32_YML_OVERRIDE_freertos_version=cubeide"], "observed": {"use_freertos": "FALSE", "freertos_version": "external"}, "log_contains": ["Неизвестное значение 'cubeide' параметра 'freertos_version'. Известные значения: cube, external. применяется 'external'."]}
+    ]
+  },
+  {
+    "name": "h7-single-core-default",
+    "args": ["-DPROJECT_CONFIG_FILE=stm32h7.yml"],
+    "observed": {"MCU": "STM32H743ZI"},
+    "properties": {"LINK_LIBRARIES": ["HAL::STM32::H7::M7::GPIO", "CMSIS::STM32::H743ZI::M7"]},
+    "log_contains": ["Ядро MCU не задано, используется единственное ядро STM32H743ZI: M7.", "не проверялось (скрипт формирует stm32-cmake)"],
+    "log_absent": ["MSPLIM"]
+  },
+  {
+    "name": "h7-dual-core",
+    "args": ["-DPROJECT_CONFIG_FILE=stm32h7.yml"],
+    "steps": [
+      {"args": ["-DSTM32_YML_PROFILE=dual"], "error": "У STM32H745ZI несколько ядер (M7, M4): укажите mcu_core"},
+      {"args": ["-DSTM32_YML_PROFILE=dualM7"], "properties": {"LINK_LIBRARIES": ["HAL::STM32::H7::M7::GPIO", "CMSIS::STM32::H745ZI::M7"]}, "log_contains": ["Ядро MCU: M7"]},
+      {"args": ["-DSTM32_YML_PROFILE=dualM4", "-DSTM32_YML_OVERRIDE_validate_linker_script=true"], "properties": {"LINK_LIBRARIES": ["HAL::STM32::H7::M4::GPIO", "CMSIS::STM32::H745xx::M4"]}, "absent_properties": {"LINK_LIBRARIES": ["HAL::STM32::H7::M7::GPIO"]}, "log_contains": ["Ядро MCU: M4", "Соотношение : 288K == 288K", "Max Flash Size: 1048576"]}
+    ]
+  },
+  {
+    "name": "mcu-core-invalid",
+    "steps": [
+      {"args": ["-DPROJECT_CONFIG_FILE=stm32h7.yml", "-DSTM32_YML_PROFILE=badcore"], "error": "mcu_core: 'M3' недопустим для STM32H743ZI. Допустимые значения: M7."},
+      {"args": ["-DPROJECT_CONFIG_FILE=stm32_config.yml", "-DSTM32_YML_PROFILE=", "-DSTM32_YML_OVERRIDE_mcu_core=M4"], "error": "mcu_core: 'M4' недопустим для STM32F411CE: stm32-cmake не выделяет ядра"}
+    ]
+  },
+  {
+    "name": "h7-freertos-cube",
+    "args": ["-DPROJECT_CONFIG_FILE=stm32h7.yml", "-DSTM32_YML_PROFILE=rtos"],
+    "properties": {"LINK_LIBRARIES": ["FreeRTOS::STM32::H7::M7::ARM_CM7", "FreeRTOS::STM32::H7::M7::Heap::4", "CMSIS::STM32::H7::M7::RTOS_V2"]}
+  },
+  {
+    "name": "hal-missing-component",
+    "args": ["-DPROJECT_CONFIG_FILE=stm32h7.yml", "-DSTM32_YML_PROFILE=badhal"],
+    "error": "Компонент HAL 'NOSUCHDRIVER' (hal_components) не найден для семейства H7 (ядро M7)",
+    "log_absent": ["CMake Generate step failed"]
+  },
+  {
+    "name": "h5-cmsis-hal-freertos-external",
+    "args": ["-DPROJECT_CONFIG_FILE=stm32h5.yml", "-DFREERTOS_PATH=/opt/FreeRTOS-Kernel/11.3.1"],
+    "steps": [
+      {"args": ["-DSTM32_YML_PROFILE="], "properties": {"LINK_LIBRARIES": ["HAL::STM32::H5::GPIO", "CMSIS::STM32::H563ZI"]}, "log_contains": ["Startup /opt/STM32Cube/Repository/STM32Cube_FW_H5_V1.7.0/Drivers/CMSIS/Device/ST/STM32H5xx/Source/Templates/gcc/startup_stm32h563xx.s задаёт границу стека (MSPLIM) по символу _sstack", "но скрипт компоновщика stm32-cmake его не определяет"]},
+      {"args": ["-DSTM32_YML_PROFILE=sstack"], "link_options_contain": "linker/h563-sstack.ld", "log_absent": ["MSPLIM"]},
+      {"args": ["-DSTM32_YML_PROFILE=rtos"], "properties": {"LINK_LIBRARIES": ["FreeRTOS::ARM_CM33_NTZ", "FreeRTOS::Heap::4"]}, "absent_properties": {"LINK_LIBRARIES": ["FreeRTOS::ARM_CM33_NTZ::NON_SECURE"]}},
+      {"args": ["-DSTM32_YML_PROFILE=rtosv2"], "error": "cmsis_rtos_api: v2: обёртка CMSIS-RTOS не найдена (нет цели CMSIS::STM32::H5::RTOS_V2)"},
+      {"args": ["-DSTM32_YML_PROFILE=crc"], "linker": {"file": "STM32H563ZI_FLASH.ld", "heap": 512, "stack": 1024}, "log_contains": ["Max Flash Size: 2097152", "Соотношение : 640K == 640K", "Startup /opt/STM32Cube/Repository/STM32Cube_FW_H5_V1.7.0/Drivers/CMSIS/Device/ST/STM32H5xx/Source/Templates/gcc/startup_stm32h563xx.s задаёт границу стека (MSPLIM) по символу _sstack"]}
+    ]
+  },
+  {
+    "name": "freertos-ioc-port-table",
+    "args": ["-DPROJECT_CONFIG_FILE=freertos-port.yml", "-DFREERTOS_PATH=/opt/FreeRTOS-Kernel/11.3.1"],
+    "steps": [
+      {"args": ["-DSTM32_YML_OVERRIDE_mcu=STM32F103C8", "-DSTM32_YML_OVERRIDE_mcu_core="], "observed": {"freertos_components": "ARM_CM3;Heap::4"}, "properties": {"LINK_LIBRARIES": ["FreeRTOS::ARM_CM3", "FreeRTOS::Heap::4"]}, "log_absent": ["не определён таблицей фреймворка"]},
+      {"args": ["-DSTM32_YML_OVERRIDE_mcu=STM32F411CE", "-DSTM32_YML_OVERRIDE_mcu_core="], "observed": {"freertos_components": "ARM_CM4F;Heap::4"}, "properties": {"LINK_LIBRARIES": ["FreeRTOS::ARM_CM4F", "FreeRTOS::Heap::4"]}, "log_absent": ["не определён таблицей фреймворка"]},
+      {"args": ["-DSTM32_YML_OVERRIDE_mcu=STM32G071RB", "-DSTM32_YML_OVERRIDE_mcu_core="], "observed": {"freertos_components": "ARM_CM0;Heap::4"}, "properties": {"LINK_LIBRARIES": ["FreeRTOS::ARM_CM0", "FreeRTOS::Heap::4"]}, "log_absent": ["не определён таблицей фреймворка"]},
+      {"args": ["-DSTM32_YML_OVERRIDE_mcu=STM32C031C6", "-DSTM32_YML_OVERRIDE_mcu_core="], "observed": {"freertos_components": "ARM_CM0;Heap::4"}, "properties": {"LINK_LIBRARIES": ["FreeRTOS::ARM_CM0", "FreeRTOS::Heap::4"]}, "log_absent": ["не определён таблицей фреймворка"]},
+      {"args": ["-DSTM32_YML_OVERRIDE_mcu=STM32U083RC", "-DSTM32_YML_OVERRIDE_mcu_core="], "observed": {"freertos_components": "ARM_CM0;Heap::4"}, "properties": {"LINK_LIBRARIES": ["FreeRTOS::ARM_CM0", "FreeRTOS::Heap::4"]}, "log_absent": ["не определён таблицей фреймворка"]},
+      {"args": ["-DSTM32_YML_OVERRIDE_mcu=STM32H563ZI", "-DSTM32_YML_OVERRIDE_mcu_core="], "observed": {"freertos_components": "ARM_CM33_NTZ;Heap::4"}, "properties": {"LINK_LIBRARIES": ["FreeRTOS::ARM_CM33_NTZ", "FreeRTOS::Heap::4"]}, "log_absent": ["не определён таблицей фреймворка"]},
+      {"args": ["-DSTM32_YML_OVERRIDE_mcu=STM32L552ZE", "-DSTM32_YML_OVERRIDE_mcu_core="], "observed": {"freertos_components": "ARM_CM33_NTZ;Heap::4"}, "properties": {"LINK_LIBRARIES": ["FreeRTOS::ARM_CM33_NTZ", "FreeRTOS::Heap::4"]}, "log_absent": ["не определён таблицей фреймворка"]},
+      {"args": ["-DSTM32_YML_OVERRIDE_mcu=STM32U575ZI", "-DSTM32_YML_OVERRIDE_mcu_core="], "observed": {"freertos_components": "ARM_CM33_NTZ;Heap::4"}, "properties": {"LINK_LIBRARIES": ["FreeRTOS::ARM_CM33_NTZ", "FreeRTOS::Heap::4"]}, "log_absent": ["не определён таблицей фреймворка"]},
+      {"args": ["-DSTM32_YML_OVERRIDE_mcu=STM32WL55JC", "-DSTM32_YML_OVERRIDE_mcu_core=M4"], "observed": {"freertos_components": "ARM_CM3;Heap::4"}, "properties": {"LINK_LIBRARIES": ["FreeRTOS::ARM_CM3", "FreeRTOS::Heap::4"]}, "log_absent": ["не определён таблицей фреймворка"]},
+      {"args": ["-DSTM32_YML_OVERRIDE_mcu=STM32WL55JC", "-DSTM32_YML_OVERRIDE_mcu_core=M0PLUS"], "observed": {"freertos_components": "ARM_CM0;Heap::4"}, "properties": {"LINK_LIBRARIES": ["FreeRTOS::ARM_CM0", "FreeRTOS::Heap::4"]}, "log_absent": ["не определён таблицей фреймворка"]},
+      {"args": ["-DSTM32_YML_OVERRIDE_mcu=STM32WB55RG", "-DSTM32_YML_OVERRIDE_mcu_core="], "observed": {"freertos_components": "ARM_CM4F;Heap::4"}, "properties": {"LINK_LIBRARIES": ["FreeRTOS::ARM_CM4F", "FreeRTOS::Heap::4"]}, "log_absent": ["не определён таблицей фреймворка"]},
+      {"args": ["-DSTM32_YML_OVERRIDE_mcu=STM32H745ZI", "-DSTM32_YML_OVERRIDE_mcu_core=M7"], "observed": {"freertos_components": "ARM_CM7;Heap::4"}, "properties": {"LINK_LIBRARIES": ["FreeRTOS::ARM_CM7", "FreeRTOS::Heap::4"]}, "log_absent": ["не определён таблицей фреймворка"]},
+      {"args": ["-DSTM32_YML_OVERRIDE_mcu=STM32H745ZI", "-DSTM32_YML_OVERRIDE_mcu_core=M4"], "observed": {"freertos_components": "ARM_CM4F;Heap::4"}, "properties": {"LINK_LIBRARIES": ["FreeRTOS::ARM_CM4F", "FreeRTOS::Heap::4"]}, "log_absent": ["не определён таблицей фреймворка"]}
+    ]
+  },
+  {
+    "name": "freertos-ioc-port-unknown-family",
+    "args": ["-DPROJECT_CONFIG_FILE=freertos-port.yml", "-DFREERTOS_PATH=/opt/FreeRTOS-Kernel/11.3.1", "-DSTM32_YML_OVERRIDE_mcu=STM32N657X0"],
+    "error": "STM32N657X0",
+    "log_contains": ["Порт FreeRTOS для 'STM32N657X0' не определён таблицей фреймворка; используется ARM_CM4F."]
   },
   {
     "name": "source-directory-target",
@@ -412,11 +579,11 @@
       "MCU": "STM32F103C8T6"
     },
     "log_contains": [
-      "Framework : 0.9.2",
-      "Config : 0.9.2 (совпадают"
+      "stm32-cmake-yml версия: 0.9.3",
+      "Версия в конфигурации: 0.9.3 (совпадают"
     ],
     "log_absent": [
-      "отсутствует обязательный параметр 'stm32_cmake_yml_version'",
+      "не указан рекомендуемый параметр 'stm32_cmake_yml_version'",
       "Рекомендуется обновить stm32_cmake_yml_version.",
       "Возможны ошибки."
     ]
@@ -432,8 +599,11 @@
       "MCU": "STM32F103C8T6"
     },
     "log_contains": [
-      "Framework : 0.9.2",
-      "отсутствует обязательный параметр 'stm32_cmake_yml_version'"
+      "stm32-cmake-yml версия: 0.9.3",
+      "не указан рекомендуемый параметр 'stm32_cmake_yml_version'"
+    ],
+    "log_absent": [
+      "обязательный параметр"
     ]
   },
   {
@@ -447,8 +617,11 @@
       "MCU": "STM32F103C8T6"
     },
     "log_contains": [
-      "Framework : 0.9.2",
-      "отсутствует обязательный параметр 'stm32_cmake_yml_version'"
+      "stm32-cmake-yml версия: 0.9.3",
+      "не указан рекомендуемый параметр 'stm32_cmake_yml_version'"
+    ],
+    "log_absent": [
+      "обязательный параметр"
     ]
   },
   {
@@ -462,13 +635,14 @@
       "MCU": "STM32F103C8T6"
     },
     "log_contains": [
-      "Framework : 0.9.2",
-      "Config : 0.9.1",
+      "stm32-cmake-yml версия: 0.9.3",
+      "Версия в конфигурации: 0.9.1",
       "Рекомендуется обновить stm32_cmake_yml_version."
     ],
     "log_absent": [
+      "Что нового в 0.9",
       "Возможны ошибки.",
-      "отсутствует обязательный параметр 'stm32_cmake_yml_version'"
+      "не указан рекомендуемый параметр 'stm32_cmake_yml_version'"
     ]
   },
   {
@@ -482,13 +656,13 @@
       "MCU": "STM32F103C8T6"
     },
     "log_contains": [
-      "Framework : 0.9.2",
-      "Config : 0.9.3",
+      "stm32-cmake-yml версия: 0.9.3",
+      "Версия в конфигурации: 0.9.4",
       "Возможны ошибки."
     ],
     "log_absent": [
       "Рекомендуется обновить stm32_cmake_yml_version.",
-      "отсутствует обязательный параметр 'stm32_cmake_yml_version'"
+      "не указан рекомендуемый параметр 'stm32_cmake_yml_version'"
     ]
   },
   {
@@ -502,11 +676,11 @@
       "MCU": "STM32F103C8T6"
     },
     "log_contains": [
-      "Framework : 0.9.2"
+      "stm32-cmake-yml версия: 0.9.3"
     ],
     "log_absent": [
-      "Config :",
-      "отсутствует обязательный параметр 'stm32_cmake_yml_version'",
+      "Версия в конфигурации:",
+      "не указан рекомендуемый параметр 'stm32_cmake_yml_version'",
       "Рекомендуется обновить stm32_cmake_yml_version.",
       "Возможны ошибки."
     ]
@@ -519,7 +693,7 @@
     ],
     "no_st_dependencies": true,
     "log_contains": [
-      "Config : 0.9.3",
+      "Версия в конфигурации: 0.9.4",
       "Возможны ошибки."
     ]
   },
@@ -527,12 +701,12 @@
     "name": "version-before-override",
     "args": [
       "-DPROJECT_CONFIG_FILE=version-newer.yml",
-      "-DSTM32_YML_OVERRIDE_stm32_cmake_yml_version=0.9.2",
+      "-DSTM32_YML_OVERRIDE_stm32_cmake_yml_version=0.9.3",
       "-DSTM32_YML_OVERRIDE_stm32_cmake_yml_version_check=false"
     ],
     "no_st_dependencies": true,
     "log_contains": [
-      "Config : 0.9.3",
+      "Версия в конфигурации: 0.9.4",
       "Возможны ошибки."
     ]
   },
@@ -670,7 +844,7 @@
       "-DPROJECT_CONFIG_FILE=freertos.yml",
       "-DSTM32_YML_PROFILE=missing"
     ],
-    "error": "FreeRTOS::STM32::F4::MissingComponent"
+    "error": "Компонент FreeRTOS 'MissingComponent' (freertos_components) не найден: нет цели FreeRTOS::STM32::F4::MissingComponent"
   },
   {
     "name": "freertos-disabled",
@@ -922,37 +1096,42 @@
     ]
   },
   {
-    "name": "freertos-external-cmake-known-failure",
-    "args": [
-      "-DPROJECT_CONFIG_FILE=freertos.yml",
-      "-DSTM32_YML_OVERRIDE_freertos_version=external",
-      "-DSTM32_YML_OVERRIDE_cmsis_rtos_api=none",
-      "-DFREERTOS_PATH=/opt/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3/Middlewares/Third_Party/FreeRTOS"
-    ],
-    "error": "FreeRTOS::ARM_CM4F",
-    "log_contains": [
-      "Search for FreeRTOS families: STM32F4",
-      "Found FreeRTOS:",
-      "CMake Generate step failed."
+    "name": "freertos-external-cmake",
+    "args": ["-DPROJECT_CONFIG_FILE=freertos.yml", "-DSTM32_YML_OVERRIDE_freertos_version=external", "-DSTM32_YML_OVERRIDE_cmsis_rtos_api=none", "-DFREERTOS_PATH=/opt/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3/Middlewares/Third_Party/FreeRTOS"],
+    "properties": {"LINK_LIBRARIES": ["FreeRTOS::ARM_CM4F", "FreeRTOS::Heap::4", "FreeRTOS::Timers", "FreeRTOS::EventGroups", "FreeRTOS::StreamBuffer"]},
+    "absent_properties": {"LINK_LIBRARIES": ["FreeRTOS::STM32::F4::ARM_CM4F", "FreeRTOS::STM32::F4::Heap::4"]},
+    "log_absent": ["Search for FreeRTOS families"]
+  },
+  {
+    "name": "freertos-external-env",
+    "args": ["-DPROJECT_CONFIG_FILE=freertos.yml", "-DSTM32_YML_OVERRIDE_freertos_version=external", "-DSTM32_YML_OVERRIDE_cmsis_rtos_api=none"],
+    "env": {"FREERTOS_PATH": "/opt/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3/Middlewares/Third_Party/FreeRTOS"},
+    "properties": {"LINK_LIBRARIES": ["FreeRTOS::ARM_CM4F", "FreeRTOS::Heap::4"]},
+    "absent_properties": {"LINK_LIBRARIES": ["FreeRTOS::STM32::F4::ARM_CM4F"]},
+    "log_contains": ["ENV FREERTOS_PATH specified, using FREERTOS_PATH: /opt/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3/Middlewares/Third_Party/FreeRTOS"]
+  },
+  {
+    "name": "freertos-external-kernel",
+    "args": ["-DPROJECT_CONFIG_FILE=freertos.yml", "-DSTM32_YML_OVERRIDE_freertos_version=external", "-DFREERTOS_PATH=/opt/FreeRTOS-Kernel/11.3.1"],
+    "steps": [
+      {"args": ["-DSTM32_YML_OVERRIDE_cmsis_rtos_api=none"], "properties": {"LINK_LIBRARIES": ["FreeRTOS::ARM_CM4F", "FreeRTOS::Heap::4"]}, "absent_properties": {"LINK_LIBRARIES": ["CMSIS::STM32::F4::RTOS_V2"]}},
+      {"args": ["-DSTM32_YML_OVERRIDE_cmsis_rtos_api=v2"], "properties": {"LINK_LIBRARIES": ["FreeRTOS::ARM_CM4F", "FreeRTOS::Heap::4", "CMSIS::STM32::F4::RTOS_V2"]}}
     ]
   },
   {
-    "name": "freertos-external-env-known-failure",
-    "args": [
-      "-DPROJECT_CONFIG_FILE=freertos.yml",
-      "-DSTM32_YML_OVERRIDE_freertos_version=external",
-      "-DSTM32_YML_OVERRIDE_cmsis_rtos_api=none"
-    ],
-    "error": "FreeRTOS::ARM_CM4F",
-    "log_contains": [
-      "Search for FreeRTOS families: STM32F4",
-      "Found FreeRTOS:",
-      "CMake Generate step failed.",
-      "ENV FREERTOS_PATH specified, using FREERTOS_PATH: /opt/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3/Middlewares/Third_Party/FreeRTOS"
-    ],
-    "env": {
-      "FREERTOS_PATH": "/opt/STM32Cube/Repository/STM32Cube_FW_F4_V1.28.3/Middlewares/Third_Party/FreeRTOS"
-    }
+    "name": "freertos-external-no-path",
+    "args": ["-DPROJECT_CONFIG_FILE=freertos.yml", "-DSTM32_YML_OVERRIDE_freertos_version=external", "-DSTM32_YML_OVERRIDE_cmsis_rtos_api=none"],
+    "error": "freertos_version: external требует путь к FreeRTOS: задайте FREERTOS_PATH"
+  },
+  {
+    "name": "freertos-external-missing-port",
+    "args": ["-DPROJECT_CONFIG_FILE=freertos.yml", "-DSTM32_YML_OVERRIDE_freertos_version=external", "-DSTM32_YML_OVERRIDE_cmsis_rtos_api=none", "-DFREERTOS_PATH=/opt/FreeRTOS-Kernel/11.3.1", "-DSTM32_YML_OVERRIDE_freertos_components=ARM_CM7_MPU;Heap::4"],
+    "error": "файлы порта 'ARM_CM7_MPU' не найдены"
+  },
+  {
+    "name": "freertos-external-missing-component",
+    "args": ["-DPROJECT_CONFIG_FILE=freertos.yml", "-DSTM32_YML_OVERRIDE_freertos_version=external", "-DSTM32_YML_OVERRIDE_cmsis_rtos_api=none", "-DFREERTOS_PATH=/opt/FreeRTOS-Kernel/11.3.1", "-DSTM32_YML_PROFILE=missing"],
+    "error": "Компонент FreeRTOS 'MissingComponent' (freertos_components) не найден: нет цели FreeRTOS::MissingComponent в пространстве FreeRTOS."
   },
   {
     "name": "stm32f0-cmsis-hal",
@@ -1661,6 +1840,7 @@
     "generated_artifacts": [
       "bin",
       "hex",
+      "srec",
       "map",
       "lss"
     ],
@@ -1734,6 +1914,9 @@
       "-DPROJECT_CONFIG_FILE=artifacts.yml",
       "-DSTM32_YML_PROFILE=unknown"
     ],
+    "log_contains": [
+      "Неизвестный элемент 'unsupported-format' параметра 'build_artifacts'. Известные значения: bin, hex, srec, map, lss. Элемент пропускается."
+    ],
     "generated_artifacts": [
       "bin"
     ],
@@ -1766,6 +1949,7 @@
         "generated_artifacts": [
           "bin",
           "hex",
+          "srec",
           "map",
           "lss"
         ],

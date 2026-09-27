@@ -1,5 +1,5 @@
 # Configure-only version diagnostic fixture.
-stm32_cmake_yml_version: 0.9.3
+stm32_cmake_yml_version: 0.9.4
 stm32_cmake_yml_version_check: false
 project_name: baremetal_probe
 mcu: STM32F103C8T6

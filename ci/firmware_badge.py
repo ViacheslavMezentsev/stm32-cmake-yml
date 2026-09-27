@@ -3,6 +3,7 @@ import argparse
 from datetime import datetime, timezone
 import json
 from pathlib import Path
+from firmware_cases import run_cases
 from firmware_matrix import pairs, verify_build, verify_matrix
 
 
@@ -27,15 +28,25 @@ def collect(build, run, lock, revision, emulator="qemu"):
         if compiled['git_revision'] != revision or compiled['git_dirty'] != '0':
             raise ValueError('Build provenance differs from the clean CI checkout')
         executed = read(run / name / f'{emulator}-summary.json')
-        expected = {c['profile']: c['metadata'] for c in compiled['cases'] + [compiled['crc_negative']]}
+        runnable = set(run_cases(emulator))
+        expected = {c['profile']: c['metadata'] for c in compiled['cases'] + compiled['crc_negatives']
+                    if c['profile'] in runnable}
         cases = executed['cases']
         if (executed['status'] != 'passed' or len(cases) != len(expected)
                 or sorted(c['profile'] for c in cases) != sorted(expected)
                 or any(c['passed'] is not True or c['metadata_ok'] is not True
                        or c['expected_metadata'] != expected[c['profile']] for c in cases)):
             raise ValueError(f'Missing, failed or mismatched {emulator} cases')
-        builds += len(compiled['cases'])
+        # Build-only firmware (H7/H5, TC-57) counts as builds, not simulator checks.
+        builds += len(compiled['cases']) + len(compiled['build_only'])
         checks += len(cases)
+        if emulator == 'renode':
+            # H7/H5 firmware runs in Renode only; QEMU has no matching machine.
+            runs = executed.get('build_only', [])
+            if (sorted(c['profile'] for c in runs) != sorted(c['profile'] for c in compiled['build_only'])
+                    or any(c['passed'] is not True for c in runs)):
+                raise ValueError('Missing or failed Renode build-only runs')
+            checks += len(runs)
     return {'builds': builds, 'checks': checks, 'emulator': 'QEMU' if emulator == 'qemu' else 'Renode', 'revision': revision}
 
 

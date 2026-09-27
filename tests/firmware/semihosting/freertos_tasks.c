@@ -1,7 +1,7 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "queue.h"
-#include "stm32f1xx.h"
+#include "smoke_target.h"
 
 /* Standard weak port hook: load, clear, enable (also works on pinned Renode). */
 void vPortSetupTimerInterrupt(void) {
@@ -45,15 +45,20 @@ static void starter(void* unused) {
     replies = xQueueCreate(1, sizeof(uint32_t));
     configASSERT(requests && replies);
     /* Lower priority keeps both children dormant until the starter deletes itself. */
-    configASSERT(xTaskCreate(receiver, "receiver", 256, NULL, 1, NULL) == pdPASS);
-    configASSERT(xTaskCreate(sender, "sender", 512, NULL, 1, NULL) == pdPASS);
+    configASSERT(xTaskCreate(receiver, "receiver", SMOKE_STACK_RECEIVER, NULL, 1, NULL) == pdPASS);
+    configASSERT(xTaskCreate(sender, "sender", SMOKE_STACK_SENDER, NULL, 1, NULL) == pdPASS);
     startup_complete = 1;
     vTaskDelete(NULL);
     configASSERT(0);
 }
 
 void smoke_freertos_tasks(void) {
-    configASSERT(xTaskCreate(starter, "starter", 256, NULL, 2, NULL) == pdPASS);
+    /* Ports without the weak hook (ARM_CM0 in FreeRTOS V10.0.1 uses a static
+       prvSetupTimerInterrupt) clear VAL before writing LOAD; Renode then reloads
+       the reset LOAD (0xFFFFFF) and the first tick comes after about 2 s. */
+    SysTick->CTRL = 0;
+    SysTick->LOAD = configCPU_CLOCK_HZ / configTICK_RATE_HZ - 1UL;
+    configASSERT(xTaskCreate(starter, "starter", SMOKE_STACK_STARTER, NULL, 2, NULL) == pdPASS);
     vTaskStartScheduler();
     configASSERT(0); /* Includes failure to allocate the idle task. */
 }

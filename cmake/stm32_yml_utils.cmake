@@ -204,6 +204,12 @@ endfunction()
 # Требования: CMake >= 3.19, 'yq' должен быть установлен и доступен в PATH.
 #
 function(stm32_yml_parse_config config_file)
+    # Необязательный второй аргумент — выражение yq, выбирающее часть файла
+    # (например, только секцию profiles: внешнего файла профилей, ТЗ 3.4.8).
+    set(_yq_expression ".")
+    if(ARGC GREATER 1)
+        set(_yq_expression "${ARGV1}")
+    endif()
     find_program(YQ_EXECUTABLE yq)
     if(NOT YQ_EXECUTABLE)
         message(FATAL_ERROR "Инструмент 'yq' не найден. Пожалуйста, установите его.")
@@ -213,7 +219,7 @@ function(stm32_yml_parse_config config_file)
     endif()
 
     execute_process(
-        COMMAND ${YQ_EXECUTABLE} -o=json "." ${config_file}
+        COMMAND ${YQ_EXECUTABLE} -o=json "${_yq_expression}" ${config_file}
         OUTPUT_VARIABLE YAML_AS_JSON
         RESULT_VARIABLE YQ_RESULT
         OUTPUT_STRIP_TRAILING_WHITESPACE
@@ -240,37 +246,49 @@ endfunction()
 #      ФУНКЦИЯ ДЛЯ НОРМАЛИЗАЦИИ РАЗМЕРОВ ПАМЯТИ В БАЙТЫ
 # ==============================================================================
 # Принимает имя переменной, значение которой нужно вычислить.
-# Поддерживает форматы:
-#   - "1M", "0.25M" (мегабайты)
-#   - "1024K", "1.5K" (килобайты)
-#   - "512" (байты)
+# Допустимые форматы (ТЗ 4.11.4):
+#   - "1536" (целое число байт, в том числе 0)
+#   - "2K"   (целое число килобайт, суффикс только в верхнем регистре)
+#   - "1M"   (целое число мегабайт, суффикс только в верхнем регистре)
+# Иной формат, в том числе дробный ("1.5K") и "1k", — ошибка Configure.
 # Результат (целое число байт) помещается в переменную с тем же именем.
 #
 function(stm32_yml_normalize_memory var_name)
-    set(value_str ${${var_name}})
-    set(result 0)
-
-    # Проверяем на мегабайты (M или m)
-    if(value_str MATCHES "^([0-9.]+)M$")
-        set(numeric_part ${CMAKE_MATCH_1})
-        math(EXPR result "${numeric_part} * 1024 * 1024")
-
-    # Проверяем на килобайты (K или k)
-    elseif(value_str MATCHES "^([0-9.]+)K$")
-        set(numeric_part ${CMAKE_MATCH_1})
-        math(EXPR result "${numeric_part} * 1024")
-
-    # Проверяем на простое число (считаем, что это байты)
-    elseif(value_str MATCHES "^[0-9]+$")
-        set(result ${value_str})
-
-    # Если формат не распознан - выдаем ошибку
-    else()
-        message(FATAL_ERROR "Недопустимый формат размера памяти: '${value_str}'. Используйте целые числа (байты) или числа с суффиксом K/M (например, '1.5K', '256K', '1M').")
-    endif()
-
-    message(STATUS "Размер памяти '${value_str}' нормализован в ${result} байт.")
+    _stm32_yml_memory_bytes(${var_name} result)
+    message(STATUS "Размер памяти '${${var_name}}' нормализован в ${result} байт.")
     set(${var_name} ${result} PARENT_SCOPE)
+endfunction()
+
+# Разбирает значение переменной VAR_NAME по формату ТЗ 4.11.4 в OUT_VAR (байты).
+function(_stm32_yml_memory_bytes VAR_NAME OUT_VAR)
+    set(value_str "${${VAR_NAME}}")
+    if(value_str MATCHES "^([0-9]+)M$")
+        math(EXPR result "${CMAKE_MATCH_1} * 1024 * 1024")
+    elseif(value_str MATCHES "^([0-9]+)K$")
+        math(EXPR result "${CMAKE_MATCH_1} * 1024")
+    elseif(value_str MATCHES "^[0-9]+$")
+        math(EXPR result "${value_str}")
+    else()
+        message(FATAL_ERROR
+            "Недопустимый формат размера памяти '${VAR_NAME}: ${value_str}'. "
+            "Укажите целое число байт или целое число с суффиксом K или M "
+            "в верхнем регистре, например: 0, 1536, 2K, 1M.")
+    endif()
+    set(${OUT_VAR} ${result} PARENT_SCOPE)
+endfunction()
+
+# ==============================================================================
+# Проверяет формат заданных размеров памяти при каждом Configure (ТЗ 4.11.8),
+# не изменяя сами значения. Пустое значение не проверяется.
+#
+# @param ARGN - Имена переменных (heap_size, stack_size).
+# ==============================================================================
+function(stm32_yml_check_memory_format)
+    foreach(_var IN LISTS ARGN)
+        if(NOT "${${_var}}" STREQUAL "")
+            _stm32_yml_memory_bytes(${_var} _bytes)
+        endif()
+    endforeach()
 endfunction()
 
 # ==============================================================================
@@ -449,12 +467,61 @@ function(stm32_yml_ensure_default_value VAR_NAME DEFAULT_VALUE)
 endfunction()
 
 # ==============================================================================
+# Проверяет значение перечислимого параметра (ТЗ 3.7).
+# Пустое значение не проверяется (ТЗ 3.7.4). Неизвестное непустое значение даёт
+# предупреждение с именем параметра, заданным и фактически применяемым значением
+# и заменяется на FALLBACK (ТЗ 3.7.1, 3.7.2); Configure продолжается.
+# Пустой FALLBACK означает, что значение не используется (system_library).
+#
+# @param VAR_NAME  - Имя параметра.
+# @param FALLBACK  - Значение, применяемое вместо неизвестного.
+# @param ARGN      - Известные значения.
+# ==============================================================================
+function(stm32_yml_check_enum_value VAR_NAME FALLBACK)
+    set(_value "${${VAR_NAME}}")
+    if("${_value}" STREQUAL "" OR "${_value}" IN_LIST ARGN)
+        return()
+    endif()
+    string(REPLACE ";" ", " _known "${ARGN}")
+    if("${FALLBACK}" STREQUAL "")
+        set(_applied "значение не используется")
+    else()
+        set(_applied "применяется '${FALLBACK}'")
+    endif()
+    message(WARNING "Неизвестное значение '${_value}' параметра '${VAR_NAME}'. "
+                    "Известные значения: ${_known}. ${_applied}.")
+    set(${VAR_NAME} "${FALLBACK}" PARENT_SCOPE)
+endfunction()
+
+# ==============================================================================
+# Проверяет элементы перечислимого списка (ТЗ 3.7): неизвестный элемент даёт
+# предупреждение и удаляется из списка; Configure продолжается.
+#
+# @param VAR_NAME  - Имя параметра-списка.
+# @param ARGN      - Известные значения элементов.
+# ==============================================================================
+function(stm32_yml_check_enum_list VAR_NAME)
+    set(_result "")
+    string(REPLACE ";" ", " _known "${ARGN}")
+    foreach(_item IN LISTS ${VAR_NAME})
+        if("${_item}" IN_LIST ARGN)
+            list(APPEND _result "${_item}")
+        else()
+            message(WARNING "Неизвестный элемент '${_item}' параметра '${VAR_NAME}'. "
+                            "Известные значения: ${_known}. Элемент пропускается.")
+        endif()
+    endforeach()
+    set(${VAR_NAME} "${_result}" PARENT_SCOPE)
+endfunction()
+
+# ==============================================================================
 #      ФОЛБЕК-ОПРЕДЕЛЕНИЕ ЦЕЛИ STM32::Semihosting
 # ==============================================================================
-# Оба штатных toolchain-файла (stm32_gcc.cmake из stm32-cmake и кастомный
-# gcc-arm-none-eabi.cmake) уже определяют эту цель. Определение здесь —
-# страховка для проектов с собственным toolchain, где её может не быть.
-# Проверка if(NOT TARGET) гарантирует отсутствие конфликта.
+# stm32-cmake (stm32/common.cmake) определяет STM32::NoSys, STM32::Nano,
+# STM32::Nano::FloatPrint и STM32::Nano::FloatScan, но не STM32::Semihosting.
+# Поэтому для system_library: Semihosting цель определяет фреймворк
+# (ТЗ 4.10.2); toolchain проекта может определить её раньше — тогда
+# проверка if(NOT TARGET) оставляет его определение.
 # ==============================================================================
 if(NOT (TARGET STM32::Semihosting))
     add_library(STM32::Semihosting INTERFACE IMPORTED)
@@ -477,5 +544,158 @@ function(stm32_yml_generate_lss_file TARGET)
         COMMAND ${CMAKE_OBJDUMP} -h -S "$<TARGET_FILE:${TARGET}>" > ${OUTPUT_FILE_PATH}
         BYPRODUCTS ${OUTPUT_FILE_PATH}
         COMMENT "Generating extended listing file ${OUTPUT_FILE_NAME} from ELF output file."
+    )
+endfunction()
+
+# ==============================================================================
+# Определяет ядро MCU по списку stm32-cmake (ТЗ 4.7.8) и записывает его в
+# mcu_core вызывающей области:
+#   нет ядер       — mcu_core должен быть пуст;
+#   одно ядро      — используется оно, если mcu_core не задан;
+#   несколько ядер — mcu_core обязателен.
+# mcu_core вне списка — ошибка Configure со списком допустимых значений.
+# ==============================================================================
+function(stm32_yml_resolve_mcu_core)
+    stm32_get_cores(_cores CHIP ${MCU})
+    string(REPLACE ";" ", " _cores_text "${_cores}")
+    if(NOT _cores)
+        if(NOT "${mcu_core}" STREQUAL "")
+            message(FATAL_ERROR
+                "mcu_core: '${mcu_core}' недопустим для ${MCU}: stm32-cmake не выделяет ядра "
+                "для этого MCU. Удалите mcu_core из конфигурации.")
+        endif()
+        return()
+    endif()
+    if("${mcu_core}" STREQUAL "")
+        list(LENGTH _cores _count)
+        if(_count GREATER 1)
+            message(FATAL_ERROR
+                "У ${MCU} несколько ядер (${_cores_text}): укажите mcu_core, "
+                "например 'mcu_core: ${_cores}'.")
+        endif()
+        message(STATUS "Ядро MCU не задано, используется единственное ядро ${MCU}: ${_cores}.")
+        set(mcu_core "${_cores}" PARENT_SCOPE)
+    elseif(NOT "${mcu_core}" IN_LIST _cores)
+        message(FATAL_ERROR
+            "mcu_core: '${mcu_core}' недопустим для ${MCU}. Допустимые значения: ${_cores_text}.")
+    else()
+        message(STATUS "Ядро MCU: ${mcu_core}")
+    endif()
+endfunction()
+
+# ==============================================================================
+# Размер области памяти MCU в байтах по stm32_get_memory_info с учётом ядра
+# (ТЗ 4.7.8). KIND: RAM, CCRAM, RAM_SHARE, FLASH. Неизвестный размер — 0.
+#
+# @param KIND       - Область памяти.
+# @param OUT_BYTES  - Переменная для размера в байтах.
+# @param ARGV2      - Необязательная переменная для исходной строки stm32-cmake.
+# ==============================================================================
+function(stm32_yml_mcu_memory_size KIND OUT_BYTES)
+    set(_core_args "")
+    if(NOT "${mcu_core}" STREQUAL "")
+        set(_core_args CORE ${mcu_core})
+    endif()
+    stm32_get_memory_info(CHIP ${MCU} ${_core_args} ${KIND} SIZE _size)
+    if("${_size}" STREQUAL "" OR _size MATCHES "NOTFOUND")
+        set(_bytes 0)
+    else()
+        # Строки вида "64K", "1M", "0x400" или "64K-4" (WB) приводятся к выражению.
+        string(TOUPPER "${_size}" _expr)
+        string(REGEX REPLACE "([0-9]+)K" "(\\1*1024)" _expr "${_expr}")
+        string(REGEX REPLACE "([0-9]+)M" "(\\1*1048576)" _expr "${_expr}")
+        string(REPLACE "0X" "0x" _expr "${_expr}")
+        math(EXPR _bytes "${_expr}")
+    endif()
+    set(${OUT_BYTES} ${_bytes} PARENT_SCOPE)
+    if(ARGC GREATER 2)
+        set(${ARGV2} "${_size}" PARENT_SCOPE)
+    endif()
+endfunction()
+
+# ==============================================================================
+# Регион FLASH итогового скрипта компоновщика (ТЗ 4.15.9, 4.14.2): из шаблона
+# или явного скрипта (LINKER_SCRIPT_PATH), а для скрипта stm32-cmake — по
+# stm32_get_memory_info с учётом ядра. Если регион не определить, OUT_ORIGIN пуст.
+#
+# @param OUT_ORIGIN  - Переменная для начального адреса (как в скрипте, 0x...).
+# @param OUT_LENGTH  - Переменная для длины в байтах.
+# ==============================================================================
+function(stm32_yml_flash_region OUT_ORIGIN OUT_LENGTH)
+    set(${OUT_ORIGIN} "" PARENT_SCOPE)
+    set(${OUT_LENGTH} "" PARENT_SCOPE)
+    if(LINKER_SCRIPT_PATH AND EXISTS "${LINKER_SCRIPT_PATH}")
+        file(READ "${LINKER_SCRIPT_PATH}" _ld_text)
+        set(_flash_re "(^|\n)[ \t]*FLASH[ \t]*(\\([^)]*\\))?[ \t]*:[ \t]*ORIGIN[ \t]*=[ \t]*(0[xX][0-9A-Fa-f]+|[0-9]+)[ \t]*,[ \t]*LENGTH[ \t]*=[ \t]*(0[xX][0-9A-Fa-f]+|[0-9]+[KkMm]?)")
+        if(NOT _ld_text MATCHES "${_flash_re}")
+            return()
+        endif()
+        set(_origin "${CMAKE_MATCH_3}")
+        string(TOUPPER "${CMAKE_MATCH_4}" _length)
+    elseif(NOT toolchain_backend STREQUAL "arduino" AND use_cmsis)
+        # Скрипт формирует stm32-cmake по той же базе памяти.
+        set(_core_args "")
+        if(NOT "${mcu_core}" STREQUAL "")
+            set(_core_args CORE ${mcu_core})
+        endif()
+        stm32_get_memory_info(CHIP ${MCU} ${_core_args} FLASH SIZE _length ORIGIN _origin)
+        string(TOUPPER "${_length}" _length)
+    else()
+        return()
+    endif()
+    if(_length MATCHES "^0X")
+        math(EXPR _bytes "${_length}")
+    elseif(_length MATCHES "^([0-9]+)K$")
+        math(EXPR _bytes "${CMAKE_MATCH_1} * 1024")
+    elseif(_length MATCHES "^([0-9]+)M$")
+        math(EXPR _bytes "${CMAKE_MATCH_1} * 1024 * 1024")
+    else()
+        set(_bytes "${_length}")
+    endif()
+    set(${OUT_ORIGIN} "${_origin}" PARENT_SCOPE)
+    set(${OUT_LENGTH} "${_bytes}" PARENT_SCOPE)
+endfunction()
+
+# ==============================================================================
+# BIN-артефакт только из секций ELF с адресом загрузки в регионе FLASH
+# (ТЗ 4.14.2, 4.15.9). objcopy -O binary заполнил бы промежуток до секции вне
+# Flash (резервная SRAM, ITCM без AT> FLASH) и дал бы файл в сотни мегабайт.
+# Для обычного ELF результат побайтно совпадает с objcopy -O binary. Команда
+# добавляется после внедрения CRC, поэтому BIN содержит записанную CRC.
+# Имя файла — как у функций stm32-cmake: OUTPUT_NAME цели или её имя.
+# Если регион FLASH или Python недоступны — функция toolchain с предупреждением.
+# ==============================================================================
+function(stm32_yml_generate_bin_file TARGET)
+    get_target_property(_output_name ${TARGET} OUTPUT_NAME)
+    if(NOT _output_name)
+        set(_output_name "${TARGET}")
+    endif()
+    get_target_property(_output_dir ${TARGET} RUNTIME_OUTPUT_DIRECTORY)
+    if(_output_dir)
+        set(_bin "${_output_dir}/${_output_name}.bin")
+    else()
+        set(_bin "${_output_name}.bin")
+    endif()
+
+    stm32_yml_flash_region(_flash_origin _flash_length)
+    find_package(Python3 COMPONENTS Interpreter QUIET)
+    set(_script "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../scripts/stm32_crc.py")
+    if("${_flash_origin}" STREQUAL "" OR NOT Python3_FOUND OR NOT EXISTS "${_script}")
+        message(WARNING
+            "bin: не удалось определить регион FLASH скрипта компоновщика или найти Python3; "
+            "BIN создаётся objcopy -O binary и может оказаться большим, если в ELF есть "
+            "секции вне Flash.")
+        stm32_generate_binary_file(${TARGET})
+        return()
+    endif()
+
+    add_custom_command(TARGET ${TARGET} POST_BUILD
+        COMMAND ${Python3_EXECUTABLE} ${_script}
+                --elf $<TARGET_FILE:${TARGET}>
+                --flash ${_flash_origin}:${_flash_length}
+                --image ${_bin}
+        BYPRODUCTS ${_bin}
+        COMMENT "Generating binary file ${_output_name}.bin from FLASH sections of the ELF output file."
+        VERBATIM
     )
 endfunction()

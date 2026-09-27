@@ -27,12 +27,18 @@ stm32-cmake-yml/
 │   ├── stm32-simple-sources/        # Навык AI: подключение исходников из CubeMX
 │   ├── stm32-module-creator/        # Навык AI: создание библиотечных модулей
 │   └── stm32-build-helper/          # Навык AI: диагностика ошибок сборки
-├── CHANGELOG.md
+├── tests/                           # Configure-сценарии, тестовые прошивки, модели Renode
+├── ci/                              # Docker-образы, runner'ы проверок, lock-файл версий
+├── tools/qemu/                      # Архив QEMU для CI и скрипт его сборки
+├── .github/workflows/               # CI GitHub Actions
+├── AGENTS.md                        # Порядок работы для ИИ-агентов
+├── TODO.md                          # Дорожная карта и статус этапов
+├── README.md / README.en.md
+├── CHANGELOG.md / CHANGELOG.en.md   # История изменений RU / EN
 └── LICENSE
 ```
 
-
-`tests/` содержит конфигурационные fixtures и CTest; `ci/` — Docker и проверки.
+`tests/` и `ci/` подробно — [уровни проверок и где их искать](testing.md#уровни-проверок-и-где-их-искать).
 `docs/ru` и `docs/en` содержат навигацию, reference и errata; `docs/reference-index.json`
 связывает опции с тестами. [Правила сопровождения](maintenance.md).
 

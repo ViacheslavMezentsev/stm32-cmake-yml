@@ -7,8 +7,20 @@
 #define configTICK_RATE_HZ 1000
 #define configMAX_PRIORITIES 3
 #define configMINIMAL_STACK_SIZE 128
+/* STM32F030R8 has 8 KiB of RAM: smaller task stacks and FreeRTOS heap. */
+#if defined(STM32F030x8)
+#define SMOKE_STACK_RECEIVER 128
+#define SMOKE_STACK_SENDER 384
+#define SMOKE_STACK_STARTER 128
+#define SMOKE_TASKS_HEAP 4096
+#else
+#define SMOKE_STACK_RECEIVER 256
+#define SMOKE_STACK_SENDER 512
+#define SMOKE_STACK_STARTER 256
+#define SMOKE_TASKS_HEAP 8192
+#endif
 #ifdef SMOKE_RTOS_TASKS
-#define configTOTAL_HEAP_SIZE 8192
+#define configTOTAL_HEAP_SIZE SMOKE_TASKS_HEAP
 #define INCLUDE_vTaskDelete 1
 #define INCLUDE_vTaskDelay 1
 #define vPortSVCHandler SVC_Handler
@@ -29,6 +41,8 @@
 #define configKERNEL_INTERRUPT_PRIORITY 240
 #define configMAX_SYSCALL_INTERRUPT_PRIORITY 80
 #define INCLUDE_xTaskGetSchedulerState 1
+/* FreeRTOS-Kernel 11 ARM_CM0 port requires an explicit MPU choice. */
+#define configENABLE_MPU 0
 #ifdef __cplusplus
 extern "C" {
 #endif

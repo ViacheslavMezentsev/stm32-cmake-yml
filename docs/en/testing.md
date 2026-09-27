@@ -2,10 +2,55 @@
 
 [Русский](../ru/testing.md)
 
-Testing uses an isolated Linux environment and CTest configuration fixtures.
-Existing `include(stm32_yml)` projects do not need any changes. The suite invokes
-the framework from the current checkout and checks Configure/Generate results;
-it does not build firmware.
+Testing uses an isolated Linux environment with pinned versions. Existing
+`include(stm32_yml)` projects do not need any changes. The tests invoke the
+framework from the current checkout. This page describes the test levels, the
+compiler environment and the configure scenarios; firmware builds and runs are on
+the [firmware tests](firmware-testing.md) page.
+
+## Test levels and where to find them
+
+Checks are split into six levels (spec 8.1, appendix F). Numbers are for a full run
+on three GCC × two CMake versions.
+
+| Level | What it checks | Where in the tree | How to run | Size |
+| --- | --- | --- | --- | --- |
+| L0 | Environment readiness: tool versions, sources from the lockfile, Configure/Generate of a small project; QEMU, Renode and machines | `ci/docker/verify.py`, `ci/emulation/check.py` | `docker run --rm --network none stm32-yml-ci:local`; `python ci/emulation/check.py` | 6 pairs; 2 emulators |
+| L1 | Documentation: links, bilingual `CFG-*` cards, errata, option-to-test mappings | `ci/check_reference.py`, `docs/reference-index.json` | `python ci/check_reference.py` | 55 cards, 8 errata, 75 pages |
+| L2 | CI script logic: QEMU/Renode runners, CRC, matrix, badges | `tests/test_firmware*.py`, `ci/emulation/test_check.py` | `python -m unittest discover -s tests -p "test_firmware*.py"` | 42 tests |
+| L3 | Framework behaviour at Configure/Generate | `tests/cases.json`, `tests/run_case.py`, `tests/CMakeLists.txt`, `tests/fixtures/project/` | `python ci/run_configure_tests.py --output <dir>` (in the image) | 139 scenarios × 6 = 834 |
+| L4 | Firmware builds; ELF, layout, CRC and metadata checks | `tests/firmware/semihosting/`, `tests/firmware/buildonly/`, `ci/build_firmware_smoke.py`, `ci/firmware_cases.py` | `python ci/firmware_matrix.py build --output <dir>` | 570 builds |
+| L5 | Firmware execution in emulators | `ci/run_qemu_smoke.py`, `ci/run_renode_smoke.py`, `tests/firmware/renode/` | `python ci/firmware_matrix.py run [--emulator renode] --build <builds> --output <logs>` | 336 QEMU, 612 Renode runs |
+
+```text
+ci/
+├── docker/                    # L0: compiler image, installer and verify.py
+├── emulation/                 # L0: QEMU/Renode image, check.py and its test
+├── dependencies.lock.json     # Pinned versions and SHA-256
+├── check_reference.py         # L1
+├── run_configure_tests.py     # L3: CTest on every GCC/CMake pair
+├── firmware_cases.py          # L4–L5: targets, profiles, emulators
+├── build_firmware_smoke.py    # L4: build and checks for one pair
+├── firmware_matrix.py         # L4–L5: every pair in a separate process
+├── run_qemu_smoke.py          # L5: QEMU
+├── run_renode_smoke.py        # L5: Renode
+└── firmware_badge.py          # Builds (Checks) counter
+tests/
+├── cases.json                 # L3: scenario descriptions
+├── run_case.py                # L3: runs one scenario
+├── fixtures/project/          # L3: test project, scenario YAML and IOC files
+├── toolchains/                # L3: Arduino toolchain file
+├── test_firmware*.py          # L2
+└── firmware/
+    ├── semihosting/           # L4–L5: firmware with 13 profiles; targets/ — F0, F4, G4, F7
+    ├── buildonly/             # L4–L5: H7/H5 and the H503 CRC image
+    └── renode/                # L5: *.repl models and exit_hook.py
+.github/workflows/             # CI: environment, configure, firmware, emulation, documentation, badges
+```
+
+Details: configure scenarios — [below](#framework-configuration-tests), firmware —
+[firmware tests](firmware-testing.md), emulators per family and their specifics —
+[emulation environment](emulation.md).
 
 ## Contents
 
@@ -17,7 +62,8 @@ it does not build firmware.
 | CMake | 3.19.8 (minimum compatibility), 3.28.3 (reference environment) |
 | Ninja / Mike Farah yq | 1.12.1 / 4.44.3 |
 | stm32-cmake | Commit recorded in the lockfile |
-| STM32Cube | F0 1.11.6, F1 1.8.7, F3 1.11.5, F4 1.28.3, F7 1.17.3, G4 1.6.3 |
+| STM32Cube | F0 1.11.6, F1 1.8.7, F3 1.11.5, F4 1.28.3, F7 1.17.3, G4 1.6.3, H5 1.7.0, H7 1.13.0 |
+| FreeRTOS-Kernel | 11.3.1 (`/opt/FreeRTOS-Kernel/11.3.1`, for `freertos_version: external`) |
 | Arduino Core STM32 / ETL | 2.12.0 / 20.47.1 |
 
 [dependencies.lock.json](../../ci/dependencies.lock.json) records archive SHA-256
@@ -31,8 +77,8 @@ in 4 parallel threads; each item's log is printed as one block.
 Git metadata and licenses are retained for inspection. The image records Ubuntu
 package versions in `/opt/stm32-yml-ci/packages.txt`.
 
-QEMU **11.0.0** (prebuilt from source, [tools/qemu](../../tools/qemu/README.md)) and Renode are planned for the later emulation
-stage; neither is installed in this image. Arduino projects still need their own
+QEMU **11.0.0** (prebuilt from source, [tools/qemu](../../tools/qemu/README.md)) and Renode
+are part of the separate emulation image ([ci/emulation](../../ci/emulation/Dockerfile)); neither is installed in this image. Arduino projects still need their own
 CMake core/library wrappers. The image does not contain a copy of stm32-cmake-yml.
 
 ## Build and verify
@@ -112,24 +158,24 @@ package or the resulting image bytes. Ubuntu snapshots are not required.
 
 ## Framework configuration tests
 
-[tests/cases.json](../../tests/cases.json) defines 115 scenarios, run with each of
-the three GCC and two CMake versions from the lockfile: **690 case executions**.
-Fifteen scenarios perform three consecutive configurations in the same build tree.
+[tests/cases.json](../../tests/cases.json) defines 139 scenarios, run with each of
+the three GCC and two CMake versions from the lockfile: **834 case executions**.
+Twenty-six scenarios perform two to thirteen consecutive configurations in the same build tree.
 
 | Area | Checks |
 | --- | --- |
 | Defaults and dependencies | F411 (BlackPill) and F103 (BluePill), actual CMSIS/HAL targets, default heap/stack, C/C++ standards |
-| Profiles on the same MCU | List replacement, append, replacement followed by append, sources, external profiles, scalar override priority |
-| IOC and YAML precedence | STM32F103C8T6, IOC-derived defaults, YAML/profile/override precedence, missing IOC |
+| Profiles on the same MCU | List replacement, append, replacement followed by append, sources, external profiles (the `profiles:` section only), profile-only and override-only keys without root declarations, scalar override priority |
+| IOC and YAML precedence | STM32F103C8T6, IOC-derived defaults, YAML/profile/override precedence, manual-mode values for an incomplete IOC, missing IOC |
 | Bare metal | No CMSIS/HAL/FreeRTOS, unavailable Cube repository, explicit CPU flags and local linker template |
 | YAML values | Unquoted scalars, `false`, zero heap, null/empty defaults, empty list replacement and append |
-| Reconfiguration | Profile source/definition replacement and reset, persistent overrides and explicit cache removal with `-U` |
+| Reconfiguration | Profile source/definition replacement and reset, persistent overrides and explicit cache removal with `-U`, Configure re-run after YAML, IOC and profile-file changes |
 | Profile regressions | External profile listing, generated heap/stack updates, MCU and compiler defines after switching profiles |
 | Language flags | Normalization and isolation of C and C++ flags/definitions in `compile_commands.json` |
-| Linker | Explicit `.ld`, template discovery in `linker_script_dir`, heap/stack substitutions, READONLY and checksum section preservation |
+| Linker | Explicit `.ld`, template discovery in `linker_script_dir`, heap/stack substitutions, size format in every mode, warning for unapplied heap/stack, READONLY and checksum section preservation |
 | CRC | Presence/absence of the generated post-build command, section and Flash-size arguments |
 | Arduino | Consumer-owned core/custom-library wrappers, profile parameters, shared compile definitions, `use_core_main: false` |
-| Diagnostics | Missing/malformed YAML, missing linker/core, invalid memory size, HAL without CMSIS, profile listing and unknown-profile warning |
+| Diagnostics | Missing/malformed YAML, missing linker/core, invalid memory size, HAL without CMSIS, profile listing and unknown-profile warning, warnings for unknown enumerated values and none for empty values |
 
 These are small **configure-only fixtures**, not ready-to-flash board examples.
 The Arduino wrapper references a real pinned core source but does not describe a
@@ -273,11 +319,19 @@ Seven `freertos-ioc-*` cases extend the manual configuration group above. Reduce
 
 YAML and profiles can replace components with Heap::2 and the API with none. Empty use_freertos, freertos_version, cmsis_rtos_api and component lists fall back to IOC/automatic values. An override of false suppresses IOC activation. `freertos-ioc-reconfigure` checks enabled → disabled by profile → enabled across Configure runs sharing a cache; it supplements the usual clean-cache reconfiguration workflow.
 
-Assertions cover exported values, direct target dependencies and successful Generate. Other families, external FreeRTOS, port/core compatibility, task execution and clock setup are not tested. No firmware is built.
+Assertions cover exported values, direct target dependencies and successful Generate. Other families and external FreeRTOS are covered by the cases below; port/core compatibility, task execution and clock setup are not tested here. No firmware is built.
 
-### Known external FreeRTOS failure
+### External FreeRTOS
 
-Two `freertos-external-*-known-failure` tests reproduce [E007](errata/E007.md) with FREERTOS_PATH passed through CMake or the environment. Passing means the expected Generate failure occurred. External mode remains unfixed and has no positive integration test.
+`freertos_version: external` ([E007](errata/E007.md) is fixed on the 0.9.3 branch) is checked on two layouts. `freertos-external-cmake` and `freertos-external-env` take the CubeF4 FreeRTOS tree through `-DFREERTOS_PATH` and the environment; `freertos-external-kernel` uses FreeRTOS-Kernel 11.3.1 with `cmsis_rtos_api: none` and `v2`. The expected targets are `FreeRTOS::<port>` and `FreeRTOS::<component>` without the `FreeRTOS::STM32::F4` namespace. Negative cases: no `FREERTOS_PATH`, the `ARM_CM7_MPU` port that FreeRTOS-Kernel lacks, and an unknown component. The CMSIS-RTOS v2 wrapper with FreeRTOS-Kernel 11.3.1 and CubeF1 was also built manually (the `freertosQueue` firmware with the FreeRTOSConfig.h options the wrapper requires); running such firmware was not checked.
+
+### MCU core, H7 and H5
+
+`h7-single-core-default` checks that the single-core STM32H743ZI gets core M7 and the `CMSIS::STM32::H743ZI::M7`, `HAL::STM32::H7::M7::*` targets. `h7-dual-core` checks STM32H745ZI: no core is an error listing the cores; M7 and M4 select that core's targets, and for M4 the RAM total and the CRC Flash limit follow the core (288K, 1024K). `mcu-core-invalid` checks a core outside the list and a core for F4. `h7-freertos-cube` checks CubeH7 FreeRTOS with the v2 wrapper in the M7 namespace. `h5-cmsis-hal-freertos-external` checks H5: CMSIS/HAL, FreeRTOS-Kernel with the `ARM_CM33_NTZ` port, the v2 wrapper refusal (CubeH5 has no FreeRTOS) and CRC with a template. `hal-missing-component` expects a Configure error before Generate.
+
+### FreeRTOS port from an IOC
+
+`freertos-ioc-port-table` checks the port table in thirteen steps for F1, F4, G0, C0, U0, H5, L5, U5, WL (M4, M0PLUS), WB and H7 (M7, M4): an override replaces the MCU and FreeRTOS-Kernel is used as external, so those families' Cube packages are not needed. `freertos-ioc-port-unknown-family` checks the warning and `ARM_CM4F` for a family outside the table.
 
 ### Additional F0, F3, F7 and G4 families
 

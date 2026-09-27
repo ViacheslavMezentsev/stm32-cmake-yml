@@ -40,7 +40,8 @@ function(stm32_yml_setup_postbuild TARGET_NAME)
         else()
             if(NOT toolchain_backend STREQUAL "arduino")
                 # 2. Бэкенд stm32-cmake: берем из внутренней базы данных тулчейна
-                stm32_get_memory_info(CHIP ${mcu} FLASH SIZE EXPECTED_FLASH_SIZE_STR)
+                # С учётом ядра (ТЗ 4.15.4): у двухъядерных H7 Flash делится между ядрами.
+                stm32_yml_mcu_memory_size(FLASH _flash_bytes EXPECTED_FLASH_SIZE_STR)
             else()
                 # 3. Бэкенд arduino: парсим размер прямо из скрипта компоновщика (.ld)
                 set(EXPECTED_FLASH_SIZE_STR "")
@@ -63,6 +64,38 @@ function(stm32_yml_setup_postbuild TARGET_NAME)
         endif()
 
         if(CRC_POSSIBLE)
+            # ТЗ 4.15.6: поддерживается только STM32_HW_DEFAULT (E004).
+            stm32_yml_check_enum_value(crc_algorithm "STM32_HW_DEFAULT" STM32_HW_DEFAULT)
+
+            # ТЗ 4.15.2: секцию CRC предоставляет скрипт компоновщика.
+            # Пустой LINKER_SCRIPT_PATH означает скрипт, который формирует stm32-cmake:
+            # секции CRC в нём нет, и сборка заведомо не сможет записать CRC.
+            if(NOT LINKER_SCRIPT_PATH OR NOT EXISTS "${LINKER_SCRIPT_PATH}")
+                message(FATAL_ERROR
+                    "crc_enable: скрипт компоновщика формирует stm32-cmake, секции "
+                    "'${crc_section_name}' (crc_section_name) в нём нет. Используйте шаблон "
+                    "STM32<MCU>_FLASH.ld.in (linker_script: auto) или явный linker_script "
+                    "с секцией '${crc_section_name}', либо crc_enable: false.")
+            endif()
+            file(READ "${LINKER_SCRIPT_PATH}" _ld_text)
+            string(FIND "${_ld_text}" "${crc_section_name}" _crc_section_pos)
+            if(_crc_section_pos EQUAL -1)
+                message(WARNING
+                    "crc_enable: секция '${crc_section_name}' (crc_section_name) не найдена в "
+                    "скрипте ${LINKER_SCRIPT_PATH}. Шаг CRC после сборки завершится ошибкой.")
+            endif()
+
+            # ТЗ 4.15.9: образ CRC строится из секций в регионе FLASH итогового скрипта.
+            stm32_yml_flash_region(CRC_FLASH_ORIGIN CRC_FLASH_LENGTH)
+            if("${CRC_FLASH_ORIGIN}" STREQUAL "")
+                message(WARNING
+                    " Расчет CRC отключен. Не удалось определить регион FLASH (ORIGIN, LENGTH) "
+                    "в скрипте ${LINKER_SCRIPT_PATH}.")
+                set(CRC_POSSIBLE FALSE)
+            endif()
+        endif()
+
+        if(CRC_POSSIBLE)
             # 1. Проверяем наличие Python
             find_package(Python3 COMPONENTS Interpreter QUIET)
             if(NOT Python3_FOUND)
@@ -70,7 +103,7 @@ function(stm32_yml_setup_postbuild TARGET_NAME)
                 set(CRC_POSSIBLE FALSE)
             endif()
 
-            # 2. Проверяем наличие objcopy
+            # 2. Проверяем наличие objcopy (запись CRC в секцию ELF)
             if(NOT CMAKE_OBJCOPY)
                 message(WARNING " Утилита objcopy не найдена. Расчет CRC отключен.")
                 set(CRC_POSSIBLE FALSE)
@@ -99,36 +132,31 @@ function(stm32_yml_setup_postbuild TARGET_NAME)
 
             message(STATUS " Метод: Внедрение в секцию '${crc_section_name}'")
             message(STATUS " Алгоритм: ${crc_algorithm}")
+            message(STATUS " Регион FLASH скрипта: ORIGIN ${CRC_FLASH_ORIGIN}, LENGTH ${CRC_FLASH_LENGTH} байт")
             message(STATUS " Max Flash Size: ${EXPECTED_FLASH_BYTES} байт (${EXPECTED_FLASH_SIZE_STR})")
-            message(STATUS " ВАЖНО: Убедитесь, что секция '${crc_section_name}' существует в вашем .ld файле, иначе сборка упадет с ошибкой!")
 
-            # Имена временных файлов
+            # Имена промежуточных файлов: образ Flash без CRC (для диагностики) и значение CRC
             set(BIN_NO_CRC "${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}_no_crc.bin")
             set(CRC_VAL_BIN "${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}_crc_val.bin")
             set(TARGET_ELF "$<TARGET_FILE:${TARGET_NAME}>")
-
-            # Жестко вырезаем секции, которые могут вызвать gap-fill
-            set(OBJCOPY_EXCLUDES
-                "-R" ".ARM.attributes"
-                "-R" ".comment"
-                "-R" ".debug_*"
-            )
 
             add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E echo " "
                 COMMAND ${CMAKE_COMMAND} -E echo "--- Injecting checksum into ${crc_section_name} ---"
 
-                # Шаг 1: Создаем BIN из ELF без секции CRC.
-                # Вырезаем CRC и мусорные секции перед созданием .bin.
-                COMMAND ${CMAKE_OBJCOPY} -O binary --gap-fill 0xFF ${OBJCOPY_EXCLUDES} --remove-section=${crc_section_name} ${TARGET_ELF} ${BIN_NO_CRC}
+                # Шаг 1 (ТЗ 4.15.9, 4.15.7): образ из секций ELF в регионе FLASH без секции
+                # CRC и расчёт CRC; любой сбой завершает сборку ошибкой.
+                COMMAND ${Python3_EXECUTABLE} ${CRC_SCRIPT_PATH}
+                        --elf ${TARGET_ELF}
+                        --flash ${CRC_FLASH_ORIGIN}:${CRC_FLASH_LENGTH}
+                        --exclude ${crc_section_name}
+                        --image ${BIN_NO_CRC}
+                        ${CRC_VAL_BIN} ${EXPECTED_FLASH_BYTES}
 
-                # Шаг 2: Запускаем Python скрипт для расчета CRC.
-                COMMAND ${Python3_EXECUTABLE} ${CRC_SCRIPT_PATH} ${BIN_NO_CRC} ${CRC_VAL_BIN} ${EXPECTED_FLASH_BYTES}
-
-                # Шаг 3: Внедряем рассчитанный CRC обратно в ELF файл
+                # Шаг 2: Внедряем рассчитанный CRC обратно в ELF файл
                 COMMAND ${CMAKE_OBJCOPY} --update-section ${crc_section_name}=${CRC_VAL_BIN} ${TARGET_ELF}
 
-                # Шаг 4: Выводим подтверждение
+                # Шаг 3: Выводим подтверждение
                 COMMAND ${CMAKE_COMMAND} -E echo "--- Injection successful! ---"
                 COMMAND ${CMAKE_COMMAND} -E echo " "
 
@@ -141,7 +169,7 @@ function(stm32_yml_setup_postbuild TARGET_NAME)
     endif()
 
     # =======================================================================
-    # 2. ГЕНЕРАЦИЯ АРТЕФАКТОВ СБОРКИ (BIN, HEX, LSS, SIZE)
+    # 2. ГЕНЕРАЦИЯ АРТЕФАКТОВ СБОРКИ (BIN, HEX, SREC, LSS, SIZE; ТЗ 4.14.2)
     # =======================================================================
 
     # Выводим размер потребляемой памяти (RAM/FLASH)
@@ -149,11 +177,15 @@ function(stm32_yml_setup_postbuild TARGET_NAME)
 
     # Генерируем запрошенные пользователем файлы из YAML
     if("bin" IN_LIST build_artifacts)
-        stm32_generate_binary_file(${TARGET_NAME})
+        stm32_yml_generate_bin_file(${TARGET_NAME})
     endif()
 
     if("hex" IN_LIST build_artifacts)
         stm32_generate_hex_file(${TARGET_NAME})
+    endif()
+
+    if("srec" IN_LIST build_artifacts)
+        stm32_generate_srec_file(${TARGET_NAME})
     endif()
 
     if("lss" IN_LIST build_artifacts)

@@ -106,14 +106,14 @@ PR больше не требуются; старые ссылки остают�
 - [x] `claude/renode-batch` слита в main (`aa58116`): один процесс Renode на пару GCC/CMake, `Clear` между сценариями, синхронный лог; Renode в CI 3:42 → 0:33.
 - [x] `claude/docker-image-cache` слита в main (`c65a7ed`): кэш слоёв BuildKit (`type=gha`) только для образа эмуляторов (3:08 → 0:12); образ компиляторов без кэша — выигрыша нет.
 - [x] `claude/qemu-prebuilt` слита в main (`5fade06`): готовый QEMU 11.0.0 в `tools/qemu` (3,7 МБ, скрипт сборки, SHA-256 в lock) вместо компиляции в образе; Windows — scoop/установщик.
-- [ ] Текущая ветка `claude/faster-ci-image`: параллельная установка и Cube без `Projects`/`Utilities` (3,9 → 1,3 ГБ); образ компиляторов в CI 2:45 → 1:09–1:29, Configure 4:47, Firmware 4:39. Разнесение пар по job — не принято, см. [сопровождение](docs/ru/maintenance.md).
+- [ ] Текущая ветка `claude/release-0.9.3` (ТЗ 1.2): в lock и образ CI добавлены STM32CubeH7 1.13.0, STM32CubeH5 1.7.0, FreeRTOS-Kernel 11.3.1 (ТЗ 8.8.1); ТЗ 1.5: CRC по секциям Flash (TC-63, TC-64), Arduino Core напрямую и CMake 3.21 — в 0.10.x; `AGENTS.md`. Группа CRC (`4cd3404`): образ по секциям Flash, провал сборки при сбое (E006), проверка секции на Configure, предупреждение `crc_algorithm` (E004). Группа 1 (`d8708b4`): ключи только из профиля (E008), только `profiles:` из `profiles_file`, зависимости Configure, текст о версии, значения для неполного IOC, формат и неприменённые размеры heap/stack, подсказка `hal_conf.h`; 125 сценариев × 6 = 750. Вопрос 10.2.16 решён: только внешние профили и предупреждение о встроенных (закрыть в ревизии ТЗ). Группа 2 (`b9a6cd3`): предупреждения о неизвестных значениях перечислимых ключей и элементов `build_artifacts`, артефакт `srec`; 127 × 6 = 762. Имена `lss`/`map`: решено оставить как в 0.9.2 (по имени цели); в ревизии ТЗ уточнить п. 4.14.2, выбор имён артефактов по итоговому имени ELF — на будущее, с учётом нескольких backend. Группа 3, уровень Configure (`3c6bfa3`): ядро MCU (H7), external FreeRTOS (E007), ранние проверки компонентов HAL/FreeRTOS и обёртки CMSIS-RTOS, таблица портов, проверка RAM с CCRAM/RAM_SHARE; TC-22, TC-54…TC-56, TC-58, TC-60, TC-61; 139 × 6 = 834. Прошивки (`422cef1`): `freertosExternal` в QEMU/Renode (TC-59), H7/H5 build-only (TC-57), образ CRC H503 с резервной SRAM (TC-63), сравнение с `--gap-fill` (TC-64); 102 сборки, 84 + 84 запуска. Решено и сделано (`2625f19`): предупреждение о `_sstack` (п. 1, вариант «в»), BIN из секций FLASH (п. 2). Примеры demo-stm32-cmake/stm32h5xx собираются без CRC; с CRC — после добавления секции `.checksum` в шаблон. Группа 4: прошивки H7/H5 запускаются в Renode на минимальных моделях (QEMU для них не применим), версия 0.9.3, ТЗ ревизии 1.6 (10.2.16 закрыт, 4.11.10, 4.14.2, 8.8.5, TC-65, TC-66), полный локальный прогон L0–L5 на итоговом коммите. ТЗ 1.7 (`d40f23d`): баннер, TC-52 в сборщике, п. 3.6.6, 4.10.2. Этап 5 (ТЗ 1.8, п. 8.8.8, TC-67): матрица прошивок по целям с полным набором профилей, по одному семейству. F0 `STM32F030R8T6` — сделано: QEMU `netduino2` (ядро M3), Renode `f030-smoke` (cortex-m0); `portasm.c` для `ARM_CM0` FreeRTOS-Kernel 11; 180 сборок, 168 + 192 запуска. F4 `STM32F411CEU6`, `STM32F401CCU6` — сделано: QEMU `netduinoplus2`, Renode `f4-smoke` (cortex-m4); 336 сборок, 336 + 360 запусков. G4 `STM32G431CBU6`, `STM32G474CEU6` — сделано: только Renode `g4-smoke`; 492 сборки, 336 + 528 запусков. F7 `STM32F746ZGT6` — сделано: только Renode `f7-smoke`; 570 сборок, 336 + 612 запусков. Подготовка выпуска (ТЗ 1.9): CHANGELOG на русском и английском в едином формате, описание эмуляторов по семействам и их особенностей, уровней проверок и расположения тестов, статусы errata; полный локальный прогон L0–L5 на итоговом коммите. Далее: слияние в main и тег `v0.9.3`; перед выпуском — все проверки локально.
+- [x] `claude/faster-ci-image` слита в main (`955b09b`): параллельная установка и Cube без `Projects`/`Utilities` (3,9 → 1,3 ГБ); образ компиляторов в CI 2:45 → 1:09–1:29, Configure 4:47, Firmware 4:39. Разнесение пар по job — не принято, см. [сопровождение](docs/ru/maintenance.md).
 - [ ] Затем оценить ограниченное распараллеливание.
-- [ ] Далее согласовать полный Arduino runtime и расширение ядер/ABI; группа 3 — [план](docs/ru/firmware-plan.md).
+- [ ] Далее согласовать полный Arduino runtime; ядра/ABI F0, F1, F4, G4, F7 проверяются с 0.9.3 — [план](docs/ru/firmware-plan.md).
 - [ ] По индексу выбрать следующие пробелы покрытия: отсутствующие/пустые значения,
   приоритеты и ошибки входных данных. Каждый новый контракт — отдельный сценарий.
-- [ ] В отдельных ветках разобрать [E004 и E006](docs/ru/errata/index.md):
-  выбор алгоритма CRC и обработку ошибок CRC.
-  Для каждого исправления сначала зафиксировать ожидаемое поведение и регрессию.
+- [x] [E004 и E006](docs/ru/errata/index.md) (выбор алгоритма CRC и обработка ошибок
+  CRC) исправлены в 0.9.3 с регрессиями.
 - [x] Уточнить контракт с автором: E003/E005 закрыты как ограничения по замыслу.
   Дробные K/M и `_` в именах профилей не поддерживаются; расширение не планируется.
 - [x] Автор выбрал доработанный F1 `02-semihosting` и netduino2 для первого
@@ -128,6 +128,28 @@ PR больше не требуются; старые ссылки остают�
 
 Сборки и эмуляция дополняют конфигурационные тесты. Изменение публичных путей или
 обязательная реструктуризация проектов-потребителей в этот план не входят.
+
+### Предложения для 0.10.x — на рассмотрение
+
+В ТЗ не внесены; решение принимается при планировании 0.10.x.
+
+- [ ] Коды сообщений: у каждого диагностического сообщения Configure постоянный код
+  (например, `[SCY-W012]`); тесты проверяют коды, а не текст (сейчас 128 из 159 проверок
+  лога в `tests/cases.json` сравнивают русский текст). Предварительное условие локализации.
+- [ ] Локализация RU/EN: язык по локали (`LC_ALL`, `LC_MESSAGES`, `LANG`; на Windows —
+  `LocaleName` из реестра через `get_filename_component`, работает в CMake 3.19),
+  явный выбор `STM32_YML_LANG=auto|ru|en`. Встроенной функции локализации в CMake нет.
+- [ ] TOML как альтернатива YAML: `stm32_config.toml` по расширению; `yq -p toml` (4.44.3)
+  читает вложенные таблицы в тот же JSON. В TOML нет `null` — пустое значение только
+  пустой строкой или массивом.
+- [ ] CMakePresets (вместе с переходом на CMake ≥ 3.21): папка сборки на профиль
+  (`binaryDir: ${sourceDir}/build/${presetName}`, `STM32_YML_PROFILE` в `cacheVariables`),
+  генератор `CMakePresets.json` по секции `profiles:`.
+- [ ] Имена папок в build без идентификаторов YAML: повторять относительный путь источника
+  (`Arduino/libraries/EEPROM`, `cli`), для путей вне проекта заменять `..` согласованным
+  маркером (например, `-`). Требует чистой сборки после обновления; вместе с прямым
+  подключением Arduino Core.
+- [ ] Имена всех артефактов по итоговому имени ELF (`OUTPUT_NAME`) с учётом нескольких backend.
 
 ## English
 
@@ -233,14 +255,14 @@ keep defect details in errata.
 - [x] `claude/renode-batch` merged into main (`aa58116`): one Renode process per GCC/CMake pair, `Clear` between cases, synchronous logging; Renode in CI 3:42 → 0:33.
 - [x] `claude/docker-image-cache` merged into main (`c65a7ed`): BuildKit layer cache (`type=gha`) for the emulator image only (3:08 → 0:12); the compiler image stays uncached — no gain.
 - [x] `claude/qemu-prebuilt` merged into main (`5fade06`): prebuilt QEMU 11.0.0 in `tools/qemu` (3.7 MB, build script, SHA-256 in the lock) instead of compiling it in the image; Windows via scoop/installer.
-- [ ] Current branch `claude/faster-ci-image`: parallel installation and Cube without `Projects`/`Utilities` (3.9 → 1.3 GB); compiler image in CI 2:45 → 1:09–1:29, Configure 4:47, Firmware 4:39. Splitting pairs across jobs — not adopted, see [maintenance](docs/en/maintenance.md).
+- [ ] Current branch `claude/release-0.9.3` (spec 1.2): STM32CubeH7 1.13.0, STM32CubeH5 1.7.0 and FreeRTOS-Kernel 11.3.1 added to the lock and CI image (spec 8.8.1); spec 1.5: CRC from FLASH sections (TC-63, TC-64), direct Arduino Core and CMake 3.21 in 0.10.x; `AGENTS.md`. CRC group (`4cd3404`): image from FLASH sections, build failure on errors (E006), Configure section check, `crc_algorithm` warning (E004). Group 1 (`d8708b4`): profile-only keys (E008), only `profiles:` from `profiles_file`, Configure dependencies, version wording, incomplete-IOC defaults, heap/stack format and unapplied-size warning, `hal_conf.h` hint; 125 scenarios × 6 = 750. Question 10.2.16 decided: external profiles only, with a warning about inline ones (close in the spec revision). Group 2 (`b9a6cd3`): warnings for unknown enumerated values and `build_artifacts` elements, `srec` artifact; 127 × 6 = 762. `lss`/`map` names: decided to keep the 0.9.2 behaviour (target name); clarify spec 4.14.2 in the revision; naming all artifacts after the final ELF name is deferred, considering several backends. Group 3, Configure level (`3c6bfa3`): MCU core (H7), external FreeRTOS (E007), early HAL/FreeRTOS component and CMSIS-RTOS wrapper checks, port table, RAM check with CCRAM/RAM_SHARE; TC-22, TC-54…TC-56, TC-58, TC-60, TC-61; 139 × 6 = 834. Firmware (`422cef1`): `freertosExternal` in QEMU/Renode (TC-59), H7/H5 build-only (TC-57), H503 CRC image with backup SRAM (TC-63), `--gap-fill` comparison (TC-64); 102 builds, 84 + 84 runs. Decided and done (`2625f19`): `_sstack` warning (item 1, option c), BIN from FLASH sections (item 2). The demo-stm32-cmake/stm32h5xx examples build without CRC, and with CRC once the template has a `.checksum` section. Group 4: H7/H5 firmware runs in Renode on minimal models (QEMU has no matching machine), version 0.9.3, spec revision 1.6 (10.2.16 closed, 4.11.10, 4.14.2, 8.8.5, TC-65, TC-66), full local L0–L5 run on the final commit. Spec 1.7 (`d40f23d`): banner, TC-52 in the builder, items 3.6.6, 4.10.2. Stage 5 (spec 1.8, item 8.8.8, TC-67): per-target firmware matrix with the full profile set, one family at a time. F0 `STM32F030R8T6` done: QEMU `netduino2` (M3 core), Renode `f030-smoke` (cortex-m0); `portasm.c` for `ARM_CM0` in FreeRTOS-Kernel 11; 180 builds, 168 + 192 runs. F4 `STM32F411CEU6`, `STM32F401CCU6` done: QEMU `netduinoplus2`, Renode `f4-smoke` (cortex-m4); 336 builds, 336 + 360 runs. G4 `STM32G431CBU6`, `STM32G474CEU6` done: Renode `g4-smoke` only; 492 builds, 336 + 528 runs. F7 `STM32F746ZGT6` done: Renode `f7-smoke` only; 570 builds, 336 + 612 runs. Release preparation (spec 1.9): Russian and English CHANGELOG in one format, emulators per family and their specifics, test levels and test locations, errata statuses; full local L0–L5 run on the final commit. Next: merge into main and tag `v0.9.3`; all checks locally before release.
+- [x] `claude/faster-ci-image` merged into main (`955b09b`): parallel installation and Cube without `Projects`/`Utilities` (3.9 → 1.3 GB); compiler image in CI 2:45 → 1:09–1:29, Configure 4:47, Firmware 4:39. Splitting pairs across jobs — not adopted, see [maintenance](docs/en/maintenance.md).
 - [ ] Then evaluate bounded parallelism.
-- [ ] Next agree full Arduino runtime and core/ABI coverage; group 3 — [plan](docs/en/firmware-plan.md).
+- [ ] Next agree full Arduino runtime; F0, F1, F4, G4 and F7 cores/ABI are checked since 0.9.3 — [plan](docs/en/firmware-plan.md).
 - [ ] Use the index to prioritize coverage gaps: missing/empty values, precedence
   and invalid input. Give each new contract a dedicated scenario.
-- [ ] Address [E004 and E006](docs/en/errata/index.md) in separate branches:
-  CRC algorithm selection and CRC error handling. Establish expected
-  behavior and a regression before each fix.
+- [x] [E004 and E006](docs/en/errata/index.md) (CRC algorithm selection and CRC error
+  handling) are fixed in 0.9.3 with regressions.
 - [x] Clarify the contract with the author: E003/E005 are closed by design.
   Fractional K/M and `_` in profile names are unsupported; expansion is not planned.
 - [x] The author selected the modified F1 `02-semihosting` with netduino2 for
@@ -255,3 +277,25 @@ keep defect details in errata.
 
 Builds and emulation supplement configure tests. Public path changes or mandatory
 restructuring of consumer projects are outside this plan.
+
+### Proposals for 0.10.x — for consideration
+
+Not in the spec; to be decided when 0.10.x is planned.
+
+- [ ] Message codes: every Configure diagnostic gets a permanent code (e.g. `[SCY-W012]`);
+  tests check codes rather than text (128 of 159 log checks in `tests/cases.json` compare
+  Russian text today). A prerequisite for localization.
+- [ ] RU/EN localization: language from the locale (`LC_ALL`, `LC_MESSAGES`, `LANG`; on
+  Windows the registry `LocaleName` via `get_filename_component`, which works in CMake 3.19),
+  explicit `STM32_YML_LANG=auto|ru|en`. CMake has no built-in localization.
+- [ ] TOML as an alternative to YAML: `stm32_config.toml` by extension; `yq -p toml` (4.44.3)
+  reads nested tables into the same JSON. TOML has no `null`, so empty values are only
+  empty strings or arrays.
+- [ ] CMakePresets (with the move to CMake ≥ 3.21): one build tree per profile
+  (`binaryDir: ${sourceDir}/build/${presetName}`, `STM32_YML_PROFILE` in `cacheVariables`),
+  a `CMakePresets.json` generator from the `profiles:` section.
+- [ ] Build-tree folder names without YAML identifiers: mirror the source's relative path
+  (`Arduino/libraries/EEPROM`, `cli`); for paths outside the project replace `..` with an
+  agreed marker (e.g. `-`). Needs a clean build after upgrading; together with the direct
+  Arduino Core integration.
+- [ ] Name every artifact after the final ELF name (`OUTPUT_NAME`), considering several backends.

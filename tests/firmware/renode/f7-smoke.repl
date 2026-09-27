@@ -1,0 +1,17 @@
+// F7 CPU/NVIC/SysTick smoke model (STM32F746ZG). RCC and FLASH controller remain RAM stubs.
+cpu: CPU.CortexM @ sysbus
+    cpuType: "cortex-m7"
+    nvic: nvic
+uart: UART.SemihostingUart @ cpu
+nvic: IRQControllers.NVIC @ sysbus 0xE000E000
+    -> cpu@0
+    priorityMask: 0xF0
+    systickFrequency: 16000000
+flash: Memory.MappedMemory @ sysbus 0x08000000
+    size: 0x100000
+sram: Memory.MappedMemory @ sysbus 0x20000000
+    size: 0x50000
+rcc: Memory.MappedMemory @ sysbus 0x40023800
+    size: 0x400
+flash_ctrl: Memory.MappedMemory @ sysbus 0x40023C00
+    size: 0x400

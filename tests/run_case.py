@@ -8,6 +8,7 @@ import shlex
 import shutil
 import subprocess
 import tempfile
+import time
 
 
 def require(condition, message):
@@ -69,8 +70,11 @@ def verify(case, build, source):
         target = observed("PROJECT_NAME")
         post = "\n".join(line for line in ninja.splitlines()
                          if line.strip().startswith("POST_BUILD = "))
-        for extension, command in (("bin", "arm-none-eabi-objcopy -O binary"),
+        # ТЗ 4.14.2: BIN строится из секций FLASH скриптом, а не objcopy -O binary.
+        require("arm-none-eabi-objcopy -O binary" not in post, "BIN must not use objcopy -O binary")
+        for extension, command in (("bin", f"--image {target}.bin"),
                                    ("hex", "arm-none-eabi-objcopy -O ihex"),
+                                   ("srec", "arm-none-eabi-objcopy -O srec"),
                                    ("lss", "arm-none-eabi-objdump -h -S")):
             require((command in post) == (extension in selected),
                     f"Incorrect {extension} conversion command presence")
@@ -79,9 +83,24 @@ def verify(case, build, source):
         require(f"{target}_always_display_size" in ninja and "arm-none-eabi-size" in ninja,
                 "Size reporting command missing")
         require(f"{target}.elf" in ninja, "Primary ELF target missing")
-        for extension in ("elf", "bin", "hex", "map", "lss"):
+        for extension in ("elf", "bin", "hex", "srec", "map", "lss"):
             require(not (build / f"{target}.{extension}").exists(),
                     f"Unexpected built artifact: {target}.{extension}")
+
+    if "configure_depends" in case:
+        # ТЗ 3.6.5: изменение YAML, IOC и файла профилей перезапускает Configure.
+        rerun = ninja[ninja.index("build build.ninja"):].split("\n\n", 1)[0]
+        for filename in case["configure_depends"]:
+            path = source / filename
+            require(str(path) in rerun, f"{filename} is not a Configure dependency")
+            stat = path.stat()
+            try:
+                os.utime(path, (stat.st_atime, time.time() + 3600))
+                plan = subprocess.run(["ninja", "-C", str(build), "-n", "build.ninja"],
+                                      capture_output=True, text=True, timeout=60)
+            finally:
+                os.utime(path, (stat.st_atime, stat.st_mtime))
+            require("Re-running CMake" in plan.stdout, f"Changing {filename} does not re-run Configure")
 
     if "cppcheck_rules" in case:
         rules = (build / "CMakeFiles/rules.ninja").read_text(encoding="utf-8")
@@ -101,10 +120,14 @@ def verify(case, build, source):
             require(token not in flags, f"Generated link flags unexpectedly contain {token!r}")
 
     if "crc_command" in case:
-        require(("stm32_crc.py" in ninja) == case["crc_command"], "Incorrect CRC command presence")
+        # BIN также строится stm32_crc.py (--image), поэтому признак CRC — --exclude.
+        require(("--exclude" in ninja) == case["crc_command"], "Incorrect CRC command presence")
         if case["crc_command"]:
-            for token in ("--remove-section=.checksum", "--update-section", "524288"):
+            # ТЗ 4.15.9: образ из секций ELF в регионе FLASH скрипта, без gap-fill.
+            for token in ("--elf", "--flash 0x08000000:524288", "--exclude .checksum",
+                          "--update-section", " 524288"):
                 require(token in ninja, f"CRC command missing {token!r}")
+            require("--gap-fill" not in ninja, "CRC image must not use objcopy --gap-fill")
 
     commands = json.loads((build / "compile_commands.json").read_text(encoding="utf-8"))
     for filename in case.get("absent_commands", []):

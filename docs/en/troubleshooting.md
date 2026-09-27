@@ -24,6 +24,12 @@ the original command/log, then compare with a fresh build directory. Omitting -D
 does not clear its value. Do not assume IDE file watchers are configured; run
 Configure explicitly. See [development](development.md) and [semantics](reference/0.9.2/semantics.md).
 
+**Version 0.9.2** (spec 3.6.6): Configure does not depend on `stm32_config.yml`,
+the IOC or the profile file, and derived values may stay in the cache (E001).
+After changing these files, delete `CMakeCache.txt` (or the whole build tree) and
+run Configure again. In 0.9.3 these files are Configure dependencies: the build
+re-runs Configure itself, and derived values are refreshed on every Configure.
+
 ## RAM and diagnostic switches
 
 `validate_linker_script` sums recognized .ld RAM regions and compares them with

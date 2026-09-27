@@ -1,0 +1,7 @@
+# Keys outside profiles: must be ignored (spec 3.4.8).
+project_name: leaked_name
+compile_definitions: [LEAKED=1]
+stack_size: 8K
+profiles:
+  external:
+    compile_definitions_append: [EXTERNAL=1]

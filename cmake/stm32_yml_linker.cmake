@@ -11,6 +11,10 @@ function(stm32_yml_setup_linker_script TARGET_NAME)
 
     stm32_yml_ensure_default_value(linker_script "auto")
 
+    # Формат размеров памяти проверяется при каждом Configure, а не только
+    # при генерации скрипта из шаблона (ТЗ 4.11.8).
+    stm32_yml_check_memory_format(heap_size stack_size)
+
     # Формируем упорядоченный список папок поиска шаблона/скрипта.
     # linker_script_dir проверяется первым, затем корень проекта.
     set(_search_dirs "")
@@ -121,8 +125,26 @@ function(stm32_yml_setup_linker_script TARGET_NAME)
                     else()
                         list(APPEND LOCAL_CMSIS_TARGET_TO_LINK "CMSIS::STM32::${MCU_DEVICE}")
                     endif()
+                    # Скрипт stm32-cmake задаёт свои размеры (stm32_get_memory_info).
+                    if(mcu_core)
+                        set(_core_args CORE ${mcu_core})
+                    else()
+                        set(_core_args "")
+                    endif()
+                    stm32_get_memory_info(CHIP ${MCU} ${_core_args} HEAP SIZE _cmake_heap)
+                    stm32_get_memory_info(CHIP ${MCU} ${_core_args} STACK SIZE _cmake_stack)
+                    _stm32_yml_warn_unused_memory_sizes(
+                        "скрипт компоновщика формирует stm32-cmake с собственными размерами "
+                        "heap ${_cmake_heap} и stack ${_cmake_stack} байт. Добавьте шаблон "
+                        "STM32${_mcu_type_concrete}_FLASH.ld.in (в корень проекта или linker_script_dir) "
+                        "или задайте размеры в явном linker_script.")
                 endif()
-                message(STATUS "Подключение встроенного скрипта компоновщика: ${CMAKE_CURRENT_BINARY_DIR}/${MCU_DEVICE}.ld")
+                if(mcu_core)
+                    set(_ld_name "${MCU_DEVICE}_${mcu_core}.ld")
+                else()
+                    set(_ld_name "${MCU_DEVICE}.ld")
+                endif()
+                message(STATUS "Подключение встроенного скрипта компоновщика: ${CMAKE_CURRENT_BINARY_DIR}/${_ld_name}")
             endif()
         endif()
 
@@ -147,6 +169,9 @@ function(stm32_yml_setup_linker_script TARGET_NAME)
 
         if(LOCAL_LINKER_SCRIPT_PATH)
             message(STATUS "Использование пользовательского скрипта компоновщика: ${LOCAL_LINKER_SCRIPT_PATH}")
+            _stm32_yml_warn_unused_memory_sizes(
+                "размеры задаёт явный скрипт компоновщика '${linker_script}'. "
+                "Измените их в скрипте или используйте шаблон .ld.in (linker_script: auto).")
             if(toolchain_backend STREQUAL "arduino")
                 target_link_options(${TARGET_NAME} PRIVATE "-T${LOCAL_LINKER_SCRIPT_PATH}")
                 set_property(TARGET ${TARGET_NAME} APPEND PROPERTY LINK_DEPENDS "${LOCAL_LINKER_SCRIPT_PATH}")
@@ -168,10 +193,74 @@ function(stm32_yml_setup_linker_script TARGET_NAME)
         target_link_libraries(${TARGET_NAME} PRIVATE ${LOCAL_CMSIS_TARGET_TO_LINK})
     endif()
 
+    _stm32_yml_check_stack_limit_symbol("${LOCAL_LINKER_SCRIPT_PATH}")
+
     # =======================================================================
     # 3. ЭКСПОРТ ПЕРЕМЕННЫХ
     # =======================================================================
     # Отправляем путь к скрипту наружу, чтобы модуль diagnostics смог прочитать RAM
     set(LINKER_SCRIPT_PATH "${LOCAL_LINKER_SCRIPT_PATH}" PARENT_SCOPE)
 
+endfunction()
+
+# ==============================================================================
+# Предупреждает, что заданные heap_size/stack_size не применяются к скрипту
+# компоновщика, который не генерируется из шаблона .ld.in (ТЗ 4.11.9).
+# Значения ручного режима по умолчанию предупреждения не вызывают:
+# STM32_YML_EXPLICIT_MEMORY_SIZES содержит только явно заданные размеры.
+#
+# @param ARGN - Причина и рекомендация (части сообщения).
+# ==============================================================================
+function(_stm32_yml_warn_unused_memory_sizes)
+    if(NOT STM32_YML_EXPLICIT_MEMORY_SIZES)
+        return()
+    endif()
+    set(_values "")
+    foreach(_key IN LISTS STM32_YML_EXPLICIT_MEMORY_SIZES)
+        list(APPEND _values "${_key}: ${${_key}}")
+    endforeach()
+    string(REPLACE ";" ", " _values "${_values}")
+    string(CONCAT _reason ${ARGN})
+    message(WARNING "Заданные размеры памяти (${_values}) не применяются: ${_reason}")
+endfunction()
+
+# ==============================================================================
+# Startup из свежих пакетов STM32Cube для ARMv8-M (например, CubeH5 1.7.0)
+# задаёт границу стека командой msr MSPLIM и ссылается на символ _sstack.
+# Скрипт stm32-cmake и старые шаблоны его не определяют: компоновка упадёт с
+# "undefined reference to _sstack". Предупреждаем на Configure (ТЗ 4.11.10).
+#
+# @param SCRIPT_PATH  Шаблонный или явный скрипт; пусто — скрипт stm32-cmake.
+# ==============================================================================
+function(_stm32_yml_check_stack_limit_symbol SCRIPT_PATH)
+    if(toolchain_backend STREQUAL "arduino" OR NOT use_cmsis)
+        return()
+    endif()
+    if(mcu_core)
+        set(_startup "${CMSIS_${MCU_FAMILY}_${mcu_core}_${MCU_TYPE}_STARTUP}")
+    else()
+        set(_startup "${CMSIS_${MCU_FAMILY}_${MCU_TYPE}_STARTUP}")
+    endif()
+    if(NOT _startup OR NOT EXISTS "${_startup}")
+        return()
+    endif()
+    file(STRINGS "${_startup}" _uses REGEX "_sstack")
+    if(NOT _uses)
+        return()
+    endif()
+    if(SCRIPT_PATH AND EXISTS "${SCRIPT_PATH}")
+        file(STRINGS "${SCRIPT_PATH}" _defines REGEX "_sstack")
+        if(_defines)
+            return()
+        endif()
+        set(_script_text "скрипт компоновщика ${SCRIPT_PATH}")
+    else()
+        set(_script_text "скрипт компоновщика stm32-cmake")
+    endif()
+    message(WARNING
+        "Startup ${_startup} задаёт границу стека (MSPLIM) по символу _sstack, "
+        "но ${_script_text} его не определяет: компоновка завершится ошибкой "
+        "'undefined reference to _sstack'. Добавьте в шаблон .ld.in или явный скрипт "
+        "строку '_sstack = _estack - _Min_Stack_Size;' либо подключите через sources "
+        "собственный startup без MSPLIM.")
 endfunction()

@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.19)
 # ==============================================================================
 
 # Определяем текущую версию фреймворка.
-set(STM32_CMAKE_YML_VERSION "0.9.2")
+set(STM32_CMAKE_YML_VERSION "0.9.3")
 
 # Подключаем функциональные модули фреймворка.
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/stm32_yml_utils.cmake)
@@ -51,6 +51,9 @@ function(stm32_yml_setup_project TARGET_NAME)
     if(NOT toolchain_backend STREQUAL "arduino")
         stm32_get_chip_info(${MCU} FAMILY MCU_FAMILY TYPE MCU_TYPE)
         target_compile_definitions(${TARGET_NAME} PRIVATE STM32${MCU_TYPE})
+        # Ядро применяется ко всем целям CMSIS/HAL/FreeRTOS, startup/system
+        # и запросам памяти (ТЗ 4.7.8).
+        stm32_yml_resolve_mcu_core()
     endif()
 
     # 2. Настройка флагов компилятора и include-директорий из YAML.

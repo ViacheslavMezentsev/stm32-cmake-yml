@@ -18,7 +18,9 @@
 | Check QEMU and Renode | [Emulation environment](emulation.md) |
 | Understand test coverage and limits | [Project status](status.md) |
 | Run checks | [Testing](testing.md) |
-| Compare versions | [Changelog](../../CHANGELOG.md) |
+| Find tests in the source tree | [Test levels and where to find them](testing.md#test-levels-and-where-to-find-them) |
+| See which emulator checks a family | [Emulators per family](emulation.md#emulators-per-family) |
+| Compare versions | [Changelog](../../CHANGELOG.en.md) |
 | Find planned work and status | [RU/EN roadmap](../../TODO.md) |
 | Work with an AI agent | [stm32-config-manager](../../skills/stm32-config-manager/SKILL.md) |
 

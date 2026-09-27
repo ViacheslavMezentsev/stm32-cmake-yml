@@ -1,5 +1,5 @@
 # Synthetic configure-only F3 scenario.
-stm32_cmake_yml_version: 0.9.2
+stm32_cmake_yml_version: 0.9.3
 project_name: stm32f3_probe
 mcu: STM32F303VC
 languages: [C, ASM]

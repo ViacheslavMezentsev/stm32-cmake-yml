@@ -11,6 +11,8 @@ Shared rules: [semantics](semantics.md). Baseline: `f8ef5200fc7a4a96d6f3fe9111af
 
 Size substituted into a local .ld.in. Use 0, integer bytes, or integer uppercase K/M. The IOC branch reads a HEX field; incomplete IOC files need explicit values. A ready .ld is not rewritten; the default stm32-cmake linker is not given these values through this branch. Fractional sizes are outside the supported contract (E003). Baseline 0.9.2 keeps stale cache values on reconfigure.
 
+**Change in 0.9.3** (`d8708b4`; spec 4.11.4, 4.11.8, 4.11.9): the format is checked on every Configure, not only when a template is generated: an integer byte count or an integer with upper-case `K`/`M` (`0`, `1536`, `2K`, `1M`); `1k`, `1.5K`, `-1`, `0x200` are errors. A size set in YAML, a profile, an override or the IOC warns that it is not applied when the script comes from stm32-cmake or an explicit `linker_script` (for stm32-cmake the warning names its heap/stack sizes); defaults do not warn.
+
 **Omission and emptiness:** see [shared rules](semantics.md#empty-values); exceptions are stated above. Profiles/overrides apply before defaults. Backend/path restrictions are stated in the description.
 
 ```yaml
@@ -19,7 +21,7 @@ heap_size: 1K
 
 [0.9.2 implementation](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_linker.cmake) · [Index](index.md)
 
-**Checks (partial coverage):** `configure.linker-template`, `configure.baremetal-no-cube`, `configure.empty-and-null-defaults`, `configure.reconfigure-memory`. [Test manifest](../../../../tests/cases.json).
+**Checks (partial coverage):** `configure.linker-template`, `configure.baremetal-no-cube`, `configure.empty-and-null-defaults`, `configure.reconfigure-memory`, `configure.memory-size-format`, `configure.memory-size-unused-warning`, `configure.ioc-missing-values-defaults`. [Test manifest](../../../../tests/cases.json).
 
 **Errata:** [E001](../../errata/E001.md), [E003](../../errata/E003.md).
 
@@ -30,6 +32,8 @@ heap_size: 1K
 
 Size substituted into a local .ld.in. Use 0, integer bytes, or integer uppercase K/M. The IOC branch reads a HEX field; incomplete IOC files need explicit values. A ready .ld is not rewritten; the default stm32-cmake linker is not given these values through this branch. Fractional sizes are outside the supported contract (E003). Baseline 0.9.2 keeps stale cache values on reconfigure.
 
+**Change in 0.9.3** (`d8708b4`; spec 4.11.4, 4.11.8, 4.11.9): the format is checked on every Configure, not only when a template is generated: an integer byte count or an integer with upper-case `K`/`M` (`0`, `1536`, `2K`, `1M`); `1k`, `1.5K`, `-1`, `0x200` are errors. A size set in YAML, a profile, an override or the IOC warns that it is not applied when the script comes from stm32-cmake or an explicit `linker_script` (for stm32-cmake the warning names its heap/stack sizes); defaults do not warn.
+
 **Omission and emptiness:** see [shared rules](semantics.md#empty-values); exceptions are stated above. Profiles/overrides apply before defaults. Backend/path restrictions are stated in the description.
 
 ```yaml
@@ -38,7 +42,7 @@ stack_size: 1K
 
 [0.9.2 implementation](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_linker.cmake) · [Index](index.md)
 
-**Checks (partial coverage):** `configure.linker-template`, `configure.baremetal-no-cube`, `configure.empty-and-null-defaults`, `configure.reconfigure-memory`, `configure.reconfigure-profile-name-boundaries`, `configure.reconfigure-empty-override`. [Test manifest](../../../../tests/cases.json).
+**Checks (partial coverage):** `configure.linker-template`, `configure.baremetal-no-cube`, `configure.empty-and-null-defaults`, `configure.reconfigure-memory`, `configure.reconfigure-profile-name-boundaries`, `configure.reconfigure-empty-override`, `configure.memory-size-format`, `configure.memory-size-unused-warning`, `configure.ioc-missing-values-defaults`. [Test manifest](../../../../tests/cases.json).
 
 **Errata:** [E001](../../errata/E001.md), [E003](../../errata/E003.md).
 
@@ -49,6 +53,10 @@ stack_size: 1K
 
 auto searches local .ld.in names: concrete MCU type, package replaced by X, then XX and xx. linker_script_dir precedes the root. A template produces a build-tree .ld with HEAP_SIZE, STACK_SIZE and USE_READONLY (GCC >=11). Without one, stm32-cmake uses a CMSIS target when use_cmsis; Arduino fails. Supply your own script/template for bare metal. A missing explicit .ld fails.
 
+**Change in 0.9.3** (`d8708b4`; spec 4.11.9): with an explicit script or the stm32-cmake script, explicitly set `heap_size`/`stack_size` warn that they are not applied.
+
+**Change in 0.9.3** (`2625f19`; spec 4.11.10): if the startup file (from the STM32Cube package or `sources`) sets the stack limit with `msr MSPLIM` from `_sstack`, as in CubeH5 1.7.0, and the final script does not define that symbol (stm32-cmake script, older templates), Configure warns in advance and suggests `_sstack = _estack - _Min_Stack_Size;`. Without it linking fails with `undefined reference to _sstack`.
+
 **Omission and emptiness:** see [shared rules](semantics.md#empty-values); exceptions are stated above. Profiles/overrides apply before defaults. Backend/path restrictions are stated in the description.
 
 ```yaml
@@ -57,7 +65,7 @@ linker_script: auto
 
 [0.9.2 implementation](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_linker.cmake) · [Index](index.md)
 
-**Checks (partial coverage):** `configure.linker-template`, `configure.explicit-linker`, `configure.missing-linker`. [Test manifest](../../../../tests/cases.json).
+**Checks (partial coverage):** `configure.linker-template`, `configure.explicit-linker`, `configure.missing-linker`, `configure.memory-size-unused-warning`, `configure.h5-cmsis-hal-freertos-external`. [Test manifest](../../../../tests/cases.json).
 
 <a id="linker-script-dir"></a>
 ## `linker_script_dir`
@@ -117,6 +125,8 @@ linker_directives: [--print-memory-usage]
 
 Links STM32::Nano; the toolchain must provide that target, including with Arduino. Does not automatically enable float printf.
 
+**Note for 0.9.3** (spec 4.10.4): floating-point `printf`/`scanf` support in newlib-nano is linked through the stm32-cmake targets `link_libraries: [STM32::Nano::FloatPrint]` and `STM32::Nano::FloatScan`; there is no separate YAML key.
+
 **Omission and emptiness:** see [shared rules](semantics.md#empty-values); exceptions are stated above. Profiles/overrides apply before defaults. Backend/path restrictions are stated in the description.
 
 ```yaml
@@ -134,6 +144,8 @@ use_newlib_nano: false
 
 Links the matching STM32 target. Unknown/empty values add nothing. NoSys must come from the toolchain; Semihosting has a fallback. Execution needs debugger/simulator support (the QEMU example uses -semihosting).
 
+**Change in 0.9.3** (`b9a6cd3`; spec 3.7.3): an unknown non-empty value (e.g. `nosys`) warns with the known values (`NoSys`, `Semihosting`); no library is linked. An empty value does not warn.
+
 **Omission and emptiness:** see [shared rules](semantics.md#empty-values); exceptions are stated above. Profiles/overrides apply before defaults. Backend/path restrictions are stated in the description.
 
 ```yaml
@@ -142,4 +154,4 @@ system_library: NoSys
 
 [0.9.2 implementation](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_frameworks.cmake) · [Index](index.md)
 
-**Checks (partial coverage):** `configure.defaults-blackpill`, `configure.system-nosys-nano`, `configure.system-semihost-nano`, `configure.system-disabled`, `configure.system-reconfigure`. [Test manifest](../../../../tests/cases.json).
+**Checks (partial coverage):** `configure.defaults-blackpill`, `configure.system-nosys-nano`, `configure.system-semihost-nano`, `configure.system-disabled`, `configure.system-reconfigure`, `configure.enum-unknown-values`, `configure.empty-and-null-defaults`. [Test manifest](../../../../tests/cases.json).

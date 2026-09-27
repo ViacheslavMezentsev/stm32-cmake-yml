@@ -1,0 +1,17 @@
+// STM32F030R8 (Cortex-M0) smoke model. RCC and FLASH controller remain RAM stubs.
+cpu: CPU.CortexM @ sysbus
+    cpuType: "cortex-m0"
+    nvic: nvic
+uart: UART.SemihostingUart @ cpu
+nvic: IRQControllers.NVIC @ sysbus 0xE000E000
+    -> cpu@0
+    priorityMask: 0xC0
+    systickFrequency: 8000000
+flash: Memory.MappedMemory @ sysbus 0x08000000
+    size: 0x10000
+sram: Memory.MappedMemory @ sysbus 0x20000000
+    size: 0x2000
+rcc: Memory.MappedMemory @ sysbus 0x40021000
+    size: 0x400
+flash_ctrl: Memory.MappedMemory @ sysbus 0x40022000
+    size: 0x400
