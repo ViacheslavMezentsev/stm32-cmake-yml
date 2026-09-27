@@ -102,7 +102,7 @@ cube selects FreeRTOS::STM32::<family> targets. Any other nonempty value selects
 
 **Change in 0.9.3** (`b9a6cd3`; spec 3.7.3): an unknown non-empty value warns with the known values (`cube`, `external`) and `external` applies, matching the actual 0.9.2 behaviour.
 
-**Change in 0.9.3** (`3c6bfa3`; spec 4.8.6): `external` works (E007): FreeRTOS is found in `FREERTOS_PATH` (CMake or environment variable) without the family component, and the `FreeRTOS::<port>` and `FreeRTOS::<component>` targets are linked. Both the Cube FreeRTOS tree and FreeRTOS-Kernel are supported (including H5 and U5, whose packages have no FreeRTOS). A missing `FREERTOS_PATH`, `FreeRTOS.h`/`tasks.c` or port files is a Configure error.
+**Change in 0.9.3** (`3c6bfa3`; spec 4.8.6): `external` works (E007): FreeRTOS is found in `FREERTOS_PATH` (CMake or environment variable) without the family component, and the `FreeRTOS::<port>` and `FreeRTOS::<component>` targets are linked. Both the Cube FreeRTOS tree and FreeRTOS-Kernel are supported (including H5 and U5, whose packages have no FreeRTOS). A missing `FREERTOS_PATH`, `FreeRTOS.h`/`tasks.c` or port files is a Configure error. If stm32-cmake omits the port's `portasm.c` (`ARM_CM0` in FreeRTOS-Kernel 11), the framework adds it to the port target (`2f742ff`).
 
 **Omission and emptiness:** see [shared rules](semantics.md#empty-values); exceptions are stated above. Profiles/overrides apply before defaults. Backend/path restrictions are stated in the description.
 
@@ -114,7 +114,7 @@ freertos_version: cube
 
 **Checks (partial coverage):** `configure.freertos-defaults`, `configure.freertos-gcs-v2`, `configure.freertos-demo-heap2`, `configure.freertos-ioc-f4-v2`, `configure.freertos-ioc-f1-v1`, `configure.freertos-ioc-empty-fallback`, `configure.freertos-external-cmake`, `configure.freertos-external-env`, `configure.freertos-unknown-enums`, `configure.empty-and-null-defaults`, `configure.freertos-external-kernel`, `configure.freertos-external-no-path`, `configure.freertos-external-missing-port`, `configure.h5-cmsis-hal-freertos-external`. [Test manifest](../../../../tests/cases.json).
 
-**Deviation:** [E007](../../errata/E007.md) — with the pinned standard upstream, external fails Generate even with a valid FREERTOS_PATH. Tests reproduce the known failure rather than demonstrate support.
+**0.9.2 deviation:** [E007](../../errata/E007.md) — with the pinned standard upstream, external failed Generate even with a valid FREERTOS_PATH. Fixed in 0.9.3; tests confirm a successful Configure/Generate.
 
 <a id="freertos-components"></a>
 ## `freertos_components`

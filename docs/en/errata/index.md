@@ -9,10 +9,10 @@ Applies to baseline `f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0`. Status audited 2
 | [E001](E001.md) | Derived values remain stale in cache | Fixed in 0.9.3 ([PR #6](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/pull/6)) |
 | [E002](E002.md) | list does not read external profiles | Fixed in 0.9.3 ([PR #6](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/pull/6)) |
 | [E003](E003.md) | Integer sizes only | Closed: by design |
-| [E004](E004.md) | crc_algorithm does not select an algorithm | Fixed in 0.9.3 (`4cd3404`) |
+| [E004](E004.md) | crc_algorithm does not select an algorithm | Fixed in 0.9.3 ([PR #41](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/pull/41), `4cd3404`) |
 | [E005](E005.md) | Profile names without `_` | Closed: by design |
-| [E006](E006.md) | CRC failure can exit successfully with a stub | Fixed in 0.9.3 (`4cd3404`) |
-| [E007](E007.md) | External FreeRTOS target namespace mismatch | Fixed in 0.9.3 (`3c6bfa3`, `2f742ff`) |
-| [E008](E008.md) | Profile-only language settings are not exported | Fixed in 0.9.3 (`d8708b4`) |
+| [E006](E006.md) | CRC failure can exit successfully with a stub | Fixed in 0.9.3 ([PR #41](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/pull/41), `4cd3404`) |
+| [E007](E007.md) | External FreeRTOS target namespace mismatch | Fixed in 0.9.3 ([PR #41](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/pull/41), `3c6bfa3`, `2f742ff`) |
+| [E008](E008.md) | Profile-only language settings are not exported | Fixed in 0.9.3 ([PR #41](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/pull/41), `d8708b4`) |
 
 [Reference](../reference/0.9.2/index.md) · [Maintenance](../maintenance.md)

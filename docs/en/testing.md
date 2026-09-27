@@ -354,7 +354,7 @@ Five `system-*` cases check NoSys + Nano, Semihosting + Nano, both settings disa
 
 `link_options: [nostartfiles, "-Wl,--cref"]` becomes driver options `-nostartfiles` and `-Wl,--cref`; `linker_directives: [--print-memory-usage]` uses LINKER to generate `-Wl,--print-memory-usage`. These three flags must not appear in compile_commands.json. The test project has one executable, so the checker requires exactly one LINK_FLAGS line. It checks the current Ninja generator, not every CMake generator format.
 
-The fixture uses bare metal without CMSIS/HAL. Specs are supplied by the pinned xPack/upstream; tests do not invoke the linker or establish syscall, printf/float or semihosting execution behavior. Preparing real test firmware remains a separate step requiring scenario guidance.
+The fixture uses bare metal without CMSIS/HAL. Specs are supplied by the pinned xPack/upstream; tests do not invoke the linker or establish syscall, printf/float or semihosting execution behavior. Real test firmware builds and runs are described in [firmware testing](firmware-testing.md).
 
 ### Cppcheck configuration
 

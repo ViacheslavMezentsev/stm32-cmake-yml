@@ -12,18 +12,23 @@ IOC заполняет поддерживаемые поля; исходники
 Разбор IOC не создаёт стартовый код и не настраивает тактирование MCU.
 
 ```yaml
-stm32_cmake_yml_version: "0.9.2"
+stm32_cmake_yml_version: "0.9.3"
 ioc_file: "my_project.ioc"
 build_artifacts: [ bin, hex, map ]
-crc_enable: true
+crc_enable: true  # нужен шаблон STM32<MCU>_FLASH.ld.in с секцией .checksum
 ```
+
+CRC требует шаблона `.ld.in` или явного `linker_script` с секцией `crc_section_name`.
+Со скриптом, который формирует stm32-cmake, `crc_enable: true` — ошибка Configure;
+отсутствие секции в скрипте — предупреждение; сбой расчёта завершает сборку ошибкой
+`[CRC ERROR]`. Подробнее — [Артефакты и CRC](reference/0.9.2/postbuild.md).
 
 ### Ручная конфигурация без CubeMX
 
 Для legacy-проектов или нестандартных конфигураций все параметры задаются явно.
 
 ```yaml
-stm32_cmake_yml_version: "0.9.2"
+stm32_cmake_yml_version: "0.9.3"
 mcu: STM32F411CEU6
 heap_size: 512
 stack_size: 1K
@@ -39,7 +44,7 @@ freertos_components: [ ARM_CM4F, "Heap::4" ]
 что отличается между ревизиями.
 
 ```yaml
-stm32_cmake_yml_version: "0.9.2"
+stm32_cmake_yml_version: "0.9.3"
 
 # Общие настройки для всех ревизий.
 hal_components: [ GPIO, UART, DMA, CRC ]
@@ -76,7 +81,7 @@ cmake -DSTM32_YML_PROFILE=G474 -B build/G474 -S .
 профилей, генерации скрипта компоновщика, расчёта CRC, артефактов и нормализации флагов.
 
 ```yaml
-stm32_cmake_yml_version: "0.9.2"
+stm32_cmake_yml_version: "0.9.3"
 toolchain_backend: arduino
 mcu: STM32G474RET6  # Требуется для автоматической генерации скрипта компоновщика и CRC.
 
@@ -85,12 +90,11 @@ arduino:
   core_cmake_dir: "Arduino/Core"
   mcu_target: "G474"
   use_core_main: false
-
-# Подключение модулей через локальные CMake-обертки.
-custom_libraries:
-  - "Arduino/libraries/SrcWrapper"
-  - "Arduino/libraries/Wire"
-  - "UserApp"
+  # Подключение модулей через локальные CMake-обёртки (add_subdirectory).
+  custom_libraries:
+    - "Arduino/libraries/SrcWrapper"
+    - "Arduino/libraries/Wire"
+    - "UserApp"
 
 # Линковка логических модулей и системных библиотек.
 link_libraries:

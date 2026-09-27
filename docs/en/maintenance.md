@@ -37,8 +37,20 @@ the technical specification, whose current revision is stated in its header.
    documentation — `python ci/check_reference.py`.
 4. Commit, push the branch, match CI to its latest commit, merge into main.
    Before a release all checks are repeated locally on the final commit of the
-   release branch (spec 8.8.7).
+   release branch (spec 8.6.1, 8.8.7).
 5. Record branch, commit and status in TODO.md.
+
+**Release** (spec 8.6.1):
+
+1. `STM32_CMAKE_YML_VERSION` in `stm32_yml.cmake` and `stm32_cmake_yml_version` in
+   test YAML and documentation examples.
+2. A `## [X.Y.Z] - date` section in CHANGELOG.md and CHANGELOG.en.md.
+3. A release revision of the spec with an updated appendix E.
+4. All L0–L5 checks locally on the final commit of the release branch, and green CI
+   for the same commit.
+5. Merge into main, then tag `vX.Y.Z` on the merge commit.
+6. Errata statuses `released` with the version in both languages and in
+   `docs/reference-index.json`; a TODO.md entry.
 
 **Technical specification**
 
@@ -113,7 +125,7 @@ rather than mixing them with confirmed errata.
 
 ## CI checks
 
-`Documentation reference` checks new local page links, RU/EN anchors, unique
+The `Docs` workflow (`ci/check_reference.py`) checks new local page links, RU/EN anchors, unique
 keys/IDs, references to existing tests and reciprocal errata mappings. It does
 not check external networking or prove semantic correctness. New examples,
 defect claims and contract changes require separate behavioral verification.
@@ -206,8 +218,9 @@ in every job.
 
 Pushes that change only `.md` files at any depth run Docs, skipping Configure,
 Firmware and CI environment. A mixed Markdown/code push still triggers the
-relevant heavy workflows. Environment and firmware retain their existing positive
-path filters, with the Markdown exclusion last. `workflow_dispatch` still allows
+relevant heavy workflows. CI environment and Firmware retain their existing positive
+path filters, with the Markdown exclusion last. Exception: Emulation environment has
+no Markdown exclusion, so editing `tools/qemu/README.md` rebuilds the emulator image. `workflow_dispatch` still allows
 manual runs. A workflow/filter change itself is not documentation-only.
 
 The Firmware counter retains the last successful tested revision when a docs-only

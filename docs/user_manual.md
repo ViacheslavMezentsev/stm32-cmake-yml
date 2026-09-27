@@ -93,6 +93,11 @@ target_include_directories(display PUBLIC "Inc")
 target_link_libraries(display PUBLIC STM32::${MCU_FAMILY} HAL::STM32::${MCU_FAMILY})
 ```
 
+Для MCU с выбранным ядром (все H7 — ядро `M7` выбирается автоматически; у двухъядерных
+`mcu_core` обязателен) цели получают суффикс ядра: `STM32::H7::M7`,
+`HAL::STM32::H7::M7::<компонент>`. Отсутствующий компонент `hal_components` или
+`freertos_components` — ошибка Configure с именем компонента.
+
 ---
 
 ## 3. Драйверы и RTOS
@@ -223,6 +228,14 @@ compile_definitions:
 | 4 — оба символа xx, нижний регистр (стиль CubeMX для G4 и F4) | `STM32G474xx_FLASH.ld.in` |
 
 Если шаблон найден, из него генерируется `.ld` файл в папке сборки с подстановкой `@HEAP_SIZE@` и `@STACK_SIZE@`. Если не найден — используется встроенный скрипт из `stm32-cmake` (при Arduino backend встроенного скрипта нет, поэтому конфигурация завершится ошибкой).
+Со встроенным скриптом stm32-cmake явно заданные `heap_size`/`stack_size` не применяются
+(Configure выводит предупреждение с размерами stm32-cmake), а `crc_enable: true` —
+ошибка Configure: для CRC нужен шаблон `.ld.in` или явный `linker_script`.
+
+Размеры heap/stack проверяются при каждом Configure: допустимы целое число байт или
+целое число с суффиксом `K`/`M` в верхнем регистре (`0`, `1536`, `2K`, `1M`); значения
+вроде `1k`, `0x200` или `1.5K` — ошибка Configure. Изменение YAML, IOC или
+`profiles_file` перезапускает Configure при следующей сборке.
 
 Файлы `.ld.in` можно получить, взяв за основу файлы `.ld`, сгенерированные STM32CubeMX, и заменив в них жёстко заданные размеры на переменные `@HEAP_SIZE@` и `@STACK_SIZE@`.
 
@@ -251,14 +264,18 @@ linker_script: "STM32H723VG_FLASH.ld"  # ищется в linker_script_dir, за
 
 ### Проверка RAM
 
-При `validate_linker_script: true` фреймворк суммирует все RAM-секции из блока `MEMORY{}` скрипта (корректно для H7 с несколькими регионами) и выводит информационное сравнение:
+При `validate_linker_script: true` фреймворк суммирует все RAM-секции из блока `MEMORY{}` скрипта (корректно для H7 с несколькими регионами) и выводит информационное сравнение с суммой RAM, CCRAM и RAM_SHARE микроконтроллера по данным stm32-cmake с учётом ядра:
 
 ```
 --   RAM-секции в скрипте: DTCMRAM:128K + RAM:320K + RAM_D2:32K + RAM_D3:16K = 507904 байт
---   stm32-cmake RAM : 128K
+--   stm32-cmake RAM : RAM 128K = 131072 байт
 --   Скрипт RAM сумма: 507904 байт (496K)
 --   Соотношение     : 496K > 128K
 ```
+
+Для MCU с CCRAM или RAM_SHARE строка эталона выглядит как
+`RAM 96K + CCRAM 32K = 131072 байт`. Если скрипт формирует stm32-cmake, выводится
+«Проверка RAM скрипта компоновщика: не проверялось (скрипт формирует stm32-cmake).»
 
 ---
 
@@ -273,6 +290,17 @@ crc_enable: true
 crc_section_name: ".checksum"
 crc_algorithm: "STM32_HW_DEFAULT"
 ```
+
+Правила с версии 0.9.3:
+
+* нужен шаблон `.ld.in` или явный `linker_script`; со скриптом, который формирует
+  stm32-cmake, `crc_enable: true` — ошибка Configure;
+* если секции `crc_section_name` в скрипте нет, Configure выводит предупреждение;
+* любой сбой расчёта завершает сборку ошибкой `[CRC ERROR]`, нулевая заглушка не пишется;
+* поддерживается только `crc_algorithm: STM32_HW_DEFAULT`; иное значение вызывает
+  предупреждение, и применяется `STM32_HW_DEFAULT`;
+* образ для расчёта строится из секций ELF, загружаемых в регион `FLASH`, поэтому
+  секции вне Flash (например, резервная SRAM STM32H5) на него не влияют.
 
 ### Настройка скрипта компоновщика (.ld)
 
@@ -299,6 +327,8 @@ SECTIONS
   } >FLASH
 
   /* ... остальные секции (.text, .rodata, и т.д.) ... */
+  /* .checksum ставится после всех секций, загружаемых во FLASH,
+     включая .data (>RAM AT> FLASH), иначе их данные не войдут в CRC. */
 
   .checksum :
   {
@@ -324,7 +354,7 @@ int CheckFirmwareIntegrity(CRC_HandleTypeDef *hcrc)
 {
     uint32_t data_len_words = (uint32_t)__checksum_size / sizeof(uint32_t);
     uint32_t calc_crc = HAL_CRC_Calculate(hcrc, (uint32_t*)__checksum_start, data_len_words);
-    uint32_t stored_crc = (uint32_t)__checksum_end;
+    uint32_t stored_crc = __checksum_end[0];  /* значение, записанное в .checksum */
 
     if (calc_crc != stored_crc)
     {
@@ -336,6 +366,13 @@ int CheckFirmwareIntegrity(CRC_HandleTypeDef *hcrc)
     return HAL_OK;
 }
 ```
+
+### Артефакты сборки (`build_artifacts`)
+
+`build_artifacts` перечисляет дополнительные файлы: `bin`, `hex`, `srec` (Motorola
+S-record, с 0.9.3), `map` (флаг компоновщика) и `lss` (листинг). `bin` строится из
+секций ELF, загружаемых в регион `FLASH`. Неизвестный элемент вызывает предупреждение
+со списком известных и пропускается. Подробнее — [Артефакты и CRC](ru/reference/0.9.2/postbuild.md).
 
 ---
 
@@ -432,9 +469,8 @@ cmake -DSTM32_YML_PROFILE=list -B build_tmp -S .
 затем дополнение приклеивается уже к заменённому списку, а не к исходному из
 корня yml.
 
-> Имя профиля не должно содержать символ `_`. Команда просмотра списка профилей
-> определяет имя как первый сегмент после `profiles_`, поэтому `G474_rev2` будет
-> показано как `G474`. На саму сборку по профилю это ограничение не влияет.
+> Имя профиля не должно содержать символ `_`: это ограничение по замыслу автора
+> ([E005](ru/errata/E005.md)). Используйте имена вроде `boardRev`, `G474` или `debug2`.
 
 Если профили разрастаются, их можно вынести в отдельный файл:
 
@@ -442,6 +478,11 @@ cmake -DSTM32_YML_PROFILE=list -B build_tmp -S .
 # stm32_config.yml
 profiles_file: "profiles.yml"
 ```
+
+Из внешнего файла читается только секция `profiles:`, остальные ключи игнорируются.
+При заданном `profiles_file` встроенная секция `profiles:` не используется, и Configure
+выводит предупреждение со списком её профилей. `STM32_YML_PROFILE=list` читает тот же
+файл, а его изменение перезапускает Configure при следующей сборке.
 
 ### Точечные cmake-overrides
 

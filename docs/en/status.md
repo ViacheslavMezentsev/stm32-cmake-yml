@@ -2,7 +2,8 @@
 
 [Documentation](index.md) · [README](../../README.en.md) · [Русский](../ru/status.md)
 
-The reference and regressions describe **version 0.9.2**. This page records the
+The reference (0.9.2 directory with 0.9.3 change notes) and regressions describe
+**version 0.9.3**. This page records the
 suite in this checkout and its scope. See [GitHub Actions](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/actions?query=branch%3Amain)
 for current `main` results. The three status badges show latest completed workflows; Builds (Checks) shows the verified firmware matrix size.
 
@@ -17,7 +18,8 @@ This is suite size, not the number of passing runs. CI verifies it against the
 The matrix is xPack GCC 13.3.1-1.1, 14.2.1-1.1, 15.2.1-1.1 × CMake 3.19.8 and 3.28.3.
 
 Checks cover Configure/Generate, profiles, precedence, IOC, components, sources
-and diagnostics. Cases include F0/F1/F3/F4/F7/G4, bare metal and Arduino, but not
+and diagnostics. Cases include F0/F1/F3/F4/F7/G4/H5/H7 (including MCU core selection), the FreeRTOS
+port table for C0/U0/L5/U5/WL, bare metal and Arduino, but not
 every MCU/option combination. Expected errors and known deviations are checked
 explicitly. Successful configuration does not establish successful linking or
 working firmware. [Coverage and commands](testing.md).

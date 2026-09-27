@@ -11,7 +11,7 @@ its own branch.
 | --- | --- | --- |
 | 1. Basic execution | Startup, .data/.bss, C++ construction, metadata, CRC, exit and hang | Adapted F1 `02-semihosting`: 18 builds, 24 QEMU + 24 Renode runs. Merged into main (`493771d`). |
 | 2. Build modes | Bare metal without CMSIS/HAL and with project-owned startup; CMSIS without HAL; explicit/template linker scripts; profiles on one MCU | Merged into main `ba9bde7`: four extra profiles, own bare startup and shared runtime assertions. Total: 42 builds and 48 checks per simulator. No new clock/peripheral configuration. |
-| 3. Libraries and C/C++ runtime | Custom CMake modules, ETL, language flags; Arduino and RTOS in subsequent separate stages | Merged into main `a53f809`: mixed C/C++ library and ETL vector/string without I/O; total 54 builds / 120 simulator checks. E008 documented with a workaround and regression; Full Arduino startup remains a separate contract; FreeRTOS stages are described below. External FreeRTOS/E007 stays regression/errata only, without a fix. |
+| 3. Libraries and C/C++ runtime | Custom CMake modules, ETL, language flags; Arduino and RTOS in subsequent separate stages | Merged into main `a53f809`: mixed C/C++ library and ETL vector/string without I/O; total 54 builds / 120 simulator checks. E008 fixed in 0.9.3 (`d8708b4`), workaround removed; full Arduino startup remains a separate contract; FreeRTOS stages are described below. External FreeRTOS (E007) is fixed in 0.9.3 and exercised by the `freertosExternal` profile. |
 | 4. Cores and ABI | M0, M3, M4/FPU, M7; startup, instruction sets and soft/hard-float | Done in 0.9.3 (spec 8.8.8, TC-67): every profile for F0 (M0), F1 (M3), F4 and G4 (M4F, hard float), F7 (M7F); QEMU `netduino2`/`netduinoplus2` for F0, F1, F4, Renode for all — [emulators per family](emulation.md#emulators-per-family). Running M0 code on an M3 in QEMU does not prove M0 compatibility; Renode checks it. F3 is not in the matrix. |
 | 5. Peripherals | GPIO, SysTick/timers, UART, then individual protocols | Start with `03-blink`, HSI without PLL; assert GPIO events and virtual time. Requires functional register/IRQ models. Memory stubs cannot establish peripheral behavior. External devices and electrical properties need hardware tests. |
 
@@ -44,6 +44,10 @@ Merged into main (`f16eb09`), `codex/firmware-freertos-tasks`: starter creates r
 
 ## Optimistic size estimate
 
+This estimate predates group 4 and is kept as a guide. The actual 0.9.3 matrix is
+already larger: 13 profiles per target plus 4 H7/H5 profiles give 570 builds and 948
+simulator runs, 66 of them corrupted ELF copies ([firmware testing](firmware-testing.md)).
+
 A planning target, not verified coverage: **50–60 distinct firmware profiles,
 300–360 builds and roughly 500–650 simulator executions** across six GCC/CMake
 pairs. This estimates representative coverage of existing configuration
@@ -53,7 +57,7 @@ One possible upper-target breakdown:
 
 | Group | Profiles in the estimate |
 | --- | ---: |
-| Already implemented profiles, including FreeRTOS tasks | 12 |
+| Profiles implemented at the time of the estimate, including FreeRTOS tasks | 12 |
 | Additional IOC/profile, linking, runtime and library variants | 12 |
 | Additional Arduino/RTOS APIs and integration variants | 10 |
 | Additional F0/F3/F4/F7/G4, startup and ABI/FPU variants | 18 |
@@ -62,7 +66,7 @@ One possible upper-target breakdown:
 
 If 42 profiles can run on both simulators and 18 on one, the result would be
 **360 builds and 624 checks**: `(42 × 2 + 18) × 6 + 12`. The final 12 are the
-current corrupted-ELF runs. This illustrative allocation requires model audits;
+corrupted-ELF runs at the time of the estimate. This illustrative allocation requires model audits;
 an incompatible model reduces execution counts rather than creating a false pass.
 
 Configure is separate: the current 139 scenarios give 834 checks, including

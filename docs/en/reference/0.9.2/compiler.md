@@ -150,4 +150,4 @@ compile_definitions_cxx: [FEATURE=1]
 
 **Checks (partial coverage):** `configure.defaults-blackpill`, `configure.source-directory-target`, `configure.profile-only-keys`. [Test manifest](../../../../tests/cases.json).
 
-Profile-only language settings require root declarations: [E008](../../errata/E008.md).
+In 0.9.2 profile-only language settings required root declarations ([E008](../../errata/E008.md)); since 0.9.3 they do not.

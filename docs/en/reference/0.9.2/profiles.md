@@ -32,9 +32,9 @@ profiles:
 
 `CFG-PROFILES-FILE` · **Type:** string: relative YAML path · **Default:** inline profiles
 
-External root-relative YAML file containing profiles. Selection loads it as the profile source; a merge of both profile catalogs is not guaranteed. A missing file warns. Baseline 0.9.2 list does not read this file.
+External root-relative YAML file containing profiles. Selection loads it as the profile source; a merge of both profile catalogs is not guaranteed. A missing file warns. Baseline 0.9.2 list does not read this file; since 0.9.3 (`858013a`) it does (E002).
 
-**Change in 0.9.3** (`d8708b4`; spec 3.4.8, 3.6.5): only the `profiles:` section of the external file is read; its other keys are ignored and no longer replace the base value for `_append`. The file is registered as a Configure dependency. An inline `profiles:` section is still unused when `profiles_file` is set, but a warning now lists the inline profiles (spec 3.4.11, question 10.2.16).
+**Change in 0.9.3** (`d8708b4`; spec 3.4.8, 3.6.5): only the `profiles:` section of the external file is read; its other keys are ignored and no longer replace the base value for `_append`. The file is registered as a Configure dependency. An inline `profiles:` section is still unused when `profiles_file` is set, but a warning now lists the inline profiles (spec 3.4.11, question 10.2.16; `489bd61`).
 
 **Omission and emptiness:** see [shared rules](semantics.md#empty-values); exceptions are stated above. Profiles/overrides apply before defaults. Backend/path restrictions are stated in the description.
 

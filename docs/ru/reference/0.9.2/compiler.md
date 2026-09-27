@@ -150,4 +150,4 @@ compile_definitions_cxx: [FEATURE=1]
 
 **Проверки (частичное покрытие):** `configure.defaults-blackpill`, `configure.source-directory-target`, `configure.profile-only-keys`. [Test manifest](../../../../tests/cases.json).
 
-Языковые параметры только из профиля требуют корневых объявлений: [E008](../../errata/E008.md).
+В 0.9.2 языковые параметры только из профиля требовали корневых объявлений ([E008](../../errata/E008.md)); с 0.9.3 не требуют.
