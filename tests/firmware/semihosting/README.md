@@ -8,7 +8,8 @@ ST copyright/license notices in copied files are retained.
 Inputs with unchanged logic (whitespace normalized): system_stm32f1xx.c, stm32f1xx_hal_conf.h, version.h. The test
 CMakeLists accepts external framework/toolchain paths. YAML is reduced to the
 same essential settings, explicitly selects framework 0.9.3 and CubeF1 1.8.7,
-and adds success/failure/hang profiles. main.cpp retains formatted semihosting output,
+and adds success/failure/hang and the other profiles; the full set of thirteen
+profiles is listed in `ci/firmware_cases.py`. main.cpp retains formatted semihosting output,
 HAL_Init, version and CPUID output. Its endless HAL_Delay loop is replaced with
 immediate SYS_WRITE0 protocol markers and SYS_EXIT_EXTENDED, or an intentional hang.
 
@@ -26,7 +27,8 @@ emulators are in `ci/firmware_cases.py`.
 Адаптировано из примера автора; исходный проект не изменялся. Хеши входных файлов
 сохранены до адаптации. system_stm32f1xx.c, stm32f1xx_hal_conf.h и version.h
 скопированы без изменения логики; нормализованы пробелы и окончания строк.
-CMake получает пути извне, YAML закрепляет версии и три профиля. main.cpp сохраняет
+CMake получает пути извне, YAML закрепляет версии (фреймворк 0.9.3, CubeF1 1.8.7) и
+тринадцать профилей (список — `ci/firmware_cases.py`). main.cpp сохраняет
 форматированный вывод через SYS_WRITE0, HAL_Init, версии и CPUID; бесконечный цикл заменён
 маркерами и управляемым выходом либо намеренным зависанием.
 

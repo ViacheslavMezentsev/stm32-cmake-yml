@@ -9,7 +9,9 @@ Shared rules: [semantics](semantics.md). Baseline: `f8ef5200fc7a4a96d6f3fe9111af
 
 `CFG-HEAP-SIZE` · **Type:** integer bytes / string with K or M · **Default:** IOC / 512 manually
 
-Size substituted into a local .ld.in. Use 0, integer bytes, or integer uppercase K/M. The IOC branch reads a HEX field; incomplete IOC files need explicit values. A ready .ld is not rewritten; the default stm32-cmake linker is not given these values through this branch. Fractional sizes are outside the supported contract (E003). Baseline 0.9.2 keeps stale cache values on reconfigure.
+Size substituted into a local .ld.in. Use 0, integer bytes, or integer uppercase K/M. The IOC branch reads a HEX field; in 0.9.2 incomplete IOC files needed explicit values. A ready .ld is not rewritten; the default stm32-cmake linker is not given these values through this branch. Fractional sizes are outside the supported contract (E003). Baseline 0.9.2 keeps stale cache values on reconfigure.
+
+**Change in 0.9.3** (`858013a`, `d8708b4`; spec 4.4.6): the cache value is refreshed on reconfigure (E001); an IOC without `HeapSize`/`StackSize` gets 512/1024.
 
 **Change in 0.9.3** (`d8708b4`; spec 4.11.4, 4.11.8, 4.11.9): the format is checked on every Configure, not only when a template is generated: an integer byte count or an integer with upper-case `K`/`M` (`0`, `1536`, `2K`, `1M`); `1k`, `1.5K`, `-1`, `0x200` are errors. A size set in YAML, a profile, an override or the IOC warns that it is not applied when the script comes from stm32-cmake or an explicit `linker_script` (for stm32-cmake the warning names its heap/stack sizes); defaults do not warn.
 
@@ -30,7 +32,9 @@ heap_size: 1K
 
 `CFG-STACK-SIZE` · **Type:** integer bytes / string with K or M · **Default:** IOC / 1024 manually
 
-Size substituted into a local .ld.in. Use 0, integer bytes, or integer uppercase K/M. The IOC branch reads a HEX field; incomplete IOC files need explicit values. A ready .ld is not rewritten; the default stm32-cmake linker is not given these values through this branch. Fractional sizes are outside the supported contract (E003). Baseline 0.9.2 keeps stale cache values on reconfigure.
+Size substituted into a local .ld.in. Use 0, integer bytes, or integer uppercase K/M. The IOC branch reads a HEX field; in 0.9.2 incomplete IOC files needed explicit values. A ready .ld is not rewritten; the default stm32-cmake linker is not given these values through this branch. Fractional sizes are outside the supported contract (E003). Baseline 0.9.2 keeps stale cache values on reconfigure.
+
+**Change in 0.9.3** (`858013a`, `d8708b4`; spec 4.4.6): the cache value is refreshed on reconfigure (E001); an IOC without `HeapSize`/`StackSize` gets 512/1024.
 
 **Change in 0.9.3** (`d8708b4`; spec 4.11.4, 4.11.8, 4.11.9): the format is checked on every Configure, not only when a template is generated: an integer byte count or an integer with upper-case `K`/`M` (`0`, `1536`, `2K`, `1M`); `1k`, `1.5K`, `-1`, `0x200` are errors. A size set in YAML, a profile, an override or the IOC warns that it is not applied when the script comes from stm32-cmake or an explicit `linker_script` (for stm32-cmake the warning names its heap/stack sizes); defaults do not warn.
 

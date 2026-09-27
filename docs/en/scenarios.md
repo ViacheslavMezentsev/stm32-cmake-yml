@@ -9,20 +9,23 @@ See [reference](reference/0.9.2/index.md) and [errata](errata/index.md) for cont
 ## CubeMX IOC
 
 ```yaml
-stm32_cmake_yml_version: 0.9.2
+stm32_cmake_yml_version: 0.9.3
 ioc_file: my_project.ioc
 build_artifacts: [bin, hex, map]
-crc_enable: true
+crc_enable: true  # requires an STM32<MCU>_FLASH.ld.in template with a .checksum section
 ```
 
 IOC provides supported fields such as MCU and memory sizes; specify source paths
 and missing values yourself. Parsing IOC does not generate startup code or clocks.
-CRC also needs a suitable linker section and tools; Configure does not validate it.
+CRC needs a `.ld.in` template or an explicit `linker_script` containing the
+`crc_section_name` section. With the stm32-cmake script `crc_enable: true` is a
+Configure error, a missing section is a warning, and a CRC failure fails the build
+with `[CRC ERROR]`. See [artifacts and CRC](reference/0.9.2/postbuild.md).
 
 ## Manual configuration
 
 ```yaml
-stm32_cmake_yml_version: 0.9.2
+stm32_cmake_yml_version: 0.9.3
 mcu: STM32F411CEU6
 heap_size: 512
 stack_size: 1K
@@ -72,7 +75,7 @@ arduino:
   core_cmake_dir: Arduino/Core
   mcu_target: G474
   use_core_main: false
-custom_libraries: [Arduino/libraries/SrcWrapper, Arduino/libraries/Wire, UserApp]
+  custom_libraries: [Arduino/libraries/SrcWrapper, Arduino/libraries/Wire, UserApp]
 link_libraries: [UserApp, Arduino::SrcWrapper, Arduino::Core, STM32::Nano]
 linker_script: auto
 crc_enable: true

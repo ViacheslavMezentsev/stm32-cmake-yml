@@ -5,7 +5,7 @@
 The first firmware test adapts the author's F1 [02-semihosting example](../../tests/firmware/semihosting/README.md).
 It is separate from the 139 configure scenarios: **570 builds, 336 QEMU runs and 612 Renode runs**:
 thirteen profiles per target (F103, F030, F411, F401, G431, G474, F746; G4 and F7 in Renode only), one corrupted copy per target and four H7/H5 profiles (Renode only) per tool pair; three xPack GCC versions × two CMake versions from the
-[lockfile](../../ci/dependencies.lock.json), CubeF1 1.8.7, CubeF0 1.11.6, CubeF4 1.28.3, CubeG4 1.6.3, CubeF7 1.17.3, QEMU 11.0.0.
+[lockfile](../../ci/dependencies.lock.json), CubeF1 1.8.7, CubeF0 1.11.6, CubeF4 1.28.3, CubeG4 1.6.3, CubeF7 1.17.3, CubeH7 1.13.0, CubeH5 1.7.0, FreeRTOS-Kernel 11.3.1, QEMU 11.0.0.
 The Windows QEMU 11.1.0 installation was also checked locally; CI uses the pinned image.
 
 ## Targets
@@ -100,7 +100,7 @@ Actual GCC/CMake versions, all thirteen profiles of every target, the corrupted 
 Failures do not stop collection of other pair results, but the matrix exits nonzero
 if any pair fails. Run selection uses the current lockfile rather than accepting
 whatever manifests happen to exist. Aggregate reports are matrix-summary.json;
-individual reports remain build-summary.json and qemu-summary.json.
+individual reports remain build-summary.json, qemu-summary.json and renode-summary.json.
 
 The fixture uses C11 and C++17. CMake 3.19 rejects C_STANDARD=17 even with a
 compiler that supports C17: CMake added that value in 3.21. The source C files do
@@ -153,7 +153,7 @@ For each tool pair and target, a copy of success ELF has one bit changed in .fw_
 Code, startup data and the injected CRC remain unchanged. The derived negative case,
 crc-corrupt, must report CRC_RESULT=FAIL and TEST_RESULT=FAIL and exit 3. A crash
 or timeout cannot pass this case. This adds one run per target and pair without extra compilations:
-546 run builds, 336 QEMU runs and 588 Renode runs. Reports distinguish thirteen profiles from fourteen executions per target.
+with the four H7/H5 profiles this gives 570 builds, 336 QEMU runs and 612 Renode runs. Reports distinguish thirteen profiles from fourteen executions per target.
 
 A separate negative build (TC-52) on each pair configures the `success` profile with `flash_size: 4K` and requires both the build and a rebuild to fail at the CRC step (`[CRC ERROR]`, image larger than the Flash limit). The badge does not count it.
 
@@ -200,7 +200,8 @@ Artifacts include process.log, firmware.log, guest-exit.json (when reached) and
 renode-summary.json. No downloads, GUI or GDB are needed.
 
 By default (`--mode batch`) all ELFs of one GCC/CMake pair run in a single
-Renode process: 6 processes per matrix instead of one per case. Before each case `Clear` removes the
+Renode process: 6 batch processes per matrix instead of one per case; each of the
+four H7/H5 firmwares runs in its own process on its family model (24 more). Before each case `Clear` removes the
 machine, which is then recreated and loads the ELF, so CPU, NVIC, SysTick,
 memory and the exit hook never carry over. Output is split by
 `RENODE_CASE_END=<n>` markers: every case keeps its own process.log,

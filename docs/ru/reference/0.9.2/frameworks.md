@@ -102,7 +102,7 @@ cube выбирает targets FreeRTOS::STM32::<family>. Иное непусто
 
 **Изменение в 0.9.3** (`b9a6cd3`; ТЗ 3.7.3): неизвестное непустое значение вызывает предупреждение со списком известных (`cube`, `external`), применяется `external` — так же, как фактически работала 0.9.2.
 
-**Изменение в 0.9.3** (`3c6bfa3`; ТЗ 4.8.6): `external` работает (E007): FreeRTOS ищется в `FREERTOS_PATH` (переменная CMake или окружения) без компонента семейства, подключаются цели `FreeRTOS::<порт>` и `FreeRTOS::<компонент>`. Поддерживаются дерево FreeRTOS из пакета Cube и FreeRTOS-Kernel (в том числе для H5 и U5, в пакетах которых FreeRTOS нет). Нет `FREERTOS_PATH`, `FreeRTOS.h`/`tasks.c` или файлов порта — ошибка Configure.
+**Изменение в 0.9.3** (`3c6bfa3`; ТЗ 4.8.6): `external` работает (E007): FreeRTOS ищется в `FREERTOS_PATH` (переменная CMake или окружения) без компонента семейства, подключаются цели `FreeRTOS::<порт>` и `FreeRTOS::<компонент>`. Поддерживаются дерево FreeRTOS из пакета Cube и FreeRTOS-Kernel (в том числе для H5 и U5, в пакетах которых FreeRTOS нет). Нет `FREERTOS_PATH`, `FreeRTOS.h`/`tasks.c` или файлов порта — ошибка Configure. Если stm32-cmake не подключил `portasm.c` порта (`ARM_CM0` в FreeRTOS-Kernel 11), фреймворк добавляет его к цели порта (`2f742ff`).
 
 **Пропуск и пустота:** см. [общие правила](semantics.md#empty-values); исключения указаны выше. Профиль/override применяется до выбора defaults. Ограничения backend и путей указаны в описании.
 
@@ -114,7 +114,7 @@ freertos_version: cube
 
 **Проверки (частичное покрытие):** `configure.freertos-defaults`, `configure.freertos-gcs-v2`, `configure.freertos-demo-heap2`, `configure.freertos-ioc-f4-v2`, `configure.freertos-ioc-f1-v1`, `configure.freertos-ioc-empty-fallback`, `configure.freertos-external-cmake`, `configure.freertos-external-env`, `configure.freertos-unknown-enums`, `configure.empty-and-null-defaults`, `configure.freertos-external-kernel`, `configure.freertos-external-no-path`, `configure.freertos-external-missing-port`, `configure.h5-cmsis-hal-freertos-external`. [Test manifest](../../../../tests/cases.json).
 
-**Отклонение:** [E007](../../errata/E007.md) — со штатным закреплённым upstream external завершается ошибкой Generate даже при корректном FREERTOS_PATH. Тесты фиксируют известную ошибку, а не подтверждают поддержку.
+**Отклонение 0.9.2:** [E007](../../errata/E007.md) — со штатным закреплённым upstream external завершался ошибкой Generate даже при корректном FREERTOS_PATH. Исправлено в 0.9.3; тесты подтверждают успешный Configure/Generate.
 
 <a id="freertos-components"></a>
 ## `freertos_components`

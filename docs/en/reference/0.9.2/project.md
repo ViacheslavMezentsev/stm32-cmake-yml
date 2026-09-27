@@ -13,10 +13,12 @@ Version the YAML targets. Set it explicitly; it does not select framework code. 
 
 **Change in 0.9.3** (`d8708b4`; spec 4.2.3): the parameter is recommended: a missing or empty value warns that the recommended parameter is not set, not that a mandatory one is missing. The "What is new in 0.9" note is removed from the older-config warning.
 
+**Change in 0.9.3** (`d40f23d`): the banner lines `Framework :` and `Config :` are replaced by «stm32-cmake-yml версия: …» and «Версия в конфигурации: …» (the log is in Russian).
+
 **Processing order:** version comparison runs immediately after YAML loading, **before** profiles and `STM32_YML_OVERRIDE_*`. Changing these two options through a profile/override cannot change diagnostics already emitted. Set them at the YAML root. Missing or empty versions warn when checking is enabled; configuration continues. An omitted or empty switch defaults to `true` (the empty switch is not separately tested).
 
 ```yaml
-stm32_cmake_yml_version: 0.9.2
+stm32_cmake_yml_version: 0.9.3
 ```
 
 [0.9.2 implementation](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_config.cmake) · [Index](index.md)
@@ -103,6 +105,8 @@ project_name: bluepill
 `CFG-MCU` · **Type:** string: STM32 part name · **Default:** IOC / required manually
 
 For example STM32F103C8T6. IOC DeviceId loses only a trailing x. The stm32-cmake backend requires a name supported by its MCU database. Arduino uses it for auto linker-template lookup; the consumer supplies chip defines. Derived MCU is stale across changes in baseline 0.9.2.
+
+**Change in 0.9.3** (`858013a`): `MCU` is refreshed on profile change (E001); use `STM32_YML_OVERRIDE_mcu` for an explicit override.
 
 **Omission and emptiness:** see [shared rules](semantics.md#empty-values); exceptions are stated above. Profiles/overrides apply before defaults. Backend/path restrictions are stated in the description.
 

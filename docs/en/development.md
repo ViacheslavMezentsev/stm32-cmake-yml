@@ -8,7 +8,9 @@ The author's usual workflow is to delete the CMake cache and reconfigure after
 editing stm32_config.yml. A fresh cache removes old cache entries, so repeated
 configuration bugs may not appear in everyday use. This is a useful diagnostic
 starting point; supply the required profile/toolchain settings again through the
-project configuration or Configure command.
+project configuration or Configure command. Since 0.9.3 editing the YAML, IOC or
+`profiles_file` re-runs Configure on the next build, and derived values (MCU,
+template heap/stack) are refreshed in the same cache.
 
 Tests retain two modes: independent scenarios with fresh caches and multi-step
 scenarios intentionally reusing one build directory. The latter checks incremental
@@ -26,6 +28,5 @@ toolchains. See [semantics](reference/0.9.2/semantics.md).
 
 CMSIS does not prove that custom vectors, clocks, memory or startup are correct.
 Configure only creates the build graph. Bare-metal fixtures check dependency
-isolation and graph settings; they are not runnable firmware. Before preparing or
-building firmware in this work, notify the author and wait for scenario guidance,
-as required by the [roadmap](../../TODO.md).
+isolation and graph settings; they are not runnable firmware. Test firmware builds
+and runs are described in [firmware testing](firmware-testing.md).

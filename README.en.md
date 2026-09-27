@@ -64,7 +64,7 @@ for your project. VS Code with CMake Tools is convenient but optional.
 
 1. Choose a [demo project](https://github.com/ViacheslavMezentsev/demo-stm32-cmake) or [connect the framework](docs/en/getting-started.md) to your own.
 2. Describe sources, MCU/IOC and components in `stm32_config.yml`; add profiles as needed.
-3. Configure, then build. Run Configure again after YAML changes; see [development](docs/en/development.md) for cache behavior.
+3. Configure, then build. Changing the YAML, IOC or `profiles_file` re-runs Configure on the next build; see [development](docs/en/development.md) for cache behavior.
 
 ## Boundaries
 

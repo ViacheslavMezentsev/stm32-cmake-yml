@@ -18,8 +18,8 @@
 | Зависимости | `libglib2.0-0t64`, `zlib1g`, `libfdt1` |
 
 `share/qemu` (прошивки для других машин, около 316 МБ) не включён: netduino2 и
-netduinoplus2 их не используют. Проверено: `check.py --locked` и все 78 запусков
-QEMU-матрицы прошивок.
+netduinoplus2 их не используют. Проверено: `check.py --locked` и все 336 запусков
+QEMU-матрицы прошивок (netduino2, netduinoplus2).
 
 Пересборка на Ubuntu 24.04 с пакетами из комментария скрипта:
 
@@ -57,8 +57,8 @@ longer compiles QEMU: it verifies the archive SHA-256 against the
 | Runtime packages | `libglib2.0-0t64`, `zlib1g`, `libfdt1` |
 
 `share/qemu` (firmware for other machines, about 316 MB) is omitted: netduino2
-and netduinoplus2 do not use it. Verified with `check.py --locked` and all 78
-firmware-matrix QEMU runs.
+and netduinoplus2 do not use it. Verified with `check.py --locked` and all 336
+firmware-matrix QEMU runs (netduino2, netduinoplus2).
 
 Rebuild on Ubuntu 24.04 with the packages listed in the script header:
 

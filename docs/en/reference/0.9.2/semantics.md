@@ -7,9 +7,11 @@
 This reference records version 0.9.2 as implemented in commit
 `f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0`. This identifies the audited code;
 it does not assert that a release tag exists. Audit date: 2026-09-22.
-Status on 2026-09-23: E001/E002 fixes (`858013a`) merged in [PR #6](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/pull/6),
-merge `5711ec6`. The reference baseline is unchanged; a fixed release is not established.
-The version string alone cannot distinguish these states: inspect the commit.
+Status on 2026-09-27: E001/E002 fixes ([PR #6](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/pull/6), merge `5711ec6`) and
+E004, E006–E008 fixes ([PR #41](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/pull/41), merge `29e64a4`) are part of release 0.9.3.
+The reference baseline is unchanged; 0.9.3 differences are marked "Changed in 0.9.3"
+in the cards. Version string `0.9.3` distinguishes the fixed implementation from the
+0.9.2 baseline.
 
 Cards describe supported intent and observed baseline behavior. Errata separately
 records departures from expected results. Fixes do not rewrite 0.9.2 history.
@@ -50,7 +52,10 @@ it. Quotes do not disable subsequent CMake normalization.
 ## Types, names and validation
 
 Card types describe the recommended input contract, not an already enforced
-JSON Schema. Baseline has no general unknown-key or enum validation. An unknown
+JSON Schema. Baseline has no general unknown-key or enum validation. In 0.9.3
+unknown values of `toolchain_backend`, `system_library`, `cmsis_rtos_api`,
+`freertos_version`, `crc_algorithm` and `build_artifacts` items warn (see cards);
+unknown keys are still not checked. An unknown
 key may be exported and ignored; Configure success does not detect every typo.
 `arduino.core_path` denotes a nested `arduino:` YAML mapping, not a literal dotted
 key. Objects flatten using `_`: `arduino: {core_path: ...}` becomes
@@ -79,7 +84,8 @@ by these configure tests.
 | `STM32_YML_OVERRIDE_<param>` | Nonempty CACHE STRING scalar overriding the profile; nested names use `_` |
 | `CMAKE_USER_HOME` | Environment variable locating STM32Cube/Repository |
 | `CMAKE_TOOLCHAIN_FILE`, `STM32_TOOLCHAIN_PATH` | Consumer/toolchain inputs, not framework YAML options |
-| `MCU`, `HEAP_SIZE`, `STACK_SIZE` | Derived cache entries retaining old baseline values (E001) |
+| `MCU`, `HEAP_SIZE`, `STACK_SIZE` | Derived cache entries; stale in 0.9.2 (E001), refreshed on every Configure since 0.9.3 (`HEAP_SIZE`/`STACK_SIZE` only for a `.ld.in` template) |
+| `FREERTOS_PATH` | CMake or environment variable: FreeRTOS directory for `freertos_version: external` (0.9.3) |
 | `ARDUINO_CORE_DIR`, `MCU_TARGET`, `USE_CORE_MAIN` | Outputs for Arduino wrappers; see cards for omission behavior |
 
 Omitting `-D` on the next command does not delete the cache entry. Remove one with

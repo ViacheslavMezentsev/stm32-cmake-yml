@@ -7,7 +7,7 @@ Shared rules: [semantics](semantics.md). Baseline: `f8ef5200fc7a4a96d6f3fe9111af
 <a id="build-artifacts"></a>
 ## `build_artifacts`
 
-`CFG-BUILD-ARTIFACTS` · **Type:** list: bin / hex / map / lss · **Default:** []
+`CFG-BUILD-ARTIFACTS` · **Type:** list: bin / hex / srec / map / lss · **Default:** []
 
 bin/hex/lss add post-build conversions; map adds a linker flag. An empty list does not disable the main target or size output. Unknown items are ignored. The toolchain must provide bin/hex/size helpers and required utilities.
 

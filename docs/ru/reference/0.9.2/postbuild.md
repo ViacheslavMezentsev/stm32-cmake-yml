@@ -7,7 +7,7 @@
 <a id="build-artifacts"></a>
 ## `build_artifacts`
 
-`CFG-BUILD-ARTIFACTS` · **Тип:** list: bin / hex / map / lss · **Default:** []
+`CFG-BUILD-ARTIFACTS` · **Тип:** list: bin / hex / srec / map / lss · **Default:** []
 
 bin/hex/lss добавляют post-build преобразования, map — флаг линкера. Пустой список не запрещает основную цель и вывод размера. Неизвестные элементы игнорируются. Toolchain должен предоставить функции bin/hex/size и необходимые утилиты.
 

@@ -68,13 +68,14 @@ HardFault исследуется отдельно по состоянию про
 векторам и доступным для данного ядра fault-регистрам. Ни лог сравнения RAM,
 ни Configure success не определяют его причину. Не меняйте размеры памяти вслепую.
 
-CRC: читайте E004/E006; успешный Configure создаёт команду, не проверяет её
-результат. Нулевое CRC само по себе не доказывает ошибку. Проверка бинарного
-результата и эталонного алгоритма требует отдельного сценария.
+CRC (E004, E006): с 0.9.3 сбой расчёта завершает Post-build ошибкой `[CRC ERROR]`,
+нулевая заглушка не пишется; `crc_enable: true` со скриптом stm32-cmake — ошибка
+Configure, отсутствие секции `crc_section_name` в скрипте — предупреждение. Нулевое
+CRC само по себе не доказывает ошибку. Успешная сборка не доказывает правильность
+алгоритма: проверка эталона требует отдельного сценария.
 
-В этой работе перед подготовкой/сборкой новых прошивок уведомите автора и
-дождитесь его сценариев согласно [TODO](../../TODO.md). При наличии уже данных
-уточнений учитывайте их, не запрашивайте повторное разрешение без причины.
+Прошивочные проверки репозитория описаны в
+[firmware-testing](../../docs/ru/firmware-testing.md); новые сценарии согласуйте с автором.
 
 ## Проверяемые основания и результат
 
@@ -92,4 +93,6 @@ Use the English guide above. Identify the failing command and phase before
 choosing a remedy. Preserve the consumer toolchain and cache context. RAM comparison
 is informational; a skipped check does not validate memory. Treat missing startup,
 Windows path formatting and HardFault causes as hypotheses until supported by
-evidence. Configure tests do not validate linking, CRC results or execution.
+evidence. Configure tests do not validate linking, CRC results or execution. Since 0.9.3 a
+CRC failure stops the build with `[CRC ERROR]`; the repository firmware matrix is
+described in docs/en/firmware-testing.md.
