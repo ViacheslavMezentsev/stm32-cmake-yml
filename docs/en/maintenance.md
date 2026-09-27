@@ -217,10 +217,10 @@ in every job.
 ## Documentation-only pushes
 
 Pushes that change only `.md` files at any depth run Docs, skipping Configure,
-Firmware and CI environment. A mixed Markdown/code push still triggers the
+Firmware, CI environment and Emulation environment. Configure is also skipped when
+only `.github/FUNDING.yml` or `LICENSE` changes. A mixed Markdown/code push still triggers the
 relevant heavy workflows. CI environment and Firmware retain their existing positive
-path filters, with the Markdown exclusion last. Exception: Emulation environment has
-no Markdown exclusion, so editing `tools/qemu/README.md` rebuilds the emulator image. `workflow_dispatch` still allows
+path filters, with the Markdown exclusion last. Emulation environment works the same way. `workflow_dispatch` still allows
 manual runs. A workflow/filter change itself is not documentation-only.
 
 The Firmware counter retains the last successful tested revision when a docs-only

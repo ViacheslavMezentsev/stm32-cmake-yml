@@ -95,6 +95,11 @@ your assistant through the mechanism your tool supports; skills are not required
 | [stm32-module-creator](skills/stm32-module-creator/SKILL.md) | Create separate libraries with explicit dependencies and flags. |
 | [stm32-build-helper](skills/stm32-build-helper/SKILL.md) | Diagnose failures by phase: Configure, Compile, Link, Post-build and Run. |
 
+## Support
+
+Questions about building, debugging and testing MCUs with this and the author's other
+repositories: Telegram support channel [MCU CI/CD & HIL](https://t.me/mcu_cicd_hil).
+
 ## Related projects by the same author
 
 - [demo-stm32-cmake](https://github.com/ViacheslavMezentsev/demo-stm32-cmake) — examples for several STM32 families, YAML configurations and VS Code settings.

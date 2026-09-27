@@ -95,6 +95,11 @@ YAML описывает поддерживаемые опции, а произв
 | [stm32-module-creator](skills/stm32-module-creator/SKILL.md) | Создание отдельных библиотек с явными зависимостями и флагами. |
 | [stm32-build-helper](skills/stm32-build-helper/SKILL.md) | Разбор ошибок по стадиям: Configure, Compile, Link, Post-build и Run. |
 
+## Поддержка
+
+Вопросы по сборке, отладке и тестированию MCU с этим и другими репозиториями автора —
+в Telegram-канале техподдержки [MCU CI/CD & HIL](https://t.me/mcu_cicd_hil).
+
 ## Дружественные проекты автора
 
 - [demo-stm32-cmake](https://github.com/ViacheslavMezentsev/demo-stm32-cmake) — примеры для разных семейств STM32, YAML-конфигурации и настройки VS Code.

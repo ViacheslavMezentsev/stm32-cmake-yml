@@ -217,11 +217,11 @@ Firmware — 4:39 (ветка `claude/faster-ci-image`, `f3f1309`).
 ## Push только с документацией
 
 Если push меняет только `.md` на любой глубине, запускается Docs, а Configure,
-Firmware и CI environment пропускаются. Смешанный push с Markdown и кодом
+Firmware, CI environment и Emulation environment пропускаются. Configure также не
+запускается при изменении только `.github/FUNDING.yml` или `LICENSE`. Смешанный push с Markdown и кодом
 по-прежнему запускает соответствующие тяжёлые workflow. CI environment и Firmware
 сохраняют прежние включающие фильтры путей; исключение Markdown стоит последним.
-Исключение: в Emulation environment исключения Markdown нет, поэтому правка
-`tools/qemu/README.md` запускает сборку образа эмуляторов.
+Emulation environment устроен так же.
 Ручной `workflow_dispatch` остаётся доступен. Изменение самого workflow/фильтров
 не считается правкой только документации.
 
