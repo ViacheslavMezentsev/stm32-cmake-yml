@@ -5,6 +5,8 @@ on:
     branches: [main, 'codex/**', 'claude/**']
     paths-ignore:
       - '**/*.md'
+      - .github/FUNDING.yml
+      - LICENSE
   workflow_dispatch:
 
 permissions:

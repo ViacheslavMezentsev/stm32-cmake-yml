@@ -8,6 +8,7 @@ on:
       - tools/qemu/**
       - .dockerignore
       - .github/workflows/emulation.yml
+      - '!**/*.md'
   workflow_dispatch:
 
 permissions:
