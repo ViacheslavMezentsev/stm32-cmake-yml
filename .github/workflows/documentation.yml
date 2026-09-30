@@ -20,3 +20,5 @@ jobs:
         run: python3 ci/check_messages.py
       - name: Test the message check
         run: python3 -m unittest discover -s tests -p test_check_messages.py
+      - name: Test component version detection
+        run: python3 -m unittest discover -s tests -p test_component_versions.py

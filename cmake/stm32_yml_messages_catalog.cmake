@@ -154,6 +154,21 @@ stm32_yml_msg_def(I038
 stm32_yml_msg_def(I039
     "Ядро MCU: {1}"
     "MCU core: {1}")
+stm32_yml_msg_def(I040
+    "Версии компонентов:"
+    "Component versions:")
+stm32_yml_msg_def(I041
+    "  {1}: {2}"
+    "  {1}: {2}")
+stm32_yml_msg_def(I042
+    "  Компилятор: {1} {2}"
+    "  Compiler: {1} {2}")
+stm32_yml_msg_def(I043
+    "  Компилятор: версия не определена"
+    "  Compiler: version unknown")
+stm32_yml_msg_def(I044
+    "  {1}: версия не определена"
+    "  {1}: version unknown")
 
 # --- 1xx: профили -------------------------------------------------------------
 

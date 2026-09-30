@@ -11,6 +11,7 @@ set(STM32_CMAKE_YML_VERSION "0.9.3")
 # сообщений создаётся заново при каждом Configure до project() (ТЗ 4.16.10).
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/stm32_yml_messages.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/stm32_yml_utils.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/cmake/stm32_yml_versions.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/stm32_yml_config.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/stm32_yml_sources.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/stm32_yml_frameworks.cmake)
@@ -29,6 +30,9 @@ include(${CMAKE_CURRENT_LIST_DIR}/cmake/stm32_yml_arduino.cmake)
 function(stm32_yml_setup_project TARGET_NAME)
 
     # 1. Базовая инициализация и опции CMake.
+
+    # Версия компилятора известна только после project() (ТЗ 4.2.6).
+    stm32_yml_print_compiler_version()
 
     # Устанавливаем backend сборки в начале функции — значение используется
     # далее в нескольких местах: при вызове stm32_get_chip_info, при выборе

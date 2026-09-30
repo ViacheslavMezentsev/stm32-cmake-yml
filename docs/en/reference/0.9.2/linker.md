@@ -144,11 +144,13 @@ use_newlib_nano: false
 <a id="system-library"></a>
 ## `system_library`
 
-`CFG-SYSTEM-LIBRARY` · **Type:** string: NoSys / Semihosting · **Default:** none
+`CFG-SYSTEM-LIBRARY` · **Type:** string: NoSys / Semihosting / none · **Default:** not set
 
 Links the matching STM32 target. Unknown/empty values add nothing. NoSys must come from the toolchain; Semihosting has a fallback. Execution needs debugger/simulator support (the QEMU example uses -semihosting).
 
 **Change in 0.9.3** (`b9a6cd3`; spec 3.7.3): an unknown non-empty value (e.g. `nosys`) warns with the known values (`NoSys`, `Semihosting`); no library is linked. An empty value does not warn.
+
+**Change in 0.10.0** (spec 4.10.2): `none` explicitly disables the system library without a warning; neither `STM32::NoSys` nor `STM32::Semihosting` is linked.
 
 **Omission and emptiness:** see [shared rules](semantics.md#empty-values); exceptions are stated above. Profiles/overrides apply before defaults. Backend/path restrictions are stated in the description.
 

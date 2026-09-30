@@ -17,6 +17,8 @@ Version the YAML targets. Set it explicitly; it does not select framework code. 
 
 **Change in 0.10.0** (spec 4.16.5–4.16.7): the version lines and warnings are printed by codes `SCY-I001`…`SCY-I005`, `SCY-W002`…`SCY-W004` in the [`STM32_YML_LANG`](semantics.md#cache-and-external-controls) language; in English the banner is «stm32-cmake-yml version: …».
 
+**Change in 0.10.0** (spec 4.2.6, 4.2.7): after the version lines the log prints "Component versions": CMake, yq, stm32-cmake (the `git describe` tag; without tags, the `CHANGELOG.md` version marked `+` with the commit) or Arduino Core STM32 (`version=` from `platform.txt` and the commit), and after `project()` the compiler. An unknown version prints "version unknown" without a warning.
+
 **Processing order:** version comparison runs immediately after YAML loading, **before** profiles and `STM32_YML_OVERRIDE_*`. Changing these two options through a profile/override cannot change diagnostics already emitted. Set them at the YAML root. Missing or empty versions warn when checking is enabled; configuration continues. An omitted or empty switch defaults to `true` (the empty switch is not separately tested).
 
 ```yaml

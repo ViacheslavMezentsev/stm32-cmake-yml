@@ -54,6 +54,11 @@ The list is built from the `cmake/stm32_yml_messages_catalog.cmake` catalog by `
 | `SCY-I037` | STATUS | Parameter '{1}' was not set or was empty. The default value is used: '{2}'. |
 | `SCY-I038` | STATUS | The MCU core is not set; the only core of {1} is used: {2}. |
 | `SCY-I039` | STATUS | MCU core: {1} |
+| `SCY-I040` | STATUS | Component versions: |
+| `SCY-I041` | STATUS | {1}: {2} |
+| `SCY-I042` | STATUS | Compiler: {1} {2} |
+| `SCY-I043` | STATUS | Compiler: version unknown |
+| `SCY-I044` | STATUS | {1}: version unknown |
 
 ## 1xx — Profiles
 

@@ -71,7 +71,9 @@
         "configure.version-newer",
         "configure.version-disabled",
         "configure.version-before-profile",
-        "configure.version-before-override"
+        "configure.version-before-override",
+        "configure.versions-stm32-cmake",
+        "configure.versions-arduino"
       ],
       "errata": []
     },
@@ -820,7 +822,7 @@
     {
       "key": "system_library",
       "requirement": "CFG-SYSTEM-LIBRARY",
-      "type": "string: NoSys / Semihosting",
+      "type": "string: NoSys / Semihosting / none",
       "since": null,
       "verified_in": "0.9.2",
       "source": "cmake/stm32_yml_frameworks.cmake",
@@ -835,7 +837,8 @@
         "configure.system-disabled",
         "configure.system-reconfigure",
         "configure.enum-unknown-values",
-        "configure.empty-and-null-defaults"
+        "configure.empty-and-null-defaults",
+        "configure.system-none"
       ],
       "errata": []
     },

@@ -144,11 +144,13 @@ use_newlib_nano: false
 <a id="system-library"></a>
 ## `system_library`
 
-`CFG-SYSTEM-LIBRARY` · **Тип:** string: NoSys / Semihosting · **Default:** none
+`CFG-SYSTEM-LIBRARY` · **Тип:** string: NoSys / Semihosting / none · **Default:** не задано
 
 Подключает одноимённый STM32 target. Неизвестное/пустое значение ничего не добавляет. NoSys должен предоставить toolchain; Semihosting имеет fallback. Для выполнения semihosting нужна поддержка отладчика/симулятора (в примере QEMU используется -semihosting).
 
 **Изменение в 0.9.3** (`b9a6cd3`; ТЗ 3.7.3): неизвестное непустое значение (например, `nosys`) вызывает предупреждение со списком известных (`NoSys`, `Semihosting`); библиотека не подключается. Пустое значение — без предупреждения.
+
+**Изменение в 0.10.0** (ТЗ 4.10.2): значение `none` явно отключает системную библиотеку без предупреждения; ни `STM32::NoSys`, ни `STM32::Semihosting` не подключаются.
 
 **Пропуск и пустота:** см. [общие правила](semantics.md#empty-values); исключения указаны выше. Профиль/override применяется до выбора defaults. Ограничения backend и путей указаны в описании.
 

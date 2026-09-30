@@ -286,7 +286,8 @@ function(stm32_yml_prepare_project_data OUT_PROJECT_NAME_VAR OUT_LANGUAGES_VAR)
     endif()
 
     # Остальные перечислимые ключи (ТЗ 3.7.3). Пустые значения не проверяются.
-    stm32_yml_check_enum_value(system_library "" NoSys Semihosting)
+    # none — системная библиотека не подключается (ТЗ 4.10.2).
+    stm32_yml_check_enum_value(system_library "" NoSys Semihosting none)
     stm32_yml_check_enum_value(cmsis_rtos_api "none" none v1 v2)
     # Неизвестная версия ведёт себя как external, как в 0.9.2.
     stm32_yml_check_enum_value(freertos_version "external" cube external)
@@ -323,6 +324,9 @@ function(stm32_yml_prepare_project_data OUT_PROJECT_NAME_VAR OUT_LANGUAGES_VAR)
         set(LOCAL_LANGUAGES ${languages})
         stm32_yml_msg(I034 "${LOCAL_LANGUAGES}")
     endif()
+
+    # Версии компонентов для лога и обращений в поддержку (ТЗ 4.2.6, 4.2.7).
+    stm32_yml_print_component_versions()
 
     # ==============================================================================
     # "Пробрасываем" ВСЕ переменные, нужные для setup_project, наверх.

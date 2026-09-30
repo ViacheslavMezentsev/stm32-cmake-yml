@@ -294,7 +294,18 @@
       "args": [
         null
       ]
-    }
+    },
+    "messages": [
+      {
+        "code": "I040"
+      },
+      {
+        "code": "I044",
+        "args": [
+          "Arduino Core STM32"
+        ]
+      }
+    ]
   },
   {
     "name": "ioc-bluepill-defaults",
@@ -815,7 +826,7 @@
         "args": [
           "nosys",
           "system_library",
-          "NoSys, Semihosting"
+          "NoSys, Semihosting, none"
         ]
       }
     ]
@@ -3996,6 +4007,111 @@
           "W901"
         ]
       }
+    ]
+  },
+  {
+    "name": "system-none",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=system-libraries.yml",
+      "-DSTM32_YML_PROFILE=nosys",
+      "-DSTM32_YML_OVERRIDE_system_library=none"
+    ],
+    "properties": {
+      "LINK_LIBRARIES": [
+        "STM32::Nano"
+      ]
+    },
+    "absent_properties": {
+      "LINK_LIBRARIES": [
+        "STM32::NoSys",
+        "STM32::Semihosting"
+      ]
+    },
+    "generated_link_flags": {
+      "present": [
+        "--specs=nano.specs"
+      ],
+      "absent": [
+        "--specs=nosys.specs",
+        "--specs=rdimon.specs",
+        "-lrdimon"
+      ]
+    },
+    "no_st_dependencies": true,
+    "messages_absent": [
+      "W005",
+      "W006"
+    ]
+  },
+  {
+    "name": "versions-stm32-cmake",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=version-equal.yml"
+    ],
+    "no_st_dependencies": true,
+    "messages": [
+      {
+        "code": "I040"
+      },
+      {
+        "code": "I041",
+        "args": [
+          "CMake",
+          null
+        ]
+      },
+      {
+        "code": "I041",
+        "args": [
+          "yq",
+          null
+        ]
+      },
+      {
+        "code": "I041",
+        "args": [
+          "stm32-cmake",
+          null
+        ]
+      },
+      {
+        "code": "I042",
+        "args": [
+          "GNU",
+          null
+        ]
+      }
+    ],
+    "messages_absent": [
+      "I043",
+      "I044"
+    ]
+  },
+  {
+    "name": "versions-arduino",
+    "backend": "arduino",
+    "messages": [
+      {
+        "code": "I040"
+      },
+      {
+        "code": "I041",
+        "args": [
+          "Arduino Core STM32",
+          null
+        ]
+      },
+      {
+        "code": "I042",
+        "args": [
+          "GNU",
+          null
+        ]
+      }
+    ],
+    "messages_absent": [
+      "I043",
+      "I044"
     ]
   }
 ]

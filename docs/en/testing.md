@@ -159,8 +159,8 @@ package or the resulting image bytes. Ubuntu snapshots are not required.
 
 ## Framework configuration tests
 
-[tests/cases.json](../../tests/cases.json) defines 152 scenarios, run with each of
-the three GCC and two CMake versions from the lockfile: **912 case executions**.
+[tests/cases.json](../../tests/cases.json) defines 155 scenarios, run with each of
+the three GCC and two CMake versions from the lockfile: **930 case executions**.
 Twenty-seven scenarios perform two to thirteen consecutive configurations in the same build tree.
 
 | Area | Checks |
@@ -305,6 +305,13 @@ hal_conf error. [Diagnostic limits](troubleshooting.md).
 ### YAML version diagnostics
 
 Eight `version-*` cases cover matching, missing, empty, older and newer versions, disabling comparison at the YAML root, and comparison before profiles/overrides. Every case must complete Configure/Generate successfully; warnings are not failures. This checks 0.9.2 diagnostics, not compatibility with future configuration versions. No firmware is built.
+
+The `versions-stm32-cmake` and `versions-arduino` cases check the "Component versions"
+block (spec 4.2.6, 4.2.7, TC-83): CMake, yq, stm32-cmake or Arduino Core STM32, and the
+compiler; in `arduino-missing-core` the core version is unknown. The values depend on the
+environment (in the CI image git may refuse repositories owned by another user), so the
+versions themselves are checked by L2 `tests/test_component_versions.py` on temporary
+directories: a tag, a clone without tags, a copy without `.git`, a missing directory.
 
 ### Messages, codes and language
 

@@ -24,6 +24,12 @@ on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
   The codes are listed in the reference ([message codes](docs/en/reference/0.9.2/messages.md));
   the issue form asks for the message file.
 
+- **Component versions** (spec 4.2.6, 4.2.7). After the version lines the log prints the
+  versions of CMake, yq, stm32-cmake or Arduino Core STM32 and, after `project()`, the
+  compiler. An unknown version prints "version unknown" without a warning.
+- **`system_library: none`** (spec 4.10.2) explicitly disables the system library without
+  a warning.
+
 ### Changed
 
 - **Output language.** Without a Russian locale (including Docker and CI) catalog
