@@ -25,7 +25,7 @@ function(stm32_yml_run_diagnostics TARGET_NAME)
         get_target_property(LINK_OPTIONS ${TARGET_NAME} LINK_OPTIONS)
         get_target_property(LINK_LIBRARIES ${TARGET_NAME} LINK_LIBRARIES)
 
-        message(STATUS "--- Отладочная информация для финальной цели '${TARGET_NAME}' ---")
+        stm32_yml_msg(I801 "${TARGET_NAME}")
 
         string(REPLACE ";" " \n    " COMPILE_OPTIONS_FORMATTED "${COMPILE_OPTIONS}")
         string(REPLACE ";" " \n    " COMPILE_DEFINITIONS_FORMATTED "${COMPILE_DEFINITIONS}")
@@ -33,11 +33,11 @@ function(stm32_yml_run_diagnostics TARGET_NAME)
         string(REPLACE ";" " \n    " LINK_OPTIONS_FORMATTED "${LINK_OPTIONS}")
         string(REPLACE ";" " \n    " LINK_LIBRARIES_FORMATTED "${LINK_LIBRARIES}")
 
-        message(STATUS "Опции компиляции (COMPILE_OPTIONS):\n    ${COMPILE_OPTIONS_FORMATTED}")
-        message(STATUS "Определения компиляции (COMPILE_DEFINITIONS):\n    ${COMPILE_DEFINITIONS_FORMATTED}")
-        message(STATUS "Директории для #include (INCLUDE_DIRECTORIES):\n    ${INCLUDE_DIRECTORIES_FORMATTED}")
-        message(STATUS "Опции компоновки (LINK_OPTIONS):\n    ${LINK_OPTIONS_FORMATTED}")
-        message(STATUS "Библиотеки для компоновки (LINK_LIBRARIES):\n    ${LINK_LIBRARIES_FORMATTED}")
+        stm32_yml_msg(I802 "${COMPILE_OPTIONS_FORMATTED}")
+        stm32_yml_msg(I803 "${COMPILE_DEFINITIONS_FORMATTED}")
+        stm32_yml_msg(I804 "${INCLUDE_DIRECTORIES_FORMATTED}")
+        stm32_yml_msg(I805 "${LINK_OPTIONS_FORMATTED}")
+        stm32_yml_msg(I806 "${LINK_LIBRARIES_FORMATTED}")
 
         # --- Вывод свойств для унаследованной цели STM32:: ---
         set(STM32_FRAMEWORK_TARGET "STM32::${MCU_FAMILY}")
@@ -48,19 +48,19 @@ function(stm32_yml_run_diagnostics TARGET_NAME)
             get_target_property(STM32_LINK_OPTIONS  ${STM32_FRAMEWORK_TARGET} INTERFACE_LINK_OPTIONS)
             get_target_property(STM32_INCLUDE_DIRS  ${STM32_FRAMEWORK_TARGET} INTERFACE_INCLUDE_DIRECTORIES)
 
-            message(STATUS "\n--- Отладочная информация для унаследованной цели '${STM32_FRAMEWORK_TARGET}' ---")
+            stm32_yml_msg(I807 "${STM32_FRAMEWORK_TARGET}")
 
             string(REPLACE ";" " \n    " STM32_COMPILE_OPTIONS_FMT "${STM32_COMPILE_OPTIONS}")
             string(REPLACE ";" " \n    " STM32_COMPILE_DEFS_FMT  "${STM32_COMPILE_DEFS}")
             string(REPLACE ";" " \n    " STM32_LINK_OPTIONS_FMT  "${STM32_LINK_OPTIONS}")
             string(REPLACE ";" " \n    " STM32_INCLUDE_DIRS_FMT  "${STM32_INCLUDE_DIRS}")
 
-            message(STATUS "INTERFACE Опции компиляции:\n    ${STM32_COMPILE_OPTIONS_FMT}")
-            message(STATUS "INTERFACE Определения компиляции:\n    ${STM32_COMPILE_DEFS_FMT}")
-            message(STATUS "INTERFACE Опции компоновки:\n    ${STM32_LINK_OPTIONS_FMT}")
+            stm32_yml_msg(I808 "${STM32_COMPILE_OPTIONS_FMT}")
+            stm32_yml_msg(I809 "${STM32_COMPILE_DEFS_FMT}")
+            stm32_yml_msg(I810 "${STM32_LINK_OPTIONS_FMT}")
         endif()
 
-        message(STATUS "---------------------------------------------------------------------------------")
+        stm32_yml_msg(I811)
     endif()
 
     # =======================================================================
@@ -80,15 +80,13 @@ function(stm32_yml_run_diagnostics TARGET_NAME)
         foreach(dir IN LISTS INCLUDE_DIRS)
             if(EXISTS "${dir}/${HAL_CONF_FILENAME}")
                 set(HAL_CONF_FOUND TRUE)
-                message(STATUS "Найден файл конфигурации HAL: ${dir}/${HAL_CONF_FILENAME}")
+                stm32_yml_msg(I812 "${dir}/${HAL_CONF_FILENAME}")
                 break()
             endif()
         endforeach()
 
         if(NOT HAL_CONF_FOUND)
-            message(FATAL_ERROR "Файл конфигурации HAL '${HAL_CONF_FILENAME}' не найден ни в одной из директорий, "
-                                "указанных в 'include_directories'. Библиотека HAL не сможет скомпилироваться без него. "
-                                "Убедитесь, что путь к этому файлу (например, 'Core/Inc') добавлен в 'include_directories' в ${PROJECT_CONFIG_FILE}.")
+            stm32_yml_msg(E801 "${HAL_CONF_FILENAME}" "${PROJECT_CONFIG_FILE}")
         endif()
     endif()
 
@@ -102,12 +100,12 @@ function(stm32_yml_run_diagnostics TARGET_NAME)
 
     if(validate_linker_script)
         if(toolchain_backend STREQUAL "arduino")
-            message(STATUS "Проверка размера RAM в скрипте компоновщика пропущена (не поддерживается в Arduino backend).")
+            stm32_yml_msg(I813)
         elseif(NOT LINKER_SCRIPT_PATH OR NOT EXISTS "${LINKER_SCRIPT_PATH}")
             # Скрипт формирует stm32-cmake (ТЗ 4.11.5): сравнивать не с чем.
-            message(STATUS "Проверка RAM скрипта компоновщика: не проверялось (скрипт формирует stm32-cmake).")
+            stm32_yml_msg(I814)
         else()
-            message(STATUS "Выполнение проверки скрипта компоновщика...")
+            stm32_yml_msg(I815)
 
             # Эталон: RAM + CCRAM + RAM_SHARE MCU с учётом ядра (ТЗ 4.13.4, 4.7.8).
             # CCM-память F3 и G4 входит в сумму, поэтому не даёт ложного превышения.
@@ -148,11 +146,11 @@ function(stm32_yml_run_diagnostics TARGET_NAME)
             endforeach()
 
             if(NOT _ram_sections_found)
-                message(WARNING "Не найдено ни одной RAM-секции (xrw/rw) в скрипте ${LINKER_SCRIPT_PATH}. Проверка размера пропущена.")
+                stm32_yml_msg(W801 "${LINKER_SCRIPT_PATH}")
             else()
                 string(REPLACE ";" " + " _ram_sections_str "${_ram_sections_found}")
                 string(REPLACE ";" " + " _expected_str "${_expected_parts}")
-                message(STATUS "  RAM-секции в скрипте: ${_ram_sections_str} = ${ACTUAL_RAM_SIZE_BYTES} байт")
+                stm32_yml_msg(I816 "${_ram_sections_str}" "${ACTUAL_RAM_SIZE_BYTES}")
 
                 if(ACTUAL_RAM_SIZE_BYTES EQUAL EXPECTED_RAM_SIZE_BYTES)
                     set(_rel "==")
@@ -164,9 +162,9 @@ function(stm32_yml_run_diagnostics TARGET_NAME)
 
                 math(EXPR _actual_k "${ACTUAL_RAM_SIZE_BYTES} / 1024")
                 math(EXPR _expected_k "${EXPECTED_RAM_SIZE_BYTES} / 1024")
-                message(STATUS "  stm32-cmake RAM : ${_expected_str} = ${EXPECTED_RAM_SIZE_BYTES} байт")
-                message(STATUS "  Скрипт RAM сумма: ${ACTUAL_RAM_SIZE_BYTES} байт (${_actual_k}K)")
-                message(STATUS "  Соотношение     : ${_actual_k}K ${_rel} ${_expected_k}K")
+                stm32_yml_msg(I817 "${_expected_str}" "${EXPECTED_RAM_SIZE_BYTES}")
+                stm32_yml_msg(I818 "${ACTUAL_RAM_SIZE_BYTES}" "${_actual_k}")
+                stm32_yml_msg(I819 "${_actual_k}" "${_rel}" "${_expected_k}")
             endif()
         endif()
     endif()

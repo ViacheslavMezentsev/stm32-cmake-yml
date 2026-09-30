@@ -13,16 +13,10 @@ CATALOG = "cmake/stm32_yml_messages_catalog.cmake"
 USE = re.compile(r"(?<![\w])stm32_yml_msg\s*\(\s*([^\s)]+)")
 DIRECT = re.compile(r"^\s*message\s*\(", re.M)
 
-# Direct message() calls not yet moved to the catalog during stage 2 of the
-# 0.10.0 plan. The numbers must match exactly: lower one when converting a
-# module; the list must be empty for the 0.10.0 release.
-LEGACY_DIRECT_MESSAGES = {
-    "cmake/stm32_yml_arduino.cmake": 13,
-    "cmake/stm32_yml_code_quality.cmake": 4,
-    "cmake/stm32_yml_diagnostics.cmake": 21,
-    "cmake/stm32_yml_linker.cmake": 13,
-    "cmake/stm32_yml_postbuild.cmake": 13,
-}
+# Direct message() calls allowed per file outside the messages module. Every
+# framework message goes through the catalog, so the map is empty; the unit
+# tests pass their own map.
+LEGACY_DIRECT_MESSAGES = {}
 
 
 def sources(root):

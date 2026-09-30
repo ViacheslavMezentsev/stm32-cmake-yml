@@ -26,7 +26,7 @@ function(stm32_yml_setup_postbuild TARGET_NAME)
     endif()
 
     if(crc_enable)
-        message(STATUS "Настройка механизма внедрения CRC32 в прошивку...")
+        stm32_yml_msg(I701)
 
         # По умолчанию считаем, что внедрение возможно
         set(CRC_POSSIBLE TRUE)
@@ -57,7 +57,7 @@ function(stm32_yml_setup_postbuild TARGET_NAME)
                 endif()
 
                 if("${EXPECTED_FLASH_SIZE_STR}" STREQUAL "")
-                    message(WARNING " Расчет CRC отключен. Не удалось автоматически определить размер FLASH из ${LINKER_SCRIPT_PATH}. Задайте 'flash_size' в stm32_config.yml.")
+                    stm32_yml_msg(W702 "${LINKER_SCRIPT_PATH}")
                     set(CRC_POSSIBLE FALSE)
                 endif()
             endif()
@@ -71,26 +71,18 @@ function(stm32_yml_setup_postbuild TARGET_NAME)
             # Пустой LINKER_SCRIPT_PATH означает скрипт, который формирует stm32-cmake:
             # секции CRC в нём нет, и сборка заведомо не сможет записать CRC.
             if(NOT LINKER_SCRIPT_PATH OR NOT EXISTS "${LINKER_SCRIPT_PATH}")
-                message(FATAL_ERROR
-                    "crc_enable: скрипт компоновщика формирует stm32-cmake, секции "
-                    "'${crc_section_name}' (crc_section_name) в нём нет. Используйте шаблон "
-                    "STM32<MCU>_FLASH.ld.in (linker_script: auto) или явный linker_script "
-                    "с секцией '${crc_section_name}', либо crc_enable: false.")
+                stm32_yml_msg(E701 "${crc_section_name}")
             endif()
             file(READ "${LINKER_SCRIPT_PATH}" _ld_text)
             string(FIND "${_ld_text}" "${crc_section_name}" _crc_section_pos)
             if(_crc_section_pos EQUAL -1)
-                message(WARNING
-                    "crc_enable: секция '${crc_section_name}' (crc_section_name) не найдена в "
-                    "скрипте ${LINKER_SCRIPT_PATH}. Шаг CRC после сборки завершится ошибкой.")
+                stm32_yml_msg(W703 "${crc_section_name}" "${LINKER_SCRIPT_PATH}")
             endif()
 
             # ТЗ 4.15.9: образ CRC строится из секций в регионе FLASH итогового скрипта.
             stm32_yml_flash_region(CRC_FLASH_ORIGIN CRC_FLASH_LENGTH)
             if("${CRC_FLASH_ORIGIN}" STREQUAL "")
-                message(WARNING
-                    " Расчет CRC отключен. Не удалось определить регион FLASH (ORIGIN, LENGTH) "
-                    "в скрипте ${LINKER_SCRIPT_PATH}.")
+                stm32_yml_msg(W704 "${LINKER_SCRIPT_PATH}")
                 set(CRC_POSSIBLE FALSE)
             endif()
         endif()
@@ -99,20 +91,20 @@ function(stm32_yml_setup_postbuild TARGET_NAME)
             # 1. Проверяем наличие Python
             find_package(Python3 COMPONENTS Interpreter QUIET)
             if(NOT Python3_FOUND)
-                message(WARNING " Интерпретатор Python3 не найден. Расчет CRC отключен.")
+                stm32_yml_msg(W705)
                 set(CRC_POSSIBLE FALSE)
             endif()
 
             # 2. Проверяем наличие objcopy (запись CRC в секцию ELF)
             if(NOT CMAKE_OBJCOPY)
-                message(WARNING " Утилита objcopy не найдена. Расчет CRC отключен.")
+                stm32_yml_msg(W706)
                 set(CRC_POSSIBLE FALSE)
             endif()
 
             # 3. Проверяем наличие скрипта (используем путь относительно текущего cmake-файла)
             set(CRC_SCRIPT_PATH "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../scripts/stm32_crc.py")
             if(NOT EXISTS ${CRC_SCRIPT_PATH})
-                message(WARNING " Скрипт расчета не найден по пути: ${CRC_SCRIPT_PATH}. Расчет CRC отключен.")
+                stm32_yml_msg(W707 "${CRC_SCRIPT_PATH}")
                 set(CRC_POSSIBLE FALSE)
             endif()
         endif()
@@ -130,10 +122,10 @@ function(stm32_yml_setup_postbuild TARGET_NAME)
             endif()
             math(EXPR EXPECTED_FLASH_BYTES "${EXPECTED_FLASH_EXPR}")
 
-            message(STATUS " Метод: Внедрение в секцию '${crc_section_name}'")
-            message(STATUS " Алгоритм: ${crc_algorithm}")
-            message(STATUS " Регион FLASH скрипта: ORIGIN ${CRC_FLASH_ORIGIN}, LENGTH ${CRC_FLASH_LENGTH} байт")
-            message(STATUS " Max Flash Size: ${EXPECTED_FLASH_BYTES} байт (${EXPECTED_FLASH_SIZE_STR})")
+            stm32_yml_msg(I702 "${crc_section_name}")
+            stm32_yml_msg(I703 "${crc_algorithm}")
+            stm32_yml_msg(I704 "${CRC_FLASH_ORIGIN}" "${CRC_FLASH_LENGTH}")
+            stm32_yml_msg(I705 "${EXPECTED_FLASH_BYTES}" "${EXPECTED_FLASH_SIZE_STR}")
 
             # Имена промежуточных файлов: образ Flash без CRC (для диагностики) и значение CRC
             set(BIN_NO_CRC "${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}_no_crc.bin")
@@ -164,7 +156,7 @@ function(stm32_yml_setup_postbuild TARGET_NAME)
                 VERBATIM
             )
         else()
-            message(STATUS " Сборка будет выполнена БЕЗ добавления контрольной суммы.")
+            stm32_yml_msg(I706)
         endif()
     endif()
 

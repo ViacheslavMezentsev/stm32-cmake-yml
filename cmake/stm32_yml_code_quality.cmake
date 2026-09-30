@@ -14,7 +14,7 @@ function(stm32_yml_setup_code_quality TARGET_NAME)
         find_program(CPPCHECK_EXECUTABLE NAMES cppcheck)
 
         if(CPPCHECK_EXECUTABLE)
-            message(STATUS "Анализатор Cppcheck найден: ${CPPCHECK_EXECUTABLE}")
+            stm32_yml_msg(I820 "${CPPCHECK_EXECUTABLE}")
 
             # 1. Базовые аргументы
             if(NOT DEFINED cppcheck_args OR "${cppcheck_args}" STREQUAL "")
@@ -33,7 +33,7 @@ function(stm32_yml_setup_code_quality TARGET_NAME)
                 foreach(ignore_dir IN LISTS cppcheck_ignores)
                     list(APPEND LOCAL_CPPCHECK_ARGS "--suppress=*:*${ignore_dir}/*")
                     # Вывод в консоль можно закомментировать, если он слишком длинный
-                    message(STATUS "  Cppcheck: Игнорируются пути, содержащие '${ignore_dir}'")
+                    stm32_yml_msg(I821 "${ignore_dir}")
                 endforeach()
             endif()
 
@@ -45,9 +45,9 @@ function(stm32_yml_setup_code_quality TARGET_NAME)
                 CXX_CPPCHECK "${CPPCHECK_COMMAND}"
             )
 
-            message(STATUS "Статический анализ (Cppcheck) активирован")
+            stm32_yml_msg(I822)
         else()
-            message(WARNING "Параметр 'cppcheck_enable' установлен, но утилита не найдена!")
+            stm32_yml_msg(W802)
         endif()
     endif()
 

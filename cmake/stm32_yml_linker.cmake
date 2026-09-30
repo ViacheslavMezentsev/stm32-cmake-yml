@@ -20,7 +20,7 @@ function(stm32_yml_setup_linker_script TARGET_NAME)
     set(_search_dirs "")
     if(DEFINED linker_script_dir AND NOT linker_script_dir STREQUAL "")
         set(_search_dirs "${CMAKE_SOURCE_DIR}/${linker_script_dir}")
-        message(STATUS "Папка поиска скрипта компоновщика: ${_search_dirs}")
+        stm32_yml_msg(I601 "${_search_dirs}")
     endif()
     list(APPEND _search_dirs "${CMAKE_SOURCE_DIR}")
 
@@ -28,7 +28,7 @@ function(stm32_yml_setup_linker_script TARGET_NAME)
     # 1. ОПРЕДЕЛЕНИЕ И ПОДКЛЮЧЕНИЕ СКРИПТА
     # =======================================================================
     if(linker_script STREQUAL "auto")
-        message(STATUS "Генерация скрипта компоновщика из шаблона...")
+        stm32_yml_msg(I602)
 
         # MCU_TYPE из stm32_get_chip_info возвращает обобщённый тип "H723xx"
         # (нужен для макроса компилятора STM32H723xx), но не подходит для поиска
@@ -69,7 +69,7 @@ function(stm32_yml_setup_linker_script TARGET_NAME)
         endforeach()
 
         if(EXISTS "${TEMPLATE_FILE_PATH}")
-            message(STATUS "Найден локальный шаблон: ${TEMPLATE_FILE_PATH}")
+            stm32_yml_msg(I603 "${TEMPLATE_FILE_PATH}")
 
             # Нормализуем размеры памяти
             stm32_yml_normalize_memory(heap_size)
@@ -83,17 +83,17 @@ function(stm32_yml_setup_linker_script TARGET_NAME)
             # Проверяем версию GCC и задаём USE_READONLY
             if(CMAKE_C_COMPILER_VERSION VERSION_GREATER_EQUAL 11.0)
                 set(USE_READONLY "(READONLY)")
-                message(STATUS "Using READONLY in linker script (GCC >= 11.0)")
+                stm32_yml_msg(I604)
             else()
                 set(USE_READONLY "")
-                message(STATUS "Not using READONLY in linker script (GCC < 11.0)")
+                stm32_yml_msg(I605)
             endif()
 
             # Генерируем скрипт — имя файла берём из конкретного типа MCU, не из MCU_TYPE
             set(LOCAL_LINKER_SCRIPT_PATH "${CMAKE_BINARY_DIR}/STM32${_mcu_type_concrete}_FLASH.ld")
             configure_file(${TEMPLATE_FILE_PATH} ${LOCAL_LINKER_SCRIPT_PATH} @ONLY)
         else()
-            message(STATUS "Локальный шаблон не найден. Будет использован стандартный скрипт компоновщика.")
+            stm32_yml_msg(I606)
         endif()
 
         # Подключаем найденный или сгенерированный скрипт
@@ -105,7 +105,7 @@ function(stm32_yml_setup_linker_script TARGET_NAME)
                     list(APPEND LOCAL_CMSIS_TARGET_TO_LINK "CMSIS::STM32::${MCU_TYPE}")
                 endif()
             endif()
-            message(STATUS "Подключение скрипта компоновщика: ${LOCAL_LINKER_SCRIPT_PATH}")
+            stm32_yml_msg(I607 "${LOCAL_LINKER_SCRIPT_PATH}")
             
             if(toolchain_backend STREQUAL "arduino")
                 target_link_options(${TARGET_NAME} PRIVATE "-T${LOCAL_LINKER_SCRIPT_PATH}")
@@ -115,7 +115,7 @@ function(stm32_yml_setup_linker_script TARGET_NAME)
             endif()
         else()
             if(toolchain_backend STREQUAL "arduino")
-                message(FATAL_ERROR "В режиме Arduino Backend генерация скрипта без локального шаблона не поддерживается. Добавьте шаблон или укажите готовый скрипт.")
+                stm32_yml_msg(E601)
             else()
                 # Доверяем stm32-cmake
                 string(SUBSTRING ${MCU} 5 6 MCU_DEVICE)
@@ -133,18 +133,18 @@ function(stm32_yml_setup_linker_script TARGET_NAME)
                     endif()
                     stm32_get_memory_info(CHIP ${MCU} ${_core_args} HEAP SIZE _cmake_heap)
                     stm32_get_memory_info(CHIP ${MCU} ${_core_args} STACK SIZE _cmake_stack)
-                    _stm32_yml_warn_unused_memory_sizes(
-                        "скрипт компоновщика формирует stm32-cmake с собственными размерами "
-                        "heap ${_cmake_heap} и stack ${_cmake_stack} байт. Добавьте шаблон "
-                        "STM32${_mcu_type_concrete}_FLASH.ld.in (в корень проекта или linker_script_dir) "
-                        "или задайте размеры в явном linker_script.")
+                    _stm32_yml_explicit_memory_sizes(_sizes)
+                    if(_sizes)
+                        stm32_yml_msg(W601 "${_sizes}" "${_cmake_heap}" "${_cmake_stack}"
+                            "STM32${_mcu_type_concrete}_FLASH.ld.in")
+                    endif()
                 endif()
                 if(mcu_core)
                     set(_ld_name "${MCU_DEVICE}_${mcu_core}.ld")
                 else()
                     set(_ld_name "${MCU_DEVICE}.ld")
                 endif()
-                message(STATUS "Подключение встроенного скрипта компоновщика: ${CMAKE_CURRENT_BINARY_DIR}/${_ld_name}")
+                stm32_yml_msg(I608 "${CMAKE_CURRENT_BINARY_DIR}/${_ld_name}")
             endif()
         endif()
 
@@ -168,10 +168,11 @@ function(stm32_yml_setup_linker_script TARGET_NAME)
         endforeach()
 
         if(LOCAL_LINKER_SCRIPT_PATH)
-            message(STATUS "Использование пользовательского скрипта компоновщика: ${LOCAL_LINKER_SCRIPT_PATH}")
-            _stm32_yml_warn_unused_memory_sizes(
-                "размеры задаёт явный скрипт компоновщика '${linker_script}'. "
-                "Измените их в скрипте или используйте шаблон .ld.in (linker_script: auto).")
+            stm32_yml_msg(I609 "${LOCAL_LINKER_SCRIPT_PATH}")
+            _stm32_yml_explicit_memory_sizes(_sizes)
+            if(_sizes)
+                stm32_yml_msg(W602 "${_sizes}" "${linker_script}")
+            endif()
             if(toolchain_backend STREQUAL "arduino")
                 target_link_options(${TARGET_NAME} PRIVATE "-T${LOCAL_LINKER_SCRIPT_PATH}")
                 set_property(TARGET ${TARGET_NAME} APPEND PROPERTY LINK_DEPENDS "${LOCAL_LINKER_SCRIPT_PATH}")
@@ -179,9 +180,7 @@ function(stm32_yml_setup_linker_script TARGET_NAME)
                 stm32_add_linker_script(${TARGET_NAME} PRIVATE ${LOCAL_LINKER_SCRIPT_PATH})
             endif()
         else()
-            message(FATAL_ERROR
-                "Указанный скрипт компоновщика не найден: '${linker_script}'\n"
-                "Папки поиска: ${_search_dirs}")
+            stm32_yml_msg(E602 "${linker_script}" "${_search_dirs}")
         endif()
     endif()
 
@@ -204,24 +203,20 @@ function(stm32_yml_setup_linker_script TARGET_NAME)
 endfunction()
 
 # ==============================================================================
-# Предупреждает, что заданные heap_size/stack_size не применяются к скрипту
-# компоновщика, который не генерируется из шаблона .ld.in (ТЗ 4.11.9).
+# Явно заданные heap_size/stack_size для предупреждения о том, что они не
+# применяются к скрипту, который не генерируется из шаблона .ld.in (ТЗ 4.11.9).
 # Значения ручного режима по умолчанию предупреждения не вызывают:
 # STM32_YML_EXPLICIT_MEMORY_SIZES содержит только явно заданные размеры.
 #
-# @param ARGN - Причина и рекомендация (части сообщения).
+# @param OUT_VAR - Строка "heap_size: …, stack_size: …" или пусто.
 # ==============================================================================
-function(_stm32_yml_warn_unused_memory_sizes)
-    if(NOT STM32_YML_EXPLICIT_MEMORY_SIZES)
-        return()
-    endif()
+function(_stm32_yml_explicit_memory_sizes OUT_VAR)
     set(_values "")
     foreach(_key IN LISTS STM32_YML_EXPLICIT_MEMORY_SIZES)
         list(APPEND _values "${_key}: ${${_key}}")
     endforeach()
     string(REPLACE ";" ", " _values "${_values}")
-    string(CONCAT _reason ${ARGN})
-    message(WARNING "Заданные размеры памяти (${_values}) не применяются: ${_reason}")
+    set(${OUT_VAR} "${_values}" PARENT_SCOPE)
 endfunction()
 
 # ==============================================================================
@@ -253,14 +248,8 @@ function(_stm32_yml_check_stack_limit_symbol SCRIPT_PATH)
         if(_defines)
             return()
         endif()
-        set(_script_text "скрипт компоновщика ${SCRIPT_PATH}")
+        stm32_yml_msg(W603 "${_startup}" "${SCRIPT_PATH}")
     else()
-        set(_script_text "скрипт компоновщика stm32-cmake")
+        stm32_yml_msg(W604 "${_startup}")
     endif()
-    message(WARNING
-        "Startup ${_startup} задаёт границу стека (MSPLIM) по символу _sstack, "
-        "но ${_script_text} его не определяет: компоновка завершится ошибкой "
-        "'undefined reference to _sstack'. Добавьте в шаблон .ld.in или явный скрипт "
-        "строку '_sstack = _estack - _Min_Stack_Size;' либо подключите через sources "
-        "собственный startup без MSPLIM.")
 endfunction()

@@ -31,23 +31,16 @@ function(stm32_yml_setup_arduino TARGET_NAME)
     # Шаг 1: проверяем наличие arduino.core_path.
     # ------------------------------------------------------------------
     if(NOT DEFINED arduino_core_path OR arduino_core_path STREQUAL "")
-        message(FATAL_ERROR
-            "[arduino] Параметр arduino.core_path не задан в stm32_config.yml.\n"
-            "Укажите путь к папке Arduino_Core_STM32 относительно корня проекта:\n"
-            "  arduino:\n"
-            "    core_path: \"modules/Arduino_Core_STM32\"")
+        stm32_yml_msg(E501)
     endif()
 
     set(_core_abs "${CMAKE_SOURCE_DIR}/${arduino_core_path}")
 
     if(NOT EXISTS "${_core_abs}")
-        message(FATAL_ERROR
-            "[arduino] Папка Arduino Core STM32 не найдена: ${_core_abs}\n"
-            "Проверьте значение arduino.core_path в stm32_config.yml.\n"
-            "В CI убедитесь, что симлинк или папка modules/Arduino_Core_STM32 существует.")
+        stm32_yml_msg(E502 "${_core_abs}")
     endif()
 
-    message(STATUS "Arduino Core STM32: ${_core_abs}")
+    stm32_yml_msg(I501 "${_core_abs}")
 
     # Пробрасываем путь в CACHE — CMakeLists.txt библиотек используют его
     # через get_filename_component(STM32_CORE_DIR ... ABSOLUTE).
@@ -66,16 +59,14 @@ function(stm32_yml_setup_arduino TARGET_NAME)
         # Уже задан снаружи через -DMCU_TARGET= — не перезаписываем.
         set(_mcu_target_val "${MCU_TARGET}")
     else()
-        message(WARNING
-            "[arduino] Параметр arduino.mcu_target не задан. "
-            "CMakeLists.txt библиотек, зависящих от MCU_TARGET, могут завершиться ошибкой.")
+        stm32_yml_msg(W501)
         set(_mcu_target_val "")
     endif()
 
     if(NOT _mcu_target_val STREQUAL "")
         set(MCU_TARGET "${_mcu_target_val}" CACHE STRING
             "Целевой MCU для Arduino Core STM32 (например G431 или G474)." FORCE)
-        message(STATUS "Arduino MCU_TARGET: ${MCU_TARGET}")
+        stm32_yml_msg(I502 "${MCU_TARGET}")
     endif()
 
     # ------------------------------------------------------------------
@@ -113,7 +104,7 @@ function(stm32_yml_setup_arduino TARGET_NAME)
             $<$<COMPILE_LANGUAGE:CXX>:${compile_options_cxx}>)
     endif()
 
-    message(STATUS "Arduino::Definitions создан.")
+    stm32_yml_msg(I503)
 
     # ------------------------------------------------------------------
     # Шаг 4: подключаем пользовательское ядро Arduino (Arduino/Core).
@@ -129,15 +120,13 @@ function(stm32_yml_setup_arduino TARGET_NAME)
     # Пробрасываем флаг use_core_main из YAML в CACHE.
     if(DEFINED arduino_use_core_main)
         set(USE_CORE_MAIN ${arduino_use_core_main} CACHE BOOL "Include default Arduino main file" FORCE)
-        message(STATUS "Arduino USE_CORE_MAIN: ${USE_CORE_MAIN}")
+        stm32_yml_msg(I504 "${USE_CORE_MAIN}")
     endif()
     if(EXISTS "${_core_cmake_dir}/CMakeLists.txt")
-        message(STATUS "Подключение Arduino Core: ${_core_cmake_dir}")
+        stm32_yml_msg(I505 "${_core_cmake_dir}")
         add_subdirectory("${_core_cmake_dir}" "${CMAKE_BINARY_DIR}/arduino_core")
     else()
-        message(WARNING
-            "[arduino] CMakeLists.txt ядра Arduino не найден: ${_core_cmake_dir}\n"
-            "Укажите правильный путь через arduino.core_cmake_dir в stm32_config.yml.")
+        stm32_yml_msg(W502 "${_core_cmake_dir}")
     endif()
 
     # ------------------------------------------------------------------
@@ -150,12 +139,10 @@ function(stm32_yml_setup_arduino TARGET_NAME)
             set(_lib_dir "${_core_abs}/libraries/${_lib}")
 
             if(EXISTS "${_lib_dir}/CMakeLists.txt")
-                message(STATUS "Подключение Arduino библиотеки: ${_lib}")
+                stm32_yml_msg(I506 "${_lib}")
                 add_subdirectory("${_lib_dir}" "${CMAKE_BINARY_DIR}/arduino_lib_${_lib}")
             else()
-                message(WARNING
-                    "[arduino] Библиотека '${_lib}' не найдена в ${_lib_dir}.\n"
-                    "Проверьте имя в arduino.libraries и наличие CMakeLists.txt.")
+                stm32_yml_msg(W503 "${_lib}" "${_lib_dir}")
             endif()
         endforeach()
     endif()
@@ -170,7 +157,7 @@ function(stm32_yml_setup_arduino TARGET_NAME)
             set(_custom_lib_dir "${CMAKE_SOURCE_DIR}/${_custom_lib}")
 
             if(EXISTS "${_custom_lib_dir}/CMakeLists.txt")
-                message(STATUS "Подключение кастомной библиотеки: ${_custom_lib}")
+                stm32_yml_msg(I507 "${_custom_lib}")
                 # Имя бинарной директории формируем из всего относительного пути,
                 # а не из последнего сегмента: пути "Arduino/libraries/Cli" и
                 # "Components/Cli" дали бы одинаковое имя и конфликт в CMake.
@@ -178,8 +165,7 @@ function(stm32_yml_setup_arduino TARGET_NAME)
                 add_subdirectory("${_custom_lib_dir}"
                     "${CMAKE_BINARY_DIR}/arduino_custom_${_custom_lib_name}")
             else()
-                message(WARNING
-                    "[arduino] Кастомная библиотека не найдена: ${_custom_lib_dir}.")
+                stm32_yml_msg(W504 "${_custom_lib_dir}")
             endif()
         endforeach()
     endif()

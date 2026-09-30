@@ -317,8 +317,215 @@ stm32_yml_msg_def(I413
     "Подключена обертка CMSIS-RTOS API {1}."
     "CMSIS-RTOS API {1} wrapper added.")
 
+# --- 5xx: Arduino -------------------------------------------------------------
+
+stm32_yml_msg_def(E501
+    "[arduino] Параметр arduino.core_path не задан в stm32_config.yml.\nУкажите путь к папке Arduino_Core_STM32 относительно корня проекта:\n  arduino:\n    core_path: \"modules/Arduino_Core_STM32\""
+    "[arduino] arduino.core_path is not set in stm32_config.yml.\nSet the path to the Arduino_Core_STM32 folder relative to the project root:\n  arduino:\n    core_path: \"modules/Arduino_Core_STM32\"")
+stm32_yml_msg_def(E502
+    "[arduino] Папка Arduino Core STM32 не найдена: {1}\nПроверьте значение arduino.core_path в stm32_config.yml.\nВ CI убедитесь, что симлинк или папка modules/Arduino_Core_STM32 существует."
+    "[arduino] Arduino Core STM32 folder not found: {1}\nCheck arduino.core_path in stm32_config.yml.\nIn CI make sure the modules/Arduino_Core_STM32 symlink or folder exists.")
+stm32_yml_msg_def(W501
+    "[arduino] Параметр arduino.mcu_target не задан. CMakeLists.txt библиотек, зависящих от MCU_TARGET, могут завершиться ошибкой."
+    "[arduino] arduino.mcu_target is not set. CMakeLists.txt of libraries that depend on MCU_TARGET may fail.")
+stm32_yml_msg_def(W502
+    "[arduino] CMakeLists.txt ядра Arduino не найден: {1}\nУкажите правильный путь через arduino.core_cmake_dir в stm32_config.yml."
+    "[arduino] Arduino core CMakeLists.txt not found: {1}\nSet the correct path with arduino.core_cmake_dir in stm32_config.yml.")
+stm32_yml_msg_def(W503
+    "[arduino] Библиотека '{1}' не найдена в {2}.\nПроверьте имя в arduino.libraries и наличие CMakeLists.txt."
+    "[arduino] Library '{1}' not found in {2}.\nCheck the name in arduino.libraries and that CMakeLists.txt exists.")
+stm32_yml_msg_def(W504
+    "[arduino] Кастомная библиотека не найдена: {1}."
+    "[arduino] Custom library not found: {1}.")
+stm32_yml_msg_def(I501
+    "Arduino Core STM32: {1}"
+    "Arduino Core STM32: {1}")
+stm32_yml_msg_def(I502
+    "Arduino MCU_TARGET: {1}"
+    "Arduino MCU_TARGET: {1}")
+stm32_yml_msg_def(I503
+    "Arduino::Definitions создан."
+    "Arduino::Definitions created.")
+stm32_yml_msg_def(I504
+    "Arduino USE_CORE_MAIN: {1}"
+    "Arduino USE_CORE_MAIN: {1}")
+stm32_yml_msg_def(I505
+    "Подключение Arduino Core: {1}"
+    "Adding Arduino Core: {1}")
+stm32_yml_msg_def(I506
+    "Подключение Arduino библиотеки: {1}"
+    "Adding Arduino library: {1}")
+stm32_yml_msg_def(I507
+    "Подключение кастомной библиотеки: {1}"
+    "Adding custom library: {1}")
+
+# --- 6xx: скрипт компоновщика -------------------------------------------------
+
+stm32_yml_msg_def(E601
+    "В режиме Arduino Backend генерация скрипта без локального шаблона не поддерживается. Добавьте шаблон или укажите готовый скрипт."
+    "The Arduino backend cannot generate a linker script without a local template. Add a template or set a ready linker script.")
+stm32_yml_msg_def(E602
+    "Указанный скрипт компоновщика не найден: '{1}'\nПапки поиска: {2}"
+    "The specified linker script is not found: '{1}'\nSearch directories: {2}")
+stm32_yml_msg_def(W601
+    "Заданные размеры памяти ({1}) не применяются: скрипт компоновщика формирует stm32-cmake с собственными размерами heap {2} и stack {3} байт. Добавьте шаблон {4} (в корень проекта или linker_script_dir) или задайте размеры в явном linker_script."
+    "The memory sizes set ({1}) are not applied: stm32-cmake generates the linker script with its own sizes, heap {2} and stack {3} bytes. Add a {4} template (to the project root or linker_script_dir) or set the sizes in an explicit linker_script.")
+stm32_yml_msg_def(W602
+    "Заданные размеры памяти ({1}) не применяются: размеры задаёт явный скрипт компоновщика '{2}'. Измените их в скрипте или используйте шаблон .ld.in (linker_script: auto)."
+    "The memory sizes set ({1}) are not applied: the explicit linker script '{2}' sets the sizes. Change them in the script or use an .ld.in template (linker_script: auto).")
+stm32_yml_msg_def(W603
+    "Startup {1} задаёт границу стека (MSPLIM) по символу _sstack, но скрипт компоновщика {2} его не определяет: компоновка завершится ошибкой 'undefined reference to _sstack'. Добавьте в шаблон .ld.in или явный скрипт строку '_sstack = _estack - _Min_Stack_Size;' либо подключите через sources собственный startup без MSPLIM."
+    "Startup {1} sets the stack limit (MSPLIM) from the _sstack symbol, but linker script {2} does not define it: linking will fail with 'undefined reference to _sstack'. Add the line '_sstack = _estack - _Min_Stack_Size;' to the .ld.in template or the explicit script, or add your own startup without MSPLIM through sources.")
+stm32_yml_msg_def(W604
+    "Startup {1} задаёт границу стека (MSPLIM) по символу _sstack, но скрипт компоновщика stm32-cmake его не определяет: компоновка завершится ошибкой 'undefined reference to _sstack'. Добавьте в шаблон .ld.in или явный скрипт строку '_sstack = _estack - _Min_Stack_Size;' либо подключите через sources собственный startup без MSPLIM."
+    "Startup {1} sets the stack limit (MSPLIM) from the _sstack symbol, but the stm32-cmake linker script does not define it: linking will fail with 'undefined reference to _sstack'. Add the line '_sstack = _estack - _Min_Stack_Size;' to an .ld.in template or an explicit script, or add your own startup without MSPLIM through sources.")
+stm32_yml_msg_def(I601
+    "Папка поиска скрипта компоновщика: {1}"
+    "Linker script search directory: {1}")
+stm32_yml_msg_def(I602
+    "Генерация скрипта компоновщика из шаблона..."
+    "Generating the linker script from a template...")
+stm32_yml_msg_def(I603
+    "Найден локальный шаблон: {1}"
+    "Local template found: {1}")
+stm32_yml_msg_def(I604
+    "В скрипте компоновщика используется READONLY (GCC >= 11.0)"
+    "Using READONLY in linker script (GCC >= 11.0)")
+stm32_yml_msg_def(I605
+    "В скрипте компоновщика не используется READONLY (GCC < 11.0)"
+    "Not using READONLY in linker script (GCC < 11.0)")
+stm32_yml_msg_def(I606
+    "Локальный шаблон не найден. Будет использован стандартный скрипт компоновщика."
+    "No local template found. The standard linker script is used.")
+stm32_yml_msg_def(I607
+    "Подключение скрипта компоновщика: {1}"
+    "Adding linker script: {1}")
+stm32_yml_msg_def(I608
+    "Подключение встроенного скрипта компоновщика: {1}"
+    "Adding the built-in linker script: {1}")
+stm32_yml_msg_def(I609
+    "Использование пользовательского скрипта компоновщика: {1}"
+    "Using the custom linker script: {1}")
+
 # --- 7xx: артефакты и CRC -----------------------------------------------------
 
 stm32_yml_msg_def(W701
     "bin: не удалось определить регион FLASH скрипта компоновщика или найти Python3; BIN создаётся objcopy -O binary и может оказаться большим, если в ELF есть секции вне Flash."
     "bin: could not find the FLASH region of the linker script or Python3; BIN is created by objcopy -O binary and may be large if the ELF has sections outside Flash.")
+stm32_yml_msg_def(E701
+    "crc_enable: скрипт компоновщика формирует stm32-cmake, секции '{1}' (crc_section_name) в нём нет. Используйте шаблон STM32<MCU>_FLASH.ld.in (linker_script: auto) или явный linker_script с секцией '{1}', либо crc_enable: false."
+    "crc_enable: stm32-cmake generates the linker script and it has no '{1}' section (crc_section_name). Use an STM32<MCU>_FLASH.ld.in template (linker_script: auto) or an explicit linker_script with a '{1}' section, or crc_enable: false.")
+stm32_yml_msg_def(W702
+    " Расчет CRC отключен. Не удалось автоматически определить размер FLASH из {1}. Задайте 'flash_size' в stm32_config.yml."
+    " CRC calculation is disabled. Could not determine the FLASH size from {1}. Set 'flash_size' in stm32_config.yml.")
+stm32_yml_msg_def(W703
+    "crc_enable: секция '{1}' (crc_section_name) не найдена в скрипте {2}. Шаг CRC после сборки завершится ошибкой."
+    "crc_enable: section '{1}' (crc_section_name) is not found in script {2}. The post-build CRC step will fail.")
+stm32_yml_msg_def(W704
+    " Расчет CRC отключен. Не удалось определить регион FLASH (ORIGIN, LENGTH) в скрипте {1}."
+    " CRC calculation is disabled. Could not determine the FLASH region (ORIGIN, LENGTH) in script {1}.")
+stm32_yml_msg_def(W705
+    " Интерпретатор Python3 не найден. Расчет CRC отключен."
+    " Python3 interpreter not found. CRC calculation is disabled.")
+stm32_yml_msg_def(W706
+    " Утилита objcopy не найдена. Расчет CRC отключен."
+    " objcopy not found. CRC calculation is disabled.")
+stm32_yml_msg_def(W707
+    " Скрипт расчета не найден по пути: {1}. Расчет CRC отключен."
+    " CRC script not found: {1}. CRC calculation is disabled.")
+stm32_yml_msg_def(I701
+    "Настройка механизма внедрения CRC32 в прошивку..."
+    "Setting up CRC32 injection into the firmware...")
+stm32_yml_msg_def(I702
+    " Метод: Внедрение в секцию '{1}'"
+    " Method: injection into section '{1}'")
+stm32_yml_msg_def(I703
+    " Алгоритм: {1}"
+    " Algorithm: {1}")
+stm32_yml_msg_def(I704
+    " Регион FLASH скрипта: ORIGIN {1}, LENGTH {2} байт"
+    " Script FLASH region: ORIGIN {1}, LENGTH {2} bytes")
+stm32_yml_msg_def(I705
+    " Max Flash Size: {1} байт ({2})"
+    " Max Flash Size: {1} bytes ({2})")
+stm32_yml_msg_def(I706
+    " Сборка будет выполнена БЕЗ добавления контрольной суммы."
+    " The build runs WITHOUT adding a checksum.")
+
+# --- 8xx: диагностика ---------------------------------------------------------
+
+stm32_yml_msg_def(E801
+    "Файл конфигурации HAL '{1}' не найден ни в одной из директорий, указанных в 'include_directories'. Библиотека HAL не сможет скомпилироваться без него. Убедитесь, что путь к этому файлу (например, 'Core/Inc') добавлен в 'include_directories' в {2}."
+    "HAL configuration file '{1}' is not found in any directory listed in 'include_directories'. The HAL library cannot compile without it. Make sure its path (for example, 'Core/Inc') is in 'include_directories' in {2}.")
+stm32_yml_msg_def(W801
+    "Не найдено ни одной RAM-секции (xrw/rw) в скрипте {1}. Проверка размера пропущена."
+    "No RAM section (xrw/rw) found in script {1}. The size check is skipped.")
+stm32_yml_msg_def(W802
+    "Параметр 'cppcheck_enable' установлен, но утилита не найдена!"
+    "'cppcheck_enable' is set, but the tool is not found!")
+stm32_yml_msg_def(I801
+    "--- Отладочная информация для финальной цели '{1}' ---"
+    "--- Debug information for the final target '{1}' ---")
+stm32_yml_msg_def(I802
+    "Опции компиляции (COMPILE_OPTIONS):\n    {1}"
+    "Compile options (COMPILE_OPTIONS):\n    {1}")
+stm32_yml_msg_def(I803
+    "Определения компиляции (COMPILE_DEFINITIONS):\n    {1}"
+    "Compile definitions (COMPILE_DEFINITIONS):\n    {1}")
+stm32_yml_msg_def(I804
+    "Директории для #include (INCLUDE_DIRECTORIES):\n    {1}"
+    "#include directories (INCLUDE_DIRECTORIES):\n    {1}")
+stm32_yml_msg_def(I805
+    "Опции компоновки (LINK_OPTIONS):\n    {1}"
+    "Link options (LINK_OPTIONS):\n    {1}")
+stm32_yml_msg_def(I806
+    "Библиотеки для компоновки (LINK_LIBRARIES):\n    {1}"
+    "Link libraries (LINK_LIBRARIES):\n    {1}")
+stm32_yml_msg_def(I807
+    "\n--- Отладочная информация для унаследованной цели '{1}' ---"
+    "\n--- Debug information for the inherited target '{1}' ---")
+stm32_yml_msg_def(I808
+    "INTERFACE Опции компиляции:\n    {1}"
+    "INTERFACE compile options:\n    {1}")
+stm32_yml_msg_def(I809
+    "INTERFACE Определения компиляции:\n    {1}"
+    "INTERFACE compile definitions:\n    {1}")
+stm32_yml_msg_def(I810
+    "INTERFACE Опции компоновки:\n    {1}"
+    "INTERFACE link options:\n    {1}")
+stm32_yml_msg_def(I811
+    "---------------------------------------------------------------------------------"
+    "---------------------------------------------------------------------------------")
+stm32_yml_msg_def(I812
+    "Найден файл конфигурации HAL: {1}"
+    "HAL configuration file found: {1}")
+stm32_yml_msg_def(I813
+    "Проверка размера RAM в скрипте компоновщика пропущена (не поддерживается в Arduino backend)."
+    "The linker script RAM size check is skipped (not supported by the Arduino backend).")
+stm32_yml_msg_def(I814
+    "Проверка RAM скрипта компоновщика: не проверялось (скрипт формирует stm32-cmake)."
+    "Linker script RAM check: not checked (stm32-cmake generates the script).")
+stm32_yml_msg_def(I815
+    "Выполнение проверки скрипта компоновщика..."
+    "Checking the linker script...")
+stm32_yml_msg_def(I816
+    "  RAM-секции в скрипте: {1} = {2} байт"
+    "  RAM sections in the script: {1} = {2} bytes")
+stm32_yml_msg_def(I817
+    "  stm32-cmake RAM : {1} = {2} байт"
+    "  stm32-cmake RAM : {1} = {2} bytes")
+stm32_yml_msg_def(I818
+    "  Скрипт RAM сумма: {1} байт ({2}K)"
+    "  Script RAM total: {1} bytes ({2}K)")
+stm32_yml_msg_def(I819
+    "  Соотношение     : {1}K {2} {3}K"
+    "  Ratio           : {1}K {2} {3}K")
+stm32_yml_msg_def(I820
+    "Анализатор Cppcheck найден: {1}"
+    "Cppcheck found: {1}")
+stm32_yml_msg_def(I821
+    "  Cppcheck: Игнорируются пути, содержащие '{1}'"
+    "  Cppcheck: paths containing '{1}' are ignored")
+stm32_yml_msg_def(I822
+    "Статический анализ (Cppcheck) активирован"
+    "Static analysis (Cppcheck) is enabled")

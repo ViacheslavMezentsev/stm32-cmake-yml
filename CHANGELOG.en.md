@@ -19,9 +19,8 @@ on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
   catalog in Russian or English. `STM32_YML_LANG` (`auto`, `ru`, `en`) selects the
   language; `auto` uses the locale, on Windows the registry. `STM32_YML_MESSAGE_CODES=ON`
   shows the codes in the output. Every Configure message is written to
-  `stm32_yml_messages.jsonl` in the build directory. Messages of the core, configuration
-  reading, profiles, IOC, utilities, sources and CMSIS/HAL/FreeRTOS use codes; the other
-  modules move to the catalog in the next changes.
+  `stm32_yml_messages.jsonl` in the build directory. All Configure messages use
+  codes; the CRC script messages at build time move to the catalog in the next change.
 
 ### Changed
 
@@ -33,6 +32,8 @@ on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
   the `M7;M4` list.
 - **Unknown enumerated value.** The end of the warning is capitalized:
   "Применяется '…'" / "Значение не используется" in Russian.
+- **English lines in the Russian output.** The READONLY linker script lines are
+  translated into Russian.
 
 ---
 

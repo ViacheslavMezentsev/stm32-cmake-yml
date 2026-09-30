@@ -55,22 +55,59 @@
   },
   {
     "name": "crc-stm32cmake-script-error",
-    "args": ["-DSTM32_YML_PROFILE=crcnoscript"],
-    "error": "скрипт компоновщика формирует stm32-cmake, секции '.checksum' (crc_section_name) в нём нет"
+    "args": [
+      "-DSTM32_YML_PROFILE=crcnoscript"
+    ],
+    "error": {
+      "code": "E701",
+      "args": [
+        ".checksum"
+      ]
+    }
   },
   {
     "name": "crc-explicit-script-without-section",
-    "args": ["-DSTM32_YML_PROFILE=crcexplicit"],
-    "observed": {"crc_enable": "TRUE"},
-    "log_contains": ["секция '.checksum' (crc_section_name) не найдена", "Регион FLASH скрипта: ORIGIN 0x08000000, LENGTH 524288 байт"],
-    "crc_command": true
+    "args": [
+      "-DSTM32_YML_PROFILE=crcexplicit"
+    ],
+    "observed": {
+      "crc_enable": "TRUE"
+    },
+    "crc_command": true,
+    "messages": [
+      {
+        "code": "W703",
+        "args": [
+          ".checksum",
+          null
+        ]
+      },
+      {
+        "code": "I704",
+        "args": [
+          "0x08000000",
+          "524288"
+        ]
+      }
+    ]
   },
   {
     "name": "crc-flash-region-missing",
-    "args": ["-DSTM32_YML_PROFILE=crcnoflash"],
-    "observed": {"crc_enable": "TRUE"},
-    "log_contains": ["Расчет CRC отключен. Не удалось определить регион FLASH (ORIGIN, LENGTH)"],
-    "crc_command": false
+    "args": [
+      "-DSTM32_YML_PROFILE=crcnoflash"
+    ],
+    "observed": {
+      "crc_enable": "TRUE"
+    },
+    "crc_command": false,
+    "messages": [
+      {
+        "code": "W704",
+        "args": [
+          null
+        ]
+      }
+    ]
   },
   {
     "name": "crc-unknown-algorithm",
@@ -81,9 +118,6 @@
     "observed": {
       "crc_enable": "TRUE"
     },
-    "log_contains": [
-      "Алгоритм: STM32_HW_DEFAULT"
-    ],
     "crc_command": true,
     "messages": [
       {
@@ -92,6 +126,12 @@
           "CRC32_MPEG",
           "crc_algorithm",
           null,
+          "STM32_HW_DEFAULT"
+        ]
+      },
+      {
+        "code": "I703",
+        "args": [
           "STM32_HW_DEFAULT"
         ]
       }
@@ -209,8 +249,16 @@
   },
   {
     "name": "missing-linker",
-    "args": ["-DSTM32_YML_OVERRIDE_linker_script=missing.ld"],
-    "error": "Указанный скрипт компоновщика не найден"
+    "args": [
+      "-DSTM32_YML_OVERRIDE_linker_script=missing.ld"
+    ],
+    "error": {
+      "code": "E602",
+      "args": [
+        "missing.ld",
+        null
+      ]
+    }
   },
   {
     "name": "hal-requires-cmsis",
@@ -238,15 +286,45 @@
   {
     "name": "arduino-missing-core",
     "backend": "arduino",
-    "args": ["-DSTM32_YML_OVERRIDE_arduino_core_path=missing-core"],
-    "error": "Папка Arduino Core STM32 не найдена"
+    "args": [
+      "-DSTM32_YML_OVERRIDE_arduino_core_path=missing-core"
+    ],
+    "error": {
+      "code": "E502",
+      "args": [
+        null
+      ]
+    }
   },
   {
     "name": "ioc-bluepill-defaults",
-    "args": ["-DPROJECT_CONFIG_FILE=ioc.yml"],
-    "observed": {"MCU": "STM32F103C8T", "PROJECT_NAME": "bluepill_hsi", "heap_size": "512", "stack_size": "1024", "cubefw_package": "V1.8.7"},
-    "properties": {"LINK_LIBRARIES": ["HAL::STM32::F1::GPIO", "CMSIS::STM32::F103C8"]},
-    "log_contains": ["Заданные размеры памяти (heap_size: 512, stack_size: 1024) не применяются: скрипт компоновщика формирует stm32-cmake"]
+    "args": [
+      "-DPROJECT_CONFIG_FILE=ioc.yml"
+    ],
+    "observed": {
+      "MCU": "STM32F103C8T",
+      "PROJECT_NAME": "bluepill_hsi",
+      "heap_size": "512",
+      "stack_size": "1024",
+      "cubefw_package": "V1.8.7"
+    },
+    "properties": {
+      "LINK_LIBRARIES": [
+        "HAL::STM32::F1::GPIO",
+        "CMSIS::STM32::F103C8"
+      ]
+    },
+    "messages": [
+      {
+        "code": "W601",
+        "args": [
+          "heap_size: 512, stack_size: 1024",
+          null,
+          null,
+          null
+        ]
+      }
+    ]
   },
   {
     "name": "yaml-over-ioc",
@@ -645,10 +723,58 @@
   {
     "name": "memory-size-unused-warning",
     "steps": [
-      {"log_absent": ["не применяются"]},
-      {"args": ["-DSTM32_YML_PROFILE=append"], "log_contains": ["Заданные размеры памяти (stack_size: 2K) не применяются: скрипт компоновщика формирует stm32-cmake с собственными размерами heap 0x200 и stack 0x400 байт."]},
-      {"args": ["-DSTM32_YML_PROFILE=template"], "linker": {"heap": 1024, "stack": 2048}, "log_absent": ["не применяются"]},
-      {"args": ["-DSTM32_YML_PROFILE=", "-DSTM32_YML_OVERRIDE_linker_script=custom.ld", "-DSTM32_YML_OVERRIDE_linker_script_dir=linker", "-DSTM32_YML_OVERRIDE_heap_size=1K"], "log_contains": ["Заданные размеры памяти (heap_size: 1K) не применяются: размеры задаёт явный скрипт компоновщика 'custom.ld'."]}
+      {
+        "messages_absent": [
+          "W601",
+          "W602"
+        ]
+      },
+      {
+        "args": [
+          "-DSTM32_YML_PROFILE=append"
+        ],
+        "messages": [
+          {
+            "code": "W601",
+            "args": [
+              "stack_size: 2K",
+              "0x200",
+              "0x400",
+              null
+            ]
+          }
+        ]
+      },
+      {
+        "args": [
+          "-DSTM32_YML_PROFILE=template"
+        ],
+        "linker": {
+          "heap": 1024,
+          "stack": 2048
+        },
+        "messages_absent": [
+          "W601",
+          "W602"
+        ]
+      },
+      {
+        "args": [
+          "-DSTM32_YML_PROFILE=",
+          "-DSTM32_YML_OVERRIDE_linker_script=custom.ld",
+          "-DSTM32_YML_OVERRIDE_linker_script_dir=linker",
+          "-DSTM32_YML_OVERRIDE_heap_size=1K"
+        ],
+        "messages": [
+          {
+            "code": "W602",
+            "args": [
+              "heap_size: 1K",
+              "custom.ld"
+            ]
+          }
+        ]
+      }
     ]
   },
   {
@@ -768,12 +894,6 @@
         "CMSIS::STM32::H743ZI::M7"
       ]
     },
-    "log_contains": [
-      "не проверялось (скрипт формирует stm32-cmake)"
-    ],
-    "log_absent": [
-      "MSPLIM"
-    ],
     "messages": [
       {
         "code": "I038",
@@ -781,7 +901,14 @@
           "STM32H743ZI",
           "M7"
         ]
+      },
+      {
+        "code": "I814"
       }
+    ],
+    "messages_absent": [
+      "W603",
+      "W604"
     ]
   },
   {
@@ -838,15 +965,26 @@
             "HAL::STM32::H7::M7::GPIO"
           ]
         },
-        "log_contains": [
-          "Соотношение : 288K == 288K",
-          "Max Flash Size: 1048576"
-        ],
         "messages": [
           {
             "code": "I039",
             "args": [
               "M4"
+            ]
+          },
+          {
+            "code": "I819",
+            "args": [
+              "288",
+              "==",
+              "288"
+            ]
+          },
+          {
+            "code": "I705",
+            "args": [
+              "1048576",
+              null
             ]
           }
         ]
@@ -927,9 +1065,13 @@
             "CMSIS::STM32::H563ZI"
           ]
         },
-        "log_contains": [
-          "Startup /opt/STM32Cube/Repository/STM32Cube_FW_H5_V1.7.0/Drivers/CMSIS/Device/ST/STM32H5xx/Source/Templates/gcc/startup_stm32h563xx.s задаёт границу стека (MSPLIM) по символу _sstack",
-          "но скрипт компоновщика stm32-cmake его не определяет"
+        "messages": [
+          {
+            "code": "W604",
+            "args": [
+              "/opt/STM32Cube/Repository/STM32Cube_FW_H5_V1.7.0/Drivers/CMSIS/Device/ST/STM32H5xx/Source/Templates/gcc/startup_stm32h563xx.s"
+            ]
+          }
         ]
       },
       {
@@ -937,8 +1079,9 @@
           "-DSTM32_YML_PROFILE=sstack"
         ],
         "link_options_contain": "linker/h563-sstack.ld",
-        "log_absent": [
-          "MSPLIM"
+        "messages_absent": [
+          "W603",
+          "W604"
         ]
       },
       {
@@ -979,10 +1122,29 @@
           "heap": 512,
           "stack": 1024
         },
-        "log_contains": [
-          "Max Flash Size: 2097152",
-          "Соотношение : 640K == 640K",
-          "Startup /opt/STM32Cube/Repository/STM32Cube_FW_H5_V1.7.0/Drivers/CMSIS/Device/ST/STM32H5xx/Source/Templates/gcc/startup_stm32h563xx.s задаёт границу стека (MSPLIM) по символу _sstack"
+        "messages": [
+          {
+            "code": "I705",
+            "args": [
+              "2097152",
+              null
+            ]
+          },
+          {
+            "code": "I819",
+            "args": [
+              "640",
+              "==",
+              "640"
+            ]
+          },
+          {
+            "code": "W603",
+            "args": [
+              "/opt/STM32Cube/Repository/STM32Cube_FW_H5_V1.7.0/Drivers/CMSIS/Device/ST/STM32H5xx/Source/Templates/gcc/startup_stm32h563xx.s",
+              null
+            ]
+          }
         ]
       }
     ]
@@ -1147,22 +1309,98 @@
   },
   {
     "name": "diagnostics-toggle",
-    "args": ["-DPROJECT_CONFIG_FILE=baremetal.yml", "-DSTM32_YML_OVERRIDE_linker_script=linker/custom.ld"],
+    "args": [
+      "-DPROJECT_CONFIG_FILE=baremetal.yml",
+      "-DSTM32_YML_OVERRIDE_linker_script=linker/custom.ld"
+    ],
     "steps": [
-      {"args": ["-DSTM32_YML_OVERRIDE_log_target_properties=true", "-DSTM32_YML_OVERRIDE_validate_linker_script=true"], "log_contains": ["Отладочная информация для финальной цели 'baremetal_probe'", "COMPILE_DEFINITIONS", "Соотношение : 128K > 20K"]},
-      {"args": ["-DSTM32_YML_OVERRIDE_log_target_properties=false", "-DSTM32_YML_OVERRIDE_validate_linker_script=false"], "log_absent": ["Отладочная информация для финальной цели 'baremetal_probe'", "Выполнение проверки скрипта компоновщика", "Соотношение"]},
-      {"args": ["-DSTM32_YML_OVERRIDE_log_target_properties=true", "-DSTM32_YML_OVERRIDE_validate_linker_script=true"], "log_contains": ["Отладочная информация для финальной цели 'baremetal_probe'", "Соотношение : 128K > 20K"]}
+      {
+        "args": [
+          "-DSTM32_YML_OVERRIDE_log_target_properties=true",
+          "-DSTM32_YML_OVERRIDE_validate_linker_script=true"
+        ],
+        "messages": [
+          {
+            "code": "I801",
+            "args": [
+              "baremetal_probe"
+            ]
+          },
+          {
+            "code": "I803"
+          },
+          {
+            "code": "I819",
+            "args": [
+              "128",
+              ">",
+              "20"
+            ]
+          }
+        ]
+      },
+      {
+        "args": [
+          "-DSTM32_YML_OVERRIDE_log_target_properties=false",
+          "-DSTM32_YML_OVERRIDE_validate_linker_script=false"
+        ],
+        "messages_absent": [
+          "I801",
+          "I815",
+          "I819"
+        ]
+      },
+      {
+        "args": [
+          "-DSTM32_YML_OVERRIDE_log_target_properties=true",
+          "-DSTM32_YML_OVERRIDE_validate_linker_script=true"
+        ],
+        "messages": [
+          {
+            "code": "I801",
+            "args": [
+              "baremetal_probe"
+            ]
+          },
+          {
+            "code": "I819",
+            "args": [
+              "128",
+              ">",
+              "20"
+            ]
+          }
+        ]
+      }
     ]
   },
   {
     "name": "diagnostics-unrecognized-ram",
-    "args": ["-DPROJECT_CONFIG_FILE=baremetal.yml", "-DSTM32_YML_OVERRIDE_linker_script=linker/diagnostic-no-ram.ld"],
-    "log_contains": ["Не найдено ни одной RAM-секции", "Проверка размера пропущена."]
+    "args": [
+      "-DPROJECT_CONFIG_FILE=baremetal.yml",
+      "-DSTM32_YML_OVERRIDE_linker_script=linker/diagnostic-no-ram.ld"
+    ],
+    "messages": [
+      {
+        "code": "W801",
+        "args": [
+          null
+        ]
+      }
+    ]
   },
   {
     "name": "diagnostics-missing-hal-conf",
-    "args": ["-DSTM32_YML_OVERRIDE_include_directories=SourceGroup/Inc"],
-    "error": "Файл конфигурации HAL 'stm32f4xx_hal_conf.h' не найден"
+    "args": [
+      "-DSTM32_YML_OVERRIDE_include_directories=SourceGroup/Inc"
+    ],
+    "error": {
+      "code": "E801",
+      "args": [
+        "stm32f4xx_hal_conf.h",
+        null
+      ]
+    }
   },
   {
     "name": "version-equal",
@@ -2495,8 +2733,10 @@
       "CXX_CPPCHECK": "/usr/bin/false;--enable=warning,performance,portability,style;--inline-suppr;--suppress=missingInclude;--suppress=unmatchedSuppression;--suppress=*:*STM32Cube/Repository/*;--suppress=*:*Drivers/*;--suppress=*:*Middlewares/*"
     },
     "cppcheck_rules": true,
-    "log_contains": [
-      "Статический анализ (Cppcheck) активирован"
+    "messages": [
+      {
+        "code": "I822"
+      }
     ]
   },
   {
@@ -2511,8 +2751,10 @@
       "CXX_CPPCHECK": "/usr/bin/false;--enable=warning;--error-exitcode=2;--suppress=*:*Vendor SDK/*"
     },
     "cppcheck_rules": true,
-    "log_contains": [
-      "Статический анализ (Cppcheck) активирован"
+    "messages": [
+      {
+        "code": "I822"
+      }
     ]
   },
   {
@@ -2527,8 +2769,10 @@
       "CXX_CPPCHECK": "/usr/bin/false;--enable=warning,performance,portability,style;--inline-suppr;--suppress=missingInclude;--suppress=unmatchedSuppression;--suppress=*:*STM32Cube/Repository/*;--suppress=*:*Drivers/*;--suppress=*:*Middlewares/*"
     },
     "cppcheck_rules": true,
-    "log_contains": [
-      "Статический анализ (Cppcheck) активирован"
+    "messages": [
+      {
+        "code": "I822"
+      }
     ]
   },
   {
@@ -2541,11 +2785,13 @@
       "CXX_CPPCHECK": "VALUE-NOTFOUND"
     },
     "cppcheck_rules": false,
-    "log_absent": [
-      "Статический анализ (Cppcheck) активирован"
+    "messages": [
+      {
+        "code": "W802"
+      }
     ],
-    "log_contains": [
-      "Параметр 'cppcheck_enable' установлен, но утилита не найдена!"
+    "messages_absent": [
+      "I822"
     ]
   },
   {
@@ -2564,8 +2810,10 @@
           "CXX_CPPCHECK": "/usr/bin/false;--enable=warning,performance,portability,style;--inline-suppr;--suppress=missingInclude;--suppress=unmatchedSuppression;--suppress=*:*STM32Cube/Repository/*;--suppress=*:*Drivers/*;--suppress=*:*Middlewares/*"
         },
         "cppcheck_rules": true,
-        "log_contains": [
-          "Статический анализ (Cppcheck) активирован"
+        "messages": [
+          {
+            "code": "I822"
+          }
         ]
       },
       {
@@ -2577,8 +2825,8 @@
           "CXX_CPPCHECK": "VALUE-NOTFOUND"
         },
         "cppcheck_rules": false,
-        "log_absent": [
-          "Статический анализ (Cppcheck) активирован"
+        "messages_absent": [
+          "I822"
         ]
       },
       {
@@ -2590,8 +2838,10 @@
           "CXX_CPPCHECK": "/usr/bin/false;--enable=warning;--error-exitcode=2;--suppress=*:*Vendor SDK/*"
         },
         "cppcheck_rules": true,
-        "log_contains": [
-          "Статический анализ (Cppcheck) активирован"
+        "messages": [
+          {
+            "code": "I822"
+          }
         ]
       }
     ]
@@ -2989,9 +3239,14 @@
     "absent_commands": [
       "arduino-library-core/libraries/Probe/probe.cpp"
     ],
-    "log_contains": [
-      "Библиотека 'Missing' не найдена",
-      "Проверьте имя в arduino.libraries и наличие CMakeLists.txt."
+    "messages": [
+      {
+        "code": "W503",
+        "args": [
+          "Missing",
+          null
+        ]
+      }
     ]
   },
   {
@@ -3016,9 +3271,14 @@
     "absent_commands": [
       "arduino-library-core/libraries/Probe/probe.cpp"
     ],
-    "log_contains": [
-      "Библиотека 'NoWrapper' не найдена",
-      "Проверьте имя в arduino.libraries и наличие CMakeLists.txt."
+    "messages": [
+      {
+        "code": "W503",
+        "args": [
+          "NoWrapper",
+          null
+        ]
+      }
     ]
   },
   {
@@ -3231,8 +3491,13 @@
       "custom/hal/driver/driver.c",
       "custom/app/driver/driver.cpp"
     ],
-    "log_contains": [
-      "[arduino] Кастомная библиотека не найдена:"
+    "messages": [
+      {
+        "code": "W504",
+        "args": [
+          null
+        ]
+      }
     ]
   },
   {
@@ -3262,8 +3527,13 @@
       "custom/hal/driver/driver.c",
       "custom/app/driver/driver.cpp"
     ],
-    "log_contains": [
-      "[arduino] Кастомная библиотека не найдена:"
+    "messages": [
+      {
+        "code": "W504",
+        "args": [
+          null
+        ]
+      }
     ]
   },
   {
