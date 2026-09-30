@@ -220,6 +220,15 @@ stm32_yml_msg_def(W301
 stm32_yml_msg_def(I301
     "Подключение пользовательской библиотеки: {1}"
     "Adding custom library: {1}")
+stm32_yml_msg_def(W302
+    "Источник '{1}' не найден и будет проигнорирован."
+    "Source '{1}' not found and ignored.")
+stm32_yml_msg_def(I302
+    "Обнаружен пользовательский system-файл. Переопределение: {1}"
+    "Custom system file found. Override: {1}")
+stm32_yml_msg_def(I303
+    "Обнаружен пользовательский startup-файл. Переопределение: {1}"
+    "Custom startup file found. Override: {1}")
 
 # --- 4xx: CMSIS, HAL, FreeRTOS ------------------------------------------------
 
@@ -235,6 +244,78 @@ stm32_yml_msg_def(E403
 stm32_yml_msg_def(W401
     "Порт FreeRTOS для '{1}' не определён таблицей фреймворка; используется ARM_CM4F. Задайте freertos_components явно."
     "The framework table has no FreeRTOS port for '{1}'; ARM_CM4F is used. Set freertos_components explicitly.")
+stm32_yml_msg_def(E404
+    "Не удалось определить пути к драйверам HAL/CMSIS. Проверьте 'cubefw_package'."
+    "Could not determine the HAL/CMSIS driver paths. Check 'cubefw_package'.")
+stm32_yml_msg_def(E405
+    "use_hal: true требует use_cmsis: true."
+    "use_hal: true requires use_cmsis: true.")
+stm32_yml_msg_def(E406
+    "Компонент HAL '{1}' (hal_components) не найден для семейства {2}: нет цели {3}. Проверьте имя драйвера в пакете STM32Cube {2}."
+    "HAL component '{1}' (hal_components) is not found for family {2}: there is no target {3}. Check the driver name in the STM32Cube {2} package.")
+stm32_yml_msg_def(E407
+    "Компонент HAL '{1}' (hal_components) не найден для семейства {2} (ядро {3}): нет цели {4}. Проверьте имя драйвера в пакете STM32Cube {2}."
+    "HAL component '{1}' (hal_components) is not found for family {2} (core {3}): there is no target {4}. Check the driver name in the STM32Cube {2} package.")
+stm32_yml_msg_def(E408
+    "Найдено несколько портов FreeRTOS: '{1}' и '{2}'."
+    "Several FreeRTOS ports found: '{1}' and '{2}'.")
+stm32_yml_msg_def(E409
+    "В 'freertos_components' не найден порт (например, 'ARM_CM4F')."
+    "No port found in 'freertos_components' (for example, 'ARM_CM4F').")
+stm32_yml_msg_def(E410
+    "freertos_version: external требует путь к FreeRTOS: задайте FREERTOS_PATH (-DFREERTOS_PATH=... или переменная окружения) — каталог FreeRTOS-Kernel или Middlewares/Third_Party/FreeRTOS пакета STM32Cube."
+    "freertos_version: external requires a FreeRTOS path: set FREERTOS_PATH (-DFREERTOS_PATH=... or an environment variable) to a FreeRTOS-Kernel directory or to Middlewares/Third_Party/FreeRTOS of an STM32Cube package.")
+stm32_yml_msg_def(E411
+    "freertos_version: external: в FREERTOS_PATH '{1}' не найдены FreeRTOS.h и tasks.c. Ожидается раскладка FreeRTOS-Kernel (include/, portable/GCC/<порт>) или дерева Cube (Source/...)."
+    "freertos_version: external: FreeRTOS.h and tasks.c are not found in FREERTOS_PATH '{1}'. Expected a FreeRTOS-Kernel layout (include/, portable/GCC/<port>) or a Cube tree (Source/...).")
+stm32_yml_msg_def(E412
+    "freertos_version: external: файлы порта '{1}' не найдены в FREERTOS_PATH '{2}' (portable/GCC/{1})."
+    "freertos_version: external: port '{1}' files are not found in FREERTOS_PATH '{2}' (portable/GCC/{1}).")
+stm32_yml_msg_def(E413
+    "Компонент FreeRTOS '{1}' (freertos_components) не найден: нет цели {2} в пространстве {3}."
+    "FreeRTOS component '{1}' (freertos_components) is not found: there is no target {2} in the {3} namespace.")
+stm32_yml_msg_def(E414
+    "cmsis_rtos_api: {1}: обёртка CMSIS-RTOS не найдена (нет цели {2}). Её исходники берутся из Middlewares/Third_Party/FreeRTOS пакета STM32Cube {3} и требуют use_cmsis: true; в пакете может не быть FreeRTOS (например, H5, U5). Используйте cmsis_rtos_api: none."
+    "cmsis_rtos_api: {1}: the CMSIS-RTOS wrapper is not found (there is no target {2}). Its sources come from Middlewares/Third_Party/FreeRTOS of the STM32Cube {3} package and require use_cmsis: true; the package may have no FreeRTOS (for example, H5, U5). Use cmsis_rtos_api: none.")
+stm32_yml_msg_def(I401
+    "Режим 'auto': поиск драйверов..."
+    "'auto' mode: looking for drivers...")
+stm32_yml_msg_def(I402
+    "Обнаружены локальные драйверы в '{1}'. Используются они."
+    "Local drivers found in '{1}'. They are used.")
+stm32_yml_msg_def(I403
+    "STM32Cube MCU Firmware Package: {1}"
+    "STM32Cube MCU Firmware Package: {1}")
+stm32_yml_msg_def(I404
+    "Локальные драйверы не найдены. Поиск последней версии в пользовательском репозитории..."
+    "No local drivers found. Looking for the latest version in the user repository...")
+stm32_yml_msg_def(I405
+    "Использование найденной версии STM32Cube FW: {1}"
+    "Using the STM32Cube FW version found: {1}")
+stm32_yml_msg_def(I406
+    "Использование указанной версии STM32Cube FW: {1}"
+    "Using the specified STM32Cube FW version: {1}")
+stm32_yml_msg_def(I407
+    "Автоматическое подключение CMSIS включено."
+    "Automatic CMSIS integration is enabled.")
+stm32_yml_msg_def(I408
+    "Автоматическое подключение компонентов HAL/LL включено."
+    "Automatic HAL/LL component integration is enabled.")
+stm32_yml_msg_def(I409
+    "Автоматическое подключение компонентов HAL/LL отключено."
+    "Automatic HAL/LL component integration is disabled.")
+stm32_yml_msg_def(I410
+    "Автоматическое подключение FreeRTOS включено."
+    "Automatic FreeRTOS integration is enabled.")
+stm32_yml_msg_def(I411
+    "Используется порт FreeRTOS: {1}"
+    "FreeRTOS port: {1}")
+stm32_yml_msg_def(I412
+    "FreeRTOS: к порту {1} добавлен {2}"
+    "FreeRTOS: {2} added to port {1}")
+stm32_yml_msg_def(I413
+    "Подключена обертка CMSIS-RTOS API {1}."
+    "CMSIS-RTOS API {1} wrapper added.")
 
 # --- 7xx: артефакты и CRC -----------------------------------------------------
 

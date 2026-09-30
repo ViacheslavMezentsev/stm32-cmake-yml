@@ -20,8 +20,8 @@ on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
   language; `auto` uses the locale, on Windows the registry. `STM32_YML_MESSAGE_CODES=ON`
   shows the codes in the output. Every Configure message is written to
   `stm32_yml_messages.jsonl` in the build directory. Messages of the core, configuration
-  reading, profiles, IOC and utilities use codes; the other modules move to the catalog
-  in the next changes.
+  reading, profiles, IOC, utilities, sources and CMSIS/HAL/FreeRTOS use codes; the other
+  modules move to the catalog in the next changes.
 
 ### Changed
 

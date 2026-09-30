@@ -18,24 +18,24 @@ function(stm32_yml_setup_frameworks TARGET_NAME)
         endif()
 
         if(cubefw_package STREQUAL "auto")
-            message(STATUS "Режим 'auto': поиск драйверов...")
+            stm32_yml_msg(I401)
             set(LOCAL_DRIVERS_PATH "${CMAKE_CURRENT_SOURCE_DIR}/Drivers")
 
             if(EXISTS "${LOCAL_DRIVERS_PATH}/CMSIS" AND EXISTS "${LOCAL_DRIVERS_PATH}/STM32${MCU_FAMILY}xx_HAL_Driver")
-                message(STATUS "Обнаружены локальные драйверы в '${LOCAL_DRIVERS_PATH}'. Используются они.")
+                stm32_yml_msg(I402 "${LOCAL_DRIVERS_PATH}")
                 set(STM32_CMSIS_PATH                "${LOCAL_DRIVERS_PATH}/CMSIS")
                 set(STM32_HAL_${MCU_FAMILY}_PATH    "${LOCAL_DRIVERS_PATH}/STM32${MCU_FAMILY}xx_HAL_Driver")
                 set(CUBEFW_PACKAGE "local")
-                message(STATUS "STM32Cube MCU Firmware Package: ${CUBEFW_PACKAGE}")
+                stm32_yml_msg(I403 "${CUBEFW_PACKAGE}")
             else()
-                message(STATUS "Локальные драйверы не найдены. Поиск последней версии в пользовательском репозитории...")
+                stm32_yml_msg(I404)
                 set(USER_HOME_PATH "$ENV{CMAKE_USER_HOME}")
                 file(TO_CMAKE_PATH "${USER_HOME_PATH}" USER_HOME_PATH)
                 set(CUBE_REPO_PATH "${USER_HOME_PATH}/STM32Cube/Repository")
 
                 stm32_yml_find_latest_stm32_cube_fw(${MCU_FAMILY} ${CUBE_REPO_PATH} LATEST_FW_VERSION)
                 set(CUBEFW_PACKAGE ${LATEST_FW_VERSION})
-                message(STATUS "Использование найденной версии STM32Cube FW: ${CUBEFW_PACKAGE}")
+                stm32_yml_msg(I405 "${CUBEFW_PACKAGE}")
 
                 if(CUBEFW_PACKAGE)
                     set(STM32_CUBE_PATH                 "${CUBE_REPO_PATH}/STM32Cube_FW_${MCU_FAMILY}_${CUBEFW_PACKAGE}")
@@ -46,7 +46,7 @@ function(stm32_yml_setup_frameworks TARGET_NAME)
             endif()
         else()
             set(CUBEFW_PACKAGE ${cubefw_package})
-            message(STATUS "Использование указанной версии STM32Cube FW: ${CUBEFW_PACKAGE}")
+            stm32_yml_msg(I406 "${CUBEFW_PACKAGE}")
             set(USER_HOME_PATH "$ENV{CMAKE_USER_HOME}")
             file(TO_CMAKE_PATH "${USER_HOME_PATH}" USER_HOME_PATH)
             set(CUBE_REPO_PATH "${USER_HOME_PATH}/STM32Cube/Repository")
@@ -60,7 +60,7 @@ function(stm32_yml_setup_frameworks TARGET_NAME)
         endif()
 
         if(NOT DEFINED STM32_CMSIS_PATH)
-            message(FATAL_ERROR "Не удалось определить пути к драйверам HAL/CMSIS. Проверьте 'cubefw_package'.")
+            stm32_yml_msg(E404)
         endif()
 
         if(CUBEFW_PACKAGE STREQUAL "local")
@@ -76,7 +76,7 @@ function(stm32_yml_setup_frameworks TARGET_NAME)
     # 2. CMSIS
     # =======================================================================
     if(use_cmsis)
-        message(STATUS "Автоматическое подключение CMSIS включено.")
+        stm32_yml_msg(I407)
         set(STM32_CMSIS_${MCU_FAMILY}_PATH "${STM32_CMSIS_PATH}/Device/ST/STM32${MCU_FAMILY}xx")
 
         if(mcu_core)
@@ -90,9 +90,9 @@ function(stm32_yml_setup_frameworks TARGET_NAME)
     # 3. HAL / LL
     # =======================================================================
     if(use_hal)
-        message(STATUS "Автоматическое подключение компонентов HAL/LL включено.")
+        stm32_yml_msg(I408)
         if(NOT use_cmsis)
-            message(FATAL_ERROR "use_hal: true требует use_cmsis: true.")
+            stm32_yml_msg(E405)
         endif()
 
         if(hal_components)
@@ -106,10 +106,8 @@ function(stm32_yml_setup_frameworks TARGET_NAME)
             endif()
 
             set(HAL_TARGET_PREFIX "HAL::STM32::${MCU_FAMILY}")
-            set(_core_text "")
             if(mcu_core)
                 set(HAL_TARGET_PREFIX "${HAL_TARGET_PREFIX}::${mcu_core}")
-                set(_core_text " (ядро ${mcu_core})")
             endif()
 
             list(TRANSFORM hal_components PREPEND "${HAL_TARGET_PREFIX}::" OUTPUT_VARIABLE LOCAL_HAL_TARGETS)
@@ -117,10 +115,13 @@ function(stm32_yml_setup_frameworks TARGET_NAME)
             # Каждый компонент проверяется сразу, а не на стадии Generate (ТЗ 4.7.9).
             foreach(_component IN LISTS hal_components)
                 if(NOT TARGET "${HAL_TARGET_PREFIX}::${_component}")
-                    message(FATAL_ERROR
-                        "Компонент HAL '${_component}' (hal_components) не найден для семейства "
-                        "${MCU_FAMILY}${_core_text}: нет цели ${HAL_TARGET_PREFIX}::${_component}. "
-                        "Проверьте имя драйвера в пакете STM32Cube ${MCU_FAMILY}.")
+                    if(mcu_core)
+                        stm32_yml_msg(E407 "${_component}" "${MCU_FAMILY}" "${mcu_core}"
+                            "${HAL_TARGET_PREFIX}::${_component}")
+                    else()
+                        stm32_yml_msg(E406 "${_component}" "${MCU_FAMILY}"
+                            "${HAL_TARGET_PREFIX}::${_component}")
+                    endif()
                 endif()
             endforeach()
 
@@ -140,14 +141,14 @@ function(stm32_yml_setup_frameworks TARGET_NAME)
             endif()
         endif()
     else()
-        message(STATUS "Автоматическое подключение компонентов HAL/LL отключено.")
+        stm32_yml_msg(I409)
     endif()
 
     # =======================================================================
     # 4. FreeRTOS
     # =======================================================================
     if(use_freertos)
-        message(STATUS "Автоматическое подключение FreeRTOS включено.")
+        stm32_yml_msg(I410)
         if(NOT DEFINED freertos_version OR "${freertos_version}" STREQUAL "")
             set(freertos_version "cube")
         endif()
@@ -158,7 +159,7 @@ function(stm32_yml_setup_frameworks TARGET_NAME)
         foreach(component IN LISTS freertos_components)
             if(component MATCHES "^ARM_")
                 if(FREERTOS_PORT)
-                    message(FATAL_ERROR "Найдено несколько портов FreeRTOS: '${FREERTOS_PORT}' и '${component}'.")
+                    stm32_yml_msg(E408 "${FREERTOS_PORT}" "${component}")
                 endif()
                 set(FREERTOS_PORT ${component})
             else()
@@ -167,9 +168,9 @@ function(stm32_yml_setup_frameworks TARGET_NAME)
         endforeach()
 
         if(NOT FREERTOS_PORT)
-            message(FATAL_ERROR "В 'freertos_components' не найден порт (например, 'ARM_CM4F').")
+            stm32_yml_msg(E409)
         endif()
-        message(STATUS "Используется порт FreeRTOS: ${FREERTOS_PORT}")
+        stm32_yml_msg(I411 "${FREERTOS_PORT}")
 
         if(freertos_version STREQUAL "cube")
             find_package(FreeRTOS COMPONENTS ${FREERTOS_PORT} STM32${MCU_FAMILY} REQUIRED)
@@ -185,21 +186,13 @@ function(stm32_yml_setup_frameworks TARGET_NAME)
             # отсутствии файлов лишь предупреждает — проверяем сами.
             find_package(FreeRTOS COMPONENTS ${FREERTOS_PORT})
             if(NOT FREERTOS_PATH)
-                message(FATAL_ERROR
-                    "freertos_version: external требует путь к FreeRTOS: задайте FREERTOS_PATH "
-                    "(-DFREERTOS_PATH=... или переменная окружения) — каталог FreeRTOS-Kernel "
-                    "или Middlewares/Third_Party/FreeRTOS пакета STM32Cube.")
+                stm32_yml_msg(E410)
             endif()
             if(NOT FreeRTOS_COMMON_INCLUDE OR NOT FreeRTOS_SOURCE_DIR)
-                message(FATAL_ERROR
-                    "freertos_version: external: в FREERTOS_PATH '${FREERTOS_PATH}' не найдены "
-                    "FreeRTOS.h и tasks.c. Ожидается раскладка FreeRTOS-Kernel (include/, "
-                    "portable/GCC/<порт>) или дерева Cube (Source/...).")
+                stm32_yml_msg(E411 "${FREERTOS_PATH}")
             endif()
             if(NOT FreeRTOS_${FREERTOS_PORT}_PATH OR NOT FreeRTOS_${FREERTOS_PORT}_SOURCE)
-                message(FATAL_ERROR
-                    "freertos_version: external: файлы порта '${FREERTOS_PORT}' не найдены в "
-                    "FREERTOS_PATH '${FREERTOS_PATH}' (portable/GCC/${FREERTOS_PORT}).")
+                stm32_yml_msg(E412 "${FREERTOS_PORT}" "${FREERTOS_PATH}")
             endif()
             set(FREERTOS_TARGET_PREFIX "FreeRTOS")
             # FreeRTOS-Kernel 11 разделяет порт ARM_CM0 на port.c и portasm.c
@@ -210,7 +203,7 @@ function(stm32_yml_setup_frameworks TARGET_NAME)
                 get_target_property(_port_sources "FreeRTOS::${FREERTOS_PORT}" INTERFACE_SOURCES)
                 if(NOT "${_portasm}" IN_LIST _port_sources)
                     set_property(TARGET "FreeRTOS::${FREERTOS_PORT}" APPEND PROPERTY INTERFACE_SOURCES "${_portasm}")
-                    message(STATUS "FreeRTOS: к порту ${FREERTOS_PORT} добавлен ${_portasm}")
+                    stm32_yml_msg(I412 "${FREERTOS_PORT}" "${_portasm}")
                 endif()
             endif()
         endif()
@@ -230,9 +223,7 @@ function(stm32_yml_setup_frameworks TARGET_NAME)
         foreach(_target IN LISTS LOCAL_FREERTOS_TARGETS)
             if(NOT TARGET "${_target}")
                 string(REPLACE "${FREERTOS_TARGET_PREFIX}::" "" _component "${_target}")
-                message(FATAL_ERROR
-                    "Компонент FreeRTOS '${_component}' (freertos_components) не найден: нет цели "
-                    "${_target} в пространстве ${FREERTOS_TARGET_PREFIX}.")
+                stm32_yml_msg(E413 "${_component}" "${_target}" "${FREERTOS_TARGET_PREFIX}")
             endif()
         endforeach()
 
@@ -251,14 +242,10 @@ function(stm32_yml_setup_frameworks TARGET_NAME)
         endif()
         if(_rtos_target)
             if(NOT TARGET "${_rtos_target}")
-                message(FATAL_ERROR
-                    "cmsis_rtos_api: ${cmsis_rtos_api}: обёртка CMSIS-RTOS не найдена (нет цели ${_rtos_target}). "
-                    "Её исходники берутся из Middlewares/Third_Party/FreeRTOS пакета STM32Cube ${MCU_FAMILY} "
-                    "и требуют use_cmsis: true; в пакете может не быть FreeRTOS (например, H5, U5). "
-                    "Используйте cmsis_rtos_api: none.")
+                stm32_yml_msg(E414 "${cmsis_rtos_api}" "${_rtos_target}" "${MCU_FAMILY}")
             endif()
             list(APPEND LOCAL_FREERTOS_TARGETS "${_rtos_target}")
-            message(STATUS "Подключена обертка CMSIS-RTOS API ${cmsis_rtos_api}.")
+            stm32_yml_msg(I413 "${cmsis_rtos_api}")
         endif()
 
         # Привязываем библиотеки сразу к цели!

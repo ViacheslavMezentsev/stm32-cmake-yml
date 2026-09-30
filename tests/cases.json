@@ -214,8 +214,12 @@
   },
   {
     "name": "hal-requires-cmsis",
-    "args": ["-DSTM32_YML_OVERRIDE_use_cmsis=false"],
-    "error": "use_hal: true требует use_cmsis: true"
+    "args": [
+      "-DSTM32_YML_OVERRIDE_use_cmsis=false"
+    ],
+    "error": {
+      "code": "E405"
+    }
   },
   {
     "name": "invalid-memory-size",
@@ -889,19 +893,98 @@
   },
   {
     "name": "hal-missing-component",
-    "args": ["-DPROJECT_CONFIG_FILE=stm32h7.yml", "-DSTM32_YML_PROFILE=badhal"],
-    "error": "Компонент HAL 'NOSUCHDRIVER' (hal_components) не найден для семейства H7 (ядро M7)",
-    "log_absent": ["CMake Generate step failed"]
+    "args": [
+      "-DPROJECT_CONFIG_FILE=stm32h7.yml",
+      "-DSTM32_YML_PROFILE=badhal"
+    ],
+    "error": {
+      "code": "E407",
+      "args": [
+        "NOSUCHDRIVER",
+        "H7",
+        "M7",
+        "HAL::STM32::H7::M7::NOSUCHDRIVER"
+      ]
+    },
+    "log_absent": [
+      "CMake Generate step failed"
+    ]
   },
   {
     "name": "h5-cmsis-hal-freertos-external",
-    "args": ["-DPROJECT_CONFIG_FILE=stm32h5.yml", "-DFREERTOS_PATH=/opt/FreeRTOS-Kernel/11.3.1"],
+    "args": [
+      "-DPROJECT_CONFIG_FILE=stm32h5.yml",
+      "-DFREERTOS_PATH=/opt/FreeRTOS-Kernel/11.3.1"
+    ],
     "steps": [
-      {"args": ["-DSTM32_YML_PROFILE="], "properties": {"LINK_LIBRARIES": ["HAL::STM32::H5::GPIO", "CMSIS::STM32::H563ZI"]}, "log_contains": ["Startup /opt/STM32Cube/Repository/STM32Cube_FW_H5_V1.7.0/Drivers/CMSIS/Device/ST/STM32H5xx/Source/Templates/gcc/startup_stm32h563xx.s задаёт границу стека (MSPLIM) по символу _sstack", "но скрипт компоновщика stm32-cmake его не определяет"]},
-      {"args": ["-DSTM32_YML_PROFILE=sstack"], "link_options_contain": "linker/h563-sstack.ld", "log_absent": ["MSPLIM"]},
-      {"args": ["-DSTM32_YML_PROFILE=rtos"], "properties": {"LINK_LIBRARIES": ["FreeRTOS::ARM_CM33_NTZ", "FreeRTOS::Heap::4"]}, "absent_properties": {"LINK_LIBRARIES": ["FreeRTOS::ARM_CM33_NTZ::NON_SECURE"]}},
-      {"args": ["-DSTM32_YML_PROFILE=rtosv2"], "error": "cmsis_rtos_api: v2: обёртка CMSIS-RTOS не найдена (нет цели CMSIS::STM32::H5::RTOS_V2)"},
-      {"args": ["-DSTM32_YML_PROFILE=crc"], "linker": {"file": "STM32H563ZI_FLASH.ld", "heap": 512, "stack": 1024}, "log_contains": ["Max Flash Size: 2097152", "Соотношение : 640K == 640K", "Startup /opt/STM32Cube/Repository/STM32Cube_FW_H5_V1.7.0/Drivers/CMSIS/Device/ST/STM32H5xx/Source/Templates/gcc/startup_stm32h563xx.s задаёт границу стека (MSPLIM) по символу _sstack"]}
+      {
+        "args": [
+          "-DSTM32_YML_PROFILE="
+        ],
+        "properties": {
+          "LINK_LIBRARIES": [
+            "HAL::STM32::H5::GPIO",
+            "CMSIS::STM32::H563ZI"
+          ]
+        },
+        "log_contains": [
+          "Startup /opt/STM32Cube/Repository/STM32Cube_FW_H5_V1.7.0/Drivers/CMSIS/Device/ST/STM32H5xx/Source/Templates/gcc/startup_stm32h563xx.s задаёт границу стека (MSPLIM) по символу _sstack",
+          "но скрипт компоновщика stm32-cmake его не определяет"
+        ]
+      },
+      {
+        "args": [
+          "-DSTM32_YML_PROFILE=sstack"
+        ],
+        "link_options_contain": "linker/h563-sstack.ld",
+        "log_absent": [
+          "MSPLIM"
+        ]
+      },
+      {
+        "args": [
+          "-DSTM32_YML_PROFILE=rtos"
+        ],
+        "properties": {
+          "LINK_LIBRARIES": [
+            "FreeRTOS::ARM_CM33_NTZ",
+            "FreeRTOS::Heap::4"
+          ]
+        },
+        "absent_properties": {
+          "LINK_LIBRARIES": [
+            "FreeRTOS::ARM_CM33_NTZ::NON_SECURE"
+          ]
+        }
+      },
+      {
+        "args": [
+          "-DSTM32_YML_PROFILE=rtosv2"
+        ],
+        "error": {
+          "code": "E414",
+          "args": [
+            "v2",
+            "CMSIS::STM32::H5::RTOS_V2",
+            "H5"
+          ]
+        }
+      },
+      {
+        "args": [
+          "-DSTM32_YML_PROFILE=crc"
+        ],
+        "linker": {
+          "file": "STM32H563ZI_FLASH.ld",
+          "heap": 512,
+          "stack": 1024
+        },
+        "log_contains": [
+          "Max Flash Size: 2097152",
+          "Соотношение : 640K == 640K",
+          "Startup /opt/STM32Cube/Repository/STM32Cube_FW_H5_V1.7.0/Drivers/CMSIS/Device/ST/STM32H5xx/Source/Templates/gcc/startup_stm32h563xx.s задаёт границу стека (MSPLIM) по символу _sstack"
+        ]
+      }
     ]
   },
   {
@@ -1011,13 +1094,18 @@
       "-DPROJECT_CONFIG_FILE=source-group.yml",
       "-DSTM32_YML_PROFILE=missing"
     ],
-    "log_contains": [
-      "Источник 'absent.c' не найден и будет проигнорирован."
-    ],
     "sources": [
       "SourceGroup/Src/probe.c",
       "SourceGroup/Src/probe.cpp",
       "main.c"
+    ],
+    "messages": [
+      {
+        "code": "W302",
+        "args": [
+          "absent.c"
+        ]
+      }
     ]
   },
   {
@@ -1355,8 +1443,16 @@
         "CMSIS::STM32::F4::RTOS_V2"
       ]
     },
-    "log_contains": [
-      "Используется порт FreeRTOS: ARM_CM4F"
+    "messages": [
+      {
+        "code": "I410"
+      },
+      {
+        "code": "I411",
+        "args": [
+          "ARM_CM4F"
+        ]
+      }
     ]
   },
   {
@@ -1383,8 +1479,16 @@
         "CMSIS::STM32::F4::RTOS"
       ]
     },
-    "log_contains": [
-      "Используется порт FreeRTOS: ARM_CM4F"
+    "messages": [
+      {
+        "code": "I410"
+      },
+      {
+        "code": "I411",
+        "args": [
+          "ARM_CM4F"
+        ]
+      }
     ]
   },
   {
@@ -1412,8 +1516,16 @@
         "CMSIS::STM32::F4::RTOS"
       ]
     },
-    "log_contains": [
-      "Используется порт FreeRTOS: ARM_CM4F"
+    "messages": [
+      {
+        "code": "I410"
+      },
+      {
+        "code": "I411",
+        "args": [
+          "ARM_CM4F"
+        ]
+      }
     ]
   },
   {
@@ -1440,8 +1552,16 @@
         "CMSIS::STM32::F4::RTOS_V2"
       ]
     },
-    "log_contains": [
-      "Используется порт FreeRTOS: ARM_CM4F"
+    "messages": [
+      {
+        "code": "I410"
+      },
+      {
+        "code": "I411",
+        "args": [
+          "ARM_CM4F"
+        ]
+      }
     ]
   },
   {
@@ -1450,7 +1570,9 @@
       "-DPROJECT_CONFIG_FILE=freertos.yml",
       "-DSTM32_YML_PROFILE=noport"
     ],
-    "error": "В 'freertos_components' не найден порт"
+    "error": {
+      "code": "E409"
+    }
   },
   {
     "name": "freertos-multiple-ports",
@@ -1458,7 +1580,13 @@
       "-DPROJECT_CONFIG_FILE=freertos.yml",
       "-DSTM32_YML_PROFILE=twoports"
     ],
-    "error": "Найдено несколько портов FreeRTOS"
+    "error": {
+      "code": "E408",
+      "args": [
+        null,
+        null
+      ]
+    }
   },
   {
     "name": "freertos-missing-component",
@@ -1466,7 +1594,14 @@
       "-DPROJECT_CONFIG_FILE=freertos.yml",
       "-DSTM32_YML_PROFILE=missing"
     ],
-    "error": "Компонент FreeRTOS 'MissingComponent' (freertos_components) не найден: нет цели FreeRTOS::STM32::F4::MissingComponent"
+    "error": {
+      "code": "E413",
+      "args": [
+        "MissingComponent",
+        "FreeRTOS::STM32::F4::MissingComponent",
+        "FreeRTOS::STM32::F4"
+      ]
+    }
   },
   {
     "name": "freertos-disabled",
@@ -1742,18 +1877,49 @@
   },
   {
     "name": "freertos-external-no-path",
-    "args": ["-DPROJECT_CONFIG_FILE=freertos.yml", "-DSTM32_YML_OVERRIDE_freertos_version=external", "-DSTM32_YML_OVERRIDE_cmsis_rtos_api=none"],
-    "error": "freertos_version: external требует путь к FreeRTOS: задайте FREERTOS_PATH"
+    "args": [
+      "-DPROJECT_CONFIG_FILE=freertos.yml",
+      "-DSTM32_YML_OVERRIDE_freertos_version=external",
+      "-DSTM32_YML_OVERRIDE_cmsis_rtos_api=none"
+    ],
+    "error": {
+      "code": "E410"
+    }
   },
   {
     "name": "freertos-external-missing-port",
-    "args": ["-DPROJECT_CONFIG_FILE=freertos.yml", "-DSTM32_YML_OVERRIDE_freertos_version=external", "-DSTM32_YML_OVERRIDE_cmsis_rtos_api=none", "-DFREERTOS_PATH=/opt/FreeRTOS-Kernel/11.3.1", "-DSTM32_YML_OVERRIDE_freertos_components=ARM_CM7_MPU;Heap::4"],
-    "error": "файлы порта 'ARM_CM7_MPU' не найдены"
+    "args": [
+      "-DPROJECT_CONFIG_FILE=freertos.yml",
+      "-DSTM32_YML_OVERRIDE_freertos_version=external",
+      "-DSTM32_YML_OVERRIDE_cmsis_rtos_api=none",
+      "-DFREERTOS_PATH=/opt/FreeRTOS-Kernel/11.3.1",
+      "-DSTM32_YML_OVERRIDE_freertos_components=ARM_CM7_MPU;Heap::4"
+    ],
+    "error": {
+      "code": "E412",
+      "args": [
+        "ARM_CM7_MPU",
+        "/opt/FreeRTOS-Kernel/11.3.1"
+      ]
+    }
   },
   {
     "name": "freertos-external-missing-component",
-    "args": ["-DPROJECT_CONFIG_FILE=freertos.yml", "-DSTM32_YML_OVERRIDE_freertos_version=external", "-DSTM32_YML_OVERRIDE_cmsis_rtos_api=none", "-DFREERTOS_PATH=/opt/FreeRTOS-Kernel/11.3.1", "-DSTM32_YML_PROFILE=missing"],
-    "error": "Компонент FreeRTOS 'MissingComponent' (freertos_components) не найден: нет цели FreeRTOS::MissingComponent в пространстве FreeRTOS."
+    "args": [
+      "-DPROJECT_CONFIG_FILE=freertos.yml",
+      "-DSTM32_YML_OVERRIDE_freertos_version=external",
+      "-DSTM32_YML_OVERRIDE_cmsis_rtos_api=none",
+      "-DFREERTOS_PATH=/opt/FreeRTOS-Kernel/11.3.1",
+      "-DSTM32_YML_PROFILE=missing"
+    ],
+    "error": {
+      "code": "E413",
+      "args": [
+        "MissingComponent",
+        "FreeRTOS::MissingComponent",
+        "FreeRTOS"
+      ]
+    }
   },
   {
     "name": "stm32f0-cmsis-hal",
