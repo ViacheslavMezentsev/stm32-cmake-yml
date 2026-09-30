@@ -165,7 +165,7 @@ repeated. Commands, the `git land` alias, branch cleanup and typical errors are 
   the owner commits from Windows with their key; ready unsigned agent commits are
   re-signed before pushing (`git rebase -S origin/main`), so documentation does not
   reference hashes of commits from the same unmerged branch. Details are in the
-  [how-to](HOWTO.md#working-with-an-agent-through-the-working-tree).
+  [how-to](HOWTO.md#agent-workflows).
 - Pushes, tags and releases are done by the owner. Force pushes to main and to other
   people's branches are forbidden; `--force-with-lease` is allowed only for your own
   unmerged branch.

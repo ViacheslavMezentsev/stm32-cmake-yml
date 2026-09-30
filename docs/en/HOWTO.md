@@ -36,22 +36,39 @@ git push --force-with-lease            # only for your own unmerged branch
 Force pushes to main and to other people's branches are forbidden. Links to PR #1…#46
 in the history stay as they are.
 
-### Working with an agent through the working tree
+### Agent workflows
 
-The agent edits the files of the `<agent>/<task>` branch directly in your working tree
-and does not commit: its git runs without your signing key and sees Windows line
-endings differently.
+Each agent has its own workflow, described separately and not generalized. A new agent
+adds its own subsection once its workflow has been verified in practice.
 
-1. Review the changes: `git status`, `git diff`.
-2. Commit them from Windows with the command the agent gives (`git add <files>` and
-   `git commit -F <message file>`); your key signs the commit.
-3. `git push -u origin <branch>`. The agent checks CI through the GitHub API and tells
-   you when to run `git land`.
+#### Claude in Cowork (a cloud session linked to the owner's computer)
 
-If an agent works without access to the working tree and hands over ready commits
-(for example through `git bundle`), they are unsigned. Re-sign them before pushing with
-`git rebase -S origin/main`; this changes the hashes, so documentation does not
-reference hashes of commits from the same unmerged branch.
+Verified on 2026-09-30 during stage 0 of the 0.10.0 plan.
+
+- Claude's commands on the owner's computer run in an isolated Linux machine with only
+  the repository folder mounted. It has no owner's `~/.gitconfig` or `~/.ssh`, and its
+  git sees the CRLF line endings of the Windows working tree as changes.
+- Claude creates a `claude/<task>` branch from `origin/main` and edits the files of the
+  working tree directly, preserving their line endings (CRLF, or LF for `eol=lf`
+  paths). It does not commit and runs no git commands in that tree that change the
+  index or history.
+- Claude puts the commit message into `.git/<NAME>_MSG` (outside tracked files) and
+  gives the commands `git add <paths>` and `git commit -F .git/<NAME>_MSG`. The owner
+  commits from Windows, so the owner's key signs the commit, then runs
+  `git push -u origin <branch>`.
+- Claude checks CI through the public GitHub API (runs, steps, annotations, commit
+  signature) and says when to run `git land`; afterwards it checks CI on main and
+  removes its temporary files in `.git`.
+- If Claude's git leaves `.git/index.lock` (deleting in the mounted folder needs
+  permission), git on Windows stops working: Claude asks for delete permission and
+  removes the file, or the owner deletes it manually.
+
+#### Ready commits without access to the working tree
+
+If an agent hands over ready commits (for example through `git bundle`), they are
+unsigned. Re-sign them before pushing with `git rebase -S origin/main`; this changes the
+hashes, so documentation does not reference hashes of commits from the same unmerged
+branch.
 
 ### The `git land` alias
 
