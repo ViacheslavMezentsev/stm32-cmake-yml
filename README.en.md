@@ -18,7 +18,8 @@ the last successful Firmware CI run on main. [Reading the counter](docs/en/statu
 [Test scope and procedure](docs/en/firmware-testing.md).
 Test firmware is built and run for F0, F1, F4, G4, F7, H5 and H7 —
 [which emulator checks each family](docs/en/emulation.md#emulators-per-family).
-Markdown-only changes run the fast Docs check without rebuilding firmware.
+On GitHub the firmware matrix runs manually at stage boundaries and on release tags;
+the counter shows the latest such run on main ([GitHub checks](docs/en/maintenance.md#github-checks)).
 
 ## Why use it?
 

@@ -2,7 +2,7 @@ name: CI environment
 
 on:
   push:
-    branches: [main, 'codex/**', 'claude/**']
+    branches: [main, 'claude/**', 'codex/**', 'gemini/**', 'dev/**']
     paths:
       - ci/**
       - .github/workflows/environment.yml
@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Build pinned environment and check compiler combinations
         run: docker build --platform linux/amd64 --progress plain -f ci/docker/Dockerfile -t stm32-yml-ci:check .
       - name: Verify without network access

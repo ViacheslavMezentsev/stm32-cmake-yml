@@ -71,7 +71,7 @@ SHA, time and a run link. GitHub image caching may delay refreshes. The image is
 unavailable until the first successful main run with this workflow. Branch rules
 must allow GITHUB_TOKEN writes to ci-badges. Runs for an older main are skipped.
 
-[E008](errata/E008.md) records profile-only language settings; on the 0.9.3 branch the workaround is removed and the library firmware profiles work without root keys.
+[E008](errata/E008.md) records profile-only language settings; it is fixed in 0.9.3, the workaround is removed and the library firmware profiles work without root keys.
 
 All four README badges use [Shields endpoints](https://shields.io/badges/endpoint-badge), sharing font, 20 px height and padding. Green PASS and the counter use #238636, matching the GitHub Code button in the supplied image. Errors show red FAIL; cancellation is CANCEL, skipping is SKIP and missing results are N/A.
 

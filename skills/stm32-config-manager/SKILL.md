@@ -50,6 +50,24 @@ Mike Farah yq. Для других версий проверяйте факти�
 - Не приписывайте конфигурации гарантии сборки или исполнения. Например,
   успешный Configure и наличие CRC-команды не доказывают корректность CRC.
 
+## Изменения 0.9.3, которые легко упустить
+
+Подробности — в карточках с отметкой «Изменение в 0.9.3»; здесь только ориентиры:
+
+- `stm32_cmake_yml_version` и `stm32_cmake_yml_version_check` задаются в корне YAML:
+  версия сравнивается до профилей и `STM32_YML_OVERRIDE_*`.
+- `heap_size`/`stack_size`: целые байты или суффиксы `K`/`M` в верхнем регистре;
+  `1k`, `0x200`, `1.5K` — ошибка Configure. При скрипте stm32-cmake или явном
+  `linker_script` заданные размеры не применяются (предупреждение).
+- `crc_enable: true` требует шаблона `.ld.in` или явного `linker_script`; со скриптом
+  stm32-cmake — ошибка Configure; сбой расчёта — ошибка сборки `[CRC ERROR]`.
+- `profiles_file`: читается только секция `profiles:`; встроенная секция при этом
+  не используется (предупреждение).
+- `mcu_core`: у H7 ядро `M7` выбирается автоматически, у двухъядерных MCU обязателен.
+- `build_artifacts` поддерживает `srec`; неизвестные значения перечислимых ключей
+  дают предупреждение и поведение по умолчанию.
+- Изменение YAML, IOC или `profiles_file` само перезапускает Configure при сборке.
+
 ## Проверить и объяснить результат
 
 Сохраните используемые проектом генератор и toolchain. Для задачи конфигурации
@@ -76,4 +94,8 @@ then change YAML or consumer CMake as the task requires. The English reference
 and maintenance links above contain the same contracts. Keep version intent,
 actual implementation, prepared fixes and released fixes distinct. Validate the
 requested phase and report its limits; never maintain a second option catalog
-inside this skill.
+inside this skill. Easy-to-miss 0.9.3 changes: version keys at the YAML root,
+strict heap/stack format, CRC requires a template or explicit script,
+`profiles_file` reads only `profiles:`, automatic H7 core and required
+`mcu_core` for dual-core MCUs, the `srec` artifact, warnings for unknown
+enumerated values, and automatic reconfigure on YAML/IOC changes.

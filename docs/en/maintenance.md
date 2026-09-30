@@ -28,6 +28,7 @@ the technical specification, whose current revision is stated in its header.
 **Work cycle**
 
 1. Branch `<agent>/<task>` from current main (section "Branches without pull requests").
+   A solution to a frequent problem is recorded in the [how-to](HOWTO.md) in the same commit.
 2. Behaviour changes follow spec 7.4: regression, `CFG-*` card and index,
    an entry in both changelogs ([RU](../../CHANGELOG.md), [EN](../../CHANGELOG.en.md))
    in the version-section format, new spec revision. Code and tests refer to spec items per
@@ -35,7 +36,8 @@ the technical specification, whose current revision is stated in its header.
 3. Local checks of the affected levels L0–L5 (spec 8.1; commands in spec
    appendix F, [testing.md](testing.md), [firmware-testing.md](firmware-testing.md));
    documentation — `python ci/check_reference.py`.
-4. Commit, push the branch, match CI to its latest commit, merge into main.
+4. Commit, push the branch, green Docs and Configure for its latest commit, merge
+   into main by fast-forward (`git land`, [how-to](HOWTO.md#git-workflow-without-prs)).
    Before a release all checks are repeated locally on the final commit of the
    release branch (spec 8.6.1, 8.8.7).
 5. Record branch, commit and status in TODO.md.
@@ -48,7 +50,8 @@ the technical specification, whose current revision is stated in its header.
 3. A release revision of the spec with an updated appendix E.
 4. All L0–L5 checks locally on the final commit of the release branch, and green CI
    for the same commit.
-5. Merge into main, then tag `vX.Y.Z` on the merge commit.
+5. A manual Firmware run on the release branch, merge into main (`git land`), then
+   tag `vX.Y.Z` on the new main HEAD.
 6. Errata statuses `released` with the version in both languages and in
    `docs/reference-index.json`; a TODO.md entry.
 
@@ -145,20 +148,29 @@ workflow status on main.
 
 ## Branches without pull requests
 
-From 2026-09-24, create a `<agent>/<task>` branch from current main. The prefix
-names the AI agent that creates the branch: `codex/` for Codex, `claude/` for
-Claude. For a new agent, choose its prefix and add `<agent>/**` to the workflows'
-`on.push.branches`, otherwise pushing the branch does not run CI. After local validation,
-push the branch: Configure and documentation checks run on push; environment
-checks run when their paths change. Match CI results to the branch's latest
-commit. Update main and merge the tested branch with git merge, resolving
-conflicts and rerunning affected checks if the resulting code changes. Push
-main; its CI verifies the merge result.
+Changes are made in a `<agent>/<task>` branch from current main. The prefix names the
+agent or contributor creating the branch (`claude/`, `codex/`, `gemini/`, `dev/`, …).
+For a new prefix, add `<prefix>/**` to the workflows' `on.push.branches`, otherwise
+pushing the branch does not run CI.
 
-No PR is required. Do not force push or treat old-commit results as validation
-of new changes. Record branch, commit and status in TODO; preserve historical
-PR links. If fetch/push is unavailable, an API check does not update local refs:
-synchronization is still required before merging.
+After local checks the branch is pushed to GitHub; Docs and Configure must be green for
+its latest commit. The owner then merges it into main by fast-forward (`git land`): no
+merge commit is created and the branch is deleted. If the branch is behind main, it is
+rebased onto a fresh main (`git rebase -S origin/main`) and the affected checks are
+repeated. Commands, the `git land` alias, branch cleanup and typical errors are in the
+[how-to](HOWTO.md#git-workflow-without-prs).
+
+- PRs are not used; links to PR #1…#46 remain as history.
+- Commits in main are signed (Verified). The agent edits the owner's working tree and
+  the owner commits from Windows with their key; ready unsigned agent commits are
+  re-signed before pushing (`git rebase -S origin/main`), so documentation does not
+  reference hashes of commits from the same unmerged branch. Details are in the
+  [how-to](HOWTO.md#working-with-an-agent-through-the-working-tree).
+- Pushes, tags and releases are done by the owner. Force pushes to main and to other
+  people's branches are forbidden; `--force-with-lease` is allowed only for your own
+  unmerged branch.
+- Do not treat checks of an old commit as checks of new changes. TODO records the
+  branch and its status.
 
 ## Docker layer cache
 
@@ -214,13 +226,30 @@ Revisit when the matrix grows (new GCC/CMake versions or families) or push time
 becomes the bottleneck. Shrink the compiler image first, since its build repeats
 in every job.
 
+## GitHub checks
+
+While 0.10 is developed (spec 8.5.2), the full firmware matrix does not run on
+every push:
+
+| Workflow | When it runs |
+| --- | --- |
+| Docs | every push |
+| Configure (6 pairs, 834 runs, ~6 min) | every push except pushes without inputs (below) |
+| CI environment, Emulation environment | pushes changing their own image files |
+| Firmware (570 builds, 948 runs, ~24 min) | manually (Actions → Firmware → Run workflow) and on a `v*` tag |
+
+Run Firmware manually at stage boundaries and before a release; only a manual run
+on main updates the `Builds (Checks)` badge. A full local L0–L5 run is done at the
+end of every stage and before a release.
+
 ## Documentation-only pushes
 
 Pushes that change only `.md` files at any depth run Docs, skipping Configure,
-Firmware, CI environment and Emulation environment. Configure is also skipped when
-only `.github/FUNDING.yml`, `.github/ISSUE_TEMPLATE/` or `LICENSE` changes. A mixed Markdown/code push still triggers the
-relevant heavy workflows. CI environment and Firmware retain their existing positive
-path filters, with the Markdown exclusion last. Emulation environment works the same way. `workflow_dispatch` still allows
+CI environment and Emulation environment. Configure is also skipped when only
+`docs/reference-index.json`, `.github/FUNDING.yml`, `.github/ISSUE_TEMPLATE/` or
+`LICENSE` changes. A mixed Markdown/code push still triggers the relevant
+workflows. CI environment and Emulation environment retain their positive path
+filters, with the Markdown exclusion last. `workflow_dispatch` still allows
 manual runs. A workflow/filter change itself is not documentation-only.
 
 The Firmware counter retains the last successful tested revision when a docs-only

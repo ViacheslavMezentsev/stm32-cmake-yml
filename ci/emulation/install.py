@@ -19,7 +19,8 @@ with tempfile.TemporaryDirectory() as temp:
         archive, expected = Path(__file__).parent / item["archive"], item["archive_sha256"]
     else:
         archive, expected = Path(temp) / "archive", item["sha256"]
-        subprocess.run(["curl", "-fL", "--retry", "3", "--connect-timeout", "30",
+        subprocess.run(["curl", "-fL", "--retry", "3", "--retry-all-errors", "--retry-delay", "5",
+                        "--connect-timeout", "30",
                         "--max-time", "1800", "-o", str(archive), item["url"]], check=True)
     with archive.open("rb") as stream:
         digest = hashlib.file_digest(stream, "sha256").hexdigest()

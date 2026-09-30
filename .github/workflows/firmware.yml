@@ -1,19 +1,10 @@
 name: Firmware
 
 on:
+  # Full matrix (~24 min): run manually at stage boundaries and before a release
+  # (Run workflow on main updates the badge); a v* tag re-checks the tagged commit.
   push:
-    branches: [main, 'codex/**', 'claude/**']
-    paths:
-      - stm32_yml.cmake
-      - cmake/**
-      - scripts/**
-      - ci/**
-      - tools/qemu/**
-      - tests/firmware/**
-      - tests/toolchains/**
-      - tests/test_firmware*.py
-      - .github/workflows/firmware.yml
-      - '!**/*.md'
+    tags: ['v*']
   workflow_dispatch:
 
 permissions:
@@ -28,7 +19,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 90
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Check result classification
         run: python3 -m unittest discover -s tests -p "test_firmware*.py"
       - name: Build compiler image
@@ -80,7 +71,7 @@ jobs:
             --output build/firmware-badge --revision "$GITHUB_SHA" \
             --run-url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
       - name: Upload badge for publication
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: firmware-badge
           path: build/firmware-badge/
@@ -88,7 +79,7 @@ jobs:
           retention-days: 14
       - name: Upload build and execution diagnostics
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: firmware-semihosting
           retention-days: 14
@@ -110,7 +101,7 @@ jobs:
       actions: read
       contents: write
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Download badge from this run
         env:
           GH_TOKEN: ${{ github.token }}

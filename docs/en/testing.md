@@ -144,10 +144,11 @@ terminal. Interactive debugging and VS Code launch configurations come later.
 ## Updates and CI
 
 The environment workflow builds the image and verifies it without network access.
-The separate `Configure tests` workflow runs on pushes to `main`, `codex/**` and `claude/**`, and manual dispatch. It builds the image once and tests all six tool pairs
+The separate `Configure tests` workflow runs on pushes to `main` and working branches (`claude/**`, `codex/**`, `gemini/**`, `dev/**`), and manual dispatch. It builds the image once and tests all six tool pairs
 in one job, continuing after a failing pair. Neither workflow publishes images
-or builds firmware. Keeping this check unconditional also makes it suitable as
-a check on every branch push rather than only selected file changes.
+or builds firmware. Configure skips only pushes without inputs: Markdown,
+`docs/reference-index.json`, `.github/FUNDING.yml`, `.github/ISSUE_TEMPLATE/`,
+`LICENSE`. Firmware runs manually and on `v*` tags — [GitHub checks](maintenance.md#github-checks).
 
 Update versions and hashes together in the lockfile, review upstream sources,
 then rebuild and verify. When changing Ubuntu, also update the Dockerfile digest
@@ -286,8 +287,8 @@ of nested C/C++ and root C, include paths and language-specific flags in
 compile_commands.json. A missing file warns; a directory without CMakeLists fails
 Configure. [Guide and coverage limits](simple-sources.md).
 
-Since 2026-09-24, checks run without PRs on pushes to working branches
-`codex/**`, `claude/**` and main. [Merge workflow](maintenance.md).
+Checks run without PRs on pushes to working branches (`claude/**`, `codex/**`,
+`gemini/**`, `dev/**`) and main; branches are merged by fast-forward. [Merge workflow](maintenance.md#branches-without-pull-requests).
 
 ### Library modules
 

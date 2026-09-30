@@ -109,7 +109,7 @@ PR больше не требуются; старые ссылки остают�
 - [x] Ветка `claude/release-0.9.3` слита в main ([PR #41](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/pull/41), merge `29e64a4`) (ТЗ 1.2): в lock и образ CI добавлены STM32CubeH7 1.13.0, STM32CubeH5 1.7.0, FreeRTOS-Kernel 11.3.1 (ТЗ 8.8.1); ТЗ 1.5: CRC по секциям Flash (TC-63, TC-64), Arduino Core напрямую и CMake 3.21 — в 0.10.x; `AGENTS.md`. Группа CRC (`4cd3404`): образ по секциям Flash, провал сборки при сбое (E006), проверка секции на Configure, предупреждение `crc_algorithm` (E004). Группа 1 (`d8708b4`): ключи только из профиля (E008), только `profiles:` из `profiles_file`, зависимости Configure, текст о версии, значения для неполного IOC, формат и неприменённые размеры heap/stack, подсказка `hal_conf.h`; 125 сценариев × 6 = 750. Вопрос 10.2.16 решён: только внешние профили и предупреждение о встроенных (закрыть в ревизии ТЗ). Группа 2 (`b9a6cd3`): предупреждения о неизвестных значениях перечислимых ключей и элементов `build_artifacts`, артефакт `srec`; 127 × 6 = 762. Имена `lss`/`map`: решено оставить как в 0.9.2 (по имени цели); в ревизии ТЗ уточнить п. 4.14.2, выбор имён артефактов по итоговому имени ELF — на будущее, с учётом нескольких backend. Группа 3, уровень Configure (`3c6bfa3`): ядро MCU (H7), external FreeRTOS (E007), ранние проверки компонентов HAL/FreeRTOS и обёртки CMSIS-RTOS, таблица портов, проверка RAM с CCRAM/RAM_SHARE; TC-22, TC-54…TC-56, TC-58, TC-60, TC-61; 139 × 6 = 834. Прошивки (`422cef1`): `freertosExternal` в QEMU/Renode (TC-59), H7/H5 build-only (TC-57), образ CRC H503 с резервной SRAM (TC-63), сравнение с `--gap-fill` (TC-64); 102 сборки, 84 + 84 запуска. Решено и сделано (`2625f19`): предупреждение о `_sstack` (п. 1, вариант «в»), BIN из секций FLASH (п. 2). Примеры demo-stm32-cmake/stm32h5xx собираются без CRC; с CRC — после добавления секции `.checksum` в шаблон. Группа 4: прошивки H7/H5 запускаются в Renode на минимальных моделях (QEMU для них не применим), версия 0.9.3, ТЗ ревизии 1.6 (10.2.16 закрыт, 4.11.10, 4.14.2, 8.8.5, TC-65, TC-66), полный локальный прогон L0–L5 на итоговом коммите. ТЗ 1.7 (`d40f23d`): баннер, TC-52 в сборщике, п. 3.6.6, 4.10.2. Этап 5 (ТЗ 1.8, п. 8.8.8, TC-67): матрица прошивок по целям с полным набором профилей, по одному семейству. F0 `STM32F030R8T6` — сделано: QEMU `netduino2` (ядро M3), Renode `f030-smoke` (cortex-m0); `portasm.c` для `ARM_CM0` FreeRTOS-Kernel 11; 180 сборок, 168 + 192 запуска. F4 `STM32F411CEU6`, `STM32F401CCU6` — сделано: QEMU `netduinoplus2`, Renode `f4-smoke` (cortex-m4); 336 сборок, 336 + 360 запусков. G4 `STM32G431CBU6`, `STM32G474CEU6` — сделано: только Renode `g4-smoke`; 492 сборки, 336 + 528 запусков. F7 `STM32F746ZGT6` — сделано: только Renode `f7-smoke`; 570 сборок, 336 + 612 запусков. Подготовка выпуска (ТЗ 1.9): CHANGELOG на русском и английском в едином формате, описание эмуляторов по семействам и их особенностей, уровней проверок и расположения тестов, статусы errata; полный локальный прогон L0–L5 на итоговом коммите. Тег `v0.9.3` ставится на merge-коммит ветки `claude/docs-0.9.3-review`, чтобы выпуск включал согласованную документацию.
 - [x] Ветка `claude/docs-0.9.3-review` слита в main (PR #42, #43); выпуск [v0.9.3](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/releases/tag/v0.9.3) опубликован, тег на `67562c0`. Только документация: сверка документации 0.9.3 с кодом и тестами — статусы errata `released` и `docs/reference-index.json`, отметки 0.9.3 в карточках, руководство пользователя, сценарии, диагностика, навыки, счётчики прошивочной матрицы, порядок выпуска в `maintenance.md`.
 - [x] Ветка `claude/ci-filters-support` слита в main (PR #45): Configure не запускается при изменении только `.github/FUNDING.yml` или `LICENSE`; Emulation environment пропускает правки `.md`; в README — Telegram-канал техподдержки [MCU CI/CD & HIL](https://t.me/mcu_cicd_hil).
-- [ ] Текущая ветка `claude/issue-templates`: форма Issue `.github/ISSUE_TEMPLATE/bug_report.yml` (версия, стадия, backend, МК и плата, ОС, версии инструментов, команда, `stm32_config.yml`, полный лог) и ссылки на Telegram-канал и диагностику; Configure не запускается при изменении только шаблонов.
+- [x] Ветка `claude/issue-templates` слита в main (PR #46): форма Issue `.github/ISSUE_TEMPLATE/bug_report.yml` (версия, стадия, backend, МК и плата, ОС, версии инструментов, команда, `stm32_config.yml`, полный лог) и ссылки на Telegram-канал и диагностику; Configure не запускается при изменении только шаблонов.
 - [x] `claude/faster-ci-image` слита в main (`955b09b`): параллельная установка и Cube без `Projects`/`Utilities` (3,9 → 1,3 ГБ); образ компиляторов в CI 2:45 → 1:09–1:29, Configure 4:47, Firmware 4:39. Разнесение пар по job — не принято, см. [сопровождение](docs/ru/maintenance.md).
 - [ ] Затем оценить ограниченное распараллеливание.
 - [ ] Далее согласовать полный Arduino runtime; ядра/ABI F0, F1, F4, G4, F7 проверяются с 0.9.3 — [план](docs/ru/firmware-plan.md).
@@ -131,6 +131,34 @@ PR больше не требуются; старые ссылки остают�
 
 Сборки и эмуляция дополняют конфигурационные тесты. Изменение публичных путей или
 обязательная реструктуризация проектов-потребителей в этот план не входят.
+
+### План 0.10.0
+
+Предварительный план от 2026-09-30; состав версии утверждается ревизией ТЗ 2.0.
+Firmware на GitHub запускается вручную на границах этапов; полный прогон L0–L5 —
+локально в конце каждого этапа. Ветки сливаются перемоткой (`git land`).
+
+- [ ] **Этап 0. Технический долг 0.9.3** — текущая ветка `claude/stage0-tech-debt`:
+  ТЗ 1.10 (слияние перемоткой, схема CI, запись вопроса 10.2.16), Firmware вручную и
+  на тегах `v*`, Configure не запускается от `docs/reference-index.json`, повтор
+  загрузок curl при любых ошибках, `actions/checkout` и `actions/upload-artifact` v7.0.1
+  (Node 24), префиксы веток `gemini/`, `dev/`, памятка `docs/ru|en/HOWTO.md`,
+  изменения 0.9.3 в навыках, устаревшие комментарии H7/H5. Код фреймворка не меняется.
+- [ ] **Этап 1. Решения и ТЗ 2.0:** минимальная версия CMake (3.19 или 3.21); прямое
+  подключение Arduino Core и совместимость со старым режимом; формат кодов сообщений;
+  локализация; схема имён папок и артефактов в build; что из `include:`, TOML,
+  JSON Schema, CMakePresets входит в 0.10.0; runner Windows (TC-44) и GitLab CI (TC-53);
+  новая база справочника.
+- [ ] **Этап 2. Основа без изменения поведения:** коды сообщений и проверка тестов по
+  кодам вместо русского текста; TC-41, TC-42, TC-45; пробелы покрытия по индексу.
+- [ ] **Этап 3. Изменения для пользователей:** CMake ≥ 3.21; прямое подключение
+  Arduino Core и прошивка Arduino в матрице; имена папок в build по относительному пути;
+  имена артефактов по `OUTPUT_NAME`; CMakePresets.
+- [ ] **Этап 4. Расширения конфигурации:** `include:`, JSON Schema, TOML, локализация RU/EN.
+- [ ] **Этап 5. Тесты и CI:** периферия в эмуляторах (группа 5), Windows, GitLab,
+  распараллеливание при необходимости.
+- [ ] **Этап 6. Выпуск 0.10.0:** руководство по переходу с 0.9.x, новая база
+  справочника, CHANGELOG, ТЗ к выпуску, L0–L5, Firmware в CI, тег `v0.10.0`.
 
 ### Предложения для 0.10.x — на рассмотрение
 
@@ -261,7 +289,7 @@ keep defect details in errata.
 - [x] Branch `claude/release-0.9.3` merged into main ([PR #41](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/pull/41), merge `29e64a4`) (spec 1.2): STM32CubeH7 1.13.0, STM32CubeH5 1.7.0 and FreeRTOS-Kernel 11.3.1 added to the lock and CI image (spec 8.8.1); spec 1.5: CRC from FLASH sections (TC-63, TC-64), direct Arduino Core and CMake 3.21 in 0.10.x; `AGENTS.md`. CRC group (`4cd3404`): image from FLASH sections, build failure on errors (E006), Configure section check, `crc_algorithm` warning (E004). Group 1 (`d8708b4`): profile-only keys (E008), only `profiles:` from `profiles_file`, Configure dependencies, version wording, incomplete-IOC defaults, heap/stack format and unapplied-size warning, `hal_conf.h` hint; 125 scenarios × 6 = 750. Question 10.2.16 decided: external profiles only, with a warning about inline ones (close in the spec revision). Group 2 (`b9a6cd3`): warnings for unknown enumerated values and `build_artifacts` elements, `srec` artifact; 127 × 6 = 762. `lss`/`map` names: decided to keep the 0.9.2 behaviour (target name); clarify spec 4.14.2 in the revision; naming all artifacts after the final ELF name is deferred, considering several backends. Group 3, Configure level (`3c6bfa3`): MCU core (H7), external FreeRTOS (E007), early HAL/FreeRTOS component and CMSIS-RTOS wrapper checks, port table, RAM check with CCRAM/RAM_SHARE; TC-22, TC-54…TC-56, TC-58, TC-60, TC-61; 139 × 6 = 834. Firmware (`422cef1`): `freertosExternal` in QEMU/Renode (TC-59), H7/H5 build-only (TC-57), H503 CRC image with backup SRAM (TC-63), `--gap-fill` comparison (TC-64); 102 builds, 84 + 84 runs. Decided and done (`2625f19`): `_sstack` warning (item 1, option c), BIN from FLASH sections (item 2). The demo-stm32-cmake/stm32h5xx examples build without CRC, and with CRC once the template has a `.checksum` section. Group 4: H7/H5 firmware runs in Renode on minimal models (QEMU has no matching machine), version 0.9.3, spec revision 1.6 (10.2.16 closed, 4.11.10, 4.14.2, 8.8.5, TC-65, TC-66), full local L0–L5 run on the final commit. Spec 1.7 (`d40f23d`): banner, TC-52 in the builder, items 3.6.6, 4.10.2. Stage 5 (spec 1.8, item 8.8.8, TC-67): per-target firmware matrix with the full profile set, one family at a time. F0 `STM32F030R8T6` done: QEMU `netduino2` (M3 core), Renode `f030-smoke` (cortex-m0); `portasm.c` for `ARM_CM0` in FreeRTOS-Kernel 11; 180 builds, 168 + 192 runs. F4 `STM32F411CEU6`, `STM32F401CCU6` done: QEMU `netduinoplus2`, Renode `f4-smoke` (cortex-m4); 336 builds, 336 + 360 runs. G4 `STM32G431CBU6`, `STM32G474CEU6` done: Renode `g4-smoke` only; 492 builds, 336 + 528 runs. F7 `STM32F746ZGT6` done: Renode `f7-smoke` only; 570 builds, 336 + 612 runs. Release preparation (spec 1.9): Russian and English CHANGELOG in one format, emulators per family and their specifics, test levels and test locations, errata statuses; full local L0–L5 run on the final commit. Tag `v0.9.3` goes on the merge commit of `claude/docs-0.9.3-review`, so the release includes the aligned documentation.
 - [x] Branch `claude/docs-0.9.3-review` merged into main (PR #42, #43); release [v0.9.3](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/releases/tag/v0.9.3) published, tag on `67562c0`. Documentation only: 0.9.3 documentation checked against code and tests — errata statuses `released` and `docs/reference-index.json`, 0.9.3 notes in the cards, user manual, scenarios, troubleshooting, skills, firmware-matrix counts, release procedure in `maintenance.md`.
 - [x] Branch `claude/ci-filters-support` merged into main (PR #45): Configure is skipped when only `.github/FUNDING.yml` or `LICENSE` changes; Emulation environment skips `.md` edits; the README links the Telegram support channel [MCU CI/CD & HIL](https://t.me/mcu_cicd_hil).
-- [ ] Current branch `claude/issue-templates`: issue form `.github/ISSUE_TEMPLATE/bug_report.yml` (version, stage, backend, MCU and board, OS, tool versions, command, `stm32_config.yml`, full log) with links to the Telegram channel and troubleshooting; Configure is skipped when only templates change.
+- [x] Branch `claude/issue-templates` merged into main (PR #46): issue form `.github/ISSUE_TEMPLATE/bug_report.yml` (version, stage, backend, MCU and board, OS, tool versions, command, `stm32_config.yml`, full log) with links to the Telegram channel and troubleshooting; Configure is skipped when only templates change.
 - [x] `claude/faster-ci-image` merged into main (`955b09b`): parallel installation and Cube without `Projects`/`Utilities` (3.9 → 1.3 GB); compiler image in CI 2:45 → 1:09–1:29, Configure 4:47, Firmware 4:39. Splitting pairs across jobs — not adopted, see [maintenance](docs/en/maintenance.md).
 - [ ] Then evaluate bounded parallelism.
 - [ ] Next agree full Arduino runtime; F0, F1, F4, G4 and F7 cores/ABI are checked since 0.9.3 — [plan](docs/en/firmware-plan.md).
@@ -283,6 +311,34 @@ keep defect details in errata.
 
 Builds and emulation supplement configure tests. Public path changes or mandatory
 restructuring of consumer projects are outside this plan.
+
+### 0.10.0 plan
+
+Preliminary plan of 2026-09-30; the version scope is approved by spec revision 2.0.
+Firmware on GitHub runs manually at stage boundaries; a full L0–L5 run is done locally
+at the end of each stage. Branches are merged by fast-forward (`git land`).
+
+- [ ] **Stage 0. 0.9.3 technical debt** — current branch `claude/stage0-tech-debt`:
+  spec 1.10 (fast-forward merges, CI scheme, question 10.2.16 record), Firmware manual
+  and on `v*` tags, Configure not triggered by `docs/reference-index.json`, curl retries
+  on any error, `actions/checkout` and `actions/upload-artifact` v7.0.1 (Node 24),
+  `gemini/` and `dev/` branch prefixes, the `docs/ru|en/HOWTO.md` how-to, 0.9.3 changes
+  in the skills, stale H7/H5 comments. Framework code is unchanged.
+- [ ] **Stage 1. Decisions and spec 2.0:** minimum CMake (3.19 or 3.21); direct
+  Arduino Core integration and compatibility with the old mode; message code format;
+  localization; naming of build folders and artifacts; which of `include:`, TOML,
+  JSON Schema, CMakePresets go into 0.10.0; Windows runner (TC-44) and GitLab CI
+  (TC-53); a new reference baseline.
+- [ ] **Stage 2. Groundwork without behaviour changes:** message codes and tests that
+  check codes instead of Russian text; TC-41, TC-42, TC-45; coverage gaps from the index.
+- [ ] **Stage 3. User-facing changes:** CMake ≥ 3.21; direct Arduino Core integration
+  and Arduino firmware in the matrix; build folder names from relative paths; artifact
+  names from `OUTPUT_NAME`; CMakePresets.
+- [ ] **Stage 4. Configuration extensions:** `include:`, JSON Schema, TOML, RU/EN localization.
+- [ ] **Stage 5. Tests and CI:** peripherals in emulators (group 5), Windows, GitLab,
+  parallelism if needed.
+- [ ] **Stage 6. 0.10.0 release:** migration guide from 0.9.x, new reference baseline,
+  CHANGELOG, release spec, L0–L5, Firmware in CI, tag `v0.10.0`.
 
 ### Proposals for 0.10.x — for consideration
 

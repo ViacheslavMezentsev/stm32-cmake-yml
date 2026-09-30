@@ -59,6 +59,9 @@ target_compile_definitions(sensor PRIVATE SENSOR_INTERNAL=1)
   target-specific стандарты. Языковые generator expressions проверяйте отдельно.
 - Согласуйте CPU, Thumb, FPU/float ABI и runtime requirements для всех связанных
   объектов. Наличие общего INTERFACE не доказывает ABI-совместимость.
+- Имена целей stm32-cmake зависят от ядра: при выбранном `mcu_core` (все H7 — `M7`)
+  к имени добавляется ядро: `HAL::STM32::H7::M7::<компонент>`. Отсутствующий компонент
+  `hal_components`/`freertos_components` — ошибка Configure с его именем (0.9.3).
 
 ## Зависимости и порядок
 
@@ -96,3 +99,5 @@ are distinct steps. Executable PRIVATE YAML flags do not propagate backwards to
 libraries. Use explicit dependency targets and shared INTERFACE settings; verify
 per-language generated commands and target ownership. Preserve consumer toolchain
 choices and distinguish Configure evidence from link/runtime or ABI guarantees.
+With a selected `mcu_core` (every H7 uses `M7`) stm32-cmake target names carry the
+core suffix, e.g. `HAL::STM32::H7::M7::<component>`.

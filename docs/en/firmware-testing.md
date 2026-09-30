@@ -400,8 +400,13 @@ still fail. configASSERT remains enabled.
 
 The measurements below predate the F0, F4, G4 and F7 targets (78 runs per simulator).
 The full matrix is now 570 builds and 948 runs; locally on 2 vCPUs it takes about
-23 minutes (builds 15, QEMU 5, Renode 3.5), so the Firmware job
-limit is raised to 90 minutes.
+23 minutes (builds 15, QEMU 5, Renode 3.5), and 24 minutes on GitHub (main
+`29e64a4`), so the Firmware job limit is raised to 90 minutes.
+
+Firmware therefore does not run on every push: it is started manually (Run workflow)
+at stage boundaries and before a release, and a `v*` tag starts it automatically.
+Only a manual run on main updates the `Builds (Checks)` badge. See
+[maintenance](maintenance.md#github-checks).
 
 In the [main f16eb09 run](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/actions/runs/36136281504), smoke took 13:23:
 

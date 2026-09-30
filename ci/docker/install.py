@@ -34,7 +34,8 @@ def install_archive(item):
     say(f"Installing {item['name']}")
     with tempfile.TemporaryDirectory() as temp:
         archive = Path(temp) / "download"
-        run("curl", "--fail", "--location", "--retry", "3", "--connect-timeout", "30",
+        run("curl", "--fail", "--location", "--retry", "3", "--retry-all-errors", "--retry-delay", "5",
+            "--connect-timeout", "30",
             "--max-time", "1800", "--output", str(archive), item["url"])
         with archive.open("rb") as stream:
             digest = hashlib.file_digest(stream, "sha256").hexdigest()
