@@ -138,13 +138,13 @@ PR больше не требуются; старые ссылки остают�
 Firmware на GitHub запускается вручную на границах этапов; полный прогон L0–L5 —
 локально в конце каждого этапа. Ветки сливаются перемоткой (`git land`).
 
-- [ ] **Этап 0. Технический долг 0.9.3** — текущая ветка `claude/stage0-tech-debt`:
+- [x] **Этап 0. Технический долг 0.9.3** — слит в main перемоткой (ветки `claude/stage0-tech-debt`, `claude/howto-agent-schemes`):
   ТЗ 1.10 (слияние перемоткой, схема CI, запись вопроса 10.2.16), Firmware вручную и
   на тегах `v*`, Configure не запускается от `docs/reference-index.json`, повтор
   загрузок curl при любых ошибках, `actions/checkout` и `actions/upload-artifact` v7.0.1
   (Node 24), префиксы веток `gemini/`, `dev/`, памятка `docs/ru|en/HOWTO.md`,
   изменения 0.9.3 в навыках, устаревшие комментарии H7/H5. Код фреймворка не меняется.
-- [ ] **Этап 1. Решения и ТЗ 2.0:** минимальная версия CMake (3.19 или 3.21); прямое
+- [ ] **Этап 1. Решения и ТЗ 2.0** — текущая ветка `claude/spec-2.0`: ТЗ 2.0 (CMake ≥ 3.21; режимы Arduino `wrappers` и `native`, выбор платы, источник CMSIS — вопросы 10.2.20, 10.2.21 закрыты по прототипу п. 10.3.6; открыты 10.2.22–10.2.28). Исходный перечень: минимальная версия CMake (3.19 или 3.21); прямое
   подключение Arduino Core и совместимость со старым режимом; формат кодов сообщений;
   локализация; схема имён папок и артефактов в build; что из `include:`, TOML,
   JSON Schema, CMakePresets входит в 0.10.0; runner Windows (TC-44) и GitLab CI (TC-53);
@@ -318,13 +318,13 @@ Preliminary plan of 2026-09-30; the version scope is approved by spec revision 2
 Firmware on GitHub runs manually at stage boundaries; a full L0–L5 run is done locally
 at the end of each stage. Branches are merged by fast-forward (`git land`).
 
-- [ ] **Stage 0. 0.9.3 technical debt** — current branch `claude/stage0-tech-debt`:
+- [x] **Stage 0. 0.9.3 technical debt** — fast-forwarded into main (branches `claude/stage0-tech-debt`, `claude/howto-agent-schemes`):
   spec 1.10 (fast-forward merges, CI scheme, question 10.2.16 record), Firmware manual
   and on `v*` tags, Configure not triggered by `docs/reference-index.json`, curl retries
   on any error, `actions/checkout` and `actions/upload-artifact` v7.0.1 (Node 24),
   `gemini/` and `dev/` branch prefixes, the `docs/ru|en/HOWTO.md` how-to, 0.9.3 changes
   in the skills, stale H7/H5 comments. Framework code is unchanged.
-- [ ] **Stage 1. Decisions and spec 2.0:** minimum CMake (3.19 or 3.21); direct
+- [ ] **Stage 1. Decisions and spec 2.0** — current branch `claude/spec-2.0`: spec 2.0 (CMake ≥ 3.21; Arduino `wrappers` and `native` modes, board selection, CMSIS source — questions 10.2.20, 10.2.21 closed after the prototype in 10.3.6; 10.2.22–10.2.28 open). Original list: minimum CMake (3.19 or 3.21); direct
   Arduino Core integration and compatibility with the old mode; message code format;
   localization; naming of build folders and artifacts; which of `include:`, TOML,
   JSON Schema, CMakePresets go into 0.10.0; Windows runner (TC-44) and GitLab CI
