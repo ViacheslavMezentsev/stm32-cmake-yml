@@ -74,10 +74,28 @@
   },
   {
     "name": "crc-unknown-algorithm",
-    "args": ["-DSTM32_YML_PROFILE=crc", "-DSTM32_YML_OVERRIDE_crc_algorithm=CRC32_MPEG"],
-    "observed": {"crc_enable": "TRUE"},
-    "log_contains": ["Неизвестное значение 'CRC32_MPEG' параметра 'crc_algorithm'", "применяется 'STM32_HW_DEFAULT'", "Алгоритм: STM32_HW_DEFAULT"],
-    "crc_command": true
+    "args": [
+      "-DSTM32_YML_PROFILE=crc",
+      "-DSTM32_YML_OVERRIDE_crc_algorithm=CRC32_MPEG"
+    ],
+    "observed": {
+      "crc_enable": "TRUE"
+    },
+    "log_contains": [
+      "Алгоритм: STM32_HW_DEFAULT"
+    ],
+    "crc_command": true,
+    "messages": [
+      {
+        "code": "W005",
+        "args": [
+          "CRC32_MPEG",
+          "crc_algorithm",
+          null,
+          "STM32_HW_DEFAULT"
+        ]
+      }
+    ]
   },
   {
     "name": "bluepill",
@@ -103,25 +121,91 @@
   },
   {
     "name": "unknown-profile-warning",
-    "args": ["-DSTM32_YML_PROFILE=unknown"],
-    "log_contains": ["Профиль 'unknown' не найден"],
-    "properties": {"COMPILE_DEFINITIONS": ["BASE=1"]}
+    "args": [
+      "-DSTM32_YML_PROFILE=unknown"
+    ],
+    "properties": {
+      "COMPILE_DEFINITIONS": [
+        "BASE=1"
+      ]
+    },
+    "messages": [
+      {
+        "code": "W101",
+        "args": [
+          "unknown",
+          null
+        ]
+      }
+    ]
   },
   {
     "name": "list-profiles",
-    "args": ["-DSTM32_YML_PROFILE=list"],
-    "error": "Передайте -DSTM32_YML_PROFILE=<имя>",
-    "log_contains": ["- append", "- replace", "- template", "- crc", "- bluepill"]
+    "args": [
+      "-DSTM32_YML_PROFILE=list"
+    ],
+    "error": {
+      "code": "E101"
+    },
+    "messages": [
+      {
+        "code": "I106"
+      },
+      {
+        "code": "I107",
+        "args": [
+          "append"
+        ]
+      },
+      {
+        "code": "I107",
+        "args": [
+          "replace"
+        ]
+      },
+      {
+        "code": "I107",
+        "args": [
+          "template"
+        ]
+      },
+      {
+        "code": "I107",
+        "args": [
+          "crc"
+        ]
+      },
+      {
+        "code": "I107",
+        "args": [
+          "bluepill"
+        ]
+      }
+    ]
   },
   {
     "name": "missing-config",
-    "args": ["-DPROJECT_CONFIG_FILE=does-not-exist.yml"],
-    "error": "Файл конфигурации не найден"
+    "args": [
+      "-DPROJECT_CONFIG_FILE=does-not-exist.yml"
+    ],
+    "error": {
+      "code": "E004",
+      "args": [
+        null
+      ]
+    }
   },
   {
     "name": "malformed-yaml",
-    "args": ["-DPROJECT_CONFIG_FILE=malformed.yml"],
-    "error": "Ошибка при конвертации"
+    "args": [
+      "-DPROJECT_CONFIG_FILE=malformed.yml"
+    ],
+    "error": {
+      "code": "E005",
+      "args": [
+        null
+      ]
+    }
   },
   {
     "name": "missing-linker",
@@ -135,8 +219,17 @@
   },
   {
     "name": "invalid-memory-size",
-    "args": ["-DSTM32_YML_PROFILE=template", "-DSTM32_YML_OVERRIDE_stack_size=invalid"],
-    "error": "Недопустимый формат размера памяти"
+    "args": [
+      "-DSTM32_YML_PROFILE=template",
+      "-DSTM32_YML_OVERRIDE_stack_size=invalid"
+    ],
+    "error": {
+      "code": "E006",
+      "args": [
+        "stack_size",
+        "invalid"
+      ]
+    }
   },
   {
     "name": "arduino-missing-core",
@@ -214,14 +307,34 @@
   },
   {
     "name": "missing-ioc",
-    "args": ["-DPROJECT_CONFIG_FILE=ioc.yml", "-DSTM32_YML_OVERRIDE_ioc_file=missing.ioc"],
-    "error": "Указанный .ioc файл не найден"
+    "args": [
+      "-DPROJECT_CONFIG_FILE=ioc.yml",
+      "-DSTM32_YML_OVERRIDE_ioc_file=missing.ioc"
+    ],
+    "error": {
+      "code": "E201",
+      "args": [
+        null
+      ]
+    }
   },
   {
     "name": "external-list-profiles",
-    "args": ["-DPROJECT_CONFIG_FILE=external.yml", "-DSTM32_YML_PROFILE=list"],
-    "error": "Передайте -DSTM32_YML_PROFILE=<имя>",
-    "log_contains": ["- external"]
+    "args": [
+      "-DPROJECT_CONFIG_FILE=external.yml",
+      "-DSTM32_YML_PROFILE=list"
+    ],
+    "error": {
+      "code": "E101"
+    },
+    "messages": [
+      {
+        "code": "I107",
+        "args": [
+          "external"
+        ]
+      }
+    ]
   },
   {
     "name": "reconfigure-profile-lists",
@@ -296,18 +409,136 @@
   },
   {
     "name": "profile-only-keys",
-    "args": ["-DPROJECT_CONFIG_FILE=profile-only.yml"],
+    "args": [
+      "-DPROJECT_CONFIG_FILE=profile-only.yml"
+    ],
     "steps": [
-      {"args": ["-DSTM32_YML_PROFILE=lang"], "language_flags": true, "observed": {"custom_probe_key": "42"}, "log_contains": ["[профиль] compile_options_c = Wstrict-prototypes", "[профиль] custom_probe_key = 42"]},
-      {"args": ["-DSTM32_YML_PROFILE=", "-DSTM32_YML_OVERRIDE_custom_probe_key=7"], "observed": {"custom_probe_key": "7"}, "command_checks": [{"file": "main.c", "absent": ["-Wstrict-prototypes", "-DONLY_C=1"]}, {"file": "helper.cpp", "absent": ["-fno-exceptions", "-DONLY_CXX=1"]}]}
+      {
+        "args": [
+          "-DSTM32_YML_PROFILE=lang"
+        ],
+        "language_flags": true,
+        "observed": {
+          "custom_probe_key": "42"
+        },
+        "messages": [
+          {
+            "code": "I101",
+            "args": [
+              "lang"
+            ]
+          },
+          {
+            "code": "I102",
+            "args": [
+              "compile_options_c",
+              "Wstrict-prototypes"
+            ]
+          },
+          {
+            "code": "I102",
+            "args": [
+              "custom_probe_key",
+              "42"
+            ]
+          }
+        ]
+      },
+      {
+        "args": [
+          "-DSTM32_YML_PROFILE=",
+          "-DSTM32_YML_OVERRIDE_custom_probe_key=7"
+        ],
+        "observed": {
+          "custom_probe_key": "7"
+        },
+        "command_checks": [
+          {
+            "file": "main.c",
+            "absent": [
+              "-Wstrict-prototypes",
+              "-DONLY_C=1"
+            ]
+          },
+          {
+            "file": "helper.cpp",
+            "absent": [
+              "-fno-exceptions",
+              "-DONLY_CXX=1"
+            ]
+          }
+        ]
+      }
     ]
   },
   {
     "name": "external-profile-ignores-top-level",
-    "args": ["-DPROJECT_CONFIG_FILE=external-toplevel.yml"],
+    "args": [
+      "-DPROJECT_CONFIG_FILE=external-toplevel.yml"
+    ],
     "steps": [
-      {"args": ["-DSTM32_YML_PROFILE=external"], "observed": {"PROJECT_NAME": "external_probe", "stack_size": "1024"}, "properties": {"COMPILE_DEFINITIONS": ["BASE=1", "EXTERNAL=1"]}, "absent_properties": {"COMPILE_DEFINITIONS": ["LEAKED=1", "INLINE=1"]}, "log_contains": ["[профиль +] compile_definitions += EXTERNAL=1", "Встроенная секция 'profiles:' игнорируется (профили: external, inline): задан profiles_file 'profiles-toplevel.yml'"]},
-      {"args": ["-DSTM32_YML_PROFILE=inline"], "properties": {"COMPILE_DEFINITIONS": ["BASE=1"]}, "absent_properties": {"COMPILE_DEFINITIONS": ["INLINE=1", "EXTERNAL=1"]}, "log_contains": ["Профиль 'inline' не найден"]}
+      {
+        "args": [
+          "-DSTM32_YML_PROFILE=external"
+        ],
+        "observed": {
+          "PROJECT_NAME": "external_probe",
+          "stack_size": "1024"
+        },
+        "properties": {
+          "COMPILE_DEFINITIONS": [
+            "BASE=1",
+            "EXTERNAL=1"
+          ]
+        },
+        "absent_properties": {
+          "COMPILE_DEFINITIONS": [
+            "LEAKED=1",
+            "INLINE=1"
+          ]
+        },
+        "messages": [
+          {
+            "code": "I103",
+            "args": [
+              "compile_definitions",
+              "EXTERNAL=1"
+            ]
+          },
+          {
+            "code": "W102",
+            "args": [
+              "external, inline",
+              "profiles-toplevel.yml"
+            ]
+          }
+        ]
+      },
+      {
+        "args": [
+          "-DSTM32_YML_PROFILE=inline"
+        ],
+        "properties": {
+          "COMPILE_DEFINITIONS": [
+            "BASE=1"
+          ]
+        },
+        "absent_properties": {
+          "COMPILE_DEFINITIONS": [
+            "INLINE=1",
+            "EXTERNAL=1"
+          ]
+        },
+        "messages": [
+          {
+            "code": "W101",
+            "args": [
+              "inline",
+              null
+            ]
+          }
+        ]
+      }
     ]
   },
   {
@@ -327,12 +558,84 @@
   {
     "name": "memory-size-format",
     "steps": [
-      {"args": ["-DSTM32_YML_PROFILE=template", "-DSTM32_YML_OVERRIDE_heap_size=1k"], "error": "Недопустимый формат размера памяти 'heap_size: 1k'"},
-      {"args": ["-DSTM32_YML_OVERRIDE_heap_size=1.5K"], "error": "например: 0, 1536, 2K, 1M.", "log_absent": ["'1.5K', '256K'"]},
-      {"args": ["-DSTM32_YML_PROFILE=", "-DSTM32_YML_OVERRIDE_heap_size=-1"], "error": "Недопустимый формат размера памяти 'heap_size: -1'"},
-      {"args": ["-DSTM32_YML_OVERRIDE_linker_script=custom.ld", "-DSTM32_YML_OVERRIDE_linker_script_dir=linker", "-DSTM32_YML_OVERRIDE_heap_size=0x200"], "error": "Недопустимый формат размера памяти 'heap_size: 0x200'"},
-      {"args": ["-DSTM32_YML_OVERRIDE_heap_size=0", "-DSTM32_YML_OVERRIDE_stack_size=1M"], "observed": {"heap_size": "0", "stack_size": "1M"}, "link_options_contain": "linker/custom.ld"},
-      {"args": ["-DSTM32_YML_OVERRIDE_linker_script=auto", "-DSTM32_YML_PROFILE=template", "-DSTM32_YML_OVERRIDE_heap_size=1536", "-DSTM32_YML_OVERRIDE_stack_size=2K"], "linker": {"heap": 1536, "stack": 2048}}
+      {
+        "args": [
+          "-DSTM32_YML_PROFILE=template",
+          "-DSTM32_YML_OVERRIDE_heap_size=1k"
+        ],
+        "error": {
+          "code": "E006",
+          "args": [
+            "heap_size",
+            "1k"
+          ]
+        }
+      },
+      {
+        "args": [
+          "-DSTM32_YML_OVERRIDE_heap_size=1.5K"
+        ],
+        "error": {
+          "code": "E006",
+          "args": [
+            "heap_size",
+            "1.5K"
+          ]
+        },
+        "log_absent": [
+          "'1.5K', '256K'"
+        ]
+      },
+      {
+        "args": [
+          "-DSTM32_YML_PROFILE=",
+          "-DSTM32_YML_OVERRIDE_heap_size=-1"
+        ],
+        "error": {
+          "code": "E006",
+          "args": [
+            "heap_size",
+            "-1"
+          ]
+        }
+      },
+      {
+        "args": [
+          "-DSTM32_YML_OVERRIDE_linker_script=custom.ld",
+          "-DSTM32_YML_OVERRIDE_linker_script_dir=linker",
+          "-DSTM32_YML_OVERRIDE_heap_size=0x200"
+        ],
+        "error": {
+          "code": "E006",
+          "args": [
+            "heap_size",
+            "0x200"
+          ]
+        }
+      },
+      {
+        "args": [
+          "-DSTM32_YML_OVERRIDE_heap_size=0",
+          "-DSTM32_YML_OVERRIDE_stack_size=1M"
+        ],
+        "observed": {
+          "heap_size": "0",
+          "stack_size": "1M"
+        },
+        "link_options_contain": "linker/custom.ld"
+      },
+      {
+        "args": [
+          "-DSTM32_YML_OVERRIDE_linker_script=auto",
+          "-DSTM32_YML_PROFILE=template",
+          "-DSTM32_YML_OVERRIDE_heap_size=1536",
+          "-DSTM32_YML_OVERRIDE_stack_size=2K"
+        ],
+        "linker": {
+          "heap": 1536,
+          "stack": 2048
+        }
+      }
     ]
   },
   {
@@ -346,43 +649,237 @@
   },
   {
     "name": "enum-unknown-values",
-    "args": ["-DPROJECT_CONFIG_FILE=system-libraries.yml", "-DSTM32_YML_PROFILE=nosys", "-DSTM32_YML_OVERRIDE_toolchain_backend=stm32cmake", "-DSTM32_YML_OVERRIDE_system_library=nosys"],
-    "observed": {"toolchain_backend": "stm32-cmake"},
-    "properties": {"LINK_LIBRARIES": ["STM32::Nano"]},
-    "absent_properties": {"LINK_LIBRARIES": ["STM32::NoSys", "STM32::Semihosting"]},
+    "args": [
+      "-DPROJECT_CONFIG_FILE=system-libraries.yml",
+      "-DSTM32_YML_PROFILE=nosys",
+      "-DSTM32_YML_OVERRIDE_toolchain_backend=stm32cmake",
+      "-DSTM32_YML_OVERRIDE_system_library=nosys"
+    ],
+    "observed": {
+      "toolchain_backend": "stm32-cmake"
+    },
+    "properties": {
+      "LINK_LIBRARIES": [
+        "STM32::Nano"
+      ]
+    },
+    "absent_properties": {
+      "LINK_LIBRARIES": [
+        "STM32::NoSys",
+        "STM32::Semihosting"
+      ]
+    },
     "no_st_dependencies": true,
-    "log_contains": ["Неизвестное значение 'stm32cmake' параметра 'toolchain_backend'. Известные значения: stm32-cmake, arduino. применяется 'stm32-cmake'.", "Неизвестное значение 'nosys' параметра 'system_library'. Известные значения: NoSys, Semihosting. значение не используется."]
+    "messages": [
+      {
+        "code": "W005",
+        "args": [
+          "stm32cmake",
+          "toolchain_backend",
+          "stm32-cmake, arduino",
+          "stm32-cmake"
+        ]
+      },
+      {
+        "code": "W006",
+        "args": [
+          "nosys",
+          "system_library",
+          "NoSys, Semihosting"
+        ]
+      }
+    ]
   },
   {
     "name": "freertos-unknown-enums",
-    "args": ["-DPROJECT_CONFIG_FILE=freertos.yml"],
+    "args": [
+      "-DPROJECT_CONFIG_FILE=freertos.yml"
+    ],
     "steps": [
-      {"args": ["-DSTM32_YML_OVERRIDE_cmsis_rtos_api=v3"], "observed": {"cmsis_rtos_api": "none"}, "properties": {"LINK_LIBRARIES": ["FreeRTOS::STM32::F4::ARM_CM4F"]}, "absent_properties": {"LINK_LIBRARIES": ["CMSIS::STM32::F4::RTOS", "CMSIS::STM32::F4::RTOS_V2"]}, "log_contains": ["Неизвестное значение 'v3' параметра 'cmsis_rtos_api'. Известные значения: none, v1, v2. применяется 'none'."]},
-      {"args": ["-DSTM32_YML_PROFILE=disabled", "-USTM32_YML_OVERRIDE_cmsis_rtos_api", "-DSTM32_YML_OVERRIDE_freertos_version=cubeide"], "observed": {"use_freertos": "FALSE", "freertos_version": "external"}, "log_contains": ["Неизвестное значение 'cubeide' параметра 'freertos_version'. Известные значения: cube, external. применяется 'external'."]}
+      {
+        "args": [
+          "-DSTM32_YML_OVERRIDE_cmsis_rtos_api=v3"
+        ],
+        "observed": {
+          "cmsis_rtos_api": "none"
+        },
+        "properties": {
+          "LINK_LIBRARIES": [
+            "FreeRTOS::STM32::F4::ARM_CM4F"
+          ]
+        },
+        "absent_properties": {
+          "LINK_LIBRARIES": [
+            "CMSIS::STM32::F4::RTOS",
+            "CMSIS::STM32::F4::RTOS_V2"
+          ]
+        },
+        "messages": [
+          {
+            "code": "W005",
+            "args": [
+              "v3",
+              "cmsis_rtos_api",
+              "none, v1, v2",
+              "none"
+            ]
+          }
+        ]
+      },
+      {
+        "args": [
+          "-DSTM32_YML_PROFILE=disabled",
+          "-USTM32_YML_OVERRIDE_cmsis_rtos_api",
+          "-DSTM32_YML_OVERRIDE_freertos_version=cubeide"
+        ],
+        "observed": {
+          "use_freertos": "FALSE",
+          "freertos_version": "external"
+        },
+        "messages": [
+          {
+            "code": "W005",
+            "args": [
+              "cubeide",
+              "freertos_version",
+              "cube, external",
+              "external"
+            ]
+          }
+        ]
+      }
     ]
   },
   {
     "name": "h7-single-core-default",
-    "args": ["-DPROJECT_CONFIG_FILE=stm32h7.yml"],
-    "observed": {"MCU": "STM32H743ZI"},
-    "properties": {"LINK_LIBRARIES": ["HAL::STM32::H7::M7::GPIO", "CMSIS::STM32::H743ZI::M7"]},
-    "log_contains": ["Ядро MCU не задано, используется единственное ядро STM32H743ZI: M7.", "не проверялось (скрипт формирует stm32-cmake)"],
-    "log_absent": ["MSPLIM"]
+    "args": [
+      "-DPROJECT_CONFIG_FILE=stm32h7.yml"
+    ],
+    "observed": {
+      "MCU": "STM32H743ZI"
+    },
+    "properties": {
+      "LINK_LIBRARIES": [
+        "HAL::STM32::H7::M7::GPIO",
+        "CMSIS::STM32::H743ZI::M7"
+      ]
+    },
+    "log_contains": [
+      "не проверялось (скрипт формирует stm32-cmake)"
+    ],
+    "log_absent": [
+      "MSPLIM"
+    ],
+    "messages": [
+      {
+        "code": "I038",
+        "args": [
+          "STM32H743ZI",
+          "M7"
+        ]
+      }
+    ]
   },
   {
     "name": "h7-dual-core",
-    "args": ["-DPROJECT_CONFIG_FILE=stm32h7.yml"],
+    "args": [
+      "-DPROJECT_CONFIG_FILE=stm32h7.yml"
+    ],
     "steps": [
-      {"args": ["-DSTM32_YML_PROFILE=dual"], "error": "У STM32H745ZI несколько ядер (M7, M4): укажите mcu_core"},
-      {"args": ["-DSTM32_YML_PROFILE=dualM7"], "properties": {"LINK_LIBRARIES": ["HAL::STM32::H7::M7::GPIO", "CMSIS::STM32::H745ZI::M7"]}, "log_contains": ["Ядро MCU: M7"]},
-      {"args": ["-DSTM32_YML_PROFILE=dualM4", "-DSTM32_YML_OVERRIDE_validate_linker_script=true"], "properties": {"LINK_LIBRARIES": ["HAL::STM32::H7::M4::GPIO", "CMSIS::STM32::H745xx::M4"]}, "absent_properties": {"LINK_LIBRARIES": ["HAL::STM32::H7::M7::GPIO"]}, "log_contains": ["Ядро MCU: M4", "Соотношение : 288K == 288K", "Max Flash Size: 1048576"]}
+      {
+        "args": [
+          "-DSTM32_YML_PROFILE=dual"
+        ],
+        "error": {
+          "code": "E008",
+          "args": [
+            "STM32H745ZI",
+            "M7, M4",
+            "M7"
+          ]
+        }
+      },
+      {
+        "args": [
+          "-DSTM32_YML_PROFILE=dualM7"
+        ],
+        "properties": {
+          "LINK_LIBRARIES": [
+            "HAL::STM32::H7::M7::GPIO",
+            "CMSIS::STM32::H745ZI::M7"
+          ]
+        },
+        "messages": [
+          {
+            "code": "I039",
+            "args": [
+              "M7"
+            ]
+          }
+        ]
+      },
+      {
+        "args": [
+          "-DSTM32_YML_PROFILE=dualM4",
+          "-DSTM32_YML_OVERRIDE_validate_linker_script=true"
+        ],
+        "properties": {
+          "LINK_LIBRARIES": [
+            "HAL::STM32::H7::M4::GPIO",
+            "CMSIS::STM32::H745xx::M4"
+          ]
+        },
+        "absent_properties": {
+          "LINK_LIBRARIES": [
+            "HAL::STM32::H7::M7::GPIO"
+          ]
+        },
+        "log_contains": [
+          "Соотношение : 288K == 288K",
+          "Max Flash Size: 1048576"
+        ],
+        "messages": [
+          {
+            "code": "I039",
+            "args": [
+              "M4"
+            ]
+          }
+        ]
+      }
     ]
   },
   {
     "name": "mcu-core-invalid",
     "steps": [
-      {"args": ["-DPROJECT_CONFIG_FILE=stm32h7.yml", "-DSTM32_YML_PROFILE=badcore"], "error": "mcu_core: 'M3' недопустим для STM32H743ZI. Допустимые значения: M7."},
-      {"args": ["-DPROJECT_CONFIG_FILE=stm32_config.yml", "-DSTM32_YML_PROFILE=", "-DSTM32_YML_OVERRIDE_mcu_core=M4"], "error": "mcu_core: 'M4' недопустим для STM32F411CE: stm32-cmake не выделяет ядра"}
+      {
+        "args": [
+          "-DPROJECT_CONFIG_FILE=stm32h7.yml",
+          "-DSTM32_YML_PROFILE=badcore"
+        ],
+        "error": {
+          "code": "E009",
+          "args": [
+            "M3",
+            "STM32H743ZI",
+            "M7"
+          ]
+        }
+      },
+      {
+        "args": [
+          "-DPROJECT_CONFIG_FILE=stm32_config.yml",
+          "-DSTM32_YML_PROFILE=",
+          "-DSTM32_YML_OVERRIDE_mcu_core=M4"
+        ],
+        "error": {
+          "code": "E007",
+          "args": [
+            "M4",
+            "STM32F411CE"
+          ]
+        }
+      }
     ]
   },
   {
@@ -428,9 +925,20 @@
   },
   {
     "name": "freertos-ioc-port-unknown-family",
-    "args": ["-DPROJECT_CONFIG_FILE=freertos-port.yml", "-DFREERTOS_PATH=/opt/FreeRTOS-Kernel/11.3.1", "-DSTM32_YML_OVERRIDE_mcu=STM32N657X0"],
+    "args": [
+      "-DPROJECT_CONFIG_FILE=freertos-port.yml",
+      "-DFREERTOS_PATH=/opt/FreeRTOS-Kernel/11.3.1",
+      "-DSTM32_YML_OVERRIDE_mcu=STM32N657X0"
+    ],
     "error": "STM32N657X0",
-    "log_contains": ["Порт FreeRTOS для 'STM32N657X0' не определён таблицей фреймворка; используется ARM_CM4F."]
+    "messages": [
+      {
+        "code": "W401",
+        "args": [
+          "STM32N657X0"
+        ]
+      }
+    ]
   },
   {
     "name": "source-directory-target",
@@ -2028,9 +2536,6 @@
       "-DPROJECT_CONFIG_FILE=artifacts.yml",
       "-DSTM32_YML_PROFILE=unknown"
     ],
-    "log_contains": [
-      "Неизвестный элемент 'unsupported-format' параметра 'build_artifacts'. Известные значения: bin, hex, srec, map, lss. Элемент пропускается."
-    ],
     "generated_artifacts": [
       "bin"
     ],
@@ -2048,7 +2553,17 @@
       "absent": [
         "-Wl,-Map=baremetal_probe.map"
       ]
-    }
+    },
+    "messages": [
+      {
+        "code": "W007",
+        "args": [
+          "unsupported-format",
+          "build_artifacts",
+          "bin, hex, srec, map, lss"
+        ]
+      }
+    ]
   },
   {
     "name": "artifacts-reconfigure",
@@ -2153,8 +2668,13 @@
       ],
       "names": []
     },
-    "log_contains": [
-      "Пользовательская библиотека не найдена и будет проигнорирована:"
+    "messages": [
+      {
+        "code": "W301",
+        "args": [
+          null
+        ]
+      }
     ]
   },
   {

@@ -19,14 +19,20 @@ on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
   catalog in Russian or English. `STM32_YML_LANG` (`auto`, `ru`, `en`) selects the
   language; `auto` uses the locale, on Windows the registry. `STM32_YML_MESSAGE_CODES=ON`
   shows the codes in the output. Every Configure message is written to
-  `stm32_yml_messages.jsonl` in the build directory. The version lines use codes so far;
-  the other messages move to the catalog in the next changes.
+  `stm32_yml_messages.jsonl` in the build directory. Messages of the core, configuration
+  reading, profiles, IOC and utilities use codes; the other modules move to the catalog
+  in the next changes.
 
 ### Changed
 
-- **Output language.** Without a Russian locale (including Docker and CI) the version
-  lines are printed in English: "stm32-cmake-yml version: …". For Russian output use
-  `-DSTM32_YML_LANG=ru`.
+- **Output language.** Without a Russian locale (including Docker and CI) catalog
+  messages are printed in English, for example "stm32-cmake-yml version: …". For Russian
+  output use `-DSTM32_YML_LANG=ru`. Scripts that parse the log should use the codes from
+  `stm32_yml_messages.jsonl` rather than the text.
+- **`mcu_core` hint.** The dual-core error suggests one core (`mcu_core: M7`) instead of
+  the `M7;M4` list.
+- **Unknown enumerated value.** The end of the warning is capitalized:
+  "Применяется '…'" / "Значение не используется" in Russian.
 
 ---
 

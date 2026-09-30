@@ -8,7 +8,7 @@
 # ==============================================================================
 function(stm32_yml_parse_ioc_file IOC_FILE_PATH PREFIX)
     if(NOT EXISTS ${IOC_FILE_PATH})
-        message(FATAL_ERROR "Указанный .ioc файл не найден: ${IOC_FILE_PATH}")
+        stm32_yml_msg(E201 "${IOC_FILE_PATH}")
     endif()
 
     file(STRINGS ${IOC_FILE_PATH} IOC_LINES)
@@ -102,8 +102,8 @@ function(stm32_yml_parse_ioc_file IOC_FILE_PATH PREFIX)
                 # папки — используем CustomerFirmwarePackage, иначе оставляем FirmwarePackage.
                 if(_use_customer_fw_path AND NOT "${_customer_fw_version}" STREQUAL "")
                     set(_cubefw_package "${_customer_fw_version}")
-                    message(STATUS "Используется CustomerFirmwarePackage: семейство=${_customer_fw_family}, версия=${_customer_fw_version}")
-                    message(STATUS "  Путь: ${_customer_fw_path}")
+                    stm32_yml_msg(I202 "${_customer_fw_family}" "${_customer_fw_version}")
+                    stm32_yml_msg(I203 "${_customer_fw_path}")
                 endif()
 
                 # Экспортируем накопленные значения в область вызывающего кода.
@@ -212,10 +212,10 @@ function(stm32_yml_parse_config config_file)
     endif()
     find_program(YQ_EXECUTABLE yq)
     if(NOT YQ_EXECUTABLE)
-        message(FATAL_ERROR "Инструмент 'yq' не найден. Пожалуйста, установите его.")
+        stm32_yml_msg(E003)
     endif()
     if(NOT EXISTS ${config_file})
-        message(FATAL_ERROR "Файл конфигурации не найден: ${config_file}")
+        stm32_yml_msg(E004 "${config_file}")
     endif()
 
     execute_process(
@@ -225,7 +225,7 @@ function(stm32_yml_parse_config config_file)
         OUTPUT_STRIP_TRAILING_WHITESPACE
     )
     if(NOT YQ_RESULT EQUAL 0)
-        message(FATAL_ERROR "Ошибка при конвертации ${config_file} в JSON с помощью yq.")
+        stm32_yml_msg(E005 "${config_file}")
     endif()
 
     # Запускаем рекурсивный парсинг с корня
@@ -239,7 +239,7 @@ function(stm32_yml_parse_config config_file)
     # СОХРАНЯЕМ СПИСОК ПЕРЕМЕННЫХ, чтобы следующий модуль мог пробросить их дальше
     set(YAML_PARSED_KEYS "${PARSED_VARS}" PARENT_SCOPE)
 
-    message(STATUS "Конфигурация из ${config_file} успешно загружена.")
+    stm32_yml_msg(I035 "${config_file}")
 endfunction()
 
 # ==============================================================================
@@ -255,7 +255,7 @@ endfunction()
 #
 function(stm32_yml_normalize_memory var_name)
     _stm32_yml_memory_bytes(${var_name} result)
-    message(STATUS "Размер памяти '${${var_name}}' нормализован в ${result} байт.")
+    stm32_yml_msg(I036 "${${var_name}}" "${result}")
     set(${var_name} ${result} PARENT_SCOPE)
 endfunction()
 
@@ -269,10 +269,7 @@ function(_stm32_yml_memory_bytes VAR_NAME OUT_VAR)
     elseif(value_str MATCHES "^[0-9]+$")
         math(EXPR result "${value_str}")
     else()
-        message(FATAL_ERROR
-            "Недопустимый формат размера памяти '${VAR_NAME}: ${value_str}'. "
-            "Укажите целое число байт или целое число с суффиксом K или M "
-            "в верхнем регистре, например: 0, 1536, 2K, 1M.")
+        stm32_yml_msg(E006 "${VAR_NAME}" "${value_str}")
     endif()
     set(${OUT_VAR} ${result} PARENT_SCOPE)
 endfunction()
@@ -303,14 +300,14 @@ endfunction()
 #
 function(stm32_yml_find_latest_stm32_cube_fw MCU_FAMILY CUBE_REPO_PATH RESULT_VAR)
     if(NOT EXISTS ${CUBE_REPO_PATH})
-        message(FATAL_ERROR "Директория STM32Cube не найдена по пути: ${CUBE_REPO_PATH}")
+        stm32_yml_msg(E401 "${CUBE_REPO_PATH}")
     endif()
 
     # Ищем все папки, подходящие под наш шаблон семейства
     file(GLOB FW_DIRS LIST_DIRECTORIES true "${CUBE_REPO_PATH}/STM32Cube_FW_${MCU_FAMILY}_V*")
 
     if(NOT FW_DIRS)
-        message(FATAL_ERROR "Не найдено ни одного пакета для семейства ${MCU_FAMILY} в ${CUBE_REPO_PATH}")
+        stm32_yml_msg(E402 "${MCU_FAMILY}" "${CUBE_REPO_PATH}")
     endif()
 
     set(LATEST_VERSION "V0.0.0") # Начальное значение для сравнения
@@ -333,7 +330,7 @@ function(stm32_yml_find_latest_stm32_cube_fw MCU_FAMILY CUBE_REPO_PATH RESULT_VA
     endforeach()
 
     if(LATEST_VERSION STREQUAL "V0.0.0")
-        message(FATAL_ERROR "Не удалось определить версию из найденных папок для ${MCU_FAMILY}.")
+        stm32_yml_msg(E403 "${MCU_FAMILY}")
     endif()
 
     # Записываем результат в переменную, имя которой передал вызывающий код
@@ -462,7 +459,7 @@ function(stm32_yml_ensure_default_value VAR_NAME DEFAULT_VALUE)
     # Это надежный способ покрыть оба случая: отсутствие ключа в YAML и ключ с пустым значением.
     if(NOT DEFINED ${VAR_NAME} OR "${${VAR_NAME}}" STREQUAL "")
         set(${VAR_NAME} "${DEFAULT_VALUE}" PARENT_SCOPE)
-        message(STATUS "Параметр '${VAR_NAME}' не был задан или был пуст. Установлено значение по умолчанию: '${DEFAULT_VALUE}'.")
+        stm32_yml_msg(I037 "${VAR_NAME}" "${DEFAULT_VALUE}")
     endif()
 endfunction()
 
@@ -484,12 +481,10 @@ function(stm32_yml_check_enum_value VAR_NAME FALLBACK)
     endif()
     string(REPLACE ";" ", " _known "${ARGN}")
     if("${FALLBACK}" STREQUAL "")
-        set(_applied "значение не используется")
+        stm32_yml_msg(W006 "${_value}" "${VAR_NAME}" "${_known}")
     else()
-        set(_applied "применяется '${FALLBACK}'")
+        stm32_yml_msg(W005 "${_value}" "${VAR_NAME}" "${_known}" "${FALLBACK}")
     endif()
-    message(WARNING "Неизвестное значение '${_value}' параметра '${VAR_NAME}'. "
-                    "Известные значения: ${_known}. ${_applied}.")
     set(${VAR_NAME} "${FALLBACK}" PARENT_SCOPE)
 endfunction()
 
@@ -507,8 +502,7 @@ function(stm32_yml_check_enum_list VAR_NAME)
         if("${_item}" IN_LIST ARGN)
             list(APPEND _result "${_item}")
         else()
-            message(WARNING "Неизвестный элемент '${_item}' параметра '${VAR_NAME}'. "
-                            "Известные значения: ${_known}. Элемент пропускается.")
+            stm32_yml_msg(W007 "${_item}" "${VAR_NAME}" "${_known}")
         endif()
     endforeach()
     set(${VAR_NAME} "${_result}" PARENT_SCOPE)
@@ -560,26 +554,22 @@ function(stm32_yml_resolve_mcu_core)
     string(REPLACE ";" ", " _cores_text "${_cores}")
     if(NOT _cores)
         if(NOT "${mcu_core}" STREQUAL "")
-            message(FATAL_ERROR
-                "mcu_core: '${mcu_core}' недопустим для ${MCU}: stm32-cmake не выделяет ядра "
-                "для этого MCU. Удалите mcu_core из конфигурации.")
+            stm32_yml_msg(E007 "${mcu_core}" "${MCU}")
         endif()
         return()
     endif()
     if("${mcu_core}" STREQUAL "")
         list(LENGTH _cores _count)
         if(_count GREATER 1)
-            message(FATAL_ERROR
-                "У ${MCU} несколько ядер (${_cores_text}): укажите mcu_core, "
-                "например 'mcu_core: ${_cores}'.")
+            list(GET _cores 0 _first_core)
+            stm32_yml_msg(E008 "${MCU}" "${_cores_text}" "${_first_core}")
         endif()
-        message(STATUS "Ядро MCU не задано, используется единственное ядро ${MCU}: ${_cores}.")
+        stm32_yml_msg(I038 "${MCU}" "${_cores}")
         set(mcu_core "${_cores}" PARENT_SCOPE)
     elseif(NOT "${mcu_core}" IN_LIST _cores)
-        message(FATAL_ERROR
-            "mcu_core: '${mcu_core}' недопустим для ${MCU}. Допустимые значения: ${_cores_text}.")
+        stm32_yml_msg(E009 "${mcu_core}" "${MCU}" "${_cores_text}")
     else()
-        message(STATUS "Ядро MCU: ${mcu_core}")
+        stm32_yml_msg(I039 "${mcu_core}")
     endif()
 endfunction()
 
@@ -681,10 +671,7 @@ function(stm32_yml_generate_bin_file TARGET)
     find_package(Python3 COMPONENTS Interpreter QUIET)
     set(_script "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../scripts/stm32_crc.py")
     if("${_flash_origin}" STREQUAL "" OR NOT Python3_FOUND OR NOT EXISTS "${_script}")
-        message(WARNING
-            "bin: не удалось определить регион FLASH скрипта компоновщика или найти Python3; "
-            "BIN создаётся objcopy -O binary и может оказаться большим, если в ELF есть "
-            "секции вне Flash.")
+        stm32_yml_msg(W701)
         stm32_generate_binary_file(${TARGET})
         return()
     endif()

@@ -17,17 +17,13 @@ DIRECT = re.compile(r"^\s*message\s*\(", re.M)
 # 0.10.0 plan. The numbers must match exactly: lower one when converting a
 # module; the list must be empty for the 0.10.0 release.
 LEGACY_DIRECT_MESSAGES = {
-    "stm32_yml.cmake": 7,
     "cmake/stm32_yml_arduino.cmake": 13,
     "cmake/stm32_yml_code_quality.cmake": 4,
-    "cmake/stm32_yml_config.cmake": 18,
     "cmake/stm32_yml_diagnostics.cmake": 21,
     "cmake/stm32_yml_frameworks.cmake": 23,
     "cmake/stm32_yml_linker.cmake": 13,
     "cmake/stm32_yml_postbuild.cmake": 13,
-    "cmake/stm32_yml_profiles.cmake": 12,
     "cmake/stm32_yml_sources.cmake": 3,
-    "cmake/stm32_yml_utils.cmake": 21,
 }
 
 

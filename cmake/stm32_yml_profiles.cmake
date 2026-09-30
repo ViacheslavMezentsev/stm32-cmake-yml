@@ -89,7 +89,7 @@ function(stm32_yml_apply_profile CONFIG_FILE_PATH)
     set(_applied_keys "")
 
     if(NOT "${STM32_YML_PROFILE}" STREQUAL "")
-        message(STATUS "Применение профиля сборки: '${STM32_YML_PROFILE}'")
+        stm32_yml_msg(I101 "${STM32_YML_PROFILE}")
 
         # Проверяем, что такой профиль существует в распарсенных переменных.
         # Парсер создаёт переменные вида profiles_<name>_<param>.
@@ -106,9 +106,7 @@ function(stm32_yml_apply_profile CONFIG_FILE_PATH)
         endif()
 
         if(NOT _profile_keys)
-            message(WARNING
-                "Профиль '${STM32_YML_PROFILE}' не найден в конфигурации. "
-                "Доступные профили можно посмотреть в секции 'profiles:' файла ${CONFIG_FILE_PATH}.")
+            stm32_yml_msg(W101 "${STM32_YML_PROFILE}" "${CONFIG_FILE_PATH}")
         else()
             foreach(_key IN LISTS _profile_keys)
                 # Пропускаем ключи с суффиксом _append — обработаем их отдельно.
@@ -126,7 +124,7 @@ function(stm32_yml_apply_profile CONFIG_FILE_PATH)
                 set(${_key} "${_pval}")
                 set(${_key} "${_pval}" PARENT_SCOPE)
                 list(APPEND _applied_keys "${_key}")
-                message(STATUS "  [профиль] ${_key} = ${_pval}")
+                stm32_yml_msg(I102 "${_key}" "${_pval}")
             endforeach()
 
             # Семантика ДОПОЛНЕНИЯ: _append добавляет к уже установленному значению.
@@ -144,7 +142,7 @@ function(stm32_yml_apply_profile CONFIG_FILE_PATH)
                 list(APPEND _base_val ${_append_val})
                 set(${_base_key} "${_base_val}" PARENT_SCOPE)
                 list(APPEND _applied_keys "${_base_key}")
-                message(STATUS "  [профиль +] ${_base_key} += ${_append_val}")
+                stm32_yml_msg(I103 "${_base_key}" "${_append_val}")
             endforeach()
         endif()
     endif()
@@ -164,14 +162,14 @@ function(stm32_yml_apply_profile CONFIG_FILE_PATH)
             if(NOT "${_param_val}" STREQUAL "")
                 set(${_param_name} "${_param_val}" PARENT_SCOPE)
                 list(APPEND _applied_keys "${_param_name}")
-                message(STATUS "  [override] ${_param_name} = ${_param_val}")
+                stm32_yml_msg(I104 "${_param_name}" "${_param_val}")
                 math(EXPR _overrides_applied "${_overrides_applied} + 1")
             endif()
         endif()
     endforeach()
 
     if(_overrides_applied GREATER 0)
-        message(STATUS "Применено точечных cmake-overrides: ${_overrides_applied}.")
+        stm32_yml_msg(I105 "${_overrides_applied}")
     endif()
 
     list(REMOVE_DUPLICATES _applied_keys)
@@ -204,12 +202,12 @@ function(stm32_yml_list_profiles)
     endif()
 
     if(_found_profiles)
-        message(STATUS "Доступные профили сборки:")
+        stm32_yml_msg(I106)
         foreach(_p IN LISTS _found_profiles)
-            message(STATUS "  - ${_p}")
+            stm32_yml_msg(I107 "${_p}")
         endforeach()
     else()
-        message(STATUS "Профили сборки не определены в конфигурации.")
+        stm32_yml_msg(I108)
     endif()
 endfunction()
 
@@ -228,7 +226,7 @@ macro(_stm32_yml_load_profiles_file)
     if(DEFINED profiles_file AND NOT "${profiles_file}" STREQUAL "")
         set(_profiles_src_path "${CMAKE_SOURCE_DIR}/${profiles_file}")
         if(EXISTS "${_profiles_src_path}")
-            message(STATUS "Загрузка профилей из внешнего файла: ${_profiles_src_path}")
+            stm32_yml_msg(I109 "${_profiles_src_path}")
             # При заданном profiles_file встроенные профили не используются
             # (ТЗ 3.4.11, решение вопроса 10.2.16) — предупреждаем о них.
             set(_inline_profiles "")
@@ -240,15 +238,12 @@ macro(_stm32_yml_load_profiles_file)
             if(_inline_profiles)
                 list(REMOVE_DUPLICATES _inline_profiles)
                 string(REPLACE ";" ", " _inline_profiles "${_inline_profiles}")
-                message(WARNING
-                    "Встроенная секция 'profiles:' игнорируется (профили: ${_inline_profiles}): "
-                    "задан profiles_file '${profiles_file}', профили берутся только из него. "
-                    "Перенесите нужные профили во внешний файл или удалите встроенную секцию.")
+                stm32_yml_msg(W102 "${_inline_profiles}" "${profiles_file}")
             endif()
             set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${_profiles_src_path}")
             stm32_yml_parse_config("${_profiles_src_path}" "{\"profiles\": (.profiles // {})}")
         else()
-            message(WARNING "Файл профилей не найден: ${_profiles_src_path}")
+            stm32_yml_msg(W103 "${_profiles_src_path}")
         endif()
     endif()
 endmacro()

@@ -199,8 +199,11 @@ def verify_messages(expectation, build, catalog, normalized):
     codes = [record["code"].removeprefix("SCY-") for record in records]
 
     def matches(record, expected):
+        # "args": null elements match any value (absolute paths, tool lists).
+        args = expected.get("args")
         return (record["code"] == "SCY-" + expected["code"]
-                and ("args" not in expected or record["args"] == expected["args"]))
+                and (args is None or (len(record["args"]) == len(args)
+                     and all(e is None or e == a for e, a in zip(args, record["args"])))))
 
     for expected in expectation.get("messages", []):
         require(any(matches(record, expected) for record in records),
