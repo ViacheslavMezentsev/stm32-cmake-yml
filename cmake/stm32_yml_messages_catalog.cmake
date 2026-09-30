@@ -229,9 +229,15 @@ stm32_yml_msg_def(I203
 
 # --- 3xx: исходники и модули --------------------------------------------------
 
+stm32_yml_msg_def(E302
+    "Каталог проекта '{1}' совпадает с каталогом сборки внешних зависимостей _deps/. Переименуйте его: внешние каталоги собираются в _deps/ (ТЗ 4.6.8)."
+    "Project directory '{1}' clashes with the _deps/ build directory of out-of-tree dependencies. Rename it: out-of-tree directories are built in _deps/ (spec 4.6.8).")
 stm32_yml_msg_def(W301
     "Пользовательская библиотека не найдена и будет проигнорирована: {1}"
     "Custom library not found and ignored: {1}")
+stm32_yml_msg_def(I304
+    "Каталог вне проекта {1} собирается в {2}"
+    "Out-of-tree directory {1} is built in {2}")
 stm32_yml_msg_def(I301
     "Подключение пользовательской библиотеки: {1}"
     "Adding custom library: {1}")

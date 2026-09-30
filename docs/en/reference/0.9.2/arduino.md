@@ -29,6 +29,8 @@ arduino:
 
 Root-relative consumer CMake wrapper directory. Its CMakeLists.txt is added with add_subdirectory; absence warns. The wrapper creates required targets, then selected by link_libraries.
 
+**Change in 0.10.0** (spec 4.6.8): the build directory of an added directory is its path from the project root; a directory outside the project uses `_deps/<path without leading ..>` (for example, `../modules/etl` → `build/_deps/modules/etl`); clashing paths get a `-<4 SHA-1 characters>` suffix. The former `external_*`, `arduino_lib_*`, `arduino_custom_*` and `arduino_core` names are gone; after upgrading from 0.9.x build in a clean directory.
+
 **Omission and emptiness:** see [shared rules](semantics.md#empty-values); exceptions are stated above. Profiles/overrides apply before defaults. Backend/path restrictions are stated in the description.
 
 ```yaml
@@ -83,6 +85,8 @@ arduino:
 
 Looks for CMakeLists.txt under <core_path>/libraries/<name>. Absence warns; Arduino IDE availability does not guarantee a CMake wrapper. Discovered targets are not automatically linked to firmware.
 
+**Change in 0.10.0** (spec 4.6.8): the build directory of an added directory is its path from the project root; a directory outside the project uses `_deps/<path without leading ..>` (for example, `../modules/etl` → `build/_deps/modules/etl`); clashing paths get a `-<4 SHA-1 characters>` suffix. The former `external_*`, `arduino_lib_*`, `arduino_custom_*` and `arduino_core` names are gone; after upgrading from 0.9.x build in a clean directory.
+
 **Omission and emptiness:** see [shared rules](semantics.md#empty-values); exceptions are stated above. Profiles/overrides apply before defaults. Backend/path restrictions are stated in the description.
 
 ```yaml
@@ -100,6 +104,8 @@ arduino:
 `CFG-ARDUINO-CUSTOM-LIBRARIES` · **Type:** list of relative directories · **Default:** []
 
 Adds consumer CMakeLists.txt directories relative to the root. Absence warns. The project defines targets and their linkage. Arduino::Definitions propagates common defines and common/language compile_options; language compile_definitions_c/cxx are not copied into that interface.
+
+**Change in 0.10.0** (spec 4.6.8): the build directory of an added directory is its path from the project root; a directory outside the project uses `_deps/<path without leading ..>` (for example, `../modules/etl` → `build/_deps/modules/etl`); clashing paths get a `-<4 SHA-1 characters>` suffix. The former `external_*`, `arduino_lib_*`, `arduino_custom_*` and `arduino_core` names are gone; after upgrading from 0.9.x build in a clean directory.
 
 **Omission and emptiness:** see [shared rules](semantics.md#empty-values); exceptions are stated above. Profiles/overrides apply before defaults. Backend/path restrictions are stated in the description.
 

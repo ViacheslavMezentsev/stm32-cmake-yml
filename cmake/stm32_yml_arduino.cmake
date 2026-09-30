@@ -124,7 +124,7 @@ function(stm32_yml_setup_arduino TARGET_NAME)
     endif()
     if(EXISTS "${_core_cmake_dir}/CMakeLists.txt")
         stm32_yml_msg(I505 "${_core_cmake_dir}")
-        add_subdirectory("${_core_cmake_dir}" "${CMAKE_BINARY_DIR}/arduino_core")
+        stm32_yml_add_subdirectory("${_core_cmake_dir}")
     else()
         stm32_yml_msg(W502 "${_core_cmake_dir}")
     endif()
@@ -140,7 +140,7 @@ function(stm32_yml_setup_arduino TARGET_NAME)
 
             if(EXISTS "${_lib_dir}/CMakeLists.txt")
                 stm32_yml_msg(I506 "${_lib}")
-                add_subdirectory("${_lib_dir}" "${CMAKE_BINARY_DIR}/arduino_lib_${_lib}")
+                stm32_yml_add_subdirectory("${_lib_dir}")
             else()
                 stm32_yml_msg(W503 "${_lib}" "${_lib_dir}")
             endif()
@@ -158,12 +158,8 @@ function(stm32_yml_setup_arduino TARGET_NAME)
 
             if(EXISTS "${_custom_lib_dir}/CMakeLists.txt")
                 stm32_yml_msg(I507 "${_custom_lib}")
-                # Имя бинарной директории формируем из всего относительного пути,
-                # а не из последнего сегмента: пути "Arduino/libraries/Cli" и
-                # "Components/Cli" дали бы одинаковое имя и конфликт в CMake.
-                string(REGEX REPLACE "[^A-Za-z0-9_]" "_" _custom_lib_name "${_custom_lib}")
-                add_subdirectory("${_custom_lib_dir}"
-                    "${CMAKE_BINARY_DIR}/arduino_custom_${_custom_lib_name}")
+                # Каталог сборки — относительный путь или _deps/… (ТЗ 4.6.8).
+                stm32_yml_add_subdirectory("${_custom_lib_dir}")
             else()
                 stm32_yml_msg(W504 "${_custom_lib_dir}")
             endif()

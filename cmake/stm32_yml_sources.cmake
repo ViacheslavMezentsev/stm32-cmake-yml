@@ -55,18 +55,9 @@ function(stm32_yml_setup_sources TARGET_NAME)
         # Стандартная обработка остальных файлов
         if(NOT is_special_file)
             if(IS_DIRECTORY ${full_path})
-                # Подключение директории как модуля (CMakeLists.txt внутри обязателен).
-                # Для каталога вне дерева проекта (например "../shared") CMake
-                # требует явного указания бинарной директории, иначе конфигурация
-                # завершается ошибкой. Имя формируем из относительного пути,
-                # заменяя разделители, чтобы исключить коллизии одноимённых папок.
-                file(RELATIVE_PATH _src_rel "${CMAKE_CURRENT_SOURCE_DIR}" "${full_path}")
-                if(_src_rel MATCHES "^\\.\\.")
-                    string(REGEX REPLACE "[^A-Za-z0-9_]" "_" _src_bin_name "${src_item}")
-                    add_subdirectory("${full_path}" "${CMAKE_BINARY_DIR}/external_${_src_bin_name}")
-                else()
-                    add_subdirectory(${src_item})
-                endif()
+                # Подключение директории как модуля (CMakeLists.txt внутри обязателен);
+                # каталог сборки — по ТЗ 4.6.8 (внешние каталоги — в _deps/).
+                stm32_yml_add_subdirectory("${full_path}")
             elseif(EXISTS ${full_path})
                 # Добавление одиночного файла
                 list(APPEND LOCAL_PROJECT_SOURCES ${full_path})
@@ -81,4 +72,33 @@ function(stm32_yml_setup_sources TARGET_NAME)
         target_sources(${TARGET_NAME} PRIVATE ${LOCAL_PROJECT_SOURCES})
     endif()
 
+endfunction()
+
+# ==============================================================================
+# Каталоги, которые подключаются через add_subdirectory в этом Configure:
+# каталоги из sources, а при backend arduino — обёртка ядра, arduino.libraries
+# и arduino.custom_libraries. Нужны заранее для плана каталогов сборки (ТЗ 4.6.8).
+# ==============================================================================
+function(stm32_yml_collect_subdirectories OUT_VAR)
+    set(_dirs "")
+    foreach(_item IN LISTS sources)
+        get_filename_component(_dir "${_item}" ABSOLUTE BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
+        if(IS_DIRECTORY "${_dir}")
+            list(APPEND _dirs "${_dir}")
+        endif()
+    endforeach()
+    if(toolchain_backend STREQUAL "arduino")
+        if(DEFINED arduino_core_cmake_dir AND NOT arduino_core_cmake_dir STREQUAL "")
+            list(APPEND _dirs "${CMAKE_SOURCE_DIR}/${arduino_core_cmake_dir}")
+        else()
+            list(APPEND _dirs "${CMAKE_SOURCE_DIR}/Arduino/Core")
+        endif()
+        foreach(_lib IN LISTS arduino_libraries)
+            list(APPEND _dirs "${CMAKE_SOURCE_DIR}/${arduino_core_path}/libraries/${_lib}")
+        endforeach()
+        foreach(_lib IN LISTS arduino_custom_libraries)
+            list(APPEND _dirs "${CMAKE_SOURCE_DIR}/${_lib}")
+        endforeach()
+    endif()
+    set(${OUT_VAR} "${_dirs}" PARENT_SCOPE)
 endfunction()

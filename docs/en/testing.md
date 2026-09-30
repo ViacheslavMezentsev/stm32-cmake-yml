@@ -159,8 +159,8 @@ package or the resulting image bytes. Ubuntu snapshots are not required.
 
 ## Framework configuration tests
 
-[tests/cases.json](../../tests/cases.json) defines 163 scenarios, run with each of
-the three GCC and two CMake versions from the lockfile: **978 case executions**.
+[tests/cases.json](../../tests/cases.json) defines 167 scenarios, run with each of
+the three GCC and two CMake versions from the lockfile: **1002 case executions**.
 Twenty-seven scenarios perform two to thirteen consecutive configurations in the same build tree.
 
 | Area | Checks |
@@ -323,6 +323,13 @@ directories: a tag, a clone without tags, a copy without `.git`, a missing direc
 - `cubefw-*` (TC-45) check the STM32Cube package choice: local `Drivers/` (the `local_drivers`
   case key links a pinned package), the latest repository version, an explicit version, a
   missing version (`SCY-E415`) and a missing repository (`SCY-E401`).
+- `build-dirs-*` (TC-78) check build directories per spec 4.6.8: a project directory
+  (`Module`), `../modules/etl` → `_deps/modules/etl`, the clashing keys `../modules/etl` and
+  `../../modules/etl` and the nested `../a/x`, `../a/x/y` with a SHA-1 suffix, `../a/xy`
+  without one, and `SCY-E302` for the `_deps/local` project directory. The `extra_dirs` case
+  key copies `tests/fixtures/outside-module` into and outside the project; `binary_dirs`
+  checks build directories (`{h:<path>}` is 4 SHA-1 characters). `arduino-library-linked` and
+  `arduino-custom-chain` check the build directories of the Arduino core wrapper and libraries.
 
 ### Messages, codes and language
 

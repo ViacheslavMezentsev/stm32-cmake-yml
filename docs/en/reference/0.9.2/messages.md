@@ -91,11 +91,13 @@ The list is built from the `cmake/stm32_yml_messages_catalog.cmake` catalog by `
 
 | Code | Level | Text |
 | --- | --- | --- |
+| `SCY-E302` | FATAL_ERROR | Project directory '{1}' clashes with the \_deps/ build directory of out-of-tree dependencies. Rename it: out-of-tree directories are built in \_deps/ (spec 4.6.8). |
 | `SCY-W301` | WARNING | Custom library not found and ignored: {1} |
 | `SCY-W302` | WARNING | Source '{1}' not found and ignored. |
 | `SCY-I301` | STATUS | Adding custom library: {1} |
 | `SCY-I302` | STATUS | Custom system file found. Override: {1} |
 | `SCY-I303` | STATUS | Custom startup file found. Override: {1} |
+| `SCY-I304` | STATUS | Out-of-tree directory {1} is built in {2} |
 
 ## 4xx — CMSIS, HAL, FreeRTOS
 

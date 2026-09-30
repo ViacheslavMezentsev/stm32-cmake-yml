@@ -1,9 +1,11 @@
 """Run one configure-only contract case against the mounted framework checkout."""
 
 import argparse
+import hashlib
 import json
 import os
 from pathlib import Path
+import re
 import shlex
 import shutil
 import subprocess
@@ -90,6 +92,15 @@ def verify(case, build, source):
         for extension in ("elf", "bin", "hex", "srec", "map", "lss"):
             require(not (build / f"{target}.{extension}").exists(),
                     f"Unexpected built artifact: {target}.{extension}")
+
+    def binary_dir(name):
+        # "{h:<path>}" is the first 4 hex digits of SHA-1 of the path from the project root.
+        return re.sub(r"\{h:([^}]+)\}", lambda m: hashlib.sha1(m.group(1).encode()).hexdigest()[:4], name)
+
+    for name in case.get("binary_dirs", []):
+        require((build / binary_dir(name) / "cmake_install.cmake").is_file(), f"Missing build directory {binary_dir(name)}")
+    for name in case.get("absent_binary_dirs", []):
+        require(not (build / binary_dir(name)).exists(), f"Unexpected build directory {binary_dir(name)}")
 
     if "configure_depends" in case:
         # ТЗ 3.6.5: изменение YAML, IOC и файла профилей перезапускает Configure.
@@ -247,8 +258,12 @@ def main():
     args.work_dir.mkdir(parents=True, exist_ok=True)
     # Cases are isolated; steps within one case deliberately reuse the same cache.
     run = Path(tempfile.mkdtemp(prefix=f"{args.case}-", dir=args.work_dir)).resolve()
-    source, build = run / "source", run / "build"
+    # Spec 4.6.8: directories outside the project ("../..") stay inside the case directory.
+    source = run / "w1/w2/source" if case.get("extra_dirs") else run / "source"
+    build = run / "build"
     shutil.copytree(tests / "fixtures/project", source)
+    for relative in case.get("extra_dirs", []):
+        shutil.copytree(tests / "fixtures/outside-module", (source / relative).resolve(), dirs_exist_ok=True)
     if case.get("backend") == "arduino":
         core = Path("/opt/Arduino_Core_STM32/2.12.0")
         require((core / "cores/arduino/wiring_digital.c").is_file(), "Pinned Arduino core missing")

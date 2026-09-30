@@ -3198,6 +3198,14 @@
           "-DARDUINO_BASE=1"
         ]
       }
+    ],
+    "binary_dirs": [
+      "Arduino/Core",
+      "arduino-library-core/libraries/Probe"
+    ],
+    "absent_binary_dirs": [
+      "arduino_core",
+      "arduino_lib_Probe"
     ]
   },
   {
@@ -3420,6 +3428,13 @@
           "custom/hal/driver"
         ]
       }
+    ],
+    "binary_dirs": [
+      "custom/hal/driver",
+      "custom/app/driver"
+    ],
+    "absent_binary_dirs": [
+      "arduino_custom_custom_hal_driver"
     ]
   },
   {
@@ -4286,6 +4301,87 @@
       "code": "E401",
       "args": [
         "/nonexistent/STM32Cube/Repository"
+      ]
+    }
+  },
+  {
+    "name": "build-dirs-external",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=build-dirs.yml",
+      "-DSTM32_YML_PROFILE=external"
+    ],
+    "extra_dirs": [
+      "../modules/etl"
+    ],
+    "no_st_dependencies": true,
+    "binary_dirs": [
+      "Module",
+      "_deps/modules/etl"
+    ],
+    "absent_binary_dirs": [
+      "external_.._modules_etl"
+    ],
+    "messages": [
+      {
+        "code": "I304",
+        "args": [
+          "../modules/etl",
+          "_deps/modules/etl"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "build-dirs-same-key",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=build-dirs.yml",
+      "-DSTM32_YML_PROFILE=same_key"
+    ],
+    "extra_dirs": [
+      "../modules/etl",
+      "../../modules/etl"
+    ],
+    "no_st_dependencies": true,
+    "binary_dirs": [
+      "_deps/modules/etl-{h:../modules/etl}",
+      "_deps/modules/etl-{h:../../modules/etl}"
+    ],
+    "absent_binary_dirs": [
+      "_deps/modules/etl"
+    ]
+  },
+  {
+    "name": "build-dirs-nested",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=build-dirs.yml",
+      "-DSTM32_YML_PROFILE=nested"
+    ],
+    "extra_dirs": [
+      "../a/x",
+      "../a/x/y",
+      "../a/xy"
+    ],
+    "no_st_dependencies": true,
+    "binary_dirs": [
+      "_deps/a/x-{h:../a/x}",
+      "_deps/a/x/y-{h:../a/x/y}",
+      "_deps/a/xy"
+    ]
+  },
+  {
+    "name": "build-dirs-deps-clash",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=build-dirs.yml",
+      "-DSTM32_YML_PROFILE=deps_clash"
+    ],
+    "extra_dirs": [
+      "_deps/local",
+      "../modules/etl"
+    ],
+    "error": {
+      "code": "E302",
+      "args": [
+        "_deps/local"
       ]
     }
   }

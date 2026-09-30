@@ -13,6 +13,7 @@ include(${CMAKE_CURRENT_LIST_DIR}/cmake/stm32_yml_messages.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/stm32_yml_utils.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/stm32_yml_versions.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/stm32_yml_config.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/cmake/stm32_yml_build_dirs.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/stm32_yml_sources.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/stm32_yml_frameworks.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/stm32_yml_linker.cmake)
@@ -121,7 +122,10 @@ function(stm32_yml_setup_project TARGET_NAME)
         target_link_options(${TARGET_NAME} PRIVATE "LINKER:${directive}")
     endforeach()
 
-    # 3. Подключение исходных файлов и папок.
+    # 3. Подключение исходных файлов и папок. Каталоги сборки всех подключаемых
+    # каталогов назначаются заранее (ТЗ 4.6.8).
+    stm32_yml_collect_subdirectories(_stm32_yml_subdirs)
+    stm32_yml_plan_build_dirs(${_stm32_yml_subdirs})
     stm32_yml_setup_sources(${TARGET_NAME})
 
     # 4. Настраиваем backend сборки: stm32-cmake (по умолчанию) или arduino.

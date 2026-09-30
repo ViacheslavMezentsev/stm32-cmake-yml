@@ -249,7 +249,11 @@
         "configure.source-directory-requires-cmake",
         "configure.module-explicit-link",
         "configure.module-not-auto-linked",
-        "configure.module-missing-target"
+        "configure.module-missing-target",
+        "configure.build-dirs-external",
+        "configure.build-dirs-same-key",
+        "configure.build-dirs-nested",
+        "configure.build-dirs-deps-clash"
       ],
       "errata": []
     },

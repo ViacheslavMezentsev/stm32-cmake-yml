@@ -11,6 +11,8 @@ Shared rules: [semantics](semantics.md). Baseline: `f8ef5200fc7a4a96d6f3fe9111af
 
 Files are added to the target; directories use add_subdirectory and need CMakeLists.txt. Paths are relative to the current source directory, normally the root. ../ modules are supported. Missing paths warn and are skipped; a target with no sources can then fail Generate. With CMSIS/HAL, startup/system files override upstream sources.
 
+**Change in 0.10.0** (spec 4.6.8): the build directory of an added directory is its path from the project root; a directory outside the project uses `_deps/<path without leading ..>` (for example, `../modules/etl` → `build/_deps/modules/etl`); clashing paths get a `-<4 SHA-1 characters>` suffix. The former `external_*`, `arduino_lib_*`, `arduino_custom_*` and `arduino_core` names are gone; after upgrading from 0.9.x build in a clean directory.
+
 **Omission and emptiness:** see [shared rules](semantics.md#empty-values); exceptions are stated above. Profiles/overrides apply before defaults. Backend/path restrictions are stated in the description.
 
 ```yaml
