@@ -144,43 +144,29 @@ Firmware на GitHub запускается вручную на границах
   загрузок curl при любых ошибках, `actions/checkout` и `actions/upload-artifact` v7.0.1
   (Node 24), префиксы веток `gemini/`, `dev/`, памятка `docs/ru|en/HOWTO.md`,
   изменения 0.9.3 в навыках, устаревшие комментарии H7/H5. Код фреймворка не меняется.
-- [ ] **Этап 1. Решения и ТЗ 2.0** — текущая ветка `claude/spec-2.0`: ТЗ 2.0 (CMake ≥ 3.21; режимы Arduino `wrappers` и `native`, выбор платы, источник CMSIS — вопросы 10.2.20, 10.2.21 закрыты по прототипу п. 10.3.6; открыты 10.2.22–10.2.28); ТЗ 2.1 — коды сообщений, каталог RU/EN, файлы сообщений (вопросы 10.2.22, 10.2.23 закрыты по прототипу п. 10.3.7); ТЗ 2.2 — каталоги сборки `_deps/…` и артефакты по имени ELF (вопрос 10.2.24, п. 10.3.8); ТЗ 2.3 — `include:`, TOML, имена по умолчанию, итоговая конфигурация, пример пресета, JSON Schema, версии компонентов, `system_library: none` (вопрос 10.2.25, п. 10.3.9). Исходный перечень: минимальная версия CMake (3.19 или 3.21); прямое
-  подключение Arduino Core и совместимость со старым режимом; формат кодов сообщений;
-  локализация; схема имён папок и артефактов в build; что из `include:`, TOML,
-  JSON Schema, CMakePresets входит в 0.10.0; runner Windows (TC-44) и GitLab CI (TC-53);
-  новая база справочника.
-- [ ] **Этап 2. Основа без изменения поведения:** коды сообщений и проверка тестов по
-  кодам вместо русского текста; TC-41, TC-42, TC-45; пробелы покрытия по индексу.
-- [ ] **Этап 3. Изменения для пользователей:** CMake ≥ 3.21; прямое подключение
-  Arduino Core и прошивка Arduino в матрице; имена папок в build по относительному пути;
-  имена артефактов по `OUTPUT_NAME`; CMakePresets.
-- [ ] **Этап 4. Расширения конфигурации:** `include:`, JSON Schema, TOML, локализация RU/EN.
-- [ ] **Этап 5. Тесты и CI:** периферия в эмуляторах (группа 5), Windows, GitLab,
-  распараллеливание при необходимости.
-- [ ] **Этап 6. Выпуск 0.10.0:** руководство по переходу с 0.9.x, новая база
-  справочника, CHANGELOG, ТЗ к выпуску, L0–L5, Firmware в CI, тег `v0.10.0`.
+- [x] **Этап 1. Решения и ТЗ 2.0–2.4** — ветки `claude/spec-*`: ТЗ 2.0 — CMake ≥ 3.21, режимы Arduino `wrappers` и `native`, выбор платы, источник CMSIS (вопросы 10.2.20, 10.2.21, прототип п. 10.3.6); ТЗ 2.1 — коды сообщений, каталог RU/EN, файлы сообщений (10.2.22, 10.2.23, п. 10.3.7); ТЗ 2.2 — каталоги сборки `_deps/…` и артефакты по имени ELF (10.2.24, п. 10.3.8); ТЗ 2.3 — `include:`, TOML, имена по умолчанию, итоговая конфигурация, пример пресета, JSON Schema, версии компонентов, `system_library: none` (10.2.25, п. 10.3.9); ТЗ 2.4 — задание CI на Windows, пример `.gitlab-ci.yml`, справочник продолжает существующий, `arduino.use_core_main` в режиме `native` (10.2.26–10.2.28, п. 10.3.10). Все вопросы состава 0.10.0 закрыты.
+- [ ] **Этап 2. Основа:** коды сообщений и каталог RU/EN, проверка тестов по кодам
+  вместо русского текста; версии компонентов; `system_library: none`; TC-41, TC-42,
+  TC-45; пробелы покрытия по индексу.
+- [ ] **Этап 3. Изменения для пользователей:** CMake ≥ 3.21; режимы Arduino `wrappers`
+  и `native`, `arduino.use_core_main`, прошивка Arduino в матрице; каталоги сборки
+  `_deps/…`; артефакты по итоговому имени ELF.
+- [ ] **Этап 4. Расширения конфигурации:** `include:`, TOML, имена файла по умолчанию,
+  итоговая конфигурация, JSON Schema, пример пресета в документации.
+- [ ] **Этап 5. Тесты и CI:** периферия в эмуляторах (группа 5), задание CI на Windows,
+  пример `.gitlab-ci.yml`, распараллеливание при необходимости.
+- [ ] **Этап 6. Выпуск 0.10.0:** руководство по переходу с 0.9.x, карточки справочника
+  с отметками 0.10.0, CHANGELOG, ТЗ к выпуску, L0–L5, Firmware в CI, тег `v0.10.0`.
 
 ### Предложения для 0.10.x — на рассмотрение
 
 В ТЗ не внесены; решение принимается при планировании 0.10.x.
 
-- [ ] Коды сообщений: у каждого диагностического сообщения Configure постоянный код
-  (например, `[SCY-W012]`); тесты проверяют коды, а не текст (сейчас 128 из 159 проверок
-  лога в `tests/cases.json` сравнивают русский текст). Предварительное условие локализации.
-- [ ] Локализация RU/EN: язык по локали (`LC_ALL`, `LC_MESSAGES`, `LANG`; на Windows —
-  `LocaleName` из реестра через `get_filename_component`, работает в CMake 3.19),
-  явный выбор `STM32_YML_LANG=auto|ru|en`. Встроенной функции локализации в CMake нет.
-- [ ] TOML как альтернатива YAML: `stm32_config.toml` по расширению; `yq -p toml` (4.44.3)
-  читает вложенные таблицы в тот же JSON. В TOML нет `null` — пустое значение только
-  пустой строкой или массивом.
-- [ ] CMakePresets (вместе с переходом на CMake ≥ 3.21): папка сборки на профиль
-  (`binaryDir: ${sourceDir}/build/${presetName}`, `STM32_YML_PROFILE` в `cacheVariables`),
-  генератор `CMakePresets.json` по секции `profiles:`.
-- [ ] Имена папок в build без идентификаторов YAML: повторять относительный путь источника
-  (`Arduino/libraries/EEPROM`, `cli`), для путей вне проекта заменять `..` согласованным
-  маркером (например, `-`). Требует чистой сборки после обновления; вместе с прямым
-  подключением Arduino Core.
-- [ ] Имена всех артефактов по итоговому имени ELF (`OUTPUT_NAME`) с учётом нескольких backend.
+Прежние предложения (коды сообщений, локализация, TOML, имена каталогов в build и
+артефактов) приняты в 0.10.0 ревизиями ТЗ 2.1–2.3; генератор CMakePresets отклонён (п. 5.1.4 ТЗ).
+
+- [ ] Библиотеки ядра Arduino с дополнительными зависимостями в режиме `native`: USBDevice,
+  VirtIO, CMSIS_DSP (вопрос 10.2.28 ТЗ; после стабилизации 0.10.0).
 
 ## English
 
@@ -324,40 +310,26 @@ at the end of each stage. Branches are merged by fast-forward (`git land`).
   on any error, `actions/checkout` and `actions/upload-artifact` v7.0.1 (Node 24),
   `gemini/` and `dev/` branch prefixes, the `docs/ru|en/HOWTO.md` how-to, 0.9.3 changes
   in the skills, stale H7/H5 comments. Framework code is unchanged.
-- [ ] **Stage 1. Decisions and spec 2.0** — current branch `claude/spec-2.0`: spec 2.0 (CMake ≥ 3.21; Arduino `wrappers` and `native` modes, board selection, CMSIS source — questions 10.2.20, 10.2.21 closed after the prototype in 10.3.6; 10.2.22–10.2.28 open); spec 2.1 — message codes, RU/EN catalog, message files (questions 10.2.22, 10.2.23 closed after the prototype in 10.3.7); spec 2.2 — `_deps/…` build directories and artifacts named after the ELF (question 10.2.24, 10.3.8); spec 2.3 — `include:`, TOML, default file names, effective configuration, preset example, JSON Schema, component versions, `system_library: none` (question 10.2.25, 10.3.9). Original list: minimum CMake (3.19 or 3.21); direct
-  Arduino Core integration and compatibility with the old mode; message code format;
-  localization; naming of build folders and artifacts; which of `include:`, TOML,
-  JSON Schema, CMakePresets go into 0.10.0; Windows runner (TC-44) and GitLab CI
-  (TC-53); a new reference baseline.
-- [ ] **Stage 2. Groundwork without behaviour changes:** message codes and tests that
-  check codes instead of Russian text; TC-41, TC-42, TC-45; coverage gaps from the index.
-- [ ] **Stage 3. User-facing changes:** CMake ≥ 3.21; direct Arduino Core integration
-  and Arduino firmware in the matrix; build folder names from relative paths; artifact
-  names from `OUTPUT_NAME`; CMakePresets.
-- [ ] **Stage 4. Configuration extensions:** `include:`, JSON Schema, TOML, RU/EN localization.
-- [ ] **Stage 5. Tests and CI:** peripherals in emulators (group 5), Windows, GitLab,
-  parallelism if needed.
-- [ ] **Stage 6. 0.10.0 release:** migration guide from 0.9.x, new reference baseline,
-  CHANGELOG, release spec, L0–L5, Firmware in CI, tag `v0.10.0`.
+- [x] **Stage 1. Decisions and spec 2.0–2.4** — branches `claude/spec-*`: spec 2.0 — CMake ≥ 3.21, Arduino `wrappers` and `native` modes, board selection, CMSIS source (questions 10.2.20, 10.2.21, prototype 10.3.6); spec 2.1 — message codes, RU/EN catalog, message files (10.2.22, 10.2.23, 10.3.7); spec 2.2 — `_deps/…` build directories and artifacts named after the ELF (10.2.24, 10.3.8); spec 2.3 — `include:`, TOML, default file names, effective configuration, preset example, JSON Schema, component versions, `system_library: none` (10.2.25, 10.3.9); spec 2.4 — a Windows CI job, a `.gitlab-ci.yml` example, the existing reference continues, `arduino.use_core_main` in `native` mode (10.2.26–10.2.28, 10.3.10). All 0.10.0 scope questions are closed.
+- [ ] **Stage 2. Groundwork:** message codes and the RU/EN catalog, tests that check
+  codes instead of Russian text; component versions; `system_library: none`; TC-41,
+  TC-42, TC-45; coverage gaps from the index.
+- [ ] **Stage 3. User-facing changes:** CMake ≥ 3.21; Arduino `wrappers` and `native`
+  modes, `arduino.use_core_main`, Arduino firmware in the matrix; `_deps/…` build
+  directories; artifacts named after the final ELF.
+- [ ] **Stage 4. Configuration extensions:** `include:`, TOML, default file names,
+  effective configuration, JSON Schema, a preset example in the documentation.
+- [ ] **Stage 5. Tests and CI:** peripherals in emulators (group 5), a Windows CI job,
+  a `.gitlab-ci.yml` example, parallelism if needed.
+- [ ] **Stage 6. 0.10.0 release:** migration guide from 0.9.x, reference cards marked
+  0.10.0, CHANGELOG, release spec, L0–L5, Firmware in CI, tag `v0.10.0`.
 
 ### Proposals for 0.10.x — for consideration
 
 Not in the spec; to be decided when 0.10.x is planned.
 
-- [ ] Message codes: every Configure diagnostic gets a permanent code (e.g. `[SCY-W012]`);
-  tests check codes rather than text (128 of 159 log checks in `tests/cases.json` compare
-  Russian text today). A prerequisite for localization.
-- [ ] RU/EN localization: language from the locale (`LC_ALL`, `LC_MESSAGES`, `LANG`; on
-  Windows the registry `LocaleName` via `get_filename_component`, which works in CMake 3.19),
-  explicit `STM32_YML_LANG=auto|ru|en`. CMake has no built-in localization.
-- [ ] TOML as an alternative to YAML: `stm32_config.toml` by extension; `yq -p toml` (4.44.3)
-  reads nested tables into the same JSON. TOML has no `null`, so empty values are only
-  empty strings or arrays.
-- [ ] CMakePresets (with the move to CMake ≥ 3.21): one build tree per profile
-  (`binaryDir: ${sourceDir}/build/${presetName}`, `STM32_YML_PROFILE` in `cacheVariables`),
-  a `CMakePresets.json` generator from the `profiles:` section.
-- [ ] Build-tree folder names without YAML identifiers: mirror the source's relative path
-  (`Arduino/libraries/EEPROM`, `cli`); for paths outside the project replace `..` with an
-  agreed marker (e.g. `-`). Needs a clean build after upgrading; together with the direct
-  Arduino Core integration.
-- [ ] Name every artifact after the final ELF name (`OUTPUT_NAME`), considering several backends.
+Earlier proposals (message codes, localization, TOML, build folder and artifact names)
+were accepted into 0.10.0 by spec revisions 2.1–2.3; the CMakePresets generator was rejected (spec 5.1.4).
+
+- [ ] Arduino core libraries with extra dependencies in `native` mode: USBDevice, VirtIO,
+  CMSIS_DSP (spec question 10.2.28; after 0.10.0 is stabilized).
