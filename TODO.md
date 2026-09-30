@@ -145,9 +145,11 @@ Firmware на GitHub запускается вручную на границах
   (Node 24), префиксы веток `gemini/`, `dev/`, памятка `docs/ru|en/HOWTO.md`,
   изменения 0.9.3 в навыках, устаревшие комментарии H7/H5. Код фреймворка не меняется.
 - [x] **Этап 1. Решения и ТЗ 2.0–2.4** — ветки `claude/spec-*`: ТЗ 2.0 — CMake ≥ 3.21, режимы Arduino `wrappers` и `native`, выбор платы, источник CMSIS (вопросы 10.2.20, 10.2.21, прототип п. 10.3.6); ТЗ 2.1 — коды сообщений, каталог RU/EN, файлы сообщений (10.2.22, 10.2.23, п. 10.3.7); ТЗ 2.2 — каталоги сборки `_deps/…` и артефакты по имени ELF (10.2.24, п. 10.3.8); ТЗ 2.3 — `include:`, TOML, имена по умолчанию, итоговая конфигурация, пример пресета, JSON Schema, версии компонентов, `system_library: none` (10.2.25, п. 10.3.9); ТЗ 2.4 — задание CI на Windows, пример `.gitlab-ci.yml`, справочник продолжает существующий, `arduino.use_core_main` в режиме `native` (10.2.26–10.2.28, п. 10.3.10). Все вопросы состава 0.10.0 закрыты.
-- [ ] **Этап 2. Основа:** коды сообщений и каталог RU/EN, проверка тестов по кодам
-  вместо русского текста; версии компонентов; `system_library: none`; TC-41, TC-42,
-  TC-45; пробелы покрытия по индексу.
+- [x] **Этап 2. Основа** — ветки `claude/msg-*`, `claude/versions-syslib`, `claude/stage2-tests`, ТЗ 2.5:
+  коды сообщений и каталог RU/EN (183 кода), выбор языка, файлы сообщений Configure и
+  сборки, перечень кодов в справочнике, поле в форме Issue; версии компонентов;
+  `system_library: none`; TC-41, TC-42, TC-45; ошибка `SCY-E415` для отсутствующей версии
+  STM32Cube. 163 сценария / 978 запусков.
 - [ ] **Этап 3. Изменения для пользователей:** CMake ≥ 3.21; режимы Arduino `wrappers`
   и `native`, `arduino.use_core_main`, прошивка Arduino в матрице; каталоги сборки
   `_deps/…`; артефакты по итоговому имени ELF.
@@ -311,9 +313,11 @@ at the end of each stage. Branches are merged by fast-forward (`git land`).
   `gemini/` and `dev/` branch prefixes, the `docs/ru|en/HOWTO.md` how-to, 0.9.3 changes
   in the skills, stale H7/H5 comments. Framework code is unchanged.
 - [x] **Stage 1. Decisions and spec 2.0–2.4** — branches `claude/spec-*`: spec 2.0 — CMake ≥ 3.21, Arduino `wrappers` and `native` modes, board selection, CMSIS source (questions 10.2.20, 10.2.21, prototype 10.3.6); spec 2.1 — message codes, RU/EN catalog, message files (10.2.22, 10.2.23, 10.3.7); spec 2.2 — `_deps/…` build directories and artifacts named after the ELF (10.2.24, 10.3.8); spec 2.3 — `include:`, TOML, default file names, effective configuration, preset example, JSON Schema, component versions, `system_library: none` (10.2.25, 10.3.9); spec 2.4 — a Windows CI job, a `.gitlab-ci.yml` example, the existing reference continues, `arduino.use_core_main` in `native` mode (10.2.26–10.2.28, 10.3.10). All 0.10.0 scope questions are closed.
-- [ ] **Stage 2. Groundwork:** message codes and the RU/EN catalog, tests that check
-  codes instead of Russian text; component versions; `system_library: none`; TC-41,
-  TC-42, TC-45; coverage gaps from the index.
+- [x] **Stage 2. Groundwork** — branches `claude/msg-*`, `claude/versions-syslib`, `claude/stage2-tests`, spec 2.5:
+  message codes and the RU/EN catalog (183 codes), language choice, Configure and build
+  message files, the code list in the reference, the issue form field; component versions;
+  `system_library: none`; TC-41, TC-42, TC-45; `SCY-E415` for a missing STM32Cube
+  version. 163 cases / 978 runs.
 - [ ] **Stage 3. User-facing changes:** CMake ≥ 3.21; Arduino `wrappers` and `native`
   modes, `arduino.use_core_main`, Arduino firmware in the matrix; `_deps/…` build
   directories; artifacts named after the final ELF.
