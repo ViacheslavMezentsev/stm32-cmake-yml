@@ -116,6 +116,18 @@ unsigned, signed with another key, or the email does not match. For unpushed com
 fix it with `git commit --amend -S --no-edit` (last commit) or `git rebase -S origin/main`
 (all branch commits). To revert: `git config --global --unset commit.gpgsign`.
 
+`git log --show-signature` prints `gpg.ssh.allowedSignersFile needs to be configured`
+and "No signature" — the commit may be signed, but git does not know which keys to trust
+for local verification (GitHub verifies against its own Signing Keys). To check that a
+signature exists: `git cat-file -p HEAD` shows a `gpgsig` header. Set up local
+verification once (PowerShell):
+
+```powershell
+$pub = Get-Content ~/.ssh/id_ed25519_signing.pub
+"<author email> $pub" | Out-File -Encoding ascii ~/.ssh/allowed_signers
+git config --global gpg.ssh.allowedSignersFile ~/.ssh/allowed_signers
+```
+
 ### Line endings
 
 - On Windows `core.autocrlf=true`: CRLF in the working tree, LF in the repository.

@@ -114,6 +114,18 @@ git log --show-signature -1            # проверить подпись по�
 коммитов — `git commit --amend -S --no-edit` (последний) или `git rebase -S origin/main`
 (все коммиты ветки). Вернуть: `git config --global --unset commit.gpgsign`.
 
+`git log --show-signature` пишет `gpg.ssh.allowedSignersFile needs to be configured`
+и «No signature» — коммит может быть подписан, но git не знает, каким ключам доверять
+при локальной проверке (GitHub проверяет по своему списку Signing Keys). Проверить
+наличие подписи: `git cat-file -p HEAD` показывает заголовок `gpgsig`. Настроить
+локальную проверку один раз (PowerShell):
+
+```powershell
+$pub = Get-Content ~/.ssh/id_ed25519_signing.pub
+"<email автора> $pub" | Out-File -Encoding ascii ~/.ssh/allowed_signers
+git config --global gpg.ssh.allowedSignersFile ~/.ssh/allowed_signers
+```
+
 ### Концы строк
 
 - На Windows `core.autocrlf=true`: в рабочей копии CRLF, в репозитории LF. Файлы
