@@ -4113,5 +4113,180 @@
       "I043",
       "I044"
     ]
+  },
+  {
+    "name": "verbose-build",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=version-equal.yml"
+    ],
+    "no_st_dependencies": true,
+    "steps": [
+      {
+        "args": [
+          "-DSTM32_YML_OVERRIDE_verbose_build=true"
+        ],
+        "observed": {
+          "CMAKE_VERBOSE_MAKEFILE": "ON"
+        },
+        "messages": [
+          {
+            "code": "I010"
+          }
+        ]
+      },
+      {
+        "args": [
+          "-DSTM32_YML_OVERRIDE_verbose_build=false"
+        ],
+        "observed": {
+          "CMAKE_VERBOSE_MAKEFILE": "OFF"
+        },
+        "messages_absent": [
+          "I010"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "yq-missing",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=version-equal.yml"
+    ],
+    "env": {
+      "PATH": "/nonexistent"
+    },
+    "error": {
+      "code": "E003"
+    }
+  },
+  {
+    "name": "unknown-keys-no-warning",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=unknown-keys.yml"
+    ],
+    "no_st_dependencies": true,
+    "no_warnings": true,
+    "observed": {
+      "custom_probe_key": "7"
+    },
+    "messages": [
+      {
+        "code": "I037",
+        "args": [
+          "toolchain_backend",
+          "stm32-cmake"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "cubefw-local-drivers",
+    "args": [
+      "-DSTM32_YML_OVERRIDE_cubefw_package=auto"
+    ],
+    "local_drivers": "STM32Cube_FW_F4_V1.28.3",
+    "properties": {
+      "LINK_LIBRARIES": [
+        "HAL::STM32::F4::GPIO",
+        "CMSIS::STM32::F411CE"
+      ]
+    },
+    "messages": [
+      {
+        "code": "I401"
+      },
+      {
+        "code": "I402",
+        "args": [
+          null
+        ]
+      },
+      {
+        "code": "I403",
+        "args": [
+          "local"
+        ]
+      }
+    ],
+    "messages_absent": [
+      "I404",
+      "I405"
+    ]
+  },
+  {
+    "name": "cubefw-latest",
+    "args": [
+      "-DSTM32_YML_OVERRIDE_cubefw_package=auto"
+    ],
+    "properties": {
+      "LINK_LIBRARIES": [
+        "HAL::STM32::F4::GPIO"
+      ]
+    },
+    "messages": [
+      {
+        "code": "I401"
+      },
+      {
+        "code": "I404"
+      },
+      {
+        "code": "I405",
+        "args": [
+          "V1.28.3"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "cubefw-explicit-version",
+    "args": [
+      "-DSTM32_YML_OVERRIDE_cubefw_package=V1.28.3"
+    ],
+    "properties": {
+      "LINK_LIBRARIES": [
+        "HAL::STM32::F4::GPIO"
+      ]
+    },
+    "messages": [
+      {
+        "code": "I406",
+        "args": [
+          "V1.28.3"
+        ]
+      }
+    ],
+    "messages_absent": [
+      "I401"
+    ]
+  },
+  {
+    "name": "cubefw-missing-version",
+    "args": [
+      "-DSTM32_YML_OVERRIDE_cubefw_package=V9.9.9"
+    ],
+    "error": {
+      "code": "E415",
+      "args": [
+        "V9.9.9",
+        "F4",
+        null
+      ]
+    }
+  },
+  {
+    "name": "cubefw-missing-repository",
+    "args": [
+      "-DSTM32_YML_OVERRIDE_cubefw_package=auto"
+    ],
+    "env": {
+      "CMAKE_USER_HOME": "/nonexistent"
+    },
+    "error": {
+      "code": "E401",
+      "args": [
+        "/nonexistent/STM32Cube/Repository"
+      ]
+    }
   }
 ]

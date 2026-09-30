@@ -159,8 +159,8 @@ package or the resulting image bytes. Ubuntu snapshots are not required.
 
 ## Framework configuration tests
 
-[tests/cases.json](../../tests/cases.json) defines 155 scenarios, run with each of
-the three GCC and two CMake versions from the lockfile: **930 case executions**.
+[tests/cases.json](../../tests/cases.json) defines 163 scenarios, run with each of
+the three GCC and two CMake versions from the lockfile: **978 case executions**.
 Twenty-seven scenarios perform two to thirteen consecutive configurations in the same build tree.
 
 | Area | Checks |
@@ -312,6 +312,17 @@ compiler; in `arduino-missing-core` the core version is unknown. The values depe
 environment (in the CI image git may refuse repositories owned by another user), so the
 versions themselves are checked by L2 `tests/test_component_versions.py` on temporary
 directories: a tag, a clone without tags, a copy without `.git`, a missing directory.
+
+### Other configuration checks
+
+- `verbose-build` (TC-41) switches `verbose_build` in one build tree: `CMAKE_VERBOSE_MAKEFILE`
+  becomes `ON`, then `OFF`.
+- `yq-missing` (TC-42) runs Configure with a `PATH` without yq: `SCY-E003` before `project()`.
+- `unknown-keys-no-warning` (TC-42): unknown top-level keys and nested sections are exported
+  without warnings (the `no_warnings` case key); `toolchain_backend` defaults to `stm32-cmake`.
+- `cubefw-*` (TC-45) check the STM32Cube package choice: local `Drivers/` (the `local_drivers`
+  case key links a pinned package), the latest repository version, an explicit version, a
+  missing version (`SCY-E415`) and a missing repository (`SCY-E401`).
 
 ### Messages, codes and language
 

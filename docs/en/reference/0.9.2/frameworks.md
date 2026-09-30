@@ -47,6 +47,8 @@ use_hal: true
 
 auto searches local Drivers/CMSIS and Drivers/STM32<family>xx_HAL_Driver, then the latest version under $ENV{CMAKE_USER_HOME}/STM32Cube/Repository. Vx.y.z selects an installed package. local is an internal discovery result, not a supported input. Nothing is downloaded; Cube is unnecessary when its dependencies are disabled.
 
+**Change in 0.10.0** (spec 4.7.2): if the specified `Vx.y.z` version is not installed, Configure fails with `SCY-E415` naming the version, family and path instead of a `find_package` failure inside stm32-cmake.
+
 **Omission and emptiness:** see [shared rules](semantics.md#empty-values); exceptions are stated above. Profiles/overrides apply before defaults. Backend/path restrictions are stated in the description.
 
 ```yaml

@@ -10,7 +10,7 @@ stm32_yml_setup_project(${PROJECT_NAME})
 
 # Observe public configuration and target properties without changing the target.
 file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/observed")
-foreach(KEY IN ITEMS PROJECT_NAME MCU STM32_YML_PROFILE heap_size stack_size
+foreach(KEY IN ITEMS PROJECT_NAME MCU STM32_YML_PROFILE heap_size stack_size CMAKE_VERBOSE_MAKEFILE
         crc_enable use_cmsis use_hal toolchain_backend arduino_mcu_target
         MCU_TARGET USE_CORE_MAIN CMAKE_C_STANDARD CMAKE_CXX_STANDARD
         cubefw_package use_freertos include_directories

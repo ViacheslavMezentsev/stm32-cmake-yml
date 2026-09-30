@@ -292,6 +292,9 @@ stm32_yml_msg_def(E413
 stm32_yml_msg_def(E414
     "cmsis_rtos_api: {1}: обёртка CMSIS-RTOS не найдена (нет цели {2}). Её исходники берутся из Middlewares/Third_Party/FreeRTOS пакета STM32Cube {3} и требуют use_cmsis: true; в пакете может не быть FreeRTOS (например, H5, U5). Используйте cmsis_rtos_api: none."
     "cmsis_rtos_api: {1}: the CMSIS-RTOS wrapper is not found (there is no target {2}). Its sources come from Middlewares/Third_Party/FreeRTOS of the STM32Cube {3} package and require use_cmsis: true; the package may have no FreeRTOS (for example, H5, U5). Use cmsis_rtos_api: none.")
+stm32_yml_msg_def(E415
+    "Пакет STM32Cube {1} для семейства {2} не найден: {3}. Установите пакет или укажите cubefw_package: auto."
+    "STM32Cube package {1} for family {2} not found: {3}. Install the package or set cubefw_package: auto.")
 stm32_yml_msg_def(I401
     "Режим 'auto': поиск драйверов..."
     "'auto' mode: looking for drivers...")

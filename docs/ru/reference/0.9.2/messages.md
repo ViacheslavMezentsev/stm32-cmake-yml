@@ -115,6 +115,7 @@
 | `SCY-E412` | FATAL_ERROR | freertos\_version: external: файлы порта '{1}' не найдены в FREERTOS\_PATH '{2}' (portable/GCC/{1}). |
 | `SCY-E413` | FATAL_ERROR | Компонент FreeRTOS '{1}' (freertos\_components) не найден: нет цели {2} в пространстве {3}. |
 | `SCY-E414` | FATAL_ERROR | cmsis\_rtos\_api: {1}: обёртка CMSIS-RTOS не найдена (нет цели {2}). Её исходники берутся из Middlewares/Third\_Party/FreeRTOS пакета STM32Cube {3} и требуют use\_cmsis: true; в пакете может не быть FreeRTOS (например, H5, U5). Используйте cmsis\_rtos\_api: none. |
+| `SCY-E415` | FATAL_ERROR | Пакет STM32Cube {1} для семейства {2} не найден: {3}. Установите пакет или укажите cubefw\_package: auto. |
 | `SCY-W401` | WARNING | Порт FreeRTOS для '{1}' не определён таблицей фреймворка; используется ARM\_CM4F. Задайте freertos\_components явно. |
 | `SCY-I401` | STATUS | Режим 'auto': поиск драйверов... |
 | `SCY-I402` | STATUS | Обнаружены локальные драйверы в '{1}'. Используются они. |

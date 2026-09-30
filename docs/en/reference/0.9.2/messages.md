@@ -115,6 +115,7 @@ The list is built from the `cmake/stm32_yml_messages_catalog.cmake` catalog by `
 | `SCY-E412` | FATAL_ERROR | freertos\_version: external: port '{1}' files are not found in FREERTOS\_PATH '{2}' (portable/GCC/{1}). |
 | `SCY-E413` | FATAL_ERROR | FreeRTOS component '{1}' (freertos\_components) is not found: there is no target {2} in the {3} namespace. |
 | `SCY-E414` | FATAL_ERROR | cmsis\_rtos\_api: {1}: the CMSIS-RTOS wrapper is not found (there is no target {2}). Its sources come from Middlewares/Third\_Party/FreeRTOS of the STM32Cube {3} package and require use\_cmsis: true; the package may have no FreeRTOS (for example, H5, U5). Use cmsis\_rtos\_api: none. |
+| `SCY-E415` | FATAL_ERROR | STM32Cube package {1} for family {2} not found: {3}. Install the package or set cubefw\_package: auto. |
 | `SCY-W401` | WARNING | The framework table has no FreeRTOS port for '{1}'; ARM\_CM4F is used. Set freertos\_components explicitly. |
 | `SCY-I401` | STATUS | 'auto' mode: looking for drivers... |
 | `SCY-I402` | STATUS | Local drivers found in '{1}'. They are used. |

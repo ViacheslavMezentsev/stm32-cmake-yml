@@ -221,6 +221,9 @@ def verify_messages(expectation, build, catalog, normalized):
                 f"Missing message {expected} in {[(r['code'], r['args']) for r in records]}")
     for code in expectation.get("messages_absent", []):
         require(code not in codes, f"Unexpected message {code}")
+    if expectation.get("no_warnings"):
+        warnings = [record["code"] for record in records if record["level"] == "WARNING"]
+        require(not warnings and "CMake Warning" not in normalized, f"Unexpected warnings {warnings}")
     if "message_lang" in expectation:
         langs = {record["lang"] for record in records}
         require(langs == {expectation["message_lang"]}, f"Message language {langs}")
@@ -258,6 +261,13 @@ def main():
     else:
         toolchain = Path(os.environ.get("MODULES_DIR", "/opt/modules")) / "stm32-cmake/cmake/stm32_gcc.cmake"
         config_args = []
+    if case.get("local_drivers"):
+        # Spec 4.7.1: project-local Drivers/ taken from a pinned STM32Cube package.
+        package = Path(os.environ.get("CMAKE_USER_HOME", "/opt")) / "STM32Cube/Repository" / case["local_drivers"]
+        (source / "Drivers").mkdir()
+        for name in ("CMSIS", f"STM32{case['local_drivers'].split('_')[2]}xx_HAL_Driver"):
+            require((package / "Drivers" / name).is_dir(), f"Pinned package lacks Drivers/{name}")
+            (source / "Drivers" / name).symlink_to(package / "Drivers" / name, target_is_directory=True)
     command = [args.cmake, "-S", str(source), "-B", str(build), "-G", "Ninja",
                f"-DSTM32_YML_FRAMEWORK_DIR={args.framework.resolve()}",
                f"-DCMAKE_TOOLCHAIN_FILE={toolchain}", "-DCMAKE_BUILD_TYPE=Debug",

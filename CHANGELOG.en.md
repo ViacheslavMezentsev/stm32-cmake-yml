@@ -27,6 +27,9 @@ on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 - **Component versions** (spec 4.2.6, 4.2.7). After the version lines the log prints the
   versions of CMake, yq, stm32-cmake or Arduino Core STM32 and, after `project()`, the
   compiler. An unknown version prints "version unknown" without a warning.
+- **Error for a missing STM32Cube version** (spec 4.7.2). A `cubefw_package: Vx.y.z` that is
+  not in the repository fails Configure with `SCY-E415` naming the version, family and path
+  instead of a `find_package` failure inside stm32-cmake.
 - **`system_library: none`** (spec 4.10.2) explicitly disables the system library without
   a warning.
 

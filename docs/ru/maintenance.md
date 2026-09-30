@@ -231,7 +231,7 @@ Firmware — 4:39 (ветка `claude/faster-ci-image`, `f3f1309`).
 | Workflow | Когда запускается |
 | --- | --- |
 | Docs | каждый push |
-| Configure (6 пар, 930 запусков, ~6 мин) | каждый push, кроме push без входных данных (ниже) |
+| Configure (6 пар, 978 запусков, ~6 мин) | каждый push, кроме push без входных данных (ниже) |
 | CI environment, Emulation environment | push с изменением файлов своего образа |
 | Firmware (570 сборок, 948 запусков, ~24 мин) | вручную (Actions → Firmware → Run workflow) и на теге `v*` |
 

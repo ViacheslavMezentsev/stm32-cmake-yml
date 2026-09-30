@@ -53,6 +53,11 @@ function(stm32_yml_setup_frameworks TARGET_NAME)
 
             if(CUBEFW_PACKAGE)
                 set(STM32_CUBE_PATH                 "${CUBE_REPO_PATH}/STM32Cube_FW_${MCU_FAMILY}_${CUBEFW_PACKAGE}")
+                # Указанная версия должна быть установлена (ТЗ 4.7.2): иначе ошибка
+                # с семейством и путём, а не отказ find_package внутри stm32-cmake.
+                if(NOT IS_DIRECTORY "${STM32_CUBE_PATH}")
+                    stm32_yml_msg(E415 "${CUBEFW_PACKAGE}" "${MCU_FAMILY}" "${STM32_CUBE_PATH}")
+                endif()
                 set(STM32_CUBE_${MCU_FAMILY}_PATH   "${STM32_CUBE_PATH}")
                 set(STM32_CMSIS_PATH                "${STM32_CUBE_PATH}/Drivers/CMSIS")
                 set(STM32_HAL_${MCU_FAMILY}_PATH    "${STM32_CUBE_PATH}/Drivers/STM32${MCU_FAMILY}xx_HAL_Driver")
