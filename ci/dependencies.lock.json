@@ -8,7 +8,7 @@
     "15.2.1-1.1"
   ],
   "cmake_versions": [
-    "3.19.8",
+    "3.21.7",
     "3.28.3"
   ],
   "default_gcc": "14.2.1-1.1",
@@ -36,11 +36,11 @@
       "destination": "/opt/xpack-arm-none-eabi-gcc-15.2.1-1.1"
     },
     {
-      "name": "cmake-3.19.8",
-      "url": "https://github.com/Kitware/CMake/releases/download/v3.19.8/cmake-3.19.8-Linux-x86_64.tar.gz",
-      "sha256": "db0d7d225150dd6e08ce54995e671f9b4801b8e93e22df1eef52339f6bbbecd9",
+      "name": "cmake-3.21.7",
+      "url": "https://github.com/Kitware/CMake/releases/download/v3.21.7/cmake-3.21.7-linux-x86_64.tar.gz",
+      "sha256": "f84e209d903a96e54f398bb8760693969b13fc50bce2f8278a9ee9dca01406b2",
       "kind": "tar",
-      "destination": "/opt/cmake-3.19.8"
+      "destination": "/opt/cmake-3.21.7"
     },
     {
       "name": "cmake-3.28.3",

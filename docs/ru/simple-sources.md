@@ -52,6 +52,6 @@ PRIVATE включает каталог заголовков для всех и�
 о пропущенном нужном исходнике нужно исправить, даже если Configure завершился.
 Проверка файлов основной цели не заменяет проверки наследования настроек отдельной библиотеки.
 
-Семантика CMake 3.19: [target_sources](https://cmake.org/cmake/help/v3.19/command/target_sources.html),
-[target_include_directories](https://cmake.org/cmake/help/v3.19/command/target_include_directories.html).
+Семантика CMake 3.21: [target_sources](https://cmake.org/cmake/help/v3.21/command/target_sources.html),
+[target_include_directories](https://cmake.org/cmake/help/v3.21/command/target_include_directories.html).
 [Навык для агента](../../skills/stm32-simple-sources/SKILL.md).

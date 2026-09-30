@@ -52,6 +52,6 @@ compile headers, link firmware, validate CMSIS startup or run code. Fix warnings
 about required missing sources even when Configure succeeds. Main-target tests
 do not replace checks of dependency/flag propagation into standalone libraries.
 
-CMake 3.19 semantics: [target_sources](https://cmake.org/cmake/help/v3.19/command/target_sources.html),
-[target_include_directories](https://cmake.org/cmake/help/v3.19/command/target_include_directories.html).
+CMake 3.21 semantics: [target_sources](https://cmake.org/cmake/help/v3.21/command/target_sources.html),
+[target_include_directories](https://cmake.org/cmake/help/v3.21/command/target_include_directories.html).
 [Agent skill](../../skills/stm32-simple-sources/SKILL.md).

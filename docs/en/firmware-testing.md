@@ -102,9 +102,9 @@ if any pair fails. Run selection uses the current lockfile rather than accepting
 whatever manifests happen to exist. Aggregate reports are matrix-summary.json;
 individual reports remain build-summary.json, qemu-summary.json and renode-summary.json.
 
-The fixture uses C11 and C++17. CMake 3.19 rejects C_STANDARD=17 even with a
-compiler that supports C17: CMake added that value in 3.21. The source C files do
-not need C17. This is a fixture compatibility adjustment, not a framework change.
+The fixture uses C11 and C++17. It was set to C11 while the matrix included CMake 3.19,
+which rejects C_STANDARD=17; since 0.10.0 the minimum is CMake 3.21, but the source C
+files do not need C17, so the fixture keeps C11.
 To run just one pair, the original build_firmware_smoke.py/run_qemu_smoke.py remain
 available with a dedicated output directory.
 

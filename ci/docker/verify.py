@@ -36,7 +36,7 @@ def main():
         # The empty library has no headers or firmware dependencies. CMake's own
         # compiler checks compile static objects; the firmware is never built.
         (src / "CMakeLists.txt").write_text(
-            'cmake_minimum_required(VERSION 3.19)\n'
+            'cmake_minimum_required(VERSION 3.21)\n'
             'project(environment_probe LANGUAGES C CXX ASM)\n'
             'add_library(probe STATIC probe.c probe.cpp)\n')
         (src / "probe.c").write_text("void c_probe(void) {}\n")

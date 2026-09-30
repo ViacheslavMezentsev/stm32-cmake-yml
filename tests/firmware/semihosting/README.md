@@ -42,8 +42,8 @@ SystemCoreClock равно 16 МГц, точность частоты и HAL tic
 целей и эмуляторов — в `ci/firmware_cases.py`. Подробный контракт запуска: [RU](../../../docs/ru/firmware-testing.md) /
 [EN](../../../docs/en/firmware-testing.md).
 
-Matrix compatibility: C11 for CMake 3.19; C++17 retained.
-Совместимость матрицы: C11 для CMake 3.19; C++17 сохранён.
+C11 and C++17: the C sources do not need C17 (C11 was chosen for CMake 3.19 before 0.10.0).
+C11 и C++17: C-исходникам C17 не нужен (C11 выбран для CMake 3.19 до 0.10.0).
 
 Metadata fields come from a generated build_metadata.h and runtime library macros.
 expected-metadata.json pins the reviewed library versions and probe values. nm

@@ -23,7 +23,7 @@ option's introduction version without historical evidence.
 The consumer includes `stm32_yml.cmake`, calls `stm32_yml_prepare_project_data`,
 then `project()` with the returned name/languages, then `stm32_yml_setup_project`.
 The project chooses its toolchain before `project()`. `yq` converts YAML to JSON;
-CMake 3.19+ parses it. Card examples are fragments, not standalone firmware.
+CMake 3.21+ (3.19+ before 0.10.0) parses it. Card examples are fragments, not standalone firmware.
 
 Precedence: defaults → IOC → YAML → selected profile → `STM32_YML_OVERRIDE_*`.
 Implementation applies profiles and overrides before IOC; IOC fills remaining

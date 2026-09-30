@@ -41,7 +41,8 @@ function(_stm32_yml_resolve_lang OUT_LANG OUT_INVALID)
         endif()
     endforeach()
     # На Windows переменные локали обычно не заданы: читаем LocaleName пользователя.
-    # get_filename_component работает в CMake 3.19; при отсутствии ключа возвращает "registry".
+    # cmake_host_system_information(QUERY WINDOWS_REGISTRY) есть только с CMake 3.24, поэтому
+    # get_filename_component; при отсутствии ключа он возвращает "registry".
     if(_locale STREQUAL "" AND CMAKE_HOST_WIN32)
         get_filename_component(_registry
             "[HKEY_CURRENT_USER\\Control Panel\\International;LocaleName]" NAME)

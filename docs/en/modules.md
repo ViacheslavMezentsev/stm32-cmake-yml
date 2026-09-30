@@ -73,5 +73,5 @@ Symbol resolution, ABI correctness, archive extraction order and execution remai
 unverified. A plain name without :: may denote an external library; successful
 Generate does not establish its availability. These tests promise no new MCU or startup support.
 
-Dependency semantics: [CMake 3.19 target_link_libraries](https://cmake.org/cmake/help/v3.19/command/target_link_libraries.html).
+Dependency semantics: [CMake 3.21 target_link_libraries](https://cmake.org/cmake/help/v3.21/command/target_link_libraries.html).
 [Agent skill](../../skills/stm32-module-creator/SKILL.md).

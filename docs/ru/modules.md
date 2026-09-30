@@ -74,5 +74,5 @@ C11/C++17 в выбранном окружении и связь целей. А�
 Простое имя без :: может быть внешней библиотекой, поэтому отсутствие ошибки
 Generate не доказывает её наличие. Новую поддержку MCU или startup эти тесты не заявляют.
 
-Основание семантики зависимостей: [CMake 3.19 target_link_libraries](https://cmake.org/cmake/help/v3.19/command/target_link_libraries.html).
+Основание семантики зависимостей: [CMake 3.21 target_link_libraries](https://cmake.org/cmake/help/v3.21/command/target_link_libraries.html).
 [Навык агента](../../skills/stm32-module-creator/SKILL.md).

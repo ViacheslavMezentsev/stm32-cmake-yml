@@ -29,7 +29,7 @@ jobs:
         run: docker run --rm --network none stm32-yml-ci:check
       - name: Verify explicit version selection
         run: |
-          docker run --rm --network none -e GCC_VERSION=13.3.1-1.1 -e CMAKE_VERSION=3.19.8 stm32-yml-ci:check cmake --version
+          docker run --rm --network none -e GCC_VERSION=13.3.1-1.1 -e CMAKE_VERSION=3.21.7 stm32-yml-ci:check cmake --version
           docker run --rm --network none -e GCC_VERSION=15.2.1-1.1 stm32-yml-ci:check arm-none-eabi-gcc --version
       - name: Reject unsupported version selection
         run: |

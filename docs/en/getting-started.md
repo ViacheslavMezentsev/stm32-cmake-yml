@@ -2,7 +2,7 @@
 
 [Documentation](index.md) · [Русский](../ru/getting-started.md)
 
-Requires CMake 3.19+, Arm GCC and Mike Farah yq. Python is used for CRC processing.
+Requires CMake 3.21+ (since 0.10.0; 3.19 before), Arm GCC and Mike Farah yq. Python is used for CRC processing.
 The framework is included in a consumer project, normally as a Git submodule.
 
 ## Layout
@@ -23,7 +23,7 @@ git submodule add https://github.com/ViacheslavMezentsev/stm32-cmake-yml.git mod
 Consumer CMakeLists.txt:
 
 ```cmake
-cmake_minimum_required(VERSION 3.19)
+cmake_minimum_required(VERSION 3.21)
 set(CMAKE_TOOLCHAIN_FILE
     "${CMAKE_CURRENT_SOURCE_DIR}/modules/stm32-cmake/cmake/stm32_gcc.cmake")
 list(APPEND CMAKE_MODULE_PATH

@@ -59,7 +59,7 @@ files are not automatically collected recursively.
 
 ## Getting started
 
-You need **CMake 3.19+**, **Arm GCC**, **Mike Farah yq v4**, and a build generator
+You need **CMake 3.21+**, **Arm GCC**, **Mike Farah yq v4**, and a build generator
 (Ninja or Make). Python is needed for CRC calculation; select drivers and libraries
 for your project. VS Code with CMake Tools is convenient but optional.
 

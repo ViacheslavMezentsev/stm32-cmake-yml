@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.19)
+cmake_minimum_required(VERSION 3.21)
 project(stm32_yml_configure_tests LANGUAGES NONE)
 
 enable_testing()

@@ -4,7 +4,7 @@
 
 ## Требования
 
-- **CMake** >= 3.19
+- **CMake** >= 3.21 (с 0.10.0; до неё — 3.19)
 - **ARM GCC Toolchain** (например, xPack GNU Arm Embedded GCC)
 - **yq** (консольная утилита для парсинга YAML)
 - **Python 3.x** (требуется только для расчёта и внедрения CRC32)
@@ -60,7 +60,7 @@ git submodule add https://github.com/ViacheslavMezentsev/stm32-cmake-yml.git mod
 Создайте минимальный `CMakeLists.txt`:
 
 ```cmake
-cmake_minimum_required(VERSION 3.19)
+cmake_minimum_required(VERSION 3.21)
 
 set(CMAKE_TOOLCHAIN_FILE
     "${CMAKE_CURRENT_SOURCE_DIR}/modules/stm32-cmake/cmake/stm32_gcc.cmake")

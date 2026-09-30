@@ -15,7 +15,7 @@ for current `main` results. The three status badges show latest completed workfl
 
 This is suite size, not the number of passing runs. CI verifies it against the
 [manifest](../../tests/cases.json) and [lockfile](../../ci/dependencies.lock.json).
-The matrix is xPack GCC 13.3.1-1.1, 14.2.1-1.1, 15.2.1-1.1 × CMake 3.19.8 and 3.28.3.
+The matrix is xPack GCC 13.3.1-1.1, 14.2.1-1.1, 15.2.1-1.1 × CMake 3.21.7 and 3.28.3.
 
 Checks cover Configure/Generate, profiles, precedence, IOC, components, sources
 and diagnostics. Cases include F0/F1/F3/F4/F7/G4/H5/H7 (including MCU core selection), the FreeRTOS

@@ -61,7 +61,7 @@ use_freertos: false   # явно отключаем, даже если в .ioc �
 Пример `Core/CMakeLists.txt`:
 
 ```cmake
-cmake_minimum_required(VERSION 3.19)
+cmake_minimum_required(VERSION 3.21)
 
 # Добавляем пути к заголовкам
 target_include_directories(${PROJECT_NAME} PRIVATE "Inc")
@@ -82,7 +82,7 @@ target_sources(${PROJECT_NAME} PRIVATE
 Пример `Drivers/Display/CMakeLists.txt`:
 
 ```cmake
-cmake_minimum_required(VERSION 3.19)
+cmake_minimum_required(VERSION 3.21)
 file(GLOB_RECURSE SOURCES "*.c" "*.cpp")
 
 # Создаем библиотеку 'display'
@@ -677,7 +677,7 @@ cmake -DSTM32_YML_PROFILE=G474 -B build/G474 -S .
 ### Минимальный CMakeLists.txt при Arduino backend
 
 ```cmake
-cmake_minimum_required(VERSION 3.19)
+cmake_minimum_required(VERSION 3.21)
 
 # Toolchain — задаётся в проекте, фреймворк его не трогает.
 set(CMAKE_TOOLCHAIN_FILE

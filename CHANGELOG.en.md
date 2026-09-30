@@ -35,6 +35,9 @@ on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 
 ### Changed
 
+- **Minimum CMake is 3.21** (spec 2.5.1). `stm32_yml.cmake` and the test projects require
+  `cmake_minimum_required(VERSION 3.21)`; the check matrix is CMake 3.21.7 and 3.28.3
+  instead of 3.19.8 and 3.28.3. Projects on CMake 3.19–3.20 must upgrade.
 - **Output language.** Without a Russian locale (including Docker and CI) catalog
   messages are printed in English, for example "stm32-cmake-yml version: …". For Russian
   output use `-DSTM32_YML_LANG=ru`. Scripts that parse the log should use the codes from

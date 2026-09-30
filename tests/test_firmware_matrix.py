@@ -34,15 +34,15 @@ class MatrixTests(unittest.TestCase):
     def test_empty_and_duplicate_lists_fail(self):
         for versions in ([], ['13', '13']):
             with self.assertRaises(ValueError):
-                pairs({'gcc_versions': versions, 'cmake_versions': ['3.19.8']})
+                pairs({'gcc_versions': versions, 'cmake_versions': ['3.21.7']})
 
     def test_wrong_tools_and_incomplete_profiles_fail(self):
-        good = {'status': 'passed', 'gcc': '14.2.1', 'cmake': 'cmake version 3.19.8',
+        good = {'status': 'passed', 'gcc': '14.2.1', 'cmake': 'cmake version 3.21.7',
                 'cases': [{'profile': p} for p in BUILD_CASES],
                 'crc_negatives': [{'profile': case_name(t, 'crc-corrupt')} for t in ENABLED_TARGETS],
                 'build_only': [{'profile': p} for p in BUILD_ONLY_PROFILES],
                 'crc_limit_negative': {'status': 'failed-as-expected'}}
-        verify_build(good, '14.2.1-1.1', '3.19.8')
+        verify_build(good, '14.2.1-1.1', '3.21.7')
         for key, value in [('gcc', '13.3.1'), ('cmake', 'cmake version 3.28.3'),
                            ('status', 'failed'), ('cases', []), ('cases', [{'profile': p} for p in BUILD_CASES[:-2]]), ('cases', [{'profile': p} for p in ('success', 'failure', 'hang')]),
                            ('cases', [{'profile': 'success'}] * 3), ('build_only', []), ('crc_negatives', []),
@@ -52,7 +52,7 @@ class MatrixTests(unittest.TestCase):
             report = copy.deepcopy(good)
             report[key] = value
             with self.assertRaises(ValueError):
-                verify_build(report, '14.2.1-1.1', '3.19.8')
+                verify_build(report, '14.2.1-1.1', '3.21.7')
 
     def test_target_case_names_round_trip(self):
         # F103 keeps plain names; other targets are prefixed (spec 8.8.8).

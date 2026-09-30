@@ -59,7 +59,7 @@ Details: configure scenarios — [below](#framework-configuration-tests), firmwa
 | Platform | Linux amd64, Ubuntu 24.04 by image digest |
 | Ubuntu packages | Ubuntu repositories; installed versions recorded in the image |
 | xPack Arm GCC | 13.3.1-1.1, 14.2.1-1.1, 15.2.1-1.1 |
-| CMake | 3.19.8 (minimum compatibility), 3.28.3 (reference environment) |
+| CMake | 3.21.7 (minimum supported version since 0.10.0), 3.28.3 (reference environment) |
 | Ninja / Mike Farah yq | 1.12.1 / 4.44.3 |
 | stm32-cmake | Commit recorded in the lockfile |
 | STM32Cube | F0 1.11.6, F1 1.8.7, F3 1.11.5, F4 1.28.3, F7 1.17.3, G4 1.6.3, H5 1.7.0, H7 1.13.0 |
@@ -109,7 +109,7 @@ Defaults: GCC `14.2.1-1.1`, CMake `3.28.3`. `GCC_VERSION` and `CMAKE_VERSION` se
 installed versions; unsupported or empty values fail immediately.
 
 ```sh
-docker run --rm --network none -e GCC_VERSION=13.3.1-1.1 -e CMAKE_VERSION=3.19.8 stm32-yml-ci:local cmake --version
+docker run --rm --network none -e GCC_VERSION=13.3.1-1.1 -e CMAKE_VERSION=3.21.7 stm32-yml-ci:local cmake --version
 docker run --rm --network none -e GCC_VERSION=15.2.1-1.1 stm32-yml-ci:local arm-none-eabi-gcc --version
 ```
 
@@ -251,8 +251,8 @@ ctest --output-on-failure -j 4
 ctest --output-on-failure -R '^configure.profile-'
 ```
 
-Use a separate `single` directory for each tool pair. The `cd` form is compatible
-with CMake 3.19. No root `CMakeLists.txt` or consumer-facing presets are added;
+Use a separate `single` directory for each tool pair. The `cd` form works with
+every CMake version of the matrix. No root `CMakeLists.txt` or consumer-facing presets are added;
 the test entry point is `tests/`.
 
 The matrix writes `summary.json`, CTest logs, source copies and generated files.
@@ -410,7 +410,7 @@ Positive cases explicitly set CPPCHECK_EXECUTABLE to `/usr/bin/false`, a test co
 
 Nonempty cppcheck_args replace default arguments. Nonempty cppcheck_ignores replace default exclusions; `Vendor SDK`, containing a space, remains one CMake property argument. Empty lists restore defaults rather than removing all arguments/exclusions. Exact values are asserted for both languages. No firmware is compiled and no static analysis is executed.
 
-CMake 3.19 stores the command in `CMakeFiles/rules.ninja`, while 3.28 stores it in `build.ninja`; the check considers both files.
+CMake 3.21 stores the command in `CMakeFiles/rules.ninja`, while 3.28 stores it in `build.ninja`; the check considers both files.
 
 ### Post-build artifact selection
 
@@ -430,7 +430,7 @@ The two `.a` files in [prebuilt](../../tests/fixtures/project/prebuilt/README.md
 
 Five `arduino-library-*` cases check a library with a CMake wrapper, explicit linkage versus adding a target alone, warnings for a missing directory or CMakeLists.txt, and profile transitions selected → empty → selected without linkage. Checks inspect LINK_LIBRARIES, compile commands, propagation of a public definition, and removal of the library source after clearing the list.
 
-The [synthetic core layout](../../tests/fixtures/project/arduino-library-core/README.md) uses test-owned library wrappers and the pinned core source through a symlink. It does not establish support for native Arduino library wrappers: for example, EEPROM and IWatchdog in pinned Core 2.12.0 require CMake 3.21. The framework minimum remains 3.19; dependencies may impose higher requirements. Consumer wrappers connected through `arduino.custom_libraries` are a separate path and can have different requirements. No firmware is built.
+The [synthetic core layout](../../tests/fixtures/project/arduino-library-core/README.md) uses test-owned library wrappers and the pinned core source through a symlink. It does not establish support for native Arduino library wrappers: for example, EEPROM and IWatchdog in pinned Core 2.12.0 require CMake 3.21. Since 0.10.0 the framework minimum is 3.21 as well (3.19 before); dependencies may impose higher requirements. Consumer wrappers connected through `arduino.custom_libraries` are a separate path and can have different requirements. No firmware is built.
 
 ### Consumer Arduino wrappers
 
