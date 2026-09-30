@@ -155,7 +155,7 @@ crc-corrupt, must report CRC_RESULT=FAIL and TEST_RESULT=FAIL and exit 3. A cras
 or timeout cannot pass this case. This adds one run per target and pair without extra compilations:
 with the four H7/H5 profiles this gives 570 builds, 336 QEMU runs and 612 Renode runs. Reports distinguish thirteen profiles from fourteen executions per target.
 
-A separate negative build (TC-52) on each pair configures the `success` profile with `flash_size: 4K` and requires both the build and a rebuild to fail at the CRC step (`[CRC ERROR]`, image larger than the Flash limit). The badge does not count it.
+A separate negative build (TC-52) on each pair configures the `success` profile with `flash_size: 4K` and requires both the build and a rebuild to fail at the CRC step: `stm32_yml_build_messages.jsonl` contains `SCY-E706` (image larger than the Flash limit) and `SCY-E708`. The badge does not count it.
 
 This verifies software CRC over loaded FLASH, not the STM32 CRC peripheral.
 Since 0.9.3 (E004, E006) the CRC image comes from FLASH sections and a failure stops the build. Old manifests must be rebuilt to include CRC expectations.

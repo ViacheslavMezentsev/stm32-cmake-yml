@@ -95,6 +95,8 @@ With CRC, limits intermediate BIN size. auto uses the MCU database or a FLASH...
 
 **Change in 0.9.3** (`4cd3404`; spec 4.15.7, 4.15.9): an image larger than `flash_size` fails the build with `[CRC ERROR]` instead of a zero stub (E006).
 
+**Change in 0.10.0** (spec 4.16.11): the CRC script prints its messages by 7xx codes in the Configure language and writes them to `stm32_yml_build_messages.jsonl`; the `[CRC ERROR]` label is replaced by the error text and the `SCY-E708` line. [Message codes](messages.md).
+
 **Change in 0.9.3** (`3c6bfa3`; spec 4.15.4): with `auto` the Flash size follows the core: 1024K for the `M4` core of a dual-core H745.
 
 **Omission and emptiness:** see [shared rules](semantics.md#empty-values); exceptions are stated above. Profiles/overrides apply before defaults. Backend/path restrictions are stated in the description.

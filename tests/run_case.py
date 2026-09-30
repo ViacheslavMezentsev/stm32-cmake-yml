@@ -128,7 +128,8 @@ def verify(case, build, source):
         require(("--exclude" in ninja) == case["crc_command"], "Incorrect CRC command presence")
         if case["crc_command"]:
             # ТЗ 4.15.9: образ из секций ELF в регионе FLASH скрипта, без gap-fill.
-            for token in ("--elf", "--flash 0x08000000:524288", "--exclude .checksum",
+            for token in ("--messages", "stm32_yml_build_messages.json", "--elf",
+                          "--flash 0x08000000:524288", "--exclude .checksum",
                           "--update-section", " 524288"):
                 require(token in ninja, f"CRC command missing {token!r}")
             require("--gap-fill" not in ninja, "CRC image must not use objcopy --gap-fill")
@@ -197,6 +198,16 @@ def verify_messages(expectation, build, catalog, normalized):
         shown = f"[SCY-{code}] {text}" if expectation.get("message_codes") else text
         require(" ".join(shown.split()) in normalized, f"{code}: text is not in the log: {shown!r}")
     codes = [record["code"].removeprefix("SCY-") for record in records]
+
+    # Spec 4.16.11: 7xx texts for the CRC script in the Configure language.
+    build_json = json.loads((build / "stm32_yml_build_messages.json").read_text(encoding="utf-8"))
+    expected = {code: messages_catalog.render(entry, build_json["lang"], [])
+                for code, entry in catalog.items() if code[1] == "7"}
+    require(build_json["messages"] == expected, "stm32_yml_build_messages.json differs from the catalog")
+    require(build_json["codes"] == bool(expectation.get("message_codes")), "Wrong codes flag in build messages")
+    require((build / "stm32_yml_build_messages.jsonl").read_text() == "", "Build message file not recreated")
+    if records:
+        require(build_json["lang"] == records[0]["lang"], "Build messages language differs from Configure")
 
     def matches(record, expected):
         # "args": null elements match any value (absolute paths, tool lists).

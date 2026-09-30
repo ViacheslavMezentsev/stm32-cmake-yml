@@ -9,6 +9,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "ci"))
 import check_messages  # noqa: E402
 import messages_catalog  # noqa: E402
+import messages_reference  # noqa: E402
 
 CATALOG = '''# comment with stm32_yml_msg(X000)
 stm32_yml_msg_def(I001
@@ -32,7 +33,8 @@ class CheckMessages(unittest.TestCase):
         (root / check_messages.CATALOG).write_text(catalog, encoding="utf-8")
         (root / "stm32_yml.cmake").write_text(source, encoding="utf-8")
         for name, text in (extra or {}).items():
-            (root / name).write_text(text, encoding="utf-8")
+            if text is not None:
+                (root / name).write_text(text, encoding="utf-8")
         return root
 
     def errors(self, root, release=False, legacy=None):
@@ -89,6 +91,31 @@ class CheckMessages(unittest.TestCase):
                         'stm32_yml_msg_def(I001 "a\\q")\n', CATALOG + 'stm32_yml_msg_def(I001 "a")\n'):
             with self.subTest(catalog=catalog):
                 self.assertEqual(len(self.errors(self.tree(catalog=catalog))), 1)
+
+    def test_script_messages(self):
+        script = ('''FALLBACK = {\n    'E701': "Old",\n}\n\n'''
+                  '''def main():\n    emit('E701')\n    raise CrcError('I001')\n''')
+        catalog = CATALOG + 'stm32_yml_msg_def(E701 "Старый" "Old text")\n'
+        root = self.tree(catalog=catalog, extra={"scripts": None})
+        (root / "scripts").mkdir()
+        (root / check_messages.SCRIPT).write_text(script, encoding="utf-8")
+        errors = "\n".join(self.errors(root))
+        self.assertIn("build-time messages use codes 7xx, got I001", errors)
+        self.assertIn("FALLBACK codes ['I001'] differ", errors)
+        self.assertIn("FALLBACK text of E701 differs", errors)
+
+    def test_reference_pages(self):
+        root = self.tree(extra={"docs": None})
+        self.assertEqual(sorted(messages_reference.differences(root)),
+                         sorted(messages_reference.PAGES.values()))
+        for page in messages_reference.PAGES.values():
+            (root / page).parent.mkdir(parents=True, exist_ok=True)
+        catalog = messages_catalog.load(root / check_messages.CATALOG)
+        for lang, page in messages_reference.PAGES.items():
+            (root / page).write_text(messages_reference.render(catalog, lang), encoding="utf-8")
+        self.assertEqual(messages_reference.differences(root), [])
+        self.assertIn("| `SCY-W002` | WARNING | Path \"{1}\" and {2} |",
+                      (root / messages_reference.PAGES["en"]).read_text(encoding="utf-8"))
 
     def test_repository(self):
         errors, summary = check_messages.check(ROOT)

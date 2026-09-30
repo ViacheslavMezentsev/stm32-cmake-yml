@@ -15,6 +15,7 @@
 - [Arduino backend](arduino.md)
 - [Артефакты и CRC](postbuild.md)
 - [Диагностика](diagnostics.md)
+- [Коды сообщений](messages.md) — 0.10.0
 
 ## Алфавитный указатель YAML-опций
 

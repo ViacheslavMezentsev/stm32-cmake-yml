@@ -68,7 +68,8 @@ HardFault исследуется отдельно по состоянию про
 векторам и доступным для данного ядра fault-регистрам. Ни лог сравнения RAM,
 ни Configure success не определяют его причину. Не меняйте размеры памяти вслепую.
 
-CRC (E004, E006): с 0.9.3 сбой расчёта завершает Post-build ошибкой `[CRC ERROR]`,
+CRC (E004, E006): с 0.9.3 сбой расчёта завершает Post-build ошибкой (с 0.10.0 — код
+`SCY-E708` в `stm32_yml_build_messages.jsonl`, до 0.10.0 — `[CRC ERROR]`),
 нулевая заглушка не пишется; `crc_enable: true` со скриптом stm32-cmake — ошибка
 Configure, отсутствие секции `crc_section_name` в скрипте — предупреждение. Нулевое
 CRC само по себе не доказывает ошибку. Успешная сборка не доказывает правильность
@@ -94,5 +95,5 @@ choosing a remedy. Preserve the consumer toolchain and cache context. RAM compar
 is informational; a skipped check does not validate memory. Treat missing startup,
 Windows path formatting and HardFault causes as hypotheses until supported by
 evidence. Configure tests do not validate linking, CRC results or execution. Since 0.9.3 a
-CRC failure stops the build with `[CRC ERROR]`; the repository firmware matrix is
+CRC failure stops the build (`SCY-E708` since 0.10.0, `[CRC ERROR]` before); the repository firmware matrix is
 described in docs/en/firmware-testing.md.

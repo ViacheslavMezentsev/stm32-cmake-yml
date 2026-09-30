@@ -101,8 +101,9 @@ def crc_limit_negative(root, output, report):
     for attempt in ('build', 'rebuild'):
         completed = subprocess.run(['cmake', '--build', str(build)], capture_output=True, text=True, timeout=180)
         (build / f'{attempt}.log').write_text(completed.stdout + completed.stderr)
-        text = completed.stdout + completed.stderr
-        if completed.returncode == 0 or '[CRC ERROR]' not in text or 'larger than the FLASH limit' not in text:
+        # Spec 4.16.11: the CRC script records its messages by code next to the build.
+        records = (build / 'stm32_yml_build_messages.jsonl').read_text(encoding='utf-8')
+        if completed.returncode == 0 or '"SCY-E706"' not in records or '"SCY-E708"' not in records:
             raise ValueError(f'Undersized flash_size did not fail the {attempt} with a CRC error')
         results.append({'attempt': attempt, 'returncode': completed.returncode})
     print('PASS negative build: flash_size 4K fails at the CRC step', flush=True)

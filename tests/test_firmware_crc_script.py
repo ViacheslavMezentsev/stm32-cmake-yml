@@ -2,8 +2,9 @@
 
 Spec: 4.15.3 (algorithm, appendix B vectors), 4.15.7 (failure breaks the build,
 no zero stub), 4.15.9 (image from sections loaded into FLASH), 5.6.2 (interface).
-Test cases TC-43, TC-63 (host part).
+Test cases TC-43, TC-63 (host part), TC-77 (build messages, spec 4.16.11).
 """
+import json
 from pathlib import Path
 import struct
 import subprocess
@@ -97,7 +98,7 @@ class BinaryModeTests(unittest.TestCase):
                      (self.dir / 'big.bin',)):
             result = run_script(*args)
             self.assertNotEqual(result.returncode, 0, args)
-            self.assertIn('[CRC ERROR]', result.stderr)
+            self.assertIn('Build failed: CRC was not calculated.', result.stderr)
             self.assertFalse((self.dir / 'out.bin').exists(), 'zero stub must not be written')
 
 
@@ -152,8 +153,57 @@ class ElfModeTests(unittest.TestCase):
             limit = ['16'] if args[-1] == '.checksum' else []
             result = run_script(*args, self.dir / 'crc.bin', *limit)
             self.assertNotEqual(result.returncode, 0, args)
-            self.assertIn('[CRC ERROR]', result.stderr)
+            self.assertIn('Build failed: CRC was not calculated.', result.stderr)
             self.assertFalse((self.dir / 'crc.bin').exists())
+
+
+class BuildMessagesTests(unittest.TestCase):
+    """TC-77: catalog texts in the Configure language and the build message file."""
+
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.dir = Path(self.temp.name)
+        (self.dir / 'in.bin').write_bytes(bytes(8))
+
+    def messages(self, lang, codes, texts):
+        path = self.dir / 'stm32_yml_build_messages.json'
+        path.write_text(json.dumps({'lang': lang, 'codes': codes, 'messages': texts}, ensure_ascii=False),
+                        encoding='utf-8')
+        return path
+
+    def records(self):
+        log = self.dir / 'stm32_yml_build_messages.jsonl'
+        return [json.loads(line) for line in log.read_text(encoding='utf-8').splitlines()]
+
+    def test_russian_texts_and_records(self):
+        path = self.messages('ru', False, {
+            'E706': 'Образ для CRC больше предела FLASH: {1} > {2} байт.',
+            'E708': 'Сборка прервана: CRC не рассчитан.'})
+        result = run_script('--messages', path, self.dir / 'in.bin', self.dir / 'out.bin', 4)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('Образ для CRC больше предела FLASH: 8 > 4 байт.', result.stderr)
+        self.assertIn('Сборка прервана: CRC не рассчитан.', result.stderr)
+        self.assertNotIn('[SCY-', result.stderr)
+        self.assertEqual([(r['code'], r['level'], r['lang'], r['args']) for r in self.records()],
+                         [('SCY-E706', 'FATAL_ERROR', 'ru', ['8', '4']), ('SCY-E708', 'FATAL_ERROR', 'ru', [])])
+        self.assertFalse((self.dir / 'out.bin').exists())
+
+    def test_codes_and_english_fallback(self):
+        # A text missing from the JSON falls back to the English catalog text.
+        path = self.messages('en', True, {})
+        result = run_script('--messages', path, self.dir / 'in.bin', self.dir / 'out.bin')
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn('[SCY-I710] [STM32 CRC32] Calculated: 0x', result.stdout)
+        [record] = self.records()
+        self.assertEqual((record['code'], record['level'], record['args'][1]), ('SCY-I710', 'STATUS', '8'))
+        self.assertEqual(record['text'], result.stdout.strip().removeprefix('[SCY-I710] '))
+
+    def test_without_messages_no_record_file(self):
+        result = run_script(self.dir / 'in.bin', self.dir / 'out.bin')
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn('[STM32 CRC32] Calculated: 0x', result.stdout)
+        self.assertFalse((self.dir / 'stm32_yml_build_messages.jsonl').exists())
 
 
 if __name__ == '__main__':

@@ -676,8 +676,10 @@ function(stm32_yml_generate_bin_file TARGET)
         return()
     endif()
 
+    get_property(_build_messages GLOBAL PROPERTY _STM32_YML_BUILD_MESSAGES)
     add_custom_command(TARGET ${TARGET} POST_BUILD
         COMMAND ${Python3_EXECUTABLE} ${_script}
+                --messages ${_build_messages}
                 --elf $<TARGET_FILE:${TARGET}>
                 --flash ${_flash_origin}:${_flash_length}
                 --image ${_bin}

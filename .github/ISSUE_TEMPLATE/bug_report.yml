@@ -94,6 +94,16 @@ body:
     validations:
       required: true
   - type: textarea
+    id: messages
+    attributes:
+      label: Файл сообщений / Message file
+      description: |
+        Содержимое `stm32_yml_messages.jsonl` из папки сборки, при ошибке сборки — также `stm32_yml_build_messages.jsonl` (версия 0.10.0 и новее). Если файла нет — лог Configure с `-DSTM32_YML_MESSAGE_CODES=ON`. Коды сообщений не зависят от языка вывода.
+        The contents of `stm32_yml_messages.jsonl` from the build directory and, for a build failure, `stm32_yml_build_messages.jsonl` (version 0.10.0 and later). Without the file, the Configure log with `-DSTM32_YML_MESSAGE_CODES=ON`. Message codes do not depend on the output language.
+      render: json
+    validations:
+      required: false
+  - type: textarea
     id: behavior
     attributes:
       label: Ожидалось и получилось / Expected and actual behavior

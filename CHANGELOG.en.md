@@ -19,8 +19,10 @@ on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
   catalog in Russian or English. `STM32_YML_LANG` (`auto`, `ru`, `en`) selects the
   language; `auto` uses the locale, on Windows the registry. `STM32_YML_MESSAGE_CODES=ON`
   shows the codes in the output. Every Configure message is written to
-  `stm32_yml_messages.jsonl` in the build directory. All Configure messages use
-  codes; the CRC script messages at build time move to the catalog in the next change.
+  `stm32_yml_messages.jsonl` in the build directory. The CRC script prints its build-time
+  messages in the Configure language and writes them to `stm32_yml_build_messages.jsonl`.
+  The codes are listed in the reference ([message codes](docs/en/reference/0.9.2/messages.md));
+  the issue form asks for the message file.
 
 ### Changed
 
@@ -32,6 +34,9 @@ on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
   the `M7;M4` list.
 - **Unknown enumerated value.** The end of the warning is capitalized:
   "Применяется '…'" / "Значение не используется" in Russian.
+- **The `[CRC ERROR]` label of the CRC script** is replaced by catalog texts: the error and
+  the line "Build failed: CRC was not calculated." (`SCY-E708`). Scripts that looked for the
+  label in the log should check the code in `stm32_yml_build_messages.jsonl`.
 - **English lines in the Russian output.** The READONLY linker script lines are
   translated into Russian.
 

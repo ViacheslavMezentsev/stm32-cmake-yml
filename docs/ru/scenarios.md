@@ -21,7 +21,7 @@ crc_enable: true  # нужен шаблон STM32<MCU>_FLASH.ld.in с секци
 CRC требует шаблона `.ld.in` или явного `linker_script` с секцией `crc_section_name`.
 Со скриптом, который формирует stm32-cmake, `crc_enable: true` — ошибка Configure;
 отсутствие секции в скрипте — предупреждение; сбой расчёта завершает сборку ошибкой
-`[CRC ERROR]`. Подробнее — [Артефакты и CRC](reference/0.9.2/postbuild.md).
+(`SCY-E708`, «Сборка прервана: CRC не рассчитан.»). Подробнее — [Артефакты и CRC](reference/0.9.2/postbuild.md).
 
 ### Ручная конфигурация без CubeMX
 

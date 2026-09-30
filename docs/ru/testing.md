@@ -330,7 +330,15 @@ PUBLIC/PRIVATE compile-свойства и INTERFACE-настройки; лин�
 кавычки и `\`, и пересоздание файла при каждом Configure. Для них фикстура подключает
 тестовые коды 9xx из `tests/fixtures/project/test_messages.cmake`
 (`-DSTM32_YML_TEST_MESSAGES=ON`). Проверку каталога и исходников выполняет
-`ci/check_messages.py` (L1), её тесты — `tests/test_check_messages.py`.
+`ci/check_messages.py` (L1), её тесты — `tests/test_check_messages.py`. Она же сверяет
+английские тексты `FALLBACK` скрипта `scripts/stm32_crc.py` с каталогом и страницы
+[кодов сообщений](reference/0.9.2/messages.md), построенные `ci/messages_reference.py`.
+
+Каждый шаг L3 проверяет и `stm32_yml_build_messages.json`: тексты кодов 7xx на языке
+Configure для скрипта CRC и пустой `stm32_yml_build_messages.jsonl`. Сообщения скрипта при
+сборке на русском и английском, коды в выводе и записи файла проверяет
+`tests/test_firmware_crc_script.py` (L2, TC-77); отказ сборки по пределу FLASH в L4
+определяется по кодам `SCY-E706` и `SCY-E708` в файле сообщений сборки.
 
 ### FreeRTOS из STM32Cube
 

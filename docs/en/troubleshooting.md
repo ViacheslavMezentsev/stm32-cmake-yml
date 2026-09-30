@@ -58,7 +58,8 @@ specific file, language and target. See [reference](reference/0.9.2/diagnostics.
   backslashes are one hypothesis, not a universal diagnosis.
 - HardFault needs execution evidence; Configure RAM output cannot establish its
   cause. Do not change heap/stack or MEMORY without evidence.
-- CRC: since 0.9.3 a calculation failure fails the build with `[CRC ERROR]` and no
+- CRC: since 0.9.3 a calculation failure fails the build (since 0.10.0 with the
+  `SCY-E708` code in `stm32_yml_build_messages.jsonl`, before 0.10.0 with `[CRC ERROR]`) and no
   zero stub is written; `crc_enable: true` with the stm32-cmake script is a Configure
   error, and a missing `crc_section_name` section in the script is a warning (history:
   [E004](errata/E004.md), [E006](errata/E006.md)). A zero CRC alone is not an error.

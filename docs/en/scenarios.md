@@ -20,7 +20,7 @@ and missing values yourself. Parsing IOC does not generate startup code or clock
 CRC needs a `.ld.in` template or an explicit `linker_script` containing the
 `crc_section_name` section. With the stm32-cmake script `crc_enable: true` is a
 Configure error, a missing section is a warning, and a CRC failure fails the build
-with `[CRC ERROR]`. See [artifacts and CRC](reference/0.9.2/postbuild.md).
+(`SCY-E708`, "Build failed: CRC was not calculated."). See [artifacts and CRC](reference/0.9.2/postbuild.md).
 
 ## Manual configuration
 

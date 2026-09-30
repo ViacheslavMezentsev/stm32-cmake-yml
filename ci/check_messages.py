@@ -7,8 +7,11 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from messages_catalog import CatalogError, load, params  # noqa: E402
+import messages_reference  # noqa: E402
 
 MODULE = "cmake/stm32_yml_messages.cmake"
+SCRIPT = "scripts/stm32_crc.py"
+SCRIPT_USE = re.compile(r"(?<![\w])(?:emit|CrcError)\(\s*'([^']*)'")
 CATALOG = "cmake/stm32_yml_messages_catalog.cmake"
 USE = re.compile(r"(?<![\w])stm32_yml_msg\s*\(\s*([^\s)]+)")
 DIRECT = re.compile(r"^\s*message\s*\(", re.M)
@@ -74,6 +77,35 @@ def check(root, release=False, legacy=None):
         if direct != allowed:
             errors.append(f"{relative}: {direct} direct message() calls, expected {allowed}; "
                           "print user messages with stm32_yml_msg() and update LEGACY_DIRECT_MESSAGES")
+
+    # Build-time messages of the CRC script (spec 4.16.11): codes from the catalog,
+    # English fallback texts equal to the catalog.
+    script = root / SCRIPT
+    if script.is_file():
+        text = script.read_text(encoding="utf-8")
+        script_codes = set()
+        for match in SCRIPT_USE.finditer(text):
+            code = match.group(1)
+            line = text.count("\n", 0, match.start()) + 1
+            script_codes.add(code)
+            if code not in catalog or catalog[code]["retired"]:
+                errors.append(f"{SCRIPT}:{line}: unknown or retired message code {code}")
+            elif code[1] != "7":
+                errors.append(f"{SCRIPT}:{line}: build-time messages use codes 7xx, got {code}")
+            used.setdefault(code, f"{SCRIPT}:{line}")
+        namespace = {}
+        exec(compile(text.split("\ndef ", 1)[0], str(script), "exec"), namespace)
+        fallback = namespace.get("FALLBACK", {})
+        if set(fallback) != script_codes:
+            errors.append(f"{SCRIPT}: FALLBACK codes {sorted(set(fallback) ^ script_codes)} differ from used codes")
+        for code, english in fallback.items():
+            if code in catalog and catalog[code]["en"] != english:
+                errors.append(f"{SCRIPT}: FALLBACK text of {code} differs from the catalog")
+
+    # Spec 4.16.13: the code list in the reference is built from the catalog.
+    if (root / "docs").is_dir():
+        for page in messages_reference.differences(root):
+            errors.append(f"{page} differs from the catalog; run python3 ci/messages_reference.py")
 
     for code, entry in catalog.items():
         if code not in used and not entry["retired"]:

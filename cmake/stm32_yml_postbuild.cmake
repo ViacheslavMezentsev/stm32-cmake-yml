@@ -132,6 +132,7 @@ function(stm32_yml_setup_postbuild TARGET_NAME)
             set(CRC_VAL_BIN "${CMAKE_CURRENT_BINARY_DIR}/${TARGET_NAME}_crc_val.bin")
             set(TARGET_ELF "$<TARGET_FILE:${TARGET_NAME}>")
 
+            get_property(_build_messages GLOBAL PROPERTY _STM32_YML_BUILD_MESSAGES)
             add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E echo " "
                 COMMAND ${CMAKE_COMMAND} -E echo "--- Injecting checksum into ${crc_section_name} ---"
@@ -139,6 +140,7 @@ function(stm32_yml_setup_postbuild TARGET_NAME)
                 # Шаг 1 (ТЗ 4.15.9, 4.15.7): образ из секций ELF в регионе FLASH без секции
                 # CRC и расчёт CRC; любой сбой завершает сборку ошибкой.
                 COMMAND ${Python3_EXECUTABLE} ${CRC_SCRIPT_PATH}
+                        --messages ${_build_messages}
                         --elf ${TARGET_ELF}
                         --flash ${CRC_FLASH_ORIGIN}:${CRC_FLASH_LENGTH}
                         --exclude ${crc_section_name}

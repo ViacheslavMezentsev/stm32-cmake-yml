@@ -452,6 +452,52 @@ stm32_yml_msg_def(I706
     " Сборка будет выполнена БЕЗ добавления контрольной суммы."
     " The build runs WITHOUT adding a checksum.")
 
+# Сообщения скрипта scripts/stm32_crc.py при сборке (ТЗ 4.16.11). Английский
+# текст совпадает с FALLBACK скрипта.
+
+stm32_yml_msg_def(E702
+    "'{1}' не является 32-битным ELF-файлом little-endian"
+    "'{1}' is not a 32-bit little-endian ELF file")
+stm32_yml_msg_def(E703
+    "Нет загружаемых секций в FLASH 0x{1}+0x{2} в '{3}'"
+    "No loadable sections inside FLASH 0x{1}+0x{2} in '{3}'")
+stm32_yml_msg_def(E704
+    "Недопустимое число '{1}' в {2}"
+    "Invalid number '{1}' in {2}")
+stm32_yml_msg_def(E705
+    "Недопустимое значение --flash '{1}', ожидается <начало>:<длина>"
+    "Invalid --flash value '{1}', expected <origin>:<length>")
+stm32_yml_msg_def(E706
+    "Образ для CRC больше предела FLASH: {1} > {2} байт. Проверьте 'flash_size' и регион FLASH скрипта компоновщика."
+    "CRC image is larger than the FLASH limit: {1} > {2} bytes. Check 'flash_size' and the FLASH region of the linker script.")
+stm32_yml_msg_def(E707
+    "Передайте <выход.bin> для CRC или --image для образа FLASH"
+    "Pass <output.bin> for the CRC or --image for the FLASH image")
+stm32_yml_msg_def(E708
+    "Сборка прервана: CRC не рассчитан."
+    "Build failed: CRC was not calculated.")
+stm32_yml_msg_def(E709
+    "Входной файл '{1}' не найден."
+    "Input file '{1}' not found.")
+stm32_yml_msg_def(E710
+    "Использование: stm32_crc.py <вход.bin> <выход.bin> [предел] | --elf <вход.elf> --flash <начало>:<длина> --exclude <секция> <выход.bin> [предел]"
+    "Usage: stm32_crc.py <input.bin> <output.bin> [limit] | --elf <input.elf> --flash <origin>:<length> --exclude <section> <output.bin> [limit]")
+stm32_yml_msg_def(E711
+    "Ошибка ввода-вывода: {1}"
+    "I/O error: {1}")
+stm32_yml_msg_def(I707
+    "{1} Пропущена секция {2}: адрес загрузки 0x{3} ({4} байт) вне FLASH"
+    "{1} Skipped {2}: load address 0x{3} ({4} bytes) is outside FLASH")
+stm32_yml_msg_def(I708
+    "{1} Записан {2}: {3} байт с адреса 0x{4}"
+    "{1} Written {2}: {3} bytes from 0x{4}")
+stm32_yml_msg_def(I709
+    "[STM32 CRC32] Рассчитано: 0x{1} (размер: {2} байт с адреса 0x{3})"
+    "[STM32 CRC32] Calculated: 0x{1} (Size: {2} bytes from 0x{3})")
+stm32_yml_msg_def(I710
+    "[STM32 CRC32] Рассчитано: 0x{1} (размер: {2} байт)"
+    "[STM32 CRC32] Calculated: 0x{1} (Size: {2} bytes)")
+
 # --- 8xx: диагностика ---------------------------------------------------------
 
 stm32_yml_msg_def(E801

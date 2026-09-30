@@ -323,7 +323,15 @@ unknown value, Russian text when English is missing, the `[SCY-…]` prefix with
 quotes and `\`, and recreation of the file on every Configure. For them the fixture loads
 test-only 9xx codes from `tests/fixtures/project/test_messages.cmake`
 (`-DSTM32_YML_TEST_MESSAGES=ON`). `ci/check_messages.py` (L1) checks the catalog and
-sources; its tests are in `tests/test_check_messages.py`.
+sources; its tests are in `tests/test_check_messages.py`. It also compares the English
+`FALLBACK` texts of `scripts/stm32_crc.py` with the catalog and the
+[message code](reference/0.9.2/messages.md) pages built by `ci/messages_reference.py`.
+
+Every L3 step also checks `stm32_yml_build_messages.json`: the 7xx texts in the Configure
+language for the CRC script, and an empty `stm32_yml_build_messages.jsonl`. The script's
+build-time messages in Russian and English, codes in the output and file records are
+checked by `tests/test_firmware_crc_script.py` (L2, TC-77); in L4 the build failure on the
+FLASH limit is detected by the `SCY-E706` and `SCY-E708` codes in the build message file.
 
 ### STM32Cube FreeRTOS
 

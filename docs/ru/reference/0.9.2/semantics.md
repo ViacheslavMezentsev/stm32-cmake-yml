@@ -90,7 +90,7 @@ Cppcheck и CRC выполняются позднее. Clock tree из IOC, на
 | `FREERTOS_PATH` | Переменная CMake или окружения: каталог FreeRTOS для `freertos_version: external` (0.9.3) |
 | `ARDUINO_CORE_DIR`, `MCU_TARGET`, `USE_CORE_MAIN` | Выходы для Arduino-обёрток; поведение при пропуске см. карточки |
 | `STM32_YML_LANG` | CACHE STRING, default `auto`: язык сообщений `auto`, `ru`, `en` (синонимы `rus`, `eng`, без учёта регистра). `auto` — по первой непустой из `LC_ALL`, `LC_MESSAGES`, `LANG` без `C`/`POSIX`, на Windows — по `LocaleName` в реестре; `ru…` — русский, иначе английский. Неизвестное значение — предупреждение и `auto`. Изменение в 0.10.0 (ТЗ 4.16.7) |
-| `STM32_YML_MESSAGE_CODES` | CACHE BOOL, default `OFF`: `ON` начинает каждую строку сообщения с кода `[SCY-<код>]`. Независимо от него каждое сообщение Configure записывается в `stm32_yml_messages.jsonl` в каталоге сборки (`code`, `level`, `lang`, `args`, `text`). Изменение в 0.10.0 (ТЗ 4.16.9, 4.16.10) |
+| `STM32_YML_MESSAGE_CODES` | CACHE BOOL, default `OFF`: `ON` начинает каждую строку сообщения с кода `[SCY-<код>]`. Независимо от него каждое сообщение Configure записывается в `stm32_yml_messages.jsonl` в каталоге сборки (`code`, `level`, `lang`, `args`, `text`); сообщения скрипта CRC при сборке — в `stm32_yml_build_messages.jsonl` (тексты для скрипта — `stm32_yml_build_messages.json`). [Перечень кодов](messages.md). Изменение в 0.10.0 (ТЗ 4.16.9–4.16.11) |
 
 Отсутствие `-D` в следующей команде не удаляет запись кэша. Для удаления используйте
 `-USTM32_YML_OVERRIDE_stack_size`, для сброса профиля — `-DSTM32_YML_PROFILE=`.
