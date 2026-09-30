@@ -16,3 +16,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Validate reference, translations and test mappings
         run: python3 ci/check_reference.py
+      - name: Validate framework messages against the catalog
+        run: python3 ci/check_messages.py
+      - name: Test the message check
+        run: python3 -m unittest discover -s tests -p test_check_messages.py

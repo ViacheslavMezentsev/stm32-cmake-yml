@@ -87,6 +87,8 @@ by these configure tests.
 | `MCU`, `HEAP_SIZE`, `STACK_SIZE` | Derived cache entries; stale in 0.9.2 (E001), refreshed on every Configure since 0.9.3 (`HEAP_SIZE`/`STACK_SIZE` only for a `.ld.in` template) |
 | `FREERTOS_PATH` | CMake or environment variable: FreeRTOS directory for `freertos_version: external` (0.9.3) |
 | `ARDUINO_CORE_DIR`, `MCU_TARGET`, `USE_CORE_MAIN` | Outputs for Arduino wrappers; see cards for omission behavior |
+| `STM32_YML_LANG` | CACHE STRING, default `auto`: message language `auto`, `ru`, `en` (synonyms `rus`, `eng`, case-insensitive). `auto` uses the first non-empty of `LC_ALL`, `LC_MESSAGES`, `LANG` except `C`/`POSIX`, on Windows the registry `LocaleName`; `ru…` selects Russian, anything else English. An unknown value warns and acts as `auto`. Change in 0.10.0 (spec 4.16.7) |
+| `STM32_YML_MESSAGE_CODES` | CACHE BOOL, default `OFF`: `ON` starts every message line with its `[SCY-<code>]` code. Regardless of it, every Configure message is written to `stm32_yml_messages.jsonl` in the build directory (`code`, `level`, `lang`, `args`, `text`). Change in 0.10.0 (spec 4.16.9, 4.16.10) |
 
 Omitting `-D` on the next command does not delete the cache entry. Remove one with
 `-USTM32_YML_OVERRIDE_stack_size`; reset the profile with `-DSTM32_YML_PROFILE=`.

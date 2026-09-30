@@ -10,6 +10,26 @@ on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 
 ---
 
+## [Unreleased]
+
+### Added
+
+- **Message codes and language** (spec 4.16.5–4.16.10). Messages are printed by
+  permanent `SCY-<I|W|E><number>` codes from the `cmake/stm32_yml_messages_catalog.cmake`
+  catalog in Russian or English. `STM32_YML_LANG` (`auto`, `ru`, `en`) selects the
+  language; `auto` uses the locale, on Windows the registry. `STM32_YML_MESSAGE_CODES=ON`
+  shows the codes in the output. Every Configure message is written to
+  `stm32_yml_messages.jsonl` in the build directory. The version lines use codes so far;
+  the other messages move to the catalog in the next changes.
+
+### Changed
+
+- **Output language.** Without a Russian locale (including Docker and CI) the version
+  lines are printed in English: "stm32-cmake-yml version: …". For Russian output use
+  `-DSTM32_YML_LANG=ru`.
+
+---
+
 ## [0.9.3] - 2026-09-27
 
 ### Added

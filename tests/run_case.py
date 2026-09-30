@@ -7,8 +7,12 @@ from pathlib import Path
 import shlex
 import shutil
 import subprocess
+import sys
 import tempfile
 import time
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "ci"))
+import messages_catalog  # noqa: E402
 
 
 def require(condition, message):
@@ -179,6 +183,40 @@ def verify(case, build, source):
                 require(f"-D{definition}" in command, f"{path}: missing {definition}")
 
 
+def verify_messages(expectation, build, catalog, normalized):
+    """Spec 4.16.10, 4.16.12: records of the message file plus the catalog text in the log."""
+    path = build / "stm32_yml_messages.jsonl"
+    require(path.is_file(), "Missing stm32_yml_messages.jsonl")
+    records = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines()]
+    for record in records:
+        code = record["code"].removeprefix("SCY-")
+        require(code in catalog, f"Message file has a code missing from the catalogs: {code}")
+        require(record["level"] == messages_catalog.level(code), f"{code}: wrong level {record['level']}")
+        text = messages_catalog.render(catalog[code], record["lang"], record["args"])
+        require(record["text"] == text, f"{code}: text {record['text']!r} != catalog {text!r}")
+        shown = f"[SCY-{code}] {text}" if expectation.get("message_codes") else text
+        require(" ".join(shown.split()) in normalized, f"{code}: text is not in the log: {shown!r}")
+    codes = [record["code"].removeprefix("SCY-") for record in records]
+
+    def matches(record, expected):
+        return (record["code"] == "SCY-" + expected["code"]
+                and ("args" not in expected or record["args"] == expected["args"]))
+
+    for expected in expectation.get("messages", []):
+        require(any(matches(record, expected) for record in records),
+                f"Missing message {expected} in {[(r['code'], r['args']) for r in records]}")
+    for code in expectation.get("messages_absent", []):
+        require(code not in codes, f"Unexpected message {code}")
+    if "message_lang" in expectation:
+        langs = {record["lang"] for record in records}
+        require(langs == {expectation["message_lang"]}, f"Message language {langs}")
+    if "message_codes" in expectation:
+        require(("[SCY-" in normalized) == expectation["message_codes"], "Incorrect code prefix presence")
+    if isinstance(expectation.get("error"), dict):
+        require(records and matches(records[-1], expectation["error"]),
+                f"The last message is not {expectation['error']}")
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--case", required=True)
@@ -209,7 +247,11 @@ def main():
     command = [args.cmake, "-S", str(source), "-B", str(build), "-G", "Ninja",
                f"-DSTM32_YML_FRAMEWORK_DIR={args.framework.resolve()}",
                f"-DCMAKE_TOOLCHAIN_FILE={toolchain}", "-DCMAKE_BUILD_TYPE=Debug",
-               "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON", *config_args, *case.get("args", [])]
+               "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON", *config_args,
+               # Spec 4.16.12: L3 runs in English unless a case selects a language.
+               f"-DSTM32_YML_LANG={case.get('lang', 'en')}", *case.get("args", [])]
+    catalog = messages_catalog.load(args.framework / "cmake/stm32_yml_messages_catalog.cmake")
+    catalog.update(messages_catalog.load(source / "test_messages.cmake"))
     env = dict(os.environ, **case.get("env", {}))
     for index, step in enumerate(case.get("steps", [{}]), start=1):
         expectation = dict(case, **step)
@@ -228,6 +270,8 @@ def main():
                 shutil.copy2(build / filename, report)
         for linker in build.glob("*.ld"):
             shutil.copy2(linker, report)
+        if (build / "stm32_yml_messages.jsonl").is_file():
+            shutil.copy2(build / "stm32_yml_messages.jsonl", report)
         if (build / "observed").is_dir():
             shutil.copytree(build / "observed", report / "observed")
         output = log_path.read_text(encoding="utf-8")
@@ -235,10 +279,13 @@ def main():
         try:
             if "error" in expectation:
                 require(result.returncode != 0, "Invalid configuration unexpectedly succeeded")
-                require(expectation["error"] in normalized, f"Failure had wrong cause: expected {expectation['error']!r}")
+                if isinstance(expectation["error"], str):
+                    require(expectation["error"] in normalized,
+                            f"Failure had wrong cause: expected {expectation['error']!r}")
             else:
                 require(result.returncode == 0, f"CMake returned {result.returncode}")
                 verify(expectation, build, source)
+            verify_messages(expectation, build, catalog, normalized)
             for message in expectation.get("log_contains", []):
                 require(message in normalized, f"Missing diagnostic {message!r}")
             for message in expectation.get("log_absent", []):

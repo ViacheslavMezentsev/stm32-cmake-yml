@@ -1,0 +1,197 @@
+# ==============================================================================
+# Модуль: СООБЩЕНИЯ ФРЕЙМВОРКА (коды, каталог RU/EN, файл сообщений)
+# ==============================================================================
+# ТЗ 4.16.5–4.16.10. Каждое сообщение выводится функцией stm32_yml_msg() по
+# постоянному коду из каталога cmake/stm32_yml_messages_catalog.cmake. Перед
+# выводом сообщение дописывается строкой JSON в stm32_yml_messages.jsonl в
+# CMAKE_BINARY_DIR: после FATAL_ERROR CMake код не выполняет, поэтому запись
+# делается до message().
+# ==============================================================================
+
+include_guard(GLOBAL)
+
+set(STM32_YML_LANG "auto" CACHE STRING "Язык сообщений stm32-cmake-yml / message language: auto, ru, en")
+set_property(CACHE STM32_YML_LANG PROPERTY STRINGS auto ru en)
+option(STM32_YML_MESSAGE_CODES "Показывать коды сообщений [SCY-...] / show message codes" OFF)
+
+# Определяет язык сообщений по STM32_YML_LANG, а при auto — по локали (ТЗ 4.16.7).
+# OUT_INVALID получает исходное значение, если оно не распознано.
+function(_stm32_yml_resolve_lang OUT_LANG OUT_INVALID)
+    string(TOLOWER "${STM32_YML_LANG}" _requested)
+    set(_invalid "")
+    if(_requested MATCHES "^(ru|rus)$")
+        set(${OUT_LANG} ru PARENT_SCOPE)
+        set(${OUT_INVALID} "" PARENT_SCOPE)
+        return()
+    elseif(_requested MATCHES "^(en|eng)$")
+        set(${OUT_LANG} en PARENT_SCOPE)
+        set(${OUT_INVALID} "" PARENT_SCOPE)
+        return()
+    elseif(NOT _requested STREQUAL "auto" AND NOT _requested STREQUAL "")
+        set(_invalid "${STM32_YML_LANG}")
+    endif()
+
+    # Первая непустая из LC_ALL, LC_MESSAGES, LANG; значения C и POSIX пропускаются.
+    set(_locale "")
+    foreach(_var IN ITEMS LC_ALL LC_MESSAGES LANG)
+        set(_value "$ENV{${_var}}")
+        if(_locale STREQUAL "" AND NOT _value STREQUAL ""
+                AND NOT _value MATCHES "^(C|POSIX)([._@].*)?$")
+            set(_locale "${_value}")
+        endif()
+    endforeach()
+    # На Windows переменные локали обычно не заданы: читаем LocaleName пользователя.
+    # get_filename_component работает в CMake 3.19; при отсутствии ключа возвращает "registry".
+    if(_locale STREQUAL "" AND CMAKE_HOST_WIN32)
+        get_filename_component(_registry
+            "[HKEY_CURRENT_USER\\Control Panel\\International;LocaleName]" NAME)
+        if(NOT _registry STREQUAL "registry")
+            set(_locale "${_registry}")
+        endif()
+    endif()
+
+    string(TOLOWER "${_locale}" _locale)
+    if(_locale MATCHES "^ru")
+        set(${OUT_LANG} ru PARENT_SCOPE)
+    else()
+        set(${OUT_LANG} en PARENT_SCOPE)
+    endif()
+    set(${OUT_INVALID} "${_invalid}" PARENT_SCOPE)
+endfunction()
+
+# Строка JSON в кавычках без изменения содержимого.
+function(_stm32_yml_json_quote OUT VALUE)
+    string(REPLACE "\\" "\\\\" VALUE "${VALUE}")
+    string(REPLACE "\"" "\\\"" VALUE "${VALUE}")
+    string(REPLACE "\n" "\\n" VALUE "${VALUE}")
+    string(REPLACE "\r" "\\r" VALUE "${VALUE}")
+    string(REPLACE "\t" "\\t" VALUE "${VALUE}")
+    set(${OUT} "\"${VALUE}\"" PARENT_SCOPE)
+endfunction()
+
+# stm32_yml_msg_def(<код> [RETIRED] "<текст RU>" ["<текст EN>"])
+# Регистрирует сообщение каталога. Хранится только текст выбранного языка;
+# при отсутствии английского текста используется русский (ТЗ 4.16.8).
+function(stm32_yml_msg_def CODE)
+    if(NOT CODE MATCHES "^[IWE][0-9][0-9][0-9]$")
+        message(FATAL_ERROR "stm32-cmake-yml: invalid message code '${CODE}'")
+    endif()
+    get_property(_known GLOBAL PROPERTY _STM32_YML_MSG_${CODE}_DEFINED)
+    if(_known)
+        message(FATAL_ERROR "stm32-cmake-yml: duplicate message code '${CODE}'")
+    endif()
+    set(_index 1)
+    if(ARGC GREATER 1 AND "${ARGV1}" STREQUAL "RETIRED")
+        set(_index 2)
+    endif()
+    if(NOT ARGC GREATER _index)
+        message(FATAL_ERROR "stm32-cmake-yml: message '${CODE}' has no text")
+    endif()
+    set(_text "${ARGV${_index}}")
+    math(EXPR _en_index "${_index} + 1")
+    get_property(_lang GLOBAL PROPERTY _STM32_YML_MSG_LANG)
+    if(_lang STREQUAL "en" AND ARGC GREATER _en_index AND NOT "${ARGV${_en_index}}" STREQUAL "")
+        set(_text "${ARGV${_en_index}}")
+    endif()
+    # Число параметров {1}…{n} проверяется при каждом выводе.
+    set(_params 0)
+    while(TRUE)
+        math(EXPR _next "${_params} + 1")
+        string(FIND "${_text}" "{${_next}}" _pos)
+        if(_pos EQUAL -1)
+            break()
+        endif()
+        set(_params ${_next})
+    endwhile()
+    set_property(GLOBAL PROPERTY _STM32_YML_MSG_${CODE}_DEFINED TRUE)
+    set_property(GLOBAL PROPERTY _STM32_YML_MSG_${CODE}_TEXT "${_text}")
+    set_property(GLOBAL PROPERTY _STM32_YML_MSG_${CODE}_PARAMS ${_params})
+endfunction()
+
+# stm32_yml_msg(<код> [аргументы…])
+# Выводит сообщение каталога на уровне, заданном классом кода: I — STATUS,
+# W — WARNING, E — FATAL_ERROR. Аргумент может содержать ';', кавычки и '\'.
+function(stm32_yml_msg CODE)
+    get_property(_known GLOBAL PROPERTY _STM32_YML_MSG_${CODE}_DEFINED)
+    if(NOT _known)
+        stm32_yml_msg(E001 "${CODE}")
+    endif()
+    get_property(_text GLOBAL PROPERTY _STM32_YML_MSG_${CODE}_TEXT)
+    get_property(_params GLOBAL PROPERTY _STM32_YML_MSG_${CODE}_PARAMS)
+    math(EXPR _count "${ARGC} - 1")
+    if(NOT _count EQUAL _params)
+        stm32_yml_msg(E002 "${CODE}" "${_params}" "${_count}")
+    endif()
+
+    string(SUBSTRING "${CODE}" 0 1 _class)
+    if(_class STREQUAL "I")
+        set(_level STATUS)
+    elseif(_class STREQUAL "W")
+        set(_level WARNING)
+    else()
+        set(_level FATAL_ERROR)
+    endif()
+
+    # Подстановка за один проход: {n} внутри значения аргумента не заменяется.
+    set(_out "")
+    set(_rest "${_text}")
+    while(TRUE)
+        string(FIND "${_rest}" "{" _pos)
+        if(_pos EQUAL -1)
+            string(APPEND _out "${_rest}")
+            break()
+        endif()
+        string(SUBSTRING "${_rest}" 0 ${_pos} _head)
+        string(APPEND _out "${_head}")
+        math(EXPR _pos "${_pos} + 1")
+        string(SUBSTRING "${_rest}" ${_pos} -1 _rest)
+        if(_rest MATCHES "^([0-9]+)}")
+            set(_number ${CMAKE_MATCH_1})
+            string(LENGTH "${CMAKE_MATCH_0}" _length)
+            string(SUBSTRING "${_rest}" ${_length} -1 _rest)
+            if(_number GREATER 0 AND NOT _number GREATER _count)
+                string(APPEND _out "${ARGV${_number}}")
+            else()
+                string(APPEND _out "{${_number}}")
+            endif()
+        else()
+            string(APPEND _out "{")
+        endif()
+    endwhile()
+    set(_text "${_out}")
+
+    set(_args_json "")
+    if(_count GREATER 0)
+        foreach(_index RANGE 1 ${_count})
+            _stm32_yml_json_quote(_quoted "${ARGV${_index}}")
+            if(_index GREATER 1)
+                string(APPEND _args_json ",")
+            endif()
+            string(APPEND _args_json "${_quoted}")
+        endforeach()
+    endif()
+
+    get_property(_lang GLOBAL PROPERTY _STM32_YML_MSG_LANG)
+    get_property(_file GLOBAL PROPERTY _STM32_YML_MSG_FILE)
+    _stm32_yml_json_quote(_text_json "${_text}")
+    file(APPEND "${_file}"
+        "{\"code\":\"SCY-${CODE}\",\"level\":\"${_level}\",\"lang\":\"${_lang}\",\"args\":[${_args_json}],\"text\":${_text_json}}\n")
+
+    if(STM32_YML_MESSAGE_CODES)
+        string(REPLACE "\n" "\n[SCY-${CODE}] " _text "${_text}")
+        set(_text "[SCY-${CODE}] ${_text}")
+    endif()
+    message(${_level} "${_text}")
+endfunction()
+
+# Инициализация при каждом Configure, в том числе до project().
+_stm32_yml_resolve_lang(_stm32_yml_lang _stm32_yml_lang_invalid)
+set_property(GLOBAL PROPERTY _STM32_YML_MSG_LANG "${_stm32_yml_lang}")
+set_property(GLOBAL PROPERTY _STM32_YML_MSG_FILE "${CMAKE_BINARY_DIR}/stm32_yml_messages.jsonl")
+file(WRITE "${CMAKE_BINARY_DIR}/stm32_yml_messages.jsonl" "")
+include("${CMAKE_CURRENT_LIST_DIR}/stm32_yml_messages_catalog.cmake")
+if(NOT _stm32_yml_lang_invalid STREQUAL "")
+    stm32_yml_msg(W001 "${_stm32_yml_lang_invalid}")
+endif()
+unset(_stm32_yml_lang)
+unset(_stm32_yml_lang_invalid)

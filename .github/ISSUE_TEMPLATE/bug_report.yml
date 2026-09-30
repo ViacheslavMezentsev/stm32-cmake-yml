@@ -13,7 +13,7 @@ body:
     id: version
     attributes:
       label: Версия stm32-cmake-yml / stm32-cmake-yml version
-      description: Строка «stm32-cmake-yml версия:» в начале лога Configure, тег или коммит / The «stm32-cmake-yml версия:» line at the start of the Configure log, a tag or a commit
+      description: Строка «stm32-cmake-yml версия:» («stm32-cmake-yml version:») в начале лога Configure, тег или коммит / The «stm32-cmake-yml version:» («stm32-cmake-yml версия:») line at the start of the Configure log, a tag or a commit
       placeholder: 0.9.3 (67562c0)
     validations:
       required: true

@@ -159,9 +159,9 @@ package or the resulting image bytes. Ubuntu snapshots are not required.
 
 ## Framework configuration tests
 
-[tests/cases.json](../../tests/cases.json) defines 139 scenarios, run with each of
-the three GCC and two CMake versions from the lockfile: **834 case executions**.
-Twenty-six scenarios perform two to thirteen consecutive configurations in the same build tree.
+[tests/cases.json](../../tests/cases.json) defines 152 scenarios, run with each of
+the three GCC and two CMake versions from the lockfile: **912 case executions**.
+Twenty-seven scenarios perform two to thirteen consecutive configurations in the same build tree.
 
 | Area | Checks |
 | --- | --- |
@@ -305,6 +305,25 @@ hal_conf error. [Diagnostic limits](troubleshooting.md).
 ### YAML version diagnostics
 
 Eight `version-*` cases cover matching, missing, empty, older and newer versions, disabling comparison at the YAML root, and comparison before profiles/overrides. Every case must complete Configure/Generate successfully; warnings are not failures. This checks 0.9.2 diagnostics, not compatibility with future configuration versions. No firmware is built.
+
+### Messages, codes and language
+
+Framework messages are printed by codes from `cmake/stm32_yml_messages_catalog.cmake`
+(spec 4.16.5–4.16.13). L3 cases run in English: `tests/run_case.py` passes
+`-DSTM32_YML_LANG=en` unless a case sets `lang`. Every step checks
+`stm32_yml_messages.jsonl`: the code is in the catalog, the level matches the code class,
+the text matches the catalog and the text itself is in the output. Case keys:
+`messages` (a code and optionally its arguments), `messages_absent`, `message_lang`,
+`message_codes`, and `error` as `{"code": …}` — the last message before the failure.
+
+Thirteen `messages-*` cases cover the language from `STM32_YML_LANG` and the locale
+(`LC_ALL`, `LC_MESSAGES`, `LANG`, skipping `C` and `POSIX`), the `rus`/`eng` synonyms, an
+unknown value, Russian text when English is missing, the `[SCY-…]` prefix with
+`STM32_YML_MESSAGE_CODES=ON`, records up to `FATAL_ERROR` with arguments containing `;`,
+quotes and `\`, and recreation of the file on every Configure. For them the fixture loads
+test-only 9xx codes from `tests/fixtures/project/test_messages.cmake`
+(`-DSTM32_YML_TEST_MESSAGES=ON`). `ci/check_messages.py` (L1) checks the catalog and
+sources; its tests are in `tests/test_check_messages.py`.
 
 ### STM32Cube FreeRTOS
 

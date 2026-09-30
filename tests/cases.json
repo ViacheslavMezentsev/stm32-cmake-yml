@@ -578,14 +578,24 @@
       "PROJECT_NAME": "baremetal_probe",
       "MCU": "STM32F103C8T6"
     },
-    "log_contains": [
-      "stm32-cmake-yml версия: 0.9.3",
-      "Версия в конфигурации: 0.9.3 (совпадают"
+    "messages": [
+      {
+        "code": "I001",
+        "args": [
+          "0.9.3"
+        ]
+      },
+      {
+        "code": "I003",
+        "args": [
+          "0.9.3"
+        ]
+      }
     ],
-    "log_absent": [
-      "не указан рекомендуемый параметр 'stm32_cmake_yml_version'",
-      "Рекомендуется обновить stm32_cmake_yml_version.",
-      "Возможны ошибки."
+    "messages_absent": [
+      "W002",
+      "W003",
+      "W004"
     ]
   },
   {
@@ -598,12 +608,32 @@
       "PROJECT_NAME": "baremetal_probe",
       "MCU": "STM32F103C8T6"
     },
-    "log_contains": [
-      "stm32-cmake-yml версия: 0.9.3",
-      "не указан рекомендуемый параметр 'stm32_cmake_yml_version'"
-    ],
     "log_absent": [
       "обязательный параметр"
+    ],
+    "messages": [
+      {
+        "code": "I001",
+        "args": [
+          "0.9.3"
+        ]
+      },
+      {
+        "code": "I002",
+        "args": [
+          "version-missing.yml"
+        ]
+      },
+      {
+        "code": "W002",
+        "args": [
+          "version-missing.yml"
+        ]
+      }
+    ],
+    "messages_absent": [
+      "W003",
+      "W004"
     ]
   },
   {
@@ -616,12 +646,32 @@
       "PROJECT_NAME": "baremetal_probe",
       "MCU": "STM32F103C8T6"
     },
-    "log_contains": [
-      "stm32-cmake-yml версия: 0.9.3",
-      "не указан рекомендуемый параметр 'stm32_cmake_yml_version'"
-    ],
     "log_absent": [
       "обязательный параметр"
+    ],
+    "messages": [
+      {
+        "code": "I001",
+        "args": [
+          "0.9.3"
+        ]
+      },
+      {
+        "code": "I002",
+        "args": [
+          "version-empty.yml"
+        ]
+      },
+      {
+        "code": "W002",
+        "args": [
+          "version-empty.yml"
+        ]
+      }
+    ],
+    "messages_absent": [
+      "W003",
+      "W004"
     ]
   },
   {
@@ -634,15 +684,33 @@
       "PROJECT_NAME": "baremetal_probe",
       "MCU": "STM32F103C8T6"
     },
-    "log_contains": [
-      "stm32-cmake-yml версия: 0.9.3",
-      "Версия в конфигурации: 0.9.1",
-      "Рекомендуется обновить stm32_cmake_yml_version."
-    ],
     "log_absent": [
-      "Что нового в 0.9",
-      "Возможны ошибки.",
-      "не указан рекомендуемый параметр 'stm32_cmake_yml_version'"
+      "Что нового в 0.9"
+    ],
+    "messages": [
+      {
+        "code": "I001",
+        "args": [
+          "0.9.3"
+        ]
+      },
+      {
+        "code": "I005",
+        "args": [
+          "0.9.1"
+        ]
+      },
+      {
+        "code": "W004",
+        "args": [
+          "0.9.3",
+          "0.9.1"
+        ]
+      }
+    ],
+    "messages_absent": [
+      "W002",
+      "W003"
     ]
   },
   {
@@ -655,14 +723,30 @@
       "PROJECT_NAME": "baremetal_probe",
       "MCU": "STM32F103C8T6"
     },
-    "log_contains": [
-      "stm32-cmake-yml версия: 0.9.3",
-      "Версия в конфигурации: 0.9.4",
-      "Возможны ошибки."
+    "messages": [
+      {
+        "code": "I001",
+        "args": [
+          "0.9.3"
+        ]
+      },
+      {
+        "code": "I004",
+        "args": [
+          "0.9.4"
+        ]
+      },
+      {
+        "code": "W003",
+        "args": [
+          "0.9.3",
+          "0.9.4"
+        ]
+      }
     ],
-    "log_absent": [
-      "Рекомендуется обновить stm32_cmake_yml_version.",
-      "не указан рекомендуемый параметр 'stm32_cmake_yml_version'"
+    "messages_absent": [
+      "W002",
+      "W004"
     ]
   },
   {
@@ -675,14 +759,22 @@
       "PROJECT_NAME": "baremetal_probe",
       "MCU": "STM32F103C8T6"
     },
-    "log_contains": [
-      "stm32-cmake-yml версия: 0.9.3"
+    "messages": [
+      {
+        "code": "I001",
+        "args": [
+          "0.9.3"
+        ]
+      }
     ],
-    "log_absent": [
-      "Версия в конфигурации:",
-      "не указан рекомендуемый параметр 'stm32_cmake_yml_version'",
-      "Рекомендуется обновить stm32_cmake_yml_version.",
-      "Возможны ошибки."
+    "messages_absent": [
+      "I002",
+      "I003",
+      "I004",
+      "I005",
+      "W002",
+      "W003",
+      "W004"
     ]
   },
   {
@@ -692,9 +784,20 @@
       "-DSTM32_YML_PROFILE=quiet"
     ],
     "no_st_dependencies": true,
-    "log_contains": [
-      "Версия в конфигурации: 0.9.4",
-      "Возможны ошибки."
+    "messages": [
+      {
+        "code": "I004",
+        "args": [
+          "0.9.4"
+        ]
+      },
+      {
+        "code": "W003",
+        "args": [
+          "0.9.3",
+          "0.9.4"
+        ]
+      }
     ]
   },
   {
@@ -705,9 +808,20 @@
       "-DSTM32_YML_OVERRIDE_stm32_cmake_yml_version_check=false"
     ],
     "no_st_dependencies": true,
-    "log_contains": [
-      "Версия в конфигурации: 0.9.4",
-      "Возможны ошибки."
+    "messages": [
+      {
+        "code": "I004",
+        "args": [
+          "0.9.4"
+        ]
+      },
+      {
+        "code": "W003",
+        "args": [
+          "0.9.3",
+          "0.9.4"
+        ]
+      }
     ]
   },
   {
@@ -2596,6 +2710,334 @@
               "custom/hal/driver"
             ]
           }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "messages-lang-auto-lc-all-ru",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=version-equal.yml",
+      "-DSTM32_YML_LANG=auto"
+    ],
+    "no_st_dependencies": true,
+    "message_lang": "ru",
+    "messages": [
+      {
+        "code": "I001",
+        "args": [
+          "0.9.3"
+        ]
+      }
+    ],
+    "env": {
+      "LC_ALL": "ru_RU.UTF-8",
+      "LC_MESSAGES": "",
+      "LANG": "en_US.UTF-8"
+    }
+  },
+  {
+    "name": "messages-lang-auto-lang-en",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=version-equal.yml",
+      "-DSTM32_YML_LANG=auto"
+    ],
+    "no_st_dependencies": true,
+    "message_lang": "en",
+    "messages": [
+      {
+        "code": "I001",
+        "args": [
+          "0.9.3"
+        ]
+      }
+    ],
+    "env": {
+      "LC_ALL": "",
+      "LC_MESSAGES": "",
+      "LANG": "en_US.UTF-8"
+    }
+  },
+  {
+    "name": "messages-lang-auto-skip-c",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=version-equal.yml",
+      "-DSTM32_YML_LANG=auto"
+    ],
+    "no_st_dependencies": true,
+    "message_lang": "ru",
+    "messages": [
+      {
+        "code": "I001",
+        "args": [
+          "0.9.3"
+        ]
+      }
+    ],
+    "env": {
+      "LC_ALL": "C.UTF-8",
+      "LC_MESSAGES": "POSIX",
+      "LANG": "ru_RU.UTF-8"
+    }
+  },
+  {
+    "name": "messages-lang-auto-undefined",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=version-equal.yml",
+      "-DSTM32_YML_LANG=auto"
+    ],
+    "no_st_dependencies": true,
+    "message_lang": "en",
+    "messages": [
+      {
+        "code": "I001",
+        "args": [
+          "0.9.3"
+        ]
+      }
+    ],
+    "env": {
+      "LC_ALL": "",
+      "LC_MESSAGES": "",
+      "LANG": ""
+    }
+  },
+  {
+    "name": "messages-lang-rus",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=version-equal.yml",
+      "-DSTM32_YML_LANG=RUS"
+    ],
+    "no_st_dependencies": true,
+    "message_lang": "ru",
+    "messages": [
+      {
+        "code": "I001",
+        "args": [
+          "0.9.3"
+        ]
+      }
+    ],
+    "env": {
+      "LC_ALL": "",
+      "LC_MESSAGES": "",
+      "LANG": "en_US.UTF-8"
+    }
+  },
+  {
+    "name": "messages-lang-eng",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=version-equal.yml",
+      "-DSTM32_YML_LANG=eng"
+    ],
+    "no_st_dependencies": true,
+    "message_lang": "en",
+    "messages": [
+      {
+        "code": "I001",
+        "args": [
+          "0.9.3"
+        ]
+      }
+    ],
+    "env": {
+      "LC_ALL": "",
+      "LC_MESSAGES": "",
+      "LANG": "ru_RU.UTF-8"
+    }
+  },
+  {
+    "name": "messages-lang-ru",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=version-equal.yml"
+    ],
+    "no_st_dependencies": true,
+    "message_lang": "ru",
+    "messages": [
+      {
+        "code": "I001",
+        "args": [
+          "0.9.3"
+        ]
+      }
+    ],
+    "env": {
+      "LC_ALL": "",
+      "LC_MESSAGES": "",
+      "LANG": ""
+    },
+    "lang": "ru",
+    "log_contains": [
+      "stm32-cmake-yml версия: 0.9.3"
+    ]
+  },
+  {
+    "name": "messages-lang-unknown",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=version-equal.yml",
+      "-DSTM32_YML_LANG=de"
+    ],
+    "no_st_dependencies": true,
+    "message_lang": "ru",
+    "messages": [
+      {
+        "code": "W001",
+        "args": [
+          "de"
+        ]
+      },
+      {
+        "code": "I001",
+        "args": [
+          "0.9.3"
+        ]
+      }
+    ],
+    "env": {
+      "LC_ALL": "",
+      "LC_MESSAGES": "",
+      "LANG": "ru_RU.UTF-8"
+    }
+  },
+  {
+    "name": "messages-russian-fallback",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=version-equal.yml",
+      "-DSTM32_YML_TEST_MESSAGES=ON"
+    ],
+    "no_st_dependencies": true,
+    "message_lang": "en",
+    "messages": [
+      {
+        "code": "W901",
+        "args": [
+          "ok"
+        ]
+      },
+      {
+        "code": "I001",
+        "args": [
+          "0.9.3"
+        ]
+      }
+    ],
+    "log_contains": [
+      "Тестовое предупреждение только на русском: ok",
+      "stm32-cmake-yml version: 0.9.3"
+    ]
+  },
+  {
+    "name": "messages-codes-off",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=version-equal.yml",
+      "-DSTM32_YML_TEST_MESSAGES=ON"
+    ],
+    "no_st_dependencies": true,
+    "message_codes": false,
+    "messages": [
+      {
+        "code": "I001",
+        "args": [
+          "0.9.3"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "messages-codes-on",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=version-equal.yml",
+      "-DSTM32_YML_TEST_MESSAGES=ON",
+      "-DSTM32_YML_MESSAGE_CODES=ON"
+    ],
+    "no_st_dependencies": true,
+    "message_codes": true,
+    "messages": [
+      {
+        "code": "I001",
+        "args": [
+          "0.9.3"
+        ]
+      }
+    ],
+    "log_contains": [
+      "[SCY-I001] stm32-cmake-yml version: 0.9.3",
+      "[SCY-W901] Тестовое предупреждение"
+    ]
+  },
+  {
+    "name": "messages-file-fatal",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=version-equal.yml",
+      "-DSTM32_YML_TEST_MESSAGES=ON",
+      "-DSTM32_YML_TEST_FAIL=ON"
+    ],
+    "error": {
+      "code": "E901",
+      "args": [
+        "stop"
+      ]
+    },
+    "messages": [
+      {
+        "code": "I901",
+        "args": [
+          "a;b",
+          "quote \"x\"",
+          "C:\\path\\to {1}"
+        ]
+      },
+      {
+        "code": "W901",
+        "args": [
+          "ok"
+        ]
+      }
+    ],
+    "messages_absent": [
+      "I001"
+    ],
+    "log_contains": [
+      "Test message: [a;b] [quote \"x\"] [C:\\path\\to {1}]",
+      "Test error: stop"
+    ]
+  },
+  {
+    "name": "messages-file-rewritten",
+    "no_st_dependencies": true,
+    "steps": [
+      {
+        "args": [
+          "-DPROJECT_CONFIG_FILE=version-equal.yml",
+          "-DSTM32_YML_TEST_MESSAGES=ON"
+        ],
+        "messages": [
+          {
+            "code": "I901"
+          },
+          {
+            "code": "I001",
+            "args": [
+              "0.9.3"
+            ]
+          }
+        ]
+      },
+      {
+        "args": [
+          "-DSTM32_YML_TEST_MESSAGES=OFF"
+        ],
+        "messages": [
+          {
+            "code": "I001",
+            "args": [
+              "0.9.3"
+            ]
+          }
+        ],
+        "messages_absent": [
+          "I901",
+          "W901"
         ]
       }
     ]

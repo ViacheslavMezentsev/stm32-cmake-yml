@@ -19,32 +19,22 @@ function(stm32_yml_prepare_project_data OUT_PROJECT_NAME_VAR OUT_LANGUAGES_VAR)
     set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${CONFIG_FILE_PATH}")
 
     # --- Баннер версий -------------------------------------------------------
-    message(STATUS "stm32-cmake-yml версия: ${STM32_CMAKE_YML_VERSION}")
+    stm32_yml_msg(I001 "${STM32_CMAKE_YML_VERSION}")
 
     stm32_yml_ensure_default_value(stm32_cmake_yml_version_check "true")
 
     if(stm32_cmake_yml_version_check)
         if(NOT DEFINED stm32_cmake_yml_version OR "${stm32_cmake_yml_version}" STREQUAL "")
-            message(STATUS "Версия в конфигурации: не указана (stm32_cmake_yml_version в ${PROJECT_CONFIG_FILE})")
-            message(WARNING "В файле '${PROJECT_CONFIG_FILE}' не указан рекомендуемый параметр 'stm32_cmake_yml_version'. "
-                            "Укажите версию фреймворка, для которой написана конфигурация (ТЗ 4.2.3).")
+            stm32_yml_msg(I002 "${PROJECT_CONFIG_FILE}")
+            stm32_yml_msg(W002 "${PROJECT_CONFIG_FILE}")
+        elseif(stm32_cmake_yml_version VERSION_EQUAL STM32_CMAKE_YML_VERSION)
+            stm32_yml_msg(I003 "${stm32_cmake_yml_version}")
+        elseif(stm32_cmake_yml_version VERSION_GREATER STM32_CMAKE_YML_VERSION)
+            stm32_yml_msg(I004 "${stm32_cmake_yml_version}")
+            stm32_yml_msg(W003 "${STM32_CMAKE_YML_VERSION}" "${stm32_cmake_yml_version}")
         else()
-            if(stm32_cmake_yml_version VERSION_EQUAL STM32_CMAKE_YML_VERSION)
-                set(_ver_status "совпадают ✓")
-            elseif(stm32_cmake_yml_version VERSION_GREATER STM32_CMAKE_YML_VERSION)
-                set(_ver_status "конфиг новее — обновите фреймворк !")
-            else()
-                set(_ver_status "фреймворк новее — обновите конфиг")
-            endif()
-            message(STATUS "Версия в конфигурации: ${stm32_cmake_yml_version}  (${_ver_status})")
-
-            if(stm32_cmake_yml_version VERSION_GREATER STM32_CMAKE_YML_VERSION)
-                message(WARNING "Версия фреймворка (${STM32_CMAKE_YML_VERSION}) старше, чем требуется конфигом (${stm32_cmake_yml_version}). Возможны ошибки.")
-            elseif(stm32_cmake_yml_version VERSION_LESS STM32_CMAKE_YML_VERSION)
-                message(WARNING
-                    "Версия фреймворка (${STM32_CMAKE_YML_VERSION}) новее, чем указано в конфиге "
-                    "(${stm32_cmake_yml_version}). Рекомендуется обновить stm32_cmake_yml_version.")
-            endif()
+            stm32_yml_msg(I005 "${stm32_cmake_yml_version}")
+            stm32_yml_msg(W004 "${STM32_CMAKE_YML_VERSION}" "${stm32_cmake_yml_version}")
         endif()
     endif()
     # -------------------------------------------------------------------------

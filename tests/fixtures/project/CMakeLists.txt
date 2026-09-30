@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 3.19)
 include("${STM32_YML_FRAMEWORK_DIR}/stm32_yml.cmake")
+# Test-only message codes 9xx before project() (spec 4.16.5, 4.16.10; TC-74, TC-75).
+if(STM32_YML_TEST_MESSAGES)
+    include("${CMAKE_CURRENT_SOURCE_DIR}/test_messages.cmake")
+endif()
 stm32_yml_prepare_project_data(PROJECT_NAME PROJECT_LANGUAGES)
 project(${PROJECT_NAME} LANGUAGES ${PROJECT_LANGUAGES})
 stm32_yml_setup_project(${PROJECT_NAME})
