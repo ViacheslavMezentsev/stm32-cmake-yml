@@ -6,7 +6,22 @@ if(STM32_YML_TEST_MESSAGES)
 endif()
 stm32_yml_prepare_project_data(PROJECT_NAME PROJECT_LANGUAGES)
 project(${PROJECT_NAME} LANGUAGES ${PROJECT_LANGUAGES})
+# TC-79: artifacts are built without the stm32-cmake stm32_generate_* functions.
+if(STM32_YML_TEST_NO_GENERATE)
+    foreach(KIND IN ITEMS binary hex srec)
+        cmake_language(EVAL CODE "function(stm32_generate_${KIND}_file)
+            message(FATAL_ERROR \"stm32_generate_${KIND}_file must not be used\")
+        endfunction()")
+    endforeach()
+endif()
 stm32_yml_setup_project(${PROJECT_NAME})
+# TC-79: target properties set after the framework call (spec 4.14.4).
+if(DEFINED STM32_YML_TEST_OUTPUT_NAME)
+    set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "${STM32_YML_TEST_OUTPUT_NAME}")
+endif()
+if(DEFINED STM32_YML_TEST_OUTPUT_DIR)
+    set_target_properties(${PROJECT_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${STM32_YML_TEST_OUTPUT_DIR}")
+endif()
 
 # Observe public configuration and target properties without changing the target.
 file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/observed")

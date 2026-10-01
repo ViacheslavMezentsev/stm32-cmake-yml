@@ -2870,13 +2870,13 @@
     },
     "absent_properties": {
       "LINK_OPTIONS": [
-        "LINKER:-Map=baremetal_probe.map"
+        "LINKER:-Map=$<TARGET_FILE_DIR:baremetal_probe>/$<TARGET_FILE_BASE_NAME:baremetal_probe>.map"
       ]
     },
     "generated_link_flags": {
       "present": [],
       "absent": [
-        "-Wl,-Map=baremetal_probe.map"
+        "-Wl,-Map={build}/baremetal_probe.map"
       ]
     }
   },
@@ -2896,7 +2896,7 @@
     "crc_command": false,
     "properties": {
       "LINK_OPTIONS": [
-        "LINKER:-Map=baremetal_probe.map"
+        "LINKER:-Map=$<TARGET_FILE_DIR:baremetal_probe>/$<TARGET_FILE_BASE_NAME:baremetal_probe>.map"
       ]
     },
     "absent_properties": {
@@ -2904,7 +2904,7 @@
     },
     "generated_link_flags": {
       "present": [
-        "-Wl,-Map=baremetal_probe.map"
+        "-Wl,-Map={build}/baremetal_probe.map"
       ],
       "absent": []
     }
@@ -2921,7 +2921,7 @@
     "crc_command": false,
     "properties": {
       "LINK_OPTIONS": [
-        "LINKER:-Map=baremetal_probe.map"
+        "LINKER:-Map=$<TARGET_FILE_DIR:baremetal_probe>/$<TARGET_FILE_BASE_NAME:baremetal_probe>.map"
       ]
     },
     "absent_properties": {
@@ -2929,7 +2929,7 @@
     },
     "generated_link_flags": {
       "present": [
-        "-Wl,-Map=baremetal_probe.map"
+        "-Wl,-Map={build}/baremetal_probe.map"
       ],
       "absent": []
     }
@@ -2947,13 +2947,13 @@
     },
     "absent_properties": {
       "LINK_OPTIONS": [
-        "LINKER:-Map=baremetal_probe.map"
+        "LINKER:-Map=$<TARGET_FILE_DIR:baremetal_probe>/$<TARGET_FILE_BASE_NAME:baremetal_probe>.map"
       ]
     },
     "generated_link_flags": {
       "present": [],
       "absent": [
-        "-Wl,-Map=baremetal_probe.map"
+        "-Wl,-Map={build}/baremetal_probe.map"
       ]
     }
   },
@@ -2972,13 +2972,13 @@
     },
     "absent_properties": {
       "LINK_OPTIONS": [
-        "LINKER:-Map=baremetal_probe.map"
+        "LINKER:-Map=$<TARGET_FILE_DIR:baremetal_probe>/$<TARGET_FILE_BASE_NAME:baremetal_probe>.map"
       ]
     },
     "generated_link_flags": {
       "present": [],
       "absent": [
-        "-Wl,-Map=baremetal_probe.map"
+        "-Wl,-Map={build}/baremetal_probe.map"
       ]
     },
     "messages": [
@@ -3012,7 +3012,7 @@
         "crc_command": false,
         "properties": {
           "LINK_OPTIONS": [
-            "LINKER:-Map=baremetal_probe.map"
+            "LINKER:-Map=$<TARGET_FILE_DIR:baremetal_probe>/$<TARGET_FILE_BASE_NAME:baremetal_probe>.map"
           ]
         },
         "absent_properties": {
@@ -3020,7 +3020,7 @@
         },
         "generated_link_flags": {
           "present": [
-            "-Wl,-Map=baremetal_probe.map"
+            "-Wl,-Map={build}/baremetal_probe.map"
           ],
           "absent": []
         }
@@ -3038,13 +3038,13 @@
         },
         "absent_properties": {
           "LINK_OPTIONS": [
-            "LINKER:-Map=baremetal_probe.map"
+            "LINKER:-Map=$<TARGET_FILE_DIR:baremetal_probe>/$<TARGET_FILE_BASE_NAME:baremetal_probe>.map"
           ]
         },
         "generated_link_flags": {
           "present": [],
           "absent": [
-            "-Wl,-Map=baremetal_probe.map"
+            "-Wl,-Map={build}/baremetal_probe.map"
           ]
         }
       },
@@ -3059,13 +3059,13 @@
         },
         "absent_properties": {
           "LINK_OPTIONS": [
-            "LINKER:-Map=baremetal_probe.map"
+            "LINKER:-Map=$<TARGET_FILE_DIR:baremetal_probe>/$<TARGET_FILE_BASE_NAME:baremetal_probe>.map"
           ]
         },
         "generated_link_flags": {
           "present": [],
           "absent": [
-            "-Wl,-Map=baremetal_probe.map"
+            "-Wl,-Map={build}/baremetal_probe.map"
           ]
         }
       }
@@ -4382,6 +4382,150 @@
       "code": "E302",
       "args": [
         "_deps/local"
+      ]
+    }
+  },
+  {
+    "name": "artifacts-build-default",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=artifacts.yml",
+      "-DSTM32_YML_PROFILE=build",
+      "-DSTM32_YML_TEST_NO_GENERATE=ON"
+    ],
+    "generated_artifacts": [
+      "bin",
+      "hex",
+      "srec",
+      "map",
+      "lss"
+    ],
+    "link_byproducts": [
+      "baremetal_probe.bin",
+      "baremetal_probe.hex",
+      "baremetal_probe.srec",
+      "baremetal_probe.map",
+      "baremetal_probe.lss"
+    ],
+    "built": {
+      "elf": "baremetal_probe.elf",
+      "files": [
+        "bin",
+        "hex",
+        "srec",
+        "map",
+        "lss"
+      ]
+    }
+  },
+  {
+    "name": "artifacts-output-name",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=artifacts.yml",
+      "-DSTM32_YML_PROFILE=build",
+      "-DSTM32_YML_TEST_NO_GENERATE=ON",
+      "-DSTM32_YML_TEST_OUTPUT_NAME=fw.v1",
+      "-DSTM32_YML_TEST_OUTPUT_DIR=out"
+    ],
+    "link_byproducts": [
+      "out/fw.v1.bin",
+      "out/fw.v1.hex",
+      "out/fw.v1.srec",
+      "out/fw.v1.map",
+      "out/fw.v1.lss"
+    ],
+    "built": {
+      "elf": "out/fw.v1.elf",
+      "files": [
+        "bin",
+        "hex",
+        "srec",
+        "map",
+        "lss"
+      ],
+      "absent": [
+        "baremetal_probe.elf",
+        "baremetal_probe.bin",
+        "baremetal_probe.hex",
+        "baremetal_probe.srec",
+        "baremetal_probe.map",
+        "baremetal_probe.lss",
+        "out/baremetal_probe.bin",
+        "out/baremetal_probe.hex",
+        "out/baremetal_probe.srec",
+        "out/baremetal_probe.map",
+        "out/baremetal_probe.lss"
+      ]
+    }
+  },
+  {
+    "name": "artifacts-multi-config",
+    "generator": "Ninja Multi-Config",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=artifacts.yml",
+      "-DSTM32_YML_PROFILE=build",
+      "-DSTM32_YML_TEST_NO_GENERATE=ON",
+      "-DSTM32_YML_TEST_OUTPUT_NAME=fw.v1"
+    ],
+    "built": {
+      "elf": "Debug/fw.v1.elf",
+      "files": [
+        "bin",
+        "hex",
+        "srec",
+        "map",
+        "lss"
+      ],
+      "absent": [
+        "fw.v1.bin",
+        "fw.v1.hex",
+        "fw.v1.srec",
+        "fw.v1.map",
+        "fw.v1.lss",
+        "Debug/baremetal_probe.bin",
+        "Debug/baremetal_probe.hex",
+        "Debug/baremetal_probe.srec",
+        "Debug/baremetal_probe.map",
+        "Debug/baremetal_probe.lss"
+      ]
+    },
+    "link_byproducts": [
+      "Debug/fw.v1.bin",
+      "Debug/fw.v1.hex",
+      "Debug/fw.v1.srec",
+      "Debug/fw.v1.map",
+      "Debug/fw.v1.lss"
+    ]
+  },
+  {
+    "name": "artifacts-makefiles",
+    "generator": "Unix Makefiles",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=artifacts.yml",
+      "-DSTM32_YML_PROFILE=build",
+      "-DSTM32_YML_TEST_NO_GENERATE=ON",
+      "-DSTM32_YML_TEST_OUTPUT_NAME=fw.v1",
+      "-DSTM32_YML_TEST_OUTPUT_DIR=out"
+    ],
+    "built": {
+      "elf": "out/fw.v1.elf",
+      "files": [
+        "bin",
+        "hex",
+        "srec",
+        "map",
+        "lss"
+      ],
+      "absent": [
+        "baremetal_probe.bin",
+        "baremetal_probe.hex",
+        "baremetal_probe.srec",
+        "baremetal_probe.map",
+        "baremetal_probe.lss",
+        "out/baremetal_probe.bin",
+        "out/baremetal_probe.hex",
+        "out/baremetal_probe.srec",
+        "out/baremetal_probe.map",
+        "out/baremetal_probe.lss"
       ]
     }
   }

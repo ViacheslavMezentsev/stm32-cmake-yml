@@ -1020,6 +1020,10 @@
         "configure.artifacts-empty",
         "configure.artifacts-unknown",
         "configure.artifacts-reconfigure",
+        "configure.artifacts-build-default",
+        "configure.artifacts-output-name",
+        "configure.artifacts-multi-config",
+        "configure.artifacts-makefiles",
         "configure.empty-and-null-defaults"
       ],
       "errata": []

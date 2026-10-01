@@ -5,7 +5,7 @@ FROM ubuntu:24.04@sha256:008173c23f95b170204355c12626cb5a965d779a7e1283b09e9cffb
 RUN test "$(dpkg --print-architecture)" = amd64 \
     && apt-get -o Acquire::Retries=3 -o APT::Update::Error-Mode=any update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-        ca-certificates curl git python3 unzip xz-utils libexpat1 libgmp10 \
+        ca-certificates curl git make python3 unzip xz-utils libexpat1 libgmp10 \
     && rm -rf /var/lib/apt/lists/*
 
 COPY ci/dependencies.lock.json /opt/stm32-yml-ci/dependencies.lock.json

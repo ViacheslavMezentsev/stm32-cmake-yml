@@ -159,8 +159,8 @@ package or the resulting image bytes. Ubuntu snapshots are not required.
 
 ## Framework configuration tests
 
-[tests/cases.json](../../tests/cases.json) defines 167 scenarios, run with each of
-the three GCC and two CMake versions from the lockfile: **1002 case executions**.
+[tests/cases.json](../../tests/cases.json) defines 171 scenarios, run with each of
+the three GCC and two CMake versions from the lockfile: **1026 case executions**.
 Twenty-seven scenarios perform two to thirteen consecutive configurations in the same build tree.
 
 | Area | Checks |
@@ -423,9 +423,11 @@ CMake 3.21 stores the command in `CMakeFiles/rules.ninja`, while 3.28 stores it 
 
 Six `artifacts-*` cases check commands declared during Configure/Generate: omitted setting, `[bin, hex, map, lss]`, map only, an empty list, an unknown item alongside bin, and shared-cache profile transitions all formats → bin → empty. CRC is disabled so its intermediate BIN commands cannot be mistaken for artifact selection.
 
-Assertions cover objcopy binary/ihex, objdump -h -S and output filenames in Ninja POST_BUILD; map checks both LINK_OPTIONS and the generated linker flag. The primary ELF target and size-reporting command remain with an empty list. Unknown items add no conversion; supported bin still adds its command. Profile transitions must remove commands from the previous selection.
+Assertions cover the `stm32_crc.py --image`, `objcopy -O ihex`/`-O srec` and `objdump -h -S` commands with output paths next to the ELF in Ninja POST_BUILD, their declaration as byproducts of the link rule; map checks both LINK_OPTIONS and the generated linker flag. The primary ELF target and size-reporting command remain with an empty list. Unknown items add no conversion; supported bin still adds its command. Profile transitions must remove commands from the previous selection.
 
 Tests also assert that no ELF/BIN/HEX/MAP/LSS output has been created in the build directory: conversion and linking are never executed. These cases do not prove file-format, listing, memory-size or CRC correctness, and do not cover the Arduino backend.
+
+Four TC-79 cases build the fixture and check the files per spec 4.14.4: `artifacts-build-default` — without `OUTPUT_NAME` and `RUNTIME_OUTPUT_DIRECTORY` every artifact is in the build directory under the target name, as in 0.9.3; `artifacts-output-name` — `OUTPUT_NAME` with a dot (`fw.v1`) and `RUNTIME_OUTPUT_DIRECTORY` `out`, set after the framework call; `artifacts-multi-config` — Ninja Multi-Config, artifacts in `Debug/`; `artifacts-makefiles` — Unix Makefiles. The fixture replaces the `stm32_generate_*` functions with an error (`STM32_YML_TEST_NO_GENERATE`); `hex` and `srec` are compared with `objcopy` output for the ELF (`srec` without the S0 header that holds the file path). Case keys: `generator`, `built` (a `cmake --build` build and the expected files next to the ELF), `link_byproducts` (byproducts of the link rule).
 
 ### Custom library paths
 

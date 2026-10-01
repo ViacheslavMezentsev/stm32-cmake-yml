@@ -25,3 +25,6 @@ profiles:
     build_artifacts: [bin, unsupported-format]
   binary:
     build_artifacts: [bin]
+  build:
+    build_artifacts: [bin, hex, srec, map, lss]
+    link_options: [nostartfiles]

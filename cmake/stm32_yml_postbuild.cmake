@@ -175,11 +175,11 @@ function(stm32_yml_setup_postbuild TARGET_NAME)
     endif()
 
     if("hex" IN_LIST build_artifacts)
-        stm32_generate_hex_file(${TARGET_NAME})
+        stm32_yml_generate_objcopy_file(${TARGET_NAME} hex ihex)
     endif()
 
     if("srec" IN_LIST build_artifacts)
-        stm32_generate_srec_file(${TARGET_NAME})
+        stm32_yml_generate_objcopy_file(${TARGET_NAME} srec srec)
     endif()
 
     if("lss" IN_LIST build_artifacts)

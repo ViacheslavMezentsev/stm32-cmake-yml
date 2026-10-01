@@ -15,6 +15,8 @@ bin/hex/lss добавляют post-build преобразования, map — 
 
 **Изменение в 0.9.3** (`2625f19`; ТЗ 4.14.2): `bin` строится фреймворком из секций ELF с адресом загрузки в регионе FLASH, как образ CRC (п. 4.15.9), а не `objcopy -O binary`: секция вне Flash (резервная SRAM, ITCM без `AT> FLASH`) больше не раздувает BIN до сотен мегабайт. Для обычного ELF файл побайтно совпадает с прежним. Регион FLASH берётся из шаблона или явного скрипта, для скрипта stm32-cmake — из `stm32_get_memory_info`; если его не определить, используется `stm32_generate_binary_file` с предупреждением.
 
+**Изменение в 0.10.0** (ТЗ 4.5.7, 4.14.2, 4.14.4): все артефакты называются `<итоговое имя ELF без расширения>.<расширение>` и лежат в каталоге ELF с учётом `OUTPUT_NAME`, `OUTPUT_NAME_<CONFIG>`, `<CONFIG>_POSTFIX`, `RUNTIME_OUTPUT_DIRECTORY` и конфигурации Ninja Multi-Config, в том числе заданных после вызова фреймворка; прежде `lss` и `map` назывались по имени цели, а `map` создавался в рабочем каталоге компоновщика. `hex` и `srec` фреймворк строит командой `objcopy` сам; резервный `bin` — `objcopy -O binary`; функции `stm32_generate_*` toolchain не используются. Побочные файлы (`BYPRODUCTS`) объявляются по итоговым свойствам цели в конце её каталога; при значении свойства с выражением генератора они не объявляются. Промежуточные файлы CRC сохраняют прежние имена.
+
 **Пропуск и пустота:** см. [общие правила](semantics.md#empty-values); исключения указаны выше. Профиль/override применяется до выбора defaults. Ограничения backend и путей указаны в описании.
 
 ```yaml
@@ -23,7 +25,7 @@ build_artifacts: [bin, hex, map, lss]
 
 [Реализация 0.9.2](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_postbuild.cmake) · [Index](index.md)
 
-**Проверки (частичное покрытие):** `configure.artifacts-defaults`, `configure.artifacts-all`, `configure.artifacts-map-only`, `configure.artifacts-empty`, `configure.artifacts-unknown`, `configure.artifacts-reconfigure`, `configure.empty-and-null-defaults`. [Test manifest](../../../../tests/cases.json).
+**Проверки (частичное покрытие):** `configure.artifacts-defaults`, `configure.artifacts-all`, `configure.artifacts-map-only`, `configure.artifacts-empty`, `configure.artifacts-unknown`, `configure.artifacts-reconfigure`, `configure.artifacts-build-default`, `configure.artifacts-output-name`, `configure.artifacts-multi-config`, `configure.artifacts-makefiles`, `configure.empty-and-null-defaults`. [Test manifest](../../../../tests/cases.json).
 
 <a id="crc-enable"></a>
 ## `crc_enable`

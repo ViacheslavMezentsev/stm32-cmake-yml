@@ -46,6 +46,24 @@ on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
   `arduino_lib_*`, `arduino_custom_*` and `arduino_core` directories are no longer created.
   **After upgrading, build in a clean build directory.** A `_deps/…` project directory with
   out-of-tree directories present fails with `SCY-E302`.
+- **Artifact names and directory** (spec 4.14.2, 4.14.4). `bin`, `hex`, `srec`, `lss` and
+  `map` are named after the final ELF name (`OUTPUT_NAME`, `OUTPUT_NAME_<CONFIG>`,
+  `<CONFIG>_POSTFIX`) and placed in the ELF directory, including target properties set after
+  the framework call; the framework builds `hex` and `srec` itself with `objcopy`, the
+  `stm32_generate_*` functions are not needed. For a target in the top directory without
+  `OUTPUT_NAME` and `RUNTIME_OUTPUT_DIRECTORY` and a single-config generator the paths are
+  unchanged. Changed:
+  - with `OUTPUT_NAME`, the `lss` and `map` names (formerly the target name);
+  - with `OUTPUT_NAME` set after the framework call, the names of all artifacts;
+  - with `RUNTIME_OUTPUT_DIRECTORY` or a target in a subdirectory under Ninja, the `map`
+    location (formerly the build directory or the build root);
+  - with Ninja Multi-Config, the location of all artifacts (formerly without the
+    configuration subdirectory).
+
+  Replace references to these files in your scripts with a path from the ELF:
+  `$<TARGET_FILE_DIR:app>/$<TARGET_FILE_BASE_NAME:app>.hex`. To keep the former location, copy
+  after the build:
+  `add_custom_command(TARGET app POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE_DIR:app>/$<TARGET_FILE_BASE_NAME:app>.map" "${CMAKE_BINARY_DIR}/app.map")`.
 - **Output language.** Without a Russian locale (including Docker and CI) catalog
   messages are printed in English, for example "stm32-cmake-yml version: …". For Russian
   output use `-DSTM32_YML_LANG=ru`. Scripts that parse the log should use the codes from

@@ -17,6 +17,8 @@ def main():
     assert Path(output("which", "arm-none-eabi-gcc")).parent == Path(os.environ["STM32_TOOLCHAIN_PATH"]) / "bin"
     assert output("cmake", "--version").splitlines()[0] == f"cmake version {os.environ['CMAKE_VERSION']}"
     assert output("ninja", "--version") == "1.12.1"
+    # TC-79 builds with Unix Makefiles.
+    assert output("make", "--version").startswith("GNU Make")
     assert output("yq", "--version").endswith("version v4.44.3")
 
     for source in lock["sources"]:

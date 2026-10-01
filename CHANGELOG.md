@@ -45,6 +45,22 @@
   `-<4 символа SHA-1>`. Прежние `external_*`, `arduino_lib_*`, `arduino_custom_*`,
   `arduino_core` не создаются. **После обновления соберите проект в чистой папке сборки.**
   Каталог проекта `_deps/…` при наличии внешних каталогов — ошибка `SCY-E302`.
+- **Имена и каталог артефактов** (ТЗ 4.14.2, 4.14.4). `bin`, `hex`, `srec`, `lss` и `map`
+  называются по итоговому имени ELF (`OUTPUT_NAME`, `OUTPUT_NAME_<CONFIG>`, `<CONFIG>_POSTFIX`)
+  и лежат в каталоге ELF, в том числе при свойствах цели, заданных после вызова фреймворка;
+  `hex` и `srec` фреймворк строит сам через `objcopy`, функции `stm32_generate_*` не нужны.
+  Без `OUTPUT_NAME` и `RUNTIME_OUTPUT_DIRECTORY` у цели в корневом каталоге при генераторе с
+  одной конфигурацией пути прежние. Меняются:
+  - при `OUTPUT_NAME` — имена `lss` и `map` (раньше по имени цели);
+  - при `OUTPUT_NAME`, заданном после вызова фреймворка, — имена всех артефактов;
+  - при `RUNTIME_OUTPUT_DIRECTORY`, для цели в подкаталоге с Ninja — место `map`
+    (раньше каталог сборки или корень build);
+  - при Ninja Multi-Config — место всех артефактов (раньше без подкаталога конфигурации).
+
+  Ссылки на эти файлы в своих скриптах замените путём от ELF:
+  `$<TARGET_FILE_DIR:app>/$<TARGET_FILE_BASE_NAME:app>.hex`. Прежнее место можно сохранить
+  копированием после сборки:
+  `add_custom_command(TARGET app POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE_DIR:app>/$<TARGET_FILE_BASE_NAME:app>.map" "${CMAKE_BINARY_DIR}/app.map")`.
 - **Язык вывода.** Без русской локали (в том числе в Docker и CI) сообщения из
   каталога выводятся на английском, например «stm32-cmake-yml version: …». Русский
   вывод — `-DSTM32_YML_LANG=ru`. Если лог разбирается скриптами, используйте коды из

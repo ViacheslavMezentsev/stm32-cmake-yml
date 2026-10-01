@@ -114,7 +114,9 @@ function(stm32_yml_setup_project TARGET_NAME)
 
     # Опции и директивы линкера.
     if("map" IN_LIST build_artifacts)
-        target_link_options(${TARGET_NAME} PRIVATE LINKER:-Map=${TARGET_NAME}.map)
+        # Имя и каталог — по итоговому имени ELF (ТЗ 4.5.7, 4.14.4).
+        stm32_yml_artifact_path(${TARGET_NAME} map _map_path)
+        target_link_options(${TARGET_NAME} PRIVATE "LINKER:-Map=${_map_path}")
     endif()
     target_link_options(${TARGET_NAME} PRIVATE ${link_options})
     # link_options уже нормализованы выше вместе с compile_options

@@ -152,12 +152,15 @@ Firmware на GitHub запускается вручную на границах
   STM32Cube. 163 сценария / 978 запусков.
 - [ ] **Этап 3. Изменения для пользователей:** CMake ≥ 3.21; режимы Arduino `wrappers`
   и `native`, `arduino.use_core_main`, прошивка Arduino в матрице; каталоги сборки
-  `_deps/…`; артефакты по итоговому имени ELF.
+  `_deps/…`; артефакты по итоговому имени ELF. В ревизии ТЗ 2.6: в п. 4.14.4 — `BYPRODUCTS`
+  по итоговым свойствам цели в конце её каталога (выражения генератора цели в `BYPRODUCTS`
+  CMake не допускает); TC-79 — из «предлагаемых» в действующие.
 - [ ] **Этап 4. Расширения конфигурации:** `include:`, TOML, имена файла по умолчанию,
   итоговая конфигурация, JSON Schema, пример пресета в документации.
 - [ ] **Этап 5. Тесты и CI:** периферия в эмуляторах (группа 5), задание CI на Windows,
   пример `.gitlab-ci.yml`, распараллеливание при необходимости.
-- [ ] **Этап 6. Выпуск 0.10.0:** руководство по переходу с 0.9.x, карточки справочника
+- [ ] **Этап 6. Выпуск 0.10.0:** руководство по переходу с 0.9.x (в том числе таблица
+  путей артефактов и фрагменты из CHANGELOG), карточки справочника
   с отметками 0.10.0, CHANGELOG, ТЗ к выпуску, L0–L5, Firmware в CI, тег `v0.10.0`.
 
 ### Предложения для 0.10.x — на рассмотрение
@@ -320,12 +323,15 @@ at the end of each stage. Branches are merged by fast-forward (`git land`).
   version. 163 cases / 978 runs.
 - [ ] **Stage 3. User-facing changes:** CMake ≥ 3.21; Arduino `wrappers` and `native`
   modes, `arduino.use_core_main`, Arduino firmware in the matrix; `_deps/…` build
-  directories; artifacts named after the final ELF.
+  directories; artifacts named after the final ELF. In spec revision 2.6: item 4.14.4 —
+  `BYPRODUCTS` from the final target properties at the end of its directory (CMake does not
+  allow target generator expressions in `BYPRODUCTS`); TC-79 from proposed to current.
 - [ ] **Stage 4. Configuration extensions:** `include:`, TOML, default file names,
   effective configuration, JSON Schema, a preset example in the documentation.
 - [ ] **Stage 5. Tests and CI:** peripherals in emulators (group 5), a Windows CI job,
   a `.gitlab-ci.yml` example, parallelism if needed.
-- [ ] **Stage 6. 0.10.0 release:** migration guide from 0.9.x, reference cards marked
+- [ ] **Stage 6. 0.10.0 release:** migration guide from 0.9.x (including the artifact
+  path table and snippets from the CHANGELOG), reference cards marked
   0.10.0, CHANGELOG, release spec, L0–L5, Firmware in CI, tag `v0.10.0`.
 
 ### Proposals for 0.10.x — for consideration

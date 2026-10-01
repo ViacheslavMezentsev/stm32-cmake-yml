@@ -23,7 +23,10 @@ def require(condition, message):
 
 
 def verify(case, build, source):
-    for filename in ("build.ninja", "CMakeCache.txt", "compile_commands.json"):
+    # TC-79: the generator may be selected per case; Makefiles have no build.ninja.
+    ninja_generator = case.get("generator", "Ninja").startswith("Ninja")
+    build_file = "build.ninja" if ninja_generator else "Makefile"
+    for filename in (build_file, "CMakeCache.txt", "compile_commands.json"):
         require((build / filename).is_file(), f"Missing generated {filename}")
 
     def observed(key):
@@ -56,7 +59,19 @@ def verify(case, build, source):
         require("@" not in content, "Unresolved linker template substitution")
         require(str(linker) in observed("LINK_OPTIONS"), "Generated linker script not linked")
 
-    ninja = (build / "build.ninja").read_text(encoding="utf-8")
+    ninja = (build / build_file).read_text(encoding="utf-8")
+    if "link_byproducts" in case:
+        # Spec 4.14.4: BYPRODUCTS follow the final target properties (TC-79).
+        target = observed("PROJECT_NAME")
+        rules = ninja
+        if case.get("generator") == "Ninja Multi-Config":
+            rules = (build / "CMakeFiles/impl-Debug.ninja").read_text(encoding="utf-8")
+        link = [line for line in rules.splitlines()
+                if line.startswith("build ") and f"C_EXECUTABLE_LINKER__{target}_" in line]
+        require(len(link) == 1, f"Expected one link rule, got {len(link)}")
+        outputs = link[0][len("build "):].split(":", 1)[0].split()
+        for path in case["link_byproducts"]:
+            require(path in outputs, f"Link rule does not declare {path}: {outputs!r}")
     if "library_inputs" in case:
         expected = [str(source / path) for path in case["library_inputs"]["files"]]
         names = case["library_inputs"].get("names", [])
@@ -78,13 +93,21 @@ def verify(case, build, source):
                          if line.strip().startswith("POST_BUILD = "))
         # ТЗ 4.14.2: BIN строится из секций FLASH скриптом, а не objcopy -O binary.
         require("arm-none-eabi-objcopy -O binary" not in post, "BIN must not use objcopy -O binary")
-        for extension, command in (("bin", f"--image {target}.bin"),
+        # ТЗ 4.14.4: артефакты рядом с ELF, BYPRODUCTS — в правиле компоновки.
+        prefix = build.as_posix()
+        link = next((line for line in ninja.splitlines()
+                     if line.startswith(f"build {target}.elf ")), "")
+        link_outputs = link.split(":", 1)[0].split()
+        for extension in ("bin", "hex", "srec", "map", "lss"):
+            require((f"{target}.{extension}" in link_outputs) == (extension in selected),
+                    f"Incorrect {extension} byproduct declaration")
+        for extension, command in (("bin", f"--image {prefix}/{target}.bin"),
                                    ("hex", "arm-none-eabi-objcopy -O ihex"),
                                    ("srec", "arm-none-eabi-objcopy -O srec"),
                                    ("lss", "arm-none-eabi-objdump -h -S")):
             require((command in post) == (extension in selected),
                     f"Incorrect {extension} conversion command presence")
-            require((f"{target}.{extension}" in post) == (extension in selected),
+            require((f"{prefix}/{target}.{extension}" in post) == (extension in selected),
                     f"Incorrect {extension} command output presence")
         require(f"{target}_always_display_size" in ninja and "arm-none-eabi-size" in ninja,
                 "Size reporting command missing")
@@ -130,8 +153,10 @@ def verify(case, build, source):
         require(len(lines) == 1, f"Expected one executable link flag line, got {len(lines)}")
         flags = shlex.split(lines[0])
         for token in case["generated_link_flags"].get("present", []):
+            token = token.replace("{build}", build.as_posix())
             require(token in flags, f"Generated link flags missing {token!r}")
         for token in case["generated_link_flags"].get("absent", []):
+            token = token.replace("{build}", build.as_posix())
             require(token not in flags, f"Generated link flags unexpectedly contain {token!r}")
 
     if "crc_command" in case:
@@ -245,6 +270,39 @@ def verify_messages(expectation, build, catalog, normalized):
                 f"The last message is not {expectation['error']}")
 
 
+def verify_built(expected, cmake, build, report):
+    """Build the fixture and check the artifacts next to the ELF (spec 4.14.4; TC-79)."""
+    log_path = report / "build.log"
+    with log_path.open("w", encoding="utf-8") as log:
+        result = subprocess.run([cmake, "--build", str(build), "--config", "Debug"],
+                                stdout=log, stderr=subprocess.STDOUT, timeout=300)
+    if result.returncode != 0:
+        print(log_path.read_text(encoding="utf-8"), flush=True)
+    require(result.returncode == 0, f"Build returned {result.returncode}")
+    elf = build / expected["elf"]
+    require(elf.is_file(), f"Missing ELF {expected['elf']}")
+    stem = elf.with_suffix("")
+    for extension in expected["files"]:
+        artifact = stem.with_name(f"{stem.name}.{extension}")
+        require(artifact.is_file() and artifact.stat().st_size > 0,
+                f"Missing artifact {artifact.relative_to(build).as_posix()}")
+    # hex and srec are objcopy output of the final ELF (spec 4.14.2).
+    cache = (build / "CMakeCache.txt").read_text(encoding="utf-8")
+    objcopy = re.search(r"^CMAKE_OBJCOPY:[A-Z]+=(.*)$", cache, re.M).group(1)
+    for extension, bfd in (("hex", "ihex"), ("srec", "srec")):
+        if extension in expected["files"]:
+            reference = report / f"reference.{extension}"
+            subprocess.run([objcopy, "-O", bfd, str(elf), str(reference)], check=True, timeout=60)
+            actual = stem.with_name(f"{stem.name}.{extension}").read_bytes().splitlines()
+            wanted = reference.read_bytes().splitlines()
+            if extension == "srec":
+                # The S0 header record holds the output path given to objcopy.
+                actual, wanted = actual[1:], wanted[1:]
+            require(actual == wanted, f"{extension} differs from objcopy -O {bfd}")
+    for relative in expected.get("absent", []):
+        require(not (build / relative).exists(), f"Unexpected built file {relative}")
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--case", required=True)
@@ -283,7 +341,7 @@ def main():
         for name in ("CMSIS", f"STM32{case['local_drivers'].split('_')[2]}xx_HAL_Driver"):
             require((package / "Drivers" / name).is_dir(), f"Pinned package lacks Drivers/{name}")
             (source / "Drivers" / name).symlink_to(package / "Drivers" / name, target_is_directory=True)
-    command = [args.cmake, "-S", str(source), "-B", str(build), "-G", "Ninja",
+    command = [args.cmake, "-S", str(source), "-B", str(build), "-G", case.get("generator", "Ninja"),
                f"-DSTM32_YML_FRAMEWORK_DIR={args.framework.resolve()}",
                f"-DCMAKE_TOOLCHAIN_FILE={toolchain}", "-DCMAKE_BUILD_TYPE=Debug",
                "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON", *config_args,
@@ -325,6 +383,9 @@ def main():
                 require(result.returncode == 0, f"CMake returned {result.returncode}")
                 verify(expectation, build, source)
             verify_messages(expectation, build, catalog, normalized)
+            if "built" in expectation and "error" not in expectation:
+                # After the message checks: the build appends to the build message file.
+                verify_built(expectation["built"], args.cmake, build, report)
             for message in expectation.get("log_contains", []):
                 require(message in normalized, f"Missing diagnostic {message!r}")
             for message in expectation.get("log_absent", []):

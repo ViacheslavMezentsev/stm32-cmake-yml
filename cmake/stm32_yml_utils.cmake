@@ -522,22 +522,120 @@ if(NOT (TARGET STM32::Semihosting))
     target_link_options(STM32::Semihosting INTERFACE -lrdimon $<$<C_COMPILER_ID:GNU>:--specs=rdimon.specs>)
 endif()
 
+# ==============================================================================
+# Листинг objdump -h -S (ТЗ 4.14.2); путь по ТЗ 4.14.4.
+# ==============================================================================
 function(stm32_yml_generate_lss_file TARGET)
-    set(OUTPUT_FILE_NAME "${TARGET}.lss")
-
-    get_target_property(RUNTIME_OUTPUT_DIRECTORY ${TARGET} RUNTIME_OUTPUT_DIRECTORY)
-    if(RUNTIME_OUTPUT_DIRECTORY)
-        set(OUTPUT_FILE_PATH "${RUNTIME_OUTPUT_DIRECTORY}/${OUTPUT_FILE_NAME}")
-    else()
-        set(OUTPUT_FILE_PATH "${OUTPUT_FILE_NAME}")
-    endif()
-
+    stm32_yml_artifact_path(${TARGET} lss _lss)
     add_custom_command(
         TARGET ${TARGET}
         POST_BUILD
-        COMMAND ${CMAKE_OBJDUMP} -h -S "$<TARGET_FILE:${TARGET}>" > ${OUTPUT_FILE_PATH}
-        BYPRODUCTS ${OUTPUT_FILE_PATH}
-        COMMENT "Generating extended listing file ${OUTPUT_FILE_NAME} from ELF output file."
+        COMMAND ${CMAKE_OBJDUMP} -h -S "$<TARGET_FILE:${TARGET}>" > "${_lss}"
+        COMMENT "Generating extended listing file ${TARGET}.lss from ELF output file."
+    )
+endfunction()
+
+# ==============================================================================
+# Путь артефакта: <итоговое имя ELF без расширения>.<EXT> в каталоге ELF
+# (ТЗ 4.14.4). Выражения генератора учитывают OUTPUT_NAME, OUTPUT_NAME_<CONFIG>,
+# <CONFIG>_POSTFIX, RUNTIME_OUTPUT_DIRECTORY и конфигурацию многоконфигурационного
+# генератора, в том числе заданные после вызова фреймворка. Артефакт
+# регистрируется для объявления BYPRODUCTS в конце каталога цели.
+# ==============================================================================
+function(stm32_yml_artifact_path TARGET EXT OUT_VAR)
+    set(${OUT_VAR} "$<TARGET_FILE_DIR:${TARGET}>/$<TARGET_FILE_BASE_NAME:${TARGET}>.${EXT}" PARENT_SCOPE)
+    get_property(_registered TARGET ${TARGET} PROPERTY _STM32_YML_ARTIFACTS)
+    if(EXT IN_LIST _registered)
+        return()
+    endif()
+    set_property(TARGET ${TARGET} APPEND PROPERTY _STM32_YML_ARTIFACTS ${EXT})
+    if(NOT _registered)
+        # Аргументы DEFER CALL вычисляются при вызове, поэтому имя цели
+        # подставляется сейчас через EVAL.
+        cmake_language(EVAL CODE
+            "cmake_language(DEFER CALL _stm32_yml_declare_artifacts [[${TARGET}]])")
+    endif()
+endfunction()
+
+# ==============================================================================
+# BYPRODUCTS артефактов цели (ТЗ 4.14.4). Выражения генератора, зависящие от
+# цели, CMake в BYPRODUCTS не допускает, поэтому пути вычисляются по итоговым
+# свойствам цели в конце её каталога и объявляются пустой командой POST_BUILD.
+# Свойство со значением-выражением генератора — побочные файлы не объявляются:
+# команды артефактов от этого не зависят.
+# ==============================================================================
+function(_stm32_yml_declare_artifacts TARGET)
+    get_property(_extensions TARGET ${TARGET} PROPERTY _STM32_YML_ARTIFACTS)
+    get_target_property(_binary_dir ${TARGET} BINARY_DIR)
+    get_property(_multi GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
+    if(_multi)
+        set(_configs ${CMAKE_CONFIGURATION_TYPES})
+    else()
+        set(_configs "${CMAKE_BUILD_TYPE}")
+    endif()
+    set(_byproducts "")
+    foreach(_config IN LISTS _configs)
+        string(TOUPPER "${_config}" _upper)
+        set(_dir "")
+        set(_name "")
+        set(_postfix "")
+        if(NOT _upper STREQUAL "")
+            get_target_property(_dir ${TARGET} RUNTIME_OUTPUT_DIRECTORY_${_upper})
+            get_target_property(_name ${TARGET} OUTPUT_NAME_${_upper})
+            get_target_property(_postfix ${TARGET} ${_upper}_POSTFIX)
+        endif()
+        if(NOT _dir)
+            get_target_property(_dir ${TARGET} RUNTIME_OUTPUT_DIRECTORY)
+            if(NOT _dir)
+                set(_dir "${_binary_dir}")
+            endif()
+            if(_multi)
+                string(APPEND _dir "/${_config}")
+            endif()
+        endif()
+        if(NOT _name)
+            get_target_property(_name ${TARGET} OUTPUT_NAME)
+            if(NOT _name)
+                set(_name "${TARGET}")
+            endif()
+        endif()
+        if(NOT _postfix)
+            set(_postfix "")
+        endif()
+        if("${_dir}${_name}${_postfix}" MATCHES "\\$<")
+            return()
+        endif()
+        get_filename_component(_dir "${_dir}" ABSOLUTE BASE_DIR "${_binary_dir}")
+        foreach(_extension IN LISTS _extensions)
+            set(_path "${_dir}/${_name}${_postfix}.${_extension}")
+            if(_multi)
+                set(_path "$<$<CONFIG:${_config}>:${_path}>")
+            endif()
+            list(APPEND _byproducts "${_path}")
+        endforeach()
+    endforeach()
+    add_custom_command(TARGET ${TARGET} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E true
+        BYPRODUCTS ${_byproducts}
+        VERBATIM
+    )
+endfunction()
+
+# ==============================================================================
+# hex, srec и резервный bin строит фреймворк командой objcopy из ELF после
+# внедрения CRC (ТЗ 4.14.2); функции stm32_generate_* toolchain не используются
+# (ТЗ 5.2.1, 5.2.2).
+#
+# @param TARGET  - Исполняемая цель.
+# @param EXT     - Расширение файла (hex, srec, bin).
+# @param FORMAT  - Формат objcopy (ihex, srec, binary).
+# ==============================================================================
+function(stm32_yml_generate_objcopy_file TARGET EXT FORMAT)
+    stm32_yml_artifact_path(${TARGET} ${EXT} _output)
+    add_custom_command(TARGET ${TARGET} POST_BUILD
+        COMMAND ${CMAKE_OBJCOPY} -O ${FORMAT} "$<TARGET_FILE:${TARGET}>" "${_output}"
+        COMMENT "Generating ${EXT} file ${TARGET}.${EXT} from ELF output file."
+        VERBATIM
     )
 endfunction()
 
@@ -652,27 +750,17 @@ endfunction()
 # Flash (резервная SRAM, ITCM без AT> FLASH) и дал бы файл в сотни мегабайт.
 # Для обычного ELF результат побайтно совпадает с objcopy -O binary. Команда
 # добавляется после внедрения CRC, поэтому BIN содержит записанную CRC.
-# Имя файла — как у функций stm32-cmake: OUTPUT_NAME цели или её имя.
-# Если регион FLASH или Python недоступны — функция toolchain с предупреждением.
+# Путь файла — по ТЗ 4.14.4. Если регион FLASH или Python недоступны —
+# objcopy -O binary с предупреждением.
 # ==============================================================================
 function(stm32_yml_generate_bin_file TARGET)
-    get_target_property(_output_name ${TARGET} OUTPUT_NAME)
-    if(NOT _output_name)
-        set(_output_name "${TARGET}")
-    endif()
-    get_target_property(_output_dir ${TARGET} RUNTIME_OUTPUT_DIRECTORY)
-    if(_output_dir)
-        set(_bin "${_output_dir}/${_output_name}.bin")
-    else()
-        set(_bin "${_output_name}.bin")
-    endif()
-
+    stm32_yml_artifact_path(${TARGET} bin _bin)
     stm32_yml_flash_region(_flash_origin _flash_length)
     find_package(Python3 COMPONENTS Interpreter QUIET)
     set(_script "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../scripts/stm32_crc.py")
     if("${_flash_origin}" STREQUAL "" OR NOT Python3_FOUND OR NOT EXISTS "${_script}")
         stm32_yml_msg(W701)
-        stm32_generate_binary_file(${TARGET})
+        stm32_yml_generate_objcopy_file(${TARGET} bin binary)
         return()
     endif()
 
@@ -683,8 +771,7 @@ function(stm32_yml_generate_bin_file TARGET)
                 --elf $<TARGET_FILE:${TARGET}>
                 --flash ${_flash_origin}:${_flash_length}
                 --image ${_bin}
-        BYPRODUCTS ${_bin}
-        COMMENT "Generating binary file ${_output_name}.bin from FLASH sections of the ELF output file."
+        COMMENT "Generating binary file ${TARGET}.bin from FLASH sections of the ELF output file."
         VERBATIM
     )
 endfunction()

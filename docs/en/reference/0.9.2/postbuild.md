@@ -15,6 +15,8 @@ bin/hex/lss add post-build conversions; map adds a linker flag. An empty list do
 
 **Change in 0.9.3** (`2625f19`; spec 4.14.2): `bin` is built by the framework from ELF sections loaded into the FLASH region, like the CRC image (4.15.9), instead of `objcopy -O binary`: a section outside Flash (backup SRAM, ITCM without `AT> FLASH`) no longer inflates the BIN to hundreds of megabytes. For an ordinary ELF the file is byte-identical to the old one. The FLASH region comes from the template or explicit script, or from `stm32_get_memory_info` for the stm32-cmake script; if it cannot be found, `stm32_generate_binary_file` is used with a warning.
 
+**Change in 0.10.0** (spec 4.5.7, 4.14.2, 4.14.4): every artifact is named `<final ELF name without extension>.<extension>` and placed in the ELF directory, following `OUTPUT_NAME`, `OUTPUT_NAME_<CONFIG>`, `<CONFIG>_POSTFIX`, `RUNTIME_OUTPUT_DIRECTORY` and the Ninja Multi-Config configuration, including values set after the framework call; formerly `lss` and `map` used the target name and `map` was created in the linker working directory. The framework builds `hex` and `srec` with `objcopy` itself, the fallback `bin` with `objcopy -O binary`; the toolchain `stm32_generate_*` functions are not used. Byproducts (`BYPRODUCTS`) are declared from the final target properties at the end of its directory; with a generator expression in a property value they are not declared. Intermediate CRC files keep their names.
+
 **Omission and emptiness:** see [shared rules](semantics.md#empty-values); exceptions are stated above. Profiles/overrides apply before defaults. Backend/path restrictions are stated in the description.
 
 ```yaml
@@ -23,7 +25,7 @@ build_artifacts: [bin, hex, map, lss]
 
 [0.9.2 implementation](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_postbuild.cmake) · [Index](index.md)
 
-**Checks (partial coverage):** `configure.artifacts-defaults`, `configure.artifacts-all`, `configure.artifacts-map-only`, `configure.artifacts-empty`, `configure.artifacts-unknown`, `configure.artifacts-reconfigure`, `configure.empty-and-null-defaults`. [Test manifest](../../../../tests/cases.json).
+**Checks (partial coverage):** `configure.artifacts-defaults`, `configure.artifacts-all`, `configure.artifacts-map-only`, `configure.artifacts-empty`, `configure.artifacts-unknown`, `configure.artifacts-reconfigure`, `configure.artifacts-build-default`, `configure.artifacts-output-name`, `configure.artifacts-multi-config`, `configure.artifacts-makefiles`, `configure.empty-and-null-defaults`. [Test manifest](../../../../tests/cases.json).
 
 <a id="crc-enable"></a>
 ## `crc_enable`
