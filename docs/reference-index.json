@@ -1003,6 +1003,91 @@
       "errata": []
     },
     {
+      "key": "arduino.integration",
+      "requirement": "CFG-ARDUINO-INTEGRATION",
+      "type": "string: wrappers",
+      "since": "0.10.0",
+      "verified_in": "0.10.0",
+      "source": "cmake/stm32_yml_arduino.cmake",
+      "pages": {
+        "ru": "docs/ru/reference/0.9.2/arduino.md#arduino-integration",
+        "en": "docs/en/reference/0.9.2/arduino.md#arduino-integration"
+      },
+      "tests": [
+        "configure.arduino-integration-wrappers",
+        "configure.arduino-integration-unknown",
+        "configure.arduino-defaults"
+      ],
+      "errata": []
+    },
+    {
+      "key": "arduino.board",
+      "requirement": "CFG-ARDUINO-BOARD",
+      "type": "string: board ID / auto",
+      "since": "0.10.0",
+      "verified_in": "0.10.0",
+      "source": "cmake/stm32_yml_arduino_board.cmake",
+      "pages": {
+        "ru": "docs/ru/reference/0.9.2/arduino.md#arduino-board",
+        "en": "docs/en/reference/0.9.2/arduino.md#arduino-board"
+      },
+      "tests": [
+        "configure.arduino-platform-arduino15",
+        "configure.arduino-board-explicit",
+        "configure.arduino-board-unknown",
+        "configure.arduino-board-short-mcu",
+        "configure.arduino-board-auto-explicit",
+        "configure.arduino-board-suffix",
+        "configure.arduino-board-ambiguous",
+        "configure.arduino-board-malformed",
+        "configure.arduino-board-target-clash",
+        "configure.arduino-platform-no-mcu"
+      ],
+      "errata": []
+    },
+    {
+      "key": "arduino.cmsis_path",
+      "requirement": "CFG-ARDUINO-CMSIS-PATH",
+      "type": "string: directory / external",
+      "since": "0.10.0",
+      "verified_in": "0.10.0",
+      "source": "cmake/stm32_yml_arduino_board.cmake",
+      "pages": {
+        "ru": "docs/ru/reference/0.9.2/arduino.md#arduino-cmsis-path",
+        "en": "docs/en/reference/0.9.2/arduino.md#arduino-cmsis-path"
+      },
+      "tests": [
+        "configure.arduino-platform-arduino15",
+        "configure.arduino-platform-dl-cache",
+        "configure.arduino-platform-cube",
+        "configure.arduino-platform-cube-explicit",
+        "configure.arduino-platform-no-cmsis",
+        "configure.arduino-platform-no-cmsis-explicit",
+        "configure.arduino-cmsis-path",
+        "configure.arduino-cmsis-path-invalid",
+        "configure.arduino-cmsis-external"
+      ],
+      "errata": []
+    },
+    {
+      "key": "arduino.cmsis_target",
+      "requirement": "CFG-ARDUINO-CMSIS-TARGET",
+      "type": "string: target",
+      "since": "0.10.0",
+      "verified_in": "0.10.0",
+      "source": "cmake/stm32_yml_arduino_board.cmake",
+      "pages": {
+        "ru": "docs/ru/reference/0.9.2/arduino.md#arduino-cmsis-target",
+        "en": "docs/en/reference/0.9.2/arduino.md#arduino-cmsis-target"
+      },
+      "tests": [
+        "configure.arduino-cmsis-external-target",
+        "configure.arduino-cmsis-external-missing",
+        "configure.arduino-cmsis-external"
+      ],
+      "errata": []
+    },
+    {
       "key": "build_artifacts",
       "requirement": "CFG-BUILD-ARTIFACTS",
       "type": "list: bin / hex / srec / map / lss",

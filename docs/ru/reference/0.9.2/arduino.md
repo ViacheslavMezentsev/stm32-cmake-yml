@@ -117,3 +117,84 @@ arduino:
 [Реализация 0.9.2](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_arduino.cmake) · [Index](index.md)
 
 **Проверки (частичное покрытие):** `configure.arduino-profile`, `configure.arduino-custom-chain`, `configure.arduino-custom-unlinked`, `configure.arduino-custom-missing`, `configure.arduino-custom-no-wrapper`, `configure.arduino-custom-reconfigure`. [Test manifest](../../../../tests/cases.json).
+
+<a id="arduino-integration"></a>
+## `arduino.integration`
+
+`CFG-ARDUINO-INTEGRATION` · **Тип:** string: wrappers · **Default:** wrappers
+
+Режим backend Arduino (ТЗ 4.9.8). Пустое или отсутствующее значение — `wrappers`, поведение 0.9.3: ядро и библиотеки подключают обёртки проекта. Неизвестное значение — предупреждение `SCY-W005` и `wrappers`. Режим выводится в лог (`SCY-I508`). Значение `native` (подключение CMake-файлов ядра напрямую) появится в той же версии отдельным изменением.
+
+**Появилось в 0.10.0** (ТЗ 4.9.8–4.9.16).
+
+**Пропуск и пустота:** см. [общие правила](semantics.md#empty-values); исключения указаны выше. Профиль/override применяется до выбора defaults. Ограничения backend и путей указаны в описании.
+
+```yaml
+arduino:
+  integration: wrappers
+```
+
+[Реализация](../../../../cmake/stm32_yml_arduino.cmake) · [Index](index.md)
+
+**Проверки:** `configure.arduino-integration-wrappers`, `configure.arduino-integration-unknown`, `configure.arduino-defaults`. [Test manifest](../../../../tests/cases.json).
+
+<a id="arduino-board"></a>
+## `arduino.board`
+
+`CFG-ARDUINO-BOARD` · **Тип:** string: board ID / auto · **Default:** auto, если задан mcu
+
+Плата из `boards.txt` ядра (ТЗ 4.9.10, 4.9.16). При `auto` идентификатор строится по `mcu`: `GENERIC_` + семь символов имени без `STM32` + `X` (`STM32F103C8T6` → `GENERIC_F103C8TX`); если его нет — единственный идентификатор с одной буквой суффикса (`GENERIC_U575ZITXQ`). Данные платы берутся из блока этой платы в `cmake/boards_db.cmake` ядра без `updatedb()` и Python. Выбранная плата выводится в лог (`SCY-I509`), её variant — в кэш `ARDUINO_VARIANT_PATH`, ID — в `ARDUINO_BOARD`. Если `arduino.board` и `arduino.cmsis_path` не заданы и плату выбрать нельзя (короткое имя MCU, нет `mcu` или базы плат), `Arduino::Platform` не создаётся и выводится сообщение (`SCY-I510`, `SCY-I511`, `SCY-I517`) — конфигурации 0.9.3 продолжают работать. При явном значении: неизвестный ID — `SCY-E503`, неудачный `auto` — `SCY-E504` со списком кандидатов, нераспознанный блок — `SCY-E509`, цель проекта с именем платы — `SCY-E508`.
+
+**Появилось в 0.10.0** (ТЗ 4.9.8–4.9.16).
+
+**Пропуск и пустота:** см. [общие правила](semantics.md#empty-values); исключения указаны выше. Профиль/override применяется до выбора defaults. Ограничения backend и путей указаны в описании.
+
+```yaml
+arduino:
+  board: GENERIC_F103C8TX
+```
+
+[Реализация](../../../../cmake/stm32_yml_arduino_board.cmake) · [Index](index.md)
+
+**Проверки:** `configure.arduino-platform-arduino15`, `configure.arduino-board-explicit`, `configure.arduino-board-unknown`, `configure.arduino-board-short-mcu`, `configure.arduino-board-auto-explicit`, `configure.arduino-board-suffix`, `configure.arduino-board-ambiguous`, `configure.arduino-board-malformed`, `configure.arduino-board-target-clash`, `configure.arduino-platform-no-mcu`. [Test manifest](../../../../tests/cases.json).
+
+<a id="arduino-cmsis-path"></a>
+## `arduino.cmsis_path`
+
+`CFG-ARDUINO-CMSIS-PATH` · **Тип:** string: directory / external · **Default:** поиск
+
+Источник CMSIS для `Arduino::Platform` (ТЗ 4.9.14). Путь от корня проекта или абсолютный — каталог с `CMSIS/Core/Include/cmsis_version.h`, иначе `SCY-E505`. Без значения — поиск по порядку: Arduino IDE (`<Arduino15>/packages/STMicroelectronics/tools/CMSIS/<версия>`, самая новая версия; `<Arduino15>` — `%LOCALAPPDATA%\Arduino15`, `~/.arduino15`, `~/Library/Arduino15`), кэш загрузок ядра (`~/.Arduino_Core_STM32_dl/*/dist/CMSIS6`), `Drivers` пакета STM32Cube семейства — локальный `Drivers/`, явный `cubefw_package` или самый новый пакет в `$CMAKE_USER_HOME/STM32Cube/Repository` (CMSIS 5 вместо CMSIS 6: при явном `arduino.board` — предупреждение `SCY-W505`, иначе сообщение `SCY-I518`). Найденный источник выводится в лог (`SCY-I514`). Ничего не найдено: при значениях по умолчанию — сообщение `SCY-I512` без `Arduino::Platform`, при явном `arduino.board` — `SCY-E506` с местами поиска. `external` — фреймворк путей CMSIS не добавляет, см. `arduino.cmsis_target`.
+
+**Появилось в 0.10.0** (ТЗ 4.9.8–4.9.16).
+
+**Пропуск и пустота:** см. [общие правила](semantics.md#empty-values); исключения указаны выше. Профиль/override применяется до выбора defaults. Ограничения backend и путей указаны в описании.
+
+```yaml
+arduino:
+  cmsis_path: modules/CMSIS_6
+```
+
+[Реализация](../../../../cmake/stm32_yml_arduino_board.cmake) · [Index](index.md)
+
+**Проверки:** `configure.arduino-platform-arduino15`, `configure.arduino-platform-dl-cache`, `configure.arduino-platform-cube`, `configure.arduino-platform-cube-explicit`, `configure.arduino-platform-no-cmsis`, `configure.arduino-platform-no-cmsis-explicit`, `configure.arduino-cmsis-path`, `configure.arduino-cmsis-path-invalid`, `configure.arduino-cmsis-external`. [Test manifest](../../../../tests/cases.json).
+
+<a id="arduino-cmsis-target"></a>
+## `arduino.cmsis_target`
+
+`CFG-ARDUINO-CMSIS-TARGET` · **Тип:** string: target · **Default:** not set
+
+Интерфейсная цель проекта с CMSIS при `arduino.cmsis_path: external` (ТЗ 4.9.14): подключается к `Arduino::Platform` (`SCY-I515`). Цель может быть определена после вызова фреймворка; если к концу `CMakeLists.txt` её нет — `SCY-E507`. Без `cmsis_target` выводится сообщение, что CMSIS подключает проект (`SCY-I516`). Минимальный набор файлов CMSIS Core — в документации режима `native`.
+
+**Появилось в 0.10.0** (ТЗ 4.9.8–4.9.16).
+
+**Пропуск и пустота:** см. [общие правила](semantics.md#empty-values); исключения указаны выше. Профиль/override применяется до выбора defaults. Ограничения backend и путей указаны в описании.
+
+```yaml
+arduino:
+  cmsis_path: external
+  cmsis_target: ProjectCmsis
+```
+
+[Реализация](../../../../cmake/stm32_yml_arduino_board.cmake) · [Index](index.md)
+
+**Проверки:** `configure.arduino-cmsis-external-target`, `configure.arduino-cmsis-external-missing`, `configure.arduino-cmsis-external`. [Test manifest](../../../../tests/cases.json).

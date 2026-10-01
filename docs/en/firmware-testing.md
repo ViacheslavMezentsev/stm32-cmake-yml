@@ -3,7 +3,7 @@
 [Documentation](index.md) · [Русский](../ru/firmware-testing.md) · [Environment](emulation.md)
 
 The first firmware test adapts the author's F1 [02-semihosting example](../../tests/firmware/semihosting/README.md).
-It is separate from the 171 configure scenarios: **570 builds, 336 QEMU runs and 612 Renode runs**:
+It is separate from the 193 configure scenarios: **570 builds, 336 QEMU runs and 612 Renode runs**:
 thirteen profiles per target (F103, F030, F411, F401, G431, G474, F746; G4 and F7 in Renode only), one corrupted copy per target and four H7/H5 profiles (Renode only) per tool pair; three xPack GCC versions × two CMake versions from the
 [lockfile](../../ci/dependencies.lock.json), CubeF1 1.8.7, CubeF0 1.11.6, CubeF4 1.28.3, CubeG4 1.6.3, CubeF7 1.17.3, CubeH7 1.13.0, CubeH5 1.7.0, FreeRTOS-Kernel 11.3.1, QEMU 11.0.0.
 The Windows QEMU 11.1.0 installation was also checked locally; CI uses the pinned image.

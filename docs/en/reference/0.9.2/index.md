@@ -21,9 +21,13 @@ Baseline: `f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0`. [Semantics and version bou
 
 | YAML | Contract |
 | --- | --- |
+| [`arduino.board`](arduino.md#arduino-board) | `CFG-ARDUINO-BOARD` |
+| [`arduino.cmsis_path`](arduino.md#arduino-cmsis-path) | `CFG-ARDUINO-CMSIS-PATH` |
+| [`arduino.cmsis_target`](arduino.md#arduino-cmsis-target) | `CFG-ARDUINO-CMSIS-TARGET` |
 | [`arduino.core_cmake_dir`](arduino.md#arduino-core-cmake-dir) | `CFG-ARDUINO-CORE-CMAKE-DIR` |
 | [`arduino.core_path`](arduino.md#arduino-core-path) | `CFG-ARDUINO-CORE-PATH` |
 | [`arduino.custom_libraries`](arduino.md#arduino-custom-libraries) | `CFG-ARDUINO-CUSTOM-LIBRARIES` |
+| [`arduino.integration`](arduino.md#arduino-integration) | `CFG-ARDUINO-INTEGRATION` |
 | [`arduino.libraries`](arduino.md#arduino-libraries) | `CFG-ARDUINO-LIBRARIES` |
 | [`arduino.mcu_target`](arduino.md#arduino-mcu-target) | `CFG-ARDUINO-MCU-TARGET` |
 | [`arduino.use_core_main`](arduino.md#arduino-use-core-main) | `CFG-ARDUINO-USE-CORE-MAIN` |

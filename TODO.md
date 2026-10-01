@@ -155,6 +155,12 @@ Firmware на GitHub запускается вручную на границах
   `_deps/…`; артефакты по итоговому имени ELF. В ревизии ТЗ 2.6: в п. 4.14.4 — `BYPRODUCTS`
   по итоговым свойствам цели в конце её каталога (выражения генератора цели в `BYPRODUCTS`
   CMake не допускает); TC-79 — из «предлагаемых» в действующие.
+  Там же: в режиме `wrappers` при значениях по умолчанию неудачный выбор платы или поиск CMSIS —
+  сообщение без `Arduino::Platform` (совместимость с 0.9.3), ошибки п. 4.9.10 и 4.9.14 — только
+  при явных `arduino.board`/`arduino.cmsis_path`, `SCY-W505` (CMSIS из STM32Cube) — только при явной
+  плате, иначе сообщение `SCY-I518`; плата читается из блока `boards_db.cmake`;
+  состав `Arduino::Platform` (параметры компоновки — только флаги ядра и FPU); TC-69, TC-71,
+  TC-72 — в действующие (TC-69 — после режима `native`).
 - [ ] **Этап 4. Расширения конфигурации:** `include:`, TOML, имена файла по умолчанию,
   итоговая конфигурация, JSON Schema, пример пресета в документации.
 - [ ] **Этап 5. Тесты и CI:** периферия в эмуляторах (группа 5), задание CI на Windows,
@@ -326,6 +332,12 @@ at the end of each stage. Branches are merged by fast-forward (`git land`).
   directories; artifacts named after the final ELF. In spec revision 2.6: item 4.14.4 —
   `BYPRODUCTS` from the final target properties at the end of its directory (CMake does not
   allow target generator expressions in `BYPRODUCTS`); TC-79 from proposed to current.
+  Also: in the `wrappers` mode with defaults a failed board selection or CMSIS search is a
+  message without `Arduino::Platform` (0.9.3 compatibility), the errors of 4.9.10 and 4.9.14
+  only with an explicit `arduino.board`/`arduino.cmsis_path`, `SCY-W505` (CMSIS from STM32Cube)
+  only with an explicit board, otherwise message `SCY-I518`; the board is read from its
+  `boards_db.cmake` block; the `Arduino::Platform` contents (link options are only core and FPU
+  flags); TC-69, TC-71, TC-72 to current (TC-69 after the `native` mode).
 - [ ] **Stage 4. Configuration extensions:** `include:`, TOML, default file names,
   effective configuration, JSON Schema, a preset example in the documentation.
 - [ ] **Stage 5. Tests and CI:** peripherals in emulators (group 5), a Windows CI job,

@@ -1,0 +1,67 @@
+stm32_cmake_yml_version: 0.9.3
+project_name: arduino_platform
+toolchain_backend: arduino
+mcu: STM32F103C8T6
+languages: [C, CXX, ASM]
+sources: [main.c, helper.cpp]
+compile_definitions: [ARDUINO_BASE=1]
+compile_options: [mcpu=cortex-m3, mthumb]
+compile_options_cxx: [fno-exceptions]
+linker_script_dir: linker
+arduino:
+  core_path: modules/Arduino_Core_STM32
+  core_cmake_dir: Arduino/PlatformCore
+  mcu_target: F103
+  use_core_main: false
+link_libraries: [Arduino::Core]
+profiles:
+  wrappers:
+    arduino:
+      integration: wrappers
+  unknownmode:
+    arduino:
+      integration: bridge
+  explicit:
+    arduino:
+      board: GENERIC_F103C8TX
+  unknownboard:
+    arduino:
+      board: NOPE_BOARD
+  shortmcu:
+    mcu: STM32F411CE
+  autoexplicit:
+    mcu: STM32F411CE
+    arduino:
+      board: auto
+  suffix:
+    mcu: STM32U575ZIT6Q
+    linker_script: custom.ld
+  cmsispath:
+    arduino:
+      cmsis_path: cmsis
+  cmsisbad:
+    arduino:
+      cmsis_path: no-cmsis
+  external:
+    arduino:
+      cmsis_path: external
+  externaltarget:
+    arduino:
+      cmsis_path: external
+      cmsis_target: ProjectCmsis
+  externalmissing:
+    arduino:
+      cmsis_path: external
+      cmsis_target: MissingCmsis
+  fakeboards:
+    mcu: STM32X123ABC6
+    arduino:
+      core_path: arduino-boards-core
+      board: auto
+  brokenboard:
+    arduino:
+      core_path: arduino-boards-core
+      board: BROKEN_BOARD
+  nomcu:
+    mcu: ""
+    linker_script: custom.ld

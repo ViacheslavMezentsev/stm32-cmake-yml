@@ -139,10 +139,18 @@ The list is built from the `cmake/stm32_yml_messages_catalog.cmake` catalog by `
 | --- | --- | --- |
 | `SCY-E501` | FATAL_ERROR | \[arduino\] arduino.core\_path is not set in stm32\_config.yml.<br>Set the path to the Arduino\_Core\_STM32 folder relative to the project root:<br>  arduino:<br>    core\_path: "modules/Arduino\_Core\_STM32" |
 | `SCY-E502` | FATAL_ERROR | \[arduino\] Arduino Core STM32 folder not found: {1}<br>Check arduino.core\_path in stm32\_config.yml.<br>In CI make sure the modules/Arduino\_Core\_STM32 symlink or folder exists. |
+| `SCY-E503` | FATAL_ERROR | \[arduino\] Board '{1}' not found in {2}.<br>Set arduino.board to an ID from the core boards.txt or to auto. |
+| `SCY-E504` | FATAL_ERROR | \[arduino\] Cannot select a board for mcu '{1}'. Candidates: {2}.<br>Set arduino.board in stm32\_config.yml. |
+| `SCY-E505` | FATAL_ERROR | \[arduino\] arduino.cmsis\_path: no CMSIS/Core/Include/cmsis\_version.h in {1}. |
+| `SCY-E506` | FATAL_ERROR | \[arduino\] CMSIS not found. Searched: {1}.<br>Set arduino.cmsis\_path (a directory with CMSIS/Core/Include) or external. |
+| `SCY-E507` | FATAL_ERROR | \[arduino\] arduino.cmsis\_target: target '{1}' is not defined in the project. |
+| `SCY-E508` | FATAL_ERROR | \[arduino\] Target '{1}' already exists: the name equals the board ID. Rename the project target. |
+| `SCY-E509` | FATAL_ERROR | \[arduino\] Unrecognized board database format: {1}. |
 | `SCY-W501` | WARNING | \[arduino\] arduino.mcu\_target is not set. CMakeLists.txt of libraries that depend on MCU\_TARGET may fail. |
 | `SCY-W502` | WARNING | \[arduino\] Arduino core CMakeLists.txt not found: {1}<br>Set the correct path with arduino.core\_cmake\_dir in stm32\_config.yml. |
 | `SCY-W503` | WARNING | \[arduino\] Library '{1}' not found in {2}.<br>Check the name in arduino.libraries and that CMakeLists.txt exists. |
 | `SCY-W504` | WARNING | \[arduino\] Custom library not found: {1}. |
+| `SCY-W505` | WARNING | \[arduino\] CMSIS from STM32Cube (CMSIS 5 instead of CMSIS 6 expected by the core): {1} |
 | `SCY-I501` | STATUS | Arduino Core STM32: {1} |
 | `SCY-I502` | STATUS | Arduino MCU\_TARGET: {1} |
 | `SCY-I503` | STATUS | Arduino::Definitions created. |
@@ -150,6 +158,17 @@ The list is built from the `cmake/stm32_yml_messages_catalog.cmake` catalog by `
 | `SCY-I505` | STATUS | Adding Arduino Core: {1} |
 | `SCY-I506` | STATUS | Adding Arduino library: {1} |
 | `SCY-I507` | STATUS | Adding custom library: {1} |
+| `SCY-I508` | STATUS | Arduino integration: {1} |
+| `SCY-I509` | STATUS | Arduino board: {1} (arduino.board: {2}) |
+| `SCY-I510` | STATUS | Arduino::Platform not created: mcu is not set. |
+| `SCY-I511` | STATUS | Arduino::Platform not created: no board for mcu '{1}' (candidates: {2}). Set arduino.board. |
+| `SCY-I512` | STATUS | Arduino::Platform not created: CMSIS not found (searched: {1}). Set arduino.cmsis\_path. |
+| `SCY-I513` | STATUS | Arduino::Platform created: {1}. |
+| `SCY-I514` | STATUS | CMSIS for Arduino: {1} ({2}) |
+| `SCY-I515` | STATUS | CMSIS for Arduino comes from the project target {1} (arduino.cmsis\_path: external). |
+| `SCY-I516` | STATUS | CMSIS for Arduino is provided by the project (arduino.cmsis\_path: external). |
+| `SCY-I517` | STATUS | Arduino::Platform not created: no board database {1}. |
+| `SCY-I518` | STATUS | CMSIS from STM32Cube (CMSIS 5 instead of CMSIS 6 expected by the core): {1} |
 
 ## 6xx — Linker script
 

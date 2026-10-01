@@ -117,3 +117,84 @@ arduino:
 [0.9.2 implementation](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_arduino.cmake) · [Index](index.md)
 
 **Checks (partial coverage):** `configure.arduino-profile`, `configure.arduino-custom-chain`, `configure.arduino-custom-unlinked`, `configure.arduino-custom-missing`, `configure.arduino-custom-no-wrapper`, `configure.arduino-custom-reconfigure`. [Test manifest](../../../../tests/cases.json).
+
+<a id="arduino-integration"></a>
+## `arduino.integration`
+
+`CFG-ARDUINO-INTEGRATION` · **Type:** string: wrappers · **Default:** wrappers
+
+Arduino backend mode (spec 4.9.8). An empty or missing value means `wrappers`, the 0.9.3 behaviour: project wrappers add the core and libraries. An unknown value warns with `SCY-W005` and uses `wrappers`. The mode is logged (`SCY-I508`). The `native` value (the core CMake files added directly) arrives in the same version as a separate change.
+
+**New in 0.10.0** (spec 4.9.8–4.9.16).
+
+**Omission and emptiness:** see [shared rules](semantics.md#empty-values); exceptions are stated above. Profiles/overrides apply before defaults. Backend/path restrictions are stated in the description.
+
+```yaml
+arduino:
+  integration: wrappers
+```
+
+[Implementation](../../../../cmake/stm32_yml_arduino.cmake) · [Index](index.md)
+
+**Checks:** `configure.arduino-integration-wrappers`, `configure.arduino-integration-unknown`, `configure.arduino-defaults`. [Test manifest](../../../../tests/cases.json).
+
+<a id="arduino-board"></a>
+## `arduino.board`
+
+`CFG-ARDUINO-BOARD` · **Type:** string: board ID / auto · **Default:** auto when mcu is set
+
+A board from the core `boards.txt` (spec 4.9.10, 4.9.16). With `auto` the ID is built from `mcu`: `GENERIC_` + seven characters of the name without `STM32` + `X` (`STM32F103C8T6` → `GENERIC_F103C8TX`); if there is none, the single ID with a one-letter suffix (`GENERIC_U575ZITXQ`). Board data is read from that board's block of the core `cmake/boards_db.cmake` without `updatedb()` and Python. The selected board is logged (`SCY-I509`), its variant goes to the `ARDUINO_VARIANT_PATH` cache entry and the ID to `ARDUINO_BOARD`. If neither `arduino.board` nor `arduino.cmsis_path` is set and no board can be selected (a short MCU name, no `mcu` or no board database), `Arduino::Platform` is not created and a message is printed (`SCY-I510`, `SCY-I511`, `SCY-I517`), so 0.9.3 configurations keep working. With an explicit value: an unknown ID fails with `SCY-E503`, a failed `auto` with `SCY-E504` listing candidates, an unrecognized block with `SCY-E509`, a project target named like the board with `SCY-E508`.
+
+**New in 0.10.0** (spec 4.9.8–4.9.16).
+
+**Omission and emptiness:** see [shared rules](semantics.md#empty-values); exceptions are stated above. Profiles/overrides apply before defaults. Backend/path restrictions are stated in the description.
+
+```yaml
+arduino:
+  board: GENERIC_F103C8TX
+```
+
+[Implementation](../../../../cmake/stm32_yml_arduino_board.cmake) · [Index](index.md)
+
+**Checks:** `configure.arduino-platform-arduino15`, `configure.arduino-board-explicit`, `configure.arduino-board-unknown`, `configure.arduino-board-short-mcu`, `configure.arduino-board-auto-explicit`, `configure.arduino-board-suffix`, `configure.arduino-board-ambiguous`, `configure.arduino-board-malformed`, `configure.arduino-board-target-clash`, `configure.arduino-platform-no-mcu`. [Test manifest](../../../../tests/cases.json).
+
+<a id="arduino-cmsis-path"></a>
+## `arduino.cmsis_path`
+
+`CFG-ARDUINO-CMSIS-PATH` · **Type:** string: directory / external · **Default:** search
+
+The CMSIS source for `Arduino::Platform` (spec 4.9.14). A path from the project root or absolute: a directory with `CMSIS/Core/Include/cmsis_version.h`, otherwise `SCY-E505`. Without a value the search order is: the Arduino IDE (`<Arduino15>/packages/STMicroelectronics/tools/CMSIS/<version>`, the newest version; `<Arduino15>` is `%LOCALAPPDATA%\Arduino15`, `~/.arduino15`, `~/Library/Arduino15`), the core download cache (`~/.Arduino_Core_STM32_dl/*/dist/CMSIS6`), `Drivers` of the family STM32Cube package — a local `Drivers/`, an explicit `cubefw_package` or the newest package in `$CMAKE_USER_HOME/STM32Cube/Repository` (CMSIS 5 instead of CMSIS 6: warning `SCY-W505` with an explicit `arduino.board`, otherwise message `SCY-I518`). The source found is logged (`SCY-I514`). Nothing found: with defaults, message `SCY-I512` without `Arduino::Platform`; with an explicit `arduino.board`, `SCY-E506` listing the places. `external`: the framework adds no CMSIS paths, see `arduino.cmsis_target`.
+
+**New in 0.10.0** (spec 4.9.8–4.9.16).
+
+**Omission and emptiness:** see [shared rules](semantics.md#empty-values); exceptions are stated above. Profiles/overrides apply before defaults. Backend/path restrictions are stated in the description.
+
+```yaml
+arduino:
+  cmsis_path: modules/CMSIS_6
+```
+
+[Implementation](../../../../cmake/stm32_yml_arduino_board.cmake) · [Index](index.md)
+
+**Checks:** `configure.arduino-platform-arduino15`, `configure.arduino-platform-dl-cache`, `configure.arduino-platform-cube`, `configure.arduino-platform-cube-explicit`, `configure.arduino-platform-no-cmsis`, `configure.arduino-platform-no-cmsis-explicit`, `configure.arduino-cmsis-path`, `configure.arduino-cmsis-path-invalid`, `configure.arduino-cmsis-external`. [Test manifest](../../../../tests/cases.json).
+
+<a id="arduino-cmsis-target"></a>
+## `arduino.cmsis_target`
+
+`CFG-ARDUINO-CMSIS-TARGET` · **Type:** string: target · **Default:** not set
+
+The project INTERFACE target with CMSIS for `arduino.cmsis_path: external` (spec 4.9.14): linked to `Arduino::Platform` (`SCY-I515`). The target may be defined after the framework call; if it does not exist at the end of `CMakeLists.txt`, `SCY-E507`. Without `cmsis_target` a message says that the project supplies CMSIS (`SCY-I516`). The minimal CMSIS Core file set is in the `native` mode documentation.
+
+**New in 0.10.0** (spec 4.9.8–4.9.16).
+
+**Omission and emptiness:** see [shared rules](semantics.md#empty-values); exceptions are stated above. Profiles/overrides apply before defaults. Backend/path restrictions are stated in the description.
+
+```yaml
+arduino:
+  cmsis_path: external
+  cmsis_target: ProjectCmsis
+```
+
+[Implementation](../../../../cmake/stm32_yml_arduino_board.cmake) · [Index](index.md)
+
+**Checks:** `configure.arduino-cmsis-external-target`, `configure.arduino-cmsis-external-missing`, `configure.arduino-cmsis-external`. [Test manifest](../../../../tests/cases.json).

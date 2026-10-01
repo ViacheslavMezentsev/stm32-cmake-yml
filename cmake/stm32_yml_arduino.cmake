@@ -17,6 +17,8 @@
 # фреймворк его не касается.
 # ==============================================================================
 
+include("${CMAKE_CURRENT_LIST_DIR}/stm32_yml_arduino_board.cmake")
+
 # ==============================================================================
 # @brief Настраивает Arduino Core STM32 как backend сборки.
 #
@@ -41,6 +43,13 @@ function(stm32_yml_setup_arduino TARGET_NAME)
     endif()
 
     stm32_yml_msg(I501 "${_core_abs}")
+
+    # Режим backend (ТЗ 4.9.8): пусто — wrappers, как в 0.9.3.
+    stm32_yml_check_enum_value(arduino_integration "wrappers" wrappers)
+    if("${arduino_integration}" STREQUAL "")
+        set(arduino_integration "wrappers")
+    endif()
+    stm32_yml_msg(I508 "${arduino_integration}")
 
     # Пробрасываем путь в CACHE — CMakeLists.txt библиотек используют его
     # через get_filename_component(STM32_CORE_DIR ... ABSOLUTE).
@@ -105,6 +114,10 @@ function(stm32_yml_setup_arduino TARGET_NAME)
     endif()
 
     stm32_yml_msg(I503)
+
+    # Arduino::Options и Arduino::Platform (ТЗ 4.9.15, 4.9.16) — до подключения
+    # обёрток, чтобы они могли связываться с этими целями.
+    stm32_yml_arduino_setup_wrappers_targets("${_core_abs}")
 
     # ------------------------------------------------------------------
     # Шаг 4: подключаем пользовательское ядро Arduino (Arduino/Core).

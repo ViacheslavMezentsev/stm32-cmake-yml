@@ -32,6 +32,16 @@ on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
   instead of a `find_package` failure inside stm32-cmake.
 - **`system_library: none`** (spec 4.10.2) explicitly disables the system library without
   a warning.
+- **`Arduino::Options` and `Arduino::Platform` targets in the `wrappers` mode** (spec 4.9.8,
+  4.9.10, 4.9.14–4.9.16). The `arduino.integration` key (`wrappers` for now, as in 0.9.3).
+  `Arduino::Options` holds common and language `compile_options`; `Arduino::Platform` holds
+  the core and FPU flags, board definitions and include directories and CMSIS, so a core
+  wrapper linked to it does not depend on the MCU family. The board is `arduino.board` or is
+  selected by `mcu` (`STM32F103C8T6` → `GENERIC_F103C8TX`) from the core `boards_db.cmake`
+  without Python; CMSIS is `arduino.cmsis_path`, a search of the Arduino IDE, the core download
+  cache and STM32Cube, or `external` with `arduino.cmsis_target`. If the board or CMSIS cannot
+  be found with defaults, `Arduino::Platform` is not created and older configurations work as
+  before.
 
 ### Changed
 

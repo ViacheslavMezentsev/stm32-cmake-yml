@@ -397,6 +397,10 @@ function(stm32_yml_prepare_project_data OUT_PROJECT_NAME_VAR OUT_LANGUAGES_VAR)
     set(arduino_use_core_main   ${arduino_use_core_main}   PARENT_SCOPE)
     set(arduino_libraries       ${arduino_libraries}       PARENT_SCOPE)
     set(arduino_custom_libraries ${arduino_custom_libraries} PARENT_SCOPE)
+    set(arduino_integration     ${arduino_integration}     PARENT_SCOPE)
+    set(arduino_board           ${arduino_board}           PARENT_SCOPE)
+    set(arduino_cmsis_path      ${arduino_cmsis_path}      PARENT_SCOPE)
+    set(arduino_cmsis_target    ${arduino_cmsis_target}    PARENT_SCOPE)
 
     # 2. АВТОМАТИЧЕСКИЙ ПРОБРОС ДИНАМИЧЕСКИХ ПАРАМЕТРОВ ИЗ YAML
     # Любой новый ключ (в том числе вложенный), добавленный в yaml, автоматически

@@ -15,6 +15,10 @@ if(STM32_YML_TEST_NO_GENERATE)
     endforeach()
 endif()
 stm32_yml_setup_project(${PROJECT_NAME})
+# TC-71: an INTERFACE CMSIS target defined after the framework call.
+if(STM32_YML_TEST_CMSIS_TARGET)
+    add_library(ProjectCmsis INTERFACE)
+endif()
 # TC-79: target properties set after the framework call (spec 4.14.4).
 if(DEFINED STM32_YML_TEST_OUTPUT_NAME)
     set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "${STM32_YML_TEST_OUTPUT_NAME}")
@@ -36,3 +40,16 @@ foreach(KEY IN ITEMS SOURCES COMPILE_DEFINITIONS COMPILE_OPTIONS LINK_OPTIONS LI
     get_target_property(VALUE ${PROJECT_NAME} ${KEY})
     file(WRITE "${CMAKE_BINARY_DIR}/observed/${KEY}.txt" "${VALUE}")
 endforeach()
+# Arduino interface targets (spec 4.9.3, 4.9.15; TC-72).
+set(ARDUINO_TARGETS "")
+foreach(TARGET_NAME IN ITEMS ArduinoDefinitions ArduinoOptions ArduinoPlatform)
+    if(TARGET ${TARGET_NAME})
+        list(APPEND ARDUINO_TARGETS ${TARGET_NAME})
+        foreach(KEY IN ITEMS INTERFACE_COMPILE_DEFINITIONS INTERFACE_COMPILE_OPTIONS
+                INTERFACE_INCLUDE_DIRECTORIES INTERFACE_LINK_OPTIONS INTERFACE_LINK_LIBRARIES)
+            get_target_property(VALUE ${TARGET_NAME} ${KEY})
+            file(WRITE "${CMAKE_BINARY_DIR}/observed/${TARGET_NAME}.${KEY}.txt" "${VALUE}")
+        endforeach()
+    endif()
+endforeach()
+file(WRITE "${CMAKE_BINARY_DIR}/observed/ARDUINO_TARGETS.txt" "${ARDUINO_TARGETS}")

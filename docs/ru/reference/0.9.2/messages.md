@@ -139,10 +139,18 @@
 | --- | --- | --- |
 | `SCY-E501` | FATAL_ERROR | \[arduino\] Параметр arduino.core\_path не задан в stm32\_config.yml.<br>Укажите путь к папке Arduino\_Core\_STM32 относительно корня проекта:<br>  arduino:<br>    core\_path: "modules/Arduino\_Core\_STM32" |
 | `SCY-E502` | FATAL_ERROR | \[arduino\] Папка Arduino Core STM32 не найдена: {1}<br>Проверьте значение arduino.core\_path в stm32\_config.yml.<br>В CI убедитесь, что симлинк или папка modules/Arduino\_Core\_STM32 существует. |
+| `SCY-E503` | FATAL_ERROR | \[arduino\] Плата '{1}' не найдена в {2}.<br>Укажите в arduino.board идентификатор из boards.txt ядра или auto. |
+| `SCY-E504` | FATAL_ERROR | \[arduino\] Не удалось выбрать плату по mcu '{1}'. Кандидаты: {2}.<br>Задайте arduino.board в stm32\_config.yml. |
+| `SCY-E505` | FATAL_ERROR | \[arduino\] arduino.cmsis\_path: нет CMSIS/Core/Include/cmsis\_version.h в {1}. |
+| `SCY-E506` | FATAL_ERROR | \[arduino\] CMSIS не найден. Места поиска: {1}.<br>Задайте arduino.cmsis\_path (каталог с CMSIS/Core/Include) или external. |
+| `SCY-E507` | FATAL_ERROR | \[arduino\] arduino.cmsis\_target: цель '{1}' не определена в проекте. |
+| `SCY-E508` | FATAL_ERROR | \[arduino\] Цель '{1}' уже существует: имя совпадает с идентификатором платы. Переименуйте цель проекта. |
+| `SCY-E509` | FATAL_ERROR | \[arduino\] Формат базы плат не распознан: {1}. |
 | `SCY-W501` | WARNING | \[arduino\] Параметр arduino.mcu\_target не задан. CMakeLists.txt библиотек, зависящих от MCU\_TARGET, могут завершиться ошибкой. |
 | `SCY-W502` | WARNING | \[arduino\] CMakeLists.txt ядра Arduino не найден: {1}<br>Укажите правильный путь через arduino.core\_cmake\_dir в stm32\_config.yml. |
 | `SCY-W503` | WARNING | \[arduino\] Библиотека '{1}' не найдена в {2}.<br>Проверьте имя в arduino.libraries и наличие CMakeLists.txt. |
 | `SCY-W504` | WARNING | \[arduino\] Кастомная библиотека не найдена: {1}. |
+| `SCY-W505` | WARNING | \[arduino\] CMSIS из STM32Cube (CMSIS 5 вместо ожидаемого ядром CMSIS 6): {1} |
 | `SCY-I501` | STATUS | Arduino Core STM32: {1} |
 | `SCY-I502` | STATUS | Arduino MCU\_TARGET: {1} |
 | `SCY-I503` | STATUS | Arduino::Definitions создан. |
@@ -150,6 +158,17 @@
 | `SCY-I505` | STATUS | Подключение Arduino Core: {1} |
 | `SCY-I506` | STATUS | Подключение Arduino библиотеки: {1} |
 | `SCY-I507` | STATUS | Подключение кастомной библиотеки: {1} |
+| `SCY-I508` | STATUS | Режим Arduino: {1} |
+| `SCY-I509` | STATUS | Плата Arduino: {1} (arduino.board: {2}) |
+| `SCY-I510` | STATUS | Arduino::Platform не создан: mcu не задан. |
+| `SCY-I511` | STATUS | Arduino::Platform не создан: плату по mcu '{1}' выбрать не удалось (кандидаты: {2}). Задайте arduino.board. |
+| `SCY-I512` | STATUS | Arduino::Platform не создан: CMSIS не найден (места поиска: {1}). Задайте arduino.cmsis\_path. |
+| `SCY-I513` | STATUS | Arduino::Platform создан: {1}. |
+| `SCY-I514` | STATUS | CMSIS для Arduino: {1} ({2}) |
+| `SCY-I515` | STATUS | CMSIS для Arduino подключает цель проекта {1} (arduino.cmsis\_path: external). |
+| `SCY-I516` | STATUS | CMSIS для Arduino подключает проект (arduino.cmsis\_path: external). |
+| `SCY-I517` | STATUS | Arduino::Platform не создан: нет базы плат {1}. |
+| `SCY-I518` | STATUS | CMSIS из STM32Cube (CMSIS 5 вместо ожидаемого ядром CMSIS 6): {1} |
 
 ## 6xx — Скрипт компоновщика
 

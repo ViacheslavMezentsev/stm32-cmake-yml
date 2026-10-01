@@ -159,8 +159,8 @@ package or the resulting image bytes. Ubuntu snapshots are not required.
 
 ## Framework configuration tests
 
-[tests/cases.json](../../tests/cases.json) defines 171 scenarios, run with each of
-the three GCC and two CMake versions from the lockfile: **1026 case executions**.
+[tests/cases.json](../../tests/cases.json) defines 193 scenarios, run with each of
+the three GCC and two CMake versions from the lockfile: **1158 case executions**.
 Twenty-seven scenarios perform two to thirteen consecutive configurations in the same build tree.
 
 | Area | Checks |
@@ -444,6 +444,10 @@ The [synthetic core layout](../../tests/fixtures/project/arduino-library-core/RE
 ### Consumer Arduino wrappers
 
 Five `arduino-custom-*` cases exercise `arduino.custom_libraries` with an empty `arduino.libraries` list. Two consumer OBJECT libraries form a public dependency chain through Arduino::Definitions and Arduino::Core. Both wrapper directories end in `driver`, so successful generation also checks distinct binary directories for different relative paths (not arbitrary path-sanitization collisions).
+
+### Arduino::Options and Arduino::Platform targets
+
+Twenty-two cases check the `wrappers` mode (spec 4.9.8, 4.9.10, 4.9.14–4.9.16; TC-69, TC-71, TC-72 and board selection of TC-70) on the pinned 2.12.0 core with the `arduino-platform.yml` fixture. `arduino-integration-*` cover an explicit `wrappers` and an unknown value (`SCY-W005`). `arduino-platform-*` and `arduino-cmsis-*` cover the CMSIS source: Arduino15 (the newer of two versions), the core download cache, STM32Cube (`SCY-I518`, `SCY-W505` with an explicit board), an explicit path, a wrong path (`SCY-E505`), `external` with a project target, without one and with a missing target (`SCY-E507`), no CMSIS with defaults (`SCY-I512`, no target) and with an explicit board (`SCY-E506`). `arduino-board-*` cover `auto` for `STM32F103C8T6`, the suffixed `GENERIC_U575ZITXQ`, an explicit ID, an unknown ID (`SCY-E503`), a short MCU name by default (`SCY-I511`) and with an explicit `auto` (`SCY-E504`), two candidates and a malformed block in the `arduino-boards-core` test database (`SCY-E504`, `SCY-E509`), a project target named like the board (`SCY-E508`) and no `mcu` (`SCY-I510`). Search places come from case environment variables (`env` with `{run}`) and the `cmsis_dirs` key, which creates `CMSIS/Core/Include` from the pinned STM32CubeF1 package. Checks cover target properties (the fixture writes them to `observed/<target>.<property>.txt`), compile commands of core files in the `Arduino/PlatformCore` wrapper linked only to `Arduino::Platform`, and a build of that wrapper (the `build_targets` key).
 
 Assertions cover owning targets, transitive definitions/includes, separate C/C++ flags, absence of automatic linkage, warnings for missing directories/CMakeLists.txt, and selected → empty → unlinked profile transitions. The wrappers are synthetic, inspired by a consumer pattern with Core/SrcWrapper/peripheral libraries; they do not implement or validate SPI, Wire or HAL. Compilation, object inclusion at link time and firmware execution remain outside this suite.
 

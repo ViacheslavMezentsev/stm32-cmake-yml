@@ -4528,5 +4528,643 @@
         "out/baremetal_probe.lss"
       ]
     }
+  },
+  {
+    "name": "arduino-platform-arduino15",
+    "backend": "arduino",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=arduino-platform.yml",
+      "-DSTM32_YML_PROFILE="
+    ],
+    "env": {
+      "HOME": "{run}/home",
+      "CMAKE_USER_HOME": "{run}/nocube"
+    },
+    "cmsis_dirs": [
+      "home/.arduino15/packages/STMicroelectronics/tools/CMSIS/5.9.0",
+      "home/.arduino15/packages/STMicroelectronics/tools/CMSIS/6.2.0"
+    ],
+    "observed": {
+      "ARDUINO_TARGETS": "ArduinoDefinitions;ArduinoOptions;ArduinoPlatform"
+    },
+    "properties": {
+      "ArduinoPlatform.INTERFACE_COMPILE_DEFINITIONS": [
+        "STM32F1xx",
+        "ARDUINO_GENERIC_F103C8TX",
+        "USE_HAL_DRIVER",
+        "USE_FULL_LL_DRIVER",
+        "ARDUINO_ARCH_STM32"
+      ],
+      "ArduinoPlatform.INTERFACE_LINK_LIBRARIES": [
+        "GENERIC_F103C8TX_serial_generic"
+      ],
+      "ArduinoPlatform.INTERFACE_INCLUDE_DIRECTORIES": [
+        "{source}/modules/Arduino_Core_STM32/cores/arduino",
+        "{source}/modules/Arduino_Core_STM32/libraries/SrcWrapper/inc"
+      ],
+      "ArduinoPlatform.INTERFACE_LINK_OPTIONS": [
+        "-mcpu=cortex-m3",
+        "-mthumb"
+      ],
+      "ArduinoOptions.INTERFACE_COMPILE_OPTIONS": [
+        "-mcpu=cortex-m3",
+        "-mthumb",
+        "$<$<COMPILE_LANGUAGE:CXX>:-fno-exceptions>"
+      ],
+      "ArduinoDefinitions.INTERFACE_COMPILE_DEFINITIONS": [
+        "ARDUINO_BASE=1"
+      ]
+    },
+    "absent_properties": {
+      "ArduinoOptions.INTERFACE_COMPILE_DEFINITIONS": [
+        "ARDUINO_BASE=1"
+      ]
+    },
+    "command_checks": [
+      {
+        "file": "modules/Arduino_Core_STM32/cores/arduino/wiring_digital.c",
+        "target": "ArduinoCore",
+        "present": [
+          "-DSTM32F103xB",
+          "-DARDUINO_GENERIC_F103C8TX",
+          "-DHAL_UART_MODULE_ENABLED",
+          "-mcpu=cortex-m3",
+          "-mthumb",
+          "-DUSE_HAL_DRIVER",
+          "-I{run}/home/.arduino15/packages/STMicroelectronics/tools/CMSIS/6.2.0/CMSIS/Core/Include"
+        ],
+        "absent": [
+          "-DARDUINO_BASE=1",
+          "-I{run}/home/.arduino15/packages/STMicroelectronics/tools/CMSIS/5.9.0/CMSIS/Core/Include"
+        ],
+        "includes": [
+          "modules/Arduino_Core_STM32/cores/arduino",
+          "modules/Arduino_Core_STM32/variants/STM32F1xx/F103C8T_F103CB(T-U)"
+        ]
+      }
+    ],
+    "build_targets": [
+      "ArduinoCore"
+    ],
+    "no_warnings": true,
+    "messages": [
+      {
+        "code": "I508",
+        "args": [
+          "wrappers"
+        ]
+      },
+      {
+        "code": "I509",
+        "args": [
+          "GENERIC_F103C8TX",
+          "auto"
+        ]
+      },
+      {
+        "code": "I514",
+        "args": [
+          null,
+          "Arduino15"
+        ]
+      },
+      {
+        "code": "I513",
+        "args": [
+          "GENERIC_F103C8TX"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "arduino-platform-dl-cache",
+    "backend": "arduino",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=arduino-platform.yml",
+      "-DSTM32_YML_PROFILE="
+    ],
+    "env": {
+      "HOME": "{run}/home",
+      "CMAKE_USER_HOME": "{run}/nocube"
+    },
+    "cmsis_dirs": [
+      "home/.Arduino_Core_STM32_dl/0123abcd/dist/CMSIS6"
+    ],
+    "observed": {
+      "ARDUINO_TARGETS": "ArduinoDefinitions;ArduinoOptions;ArduinoPlatform"
+    },
+    "command_checks": [
+      {
+        "file": "modules/Arduino_Core_STM32/cores/arduino/wiring_digital.c",
+        "present": [
+          "-I{run}/home/.Arduino_Core_STM32_dl/0123abcd/dist/CMSIS6/CMSIS/Core/Include"
+        ]
+      }
+    ],
+    "messages": [
+      {
+        "code": "I514",
+        "args": [
+          null,
+          "Arduino_Core_STM32_dl"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "arduino-platform-cube",
+    "backend": "arduino",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=arduino-platform.yml",
+      "-DSTM32_YML_PROFILE="
+    ],
+    "env": {
+      "HOME": "{run}/home"
+    },
+    "observed": {
+      "ARDUINO_TARGETS": "ArduinoDefinitions;ArduinoOptions;ArduinoPlatform"
+    },
+    "messages": [
+      {
+        "code": "I518",
+        "args": [
+          null
+        ]
+      },
+      {
+        "code": "I514",
+        "args": [
+          null,
+          "STM32Cube"
+        ]
+      }
+    ],
+    "build_targets": [
+      "ArduinoCore"
+    ],
+    "messages_absent": [
+      "W505"
+    ],
+    "no_warnings": true
+  },
+  {
+    "name": "arduino-platform-no-cmsis",
+    "backend": "arduino",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=arduino-platform.yml",
+      "-DSTM32_YML_PROFILE="
+    ],
+    "env": {
+      "HOME": "{run}/home",
+      "CMAKE_USER_HOME": "{run}/nocube"
+    },
+    "observed": {
+      "ARDUINO_TARGETS": "ArduinoDefinitions;ArduinoOptions"
+    },
+    "messages": [
+      {
+        "code": "I512",
+        "args": [
+          null
+        ]
+      }
+    ],
+    "messages_absent": [
+      "I513",
+      "I509"
+    ]
+  },
+  {
+    "name": "arduino-platform-no-cmsis-explicit",
+    "backend": "arduino",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=arduino-platform.yml",
+      "-DSTM32_YML_PROFILE=explicit"
+    ],
+    "env": {
+      "HOME": "{run}/home",
+      "CMAKE_USER_HOME": "{run}/nocube"
+    },
+    "error": {
+      "code": "E506",
+      "args": [
+        null
+      ]
+    }
+  },
+  {
+    "name": "arduino-cmsis-path",
+    "backend": "arduino",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=arduino-platform.yml",
+      "-DSTM32_YML_PROFILE=cmsispath"
+    ],
+    "env": {
+      "HOME": "{run}/home",
+      "CMAKE_USER_HOME": "{run}/nocube"
+    },
+    "cmsis_dirs": [
+      "source/cmsis"
+    ],
+    "observed": {
+      "ARDUINO_TARGETS": "ArduinoDefinitions;ArduinoOptions;ArduinoPlatform"
+    },
+    "command_checks": [
+      {
+        "file": "modules/Arduino_Core_STM32/cores/arduino/wiring_digital.c",
+        "includes": [
+          "cmsis/CMSIS/Core/Include"
+        ]
+      }
+    ],
+    "build_targets": [
+      "ArduinoCore"
+    ],
+    "messages": [
+      {
+        "code": "I514",
+        "args": [
+          null,
+          "arduino.cmsis_path"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "arduino-cmsis-path-invalid",
+    "backend": "arduino",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=arduino-platform.yml",
+      "-DSTM32_YML_PROFILE=cmsisbad"
+    ],
+    "env": {
+      "HOME": "{run}/home",
+      "CMAKE_USER_HOME": "{run}/nocube"
+    },
+    "error": {
+      "code": "E505",
+      "args": [
+        null
+      ]
+    }
+  },
+  {
+    "name": "arduino-cmsis-external",
+    "backend": "arduino",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=arduino-platform.yml",
+      "-DSTM32_YML_PROFILE=external"
+    ],
+    "env": {
+      "HOME": "{run}/home",
+      "CMAKE_USER_HOME": "{run}/nocube"
+    },
+    "observed": {
+      "ARDUINO_TARGETS": "ArduinoDefinitions;ArduinoOptions;ArduinoPlatform"
+    },
+    "messages": [
+      {
+        "code": "I516"
+      },
+      {
+        "code": "I513",
+        "args": [
+          "GENERIC_F103C8TX"
+        ]
+      }
+    ],
+    "messages_absent": [
+      "I514"
+    ]
+  },
+  {
+    "name": "arduino-cmsis-external-target",
+    "backend": "arduino",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=arduino-platform.yml",
+      "-DSTM32_YML_PROFILE=externaltarget",
+      "-DSTM32_YML_TEST_CMSIS_TARGET=ON"
+    ],
+    "env": {
+      "HOME": "{run}/home",
+      "CMAKE_USER_HOME": "{run}/nocube"
+    },
+    "properties": {
+      "ArduinoPlatform.INTERFACE_LINK_LIBRARIES": [
+        "ProjectCmsis"
+      ]
+    },
+    "messages": [
+      {
+        "code": "I515",
+        "args": [
+          "ProjectCmsis"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "arduino-cmsis-external-missing",
+    "backend": "arduino",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=arduino-platform.yml",
+      "-DSTM32_YML_PROFILE=externalmissing"
+    ],
+    "env": {
+      "HOME": "{run}/home",
+      "CMAKE_USER_HOME": "{run}/nocube"
+    },
+    "error": {
+      "code": "E507",
+      "args": [
+        "MissingCmsis"
+      ]
+    }
+  },
+  {
+    "name": "arduino-board-explicit",
+    "backend": "arduino",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=arduino-platform.yml",
+      "-DSTM32_YML_PROFILE=explicit"
+    ],
+    "env": {
+      "HOME": "{run}/home",
+      "CMAKE_USER_HOME": "{run}/nocube"
+    },
+    "cmsis_dirs": [
+      "home/.arduino15/packages/STMicroelectronics/tools/CMSIS/6.2.0"
+    ],
+    "messages": [
+      {
+        "code": "I509",
+        "args": [
+          "GENERIC_F103C8TX",
+          "GENERIC_F103C8TX"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "arduino-board-unknown",
+    "backend": "arduino",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=arduino-platform.yml",
+      "-DSTM32_YML_PROFILE=unknownboard"
+    ],
+    "env": {
+      "HOME": "{run}/home",
+      "CMAKE_USER_HOME": "{run}/nocube"
+    },
+    "error": {
+      "code": "E503",
+      "args": [
+        "NOPE_BOARD",
+        null
+      ]
+    }
+  },
+  {
+    "name": "arduino-board-short-mcu",
+    "backend": "arduino",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=arduino-platform.yml",
+      "-DSTM32_YML_PROFILE=shortmcu"
+    ],
+    "env": {
+      "HOME": "{run}/home",
+      "CMAKE_USER_HOME": "{run}/nocube"
+    },
+    "cmsis_dirs": [
+      "home/.arduino15/packages/STMicroelectronics/tools/CMSIS/6.2.0"
+    ],
+    "observed": {
+      "ARDUINO_TARGETS": "ArduinoDefinitions;ArduinoOptions"
+    },
+    "messages": [
+      {
+        "code": "I511",
+        "args": [
+          "STM32F411CE",
+          null
+        ]
+      }
+    ],
+    "messages_absent": [
+      "I509"
+    ]
+  },
+  {
+    "name": "arduino-board-auto-explicit",
+    "backend": "arduino",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=arduino-platform.yml",
+      "-DSTM32_YML_PROFILE=autoexplicit"
+    ],
+    "env": {
+      "HOME": "{run}/home",
+      "CMAKE_USER_HOME": "{run}/nocube"
+    },
+    "cmsis_dirs": [
+      "home/.arduino15/packages/STMicroelectronics/tools/CMSIS/6.2.0"
+    ],
+    "error": {
+      "code": "E504",
+      "args": [
+        "STM32F411CE",
+        null
+      ]
+    }
+  },
+  {
+    "name": "arduino-board-suffix",
+    "backend": "arduino",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=arduino-platform.yml",
+      "-DSTM32_YML_PROFILE=suffix"
+    ],
+    "env": {
+      "HOME": "{run}/home",
+      "CMAKE_USER_HOME": "{run}/nocube"
+    },
+    "cmsis_dirs": [
+      "home/.arduino15/packages/STMicroelectronics/tools/CMSIS/6.2.0"
+    ],
+    "messages": [
+      {
+        "code": "I509",
+        "args": [
+          "GENERIC_U575ZITXQ",
+          "auto"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "arduino-board-ambiguous",
+    "backend": "arduino",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=arduino-platform.yml",
+      "-DSTM32_YML_PROFILE=fakeboards"
+    ],
+    "env": {
+      "HOME": "{run}/home",
+      "CMAKE_USER_HOME": "{run}/nocube"
+    },
+    "error": {
+      "code": "E504",
+      "args": [
+        "STM32X123ABC6",
+        "GENERIC_X123ABCXA, GENERIC_X123ABCXB"
+      ]
+    }
+  },
+  {
+    "name": "arduino-board-malformed",
+    "backend": "arduino",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=arduino-platform.yml",
+      "-DSTM32_YML_PROFILE=brokenboard"
+    ],
+    "env": {
+      "HOME": "{run}/home",
+      "CMAKE_USER_HOME": "{run}/nocube"
+    },
+    "cmsis_dirs": [
+      "home/.arduino15/packages/STMicroelectronics/tools/CMSIS/6.2.0"
+    ],
+    "error": {
+      "code": "E509",
+      "args": [
+        null
+      ]
+    }
+  },
+  {
+    "name": "arduino-board-target-clash",
+    "backend": "arduino",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=arduino-platform.yml",
+      "-DSTM32_YML_PROFILE=",
+      "-DSTM32_YML_OVERRIDE_project_name=GENERIC_F103C8TX"
+    ],
+    "env": {
+      "HOME": "{run}/home",
+      "CMAKE_USER_HOME": "{run}/nocube"
+    },
+    "cmsis_dirs": [
+      "home/.arduino15/packages/STMicroelectronics/tools/CMSIS/6.2.0"
+    ],
+    "error": {
+      "code": "E508",
+      "args": [
+        "GENERIC_F103C8TX"
+      ]
+    }
+  },
+  {
+    "name": "arduino-integration-wrappers",
+    "backend": "arduino",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=arduino-platform.yml",
+      "-DSTM32_YML_PROFILE=wrappers"
+    ],
+    "env": {
+      "HOME": "{run}/home",
+      "CMAKE_USER_HOME": "{run}/nocube"
+    },
+    "messages": [
+      {
+        "code": "I508",
+        "args": [
+          "wrappers"
+        ]
+      }
+    ],
+    "messages_absent": [
+      "W005"
+    ]
+  },
+  {
+    "name": "arduino-integration-unknown",
+    "backend": "arduino",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=arduino-platform.yml",
+      "-DSTM32_YML_PROFILE=unknownmode"
+    ],
+    "env": {
+      "HOME": "{run}/home",
+      "CMAKE_USER_HOME": "{run}/nocube"
+    },
+    "messages": [
+      {
+        "code": "W005",
+        "args": [
+          "bridge",
+          "arduino_integration",
+          "wrappers",
+          "wrappers"
+        ]
+      },
+      {
+        "code": "I508",
+        "args": [
+          "wrappers"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "arduino-platform-no-mcu",
+    "backend": "arduino",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=arduino-platform.yml",
+      "-DSTM32_YML_PROFILE=nomcu"
+    ],
+    "env": {
+      "HOME": "{run}/home",
+      "CMAKE_USER_HOME": "{run}/nocube"
+    },
+    "observed": {
+      "ARDUINO_TARGETS": "ArduinoDefinitions;ArduinoOptions"
+    },
+    "messages": [
+      {
+        "code": "I510"
+      }
+    ],
+    "messages_absent": [
+      "I509",
+      "I511"
+    ]
+  },
+  {
+    "name": "arduino-platform-cube-explicit",
+    "backend": "arduino",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=arduino-platform.yml",
+      "-DSTM32_YML_PROFILE=explicit"
+    ],
+    "env": {
+      "HOME": "{run}/home"
+    },
+    "messages": [
+      {
+        "code": "W505",
+        "args": [
+          null
+        ]
+      },
+      {
+        "code": "I514",
+        "args": [
+          null,
+          "STM32Cube"
+        ]
+      }
+    ],
+    "messages_absent": [
+      "I518"
+    ]
   }
 ]

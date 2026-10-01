@@ -595,6 +595,13 @@ arduino:
    линкуются с ним через `target_link_libraries(... Arduino::Definitions)`.
 3. Пробрасывает `MCU_TARGET` и `ARDUINO_CORE_DIR` в CMake CACHE — их
    используют `CMakeLists.txt` `Arduino/Core` и библиотек.
+   С 0.10.0 создаёт также `Arduino::Options` (общие и языковые
+   `compile_options`) и `Arduino::Platform` — флаги ядра и FPU, определения
+   и include-каталоги платы (`arduino.board`, по умолчанию выбирается по
+   `mcu`), CMSIS по `arduino.cmsis_path`. Обёртка, связанная с
+   `Arduino::Platform`, не зависит от семейства MCU. Если плату или CMSIS
+   при значениях по умолчанию определить нельзя, `Arduino::Platform` не
+   создаётся и в лог выводится причина.
 4. Вызывает `add_subdirectory` для `arduino.core_cmake_dir` (ядро Arduino).
 5. Вызывает `add_subdirectory` для каждой библиотеки из `arduino.libraries`.
 6. Вызывает `add_subdirectory` для каждой библиотеки из `arduino.custom_libraries`.

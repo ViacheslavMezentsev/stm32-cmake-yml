@@ -383,6 +383,82 @@ stm32_yml_msg_def(I507
     "Подключение кастомной библиотеки: {1}"
     "Adding custom library: {1}")
 
+stm32_yml_msg_def(E503
+    "[arduino] Плата '{1}' не найдена в {2}.\nУкажите в arduino.board идентификатор из boards.txt ядра или auto."
+    "[arduino] Board '{1}' not found in {2}.\nSet arduino.board to an ID from the core boards.txt or to auto.")
+
+stm32_yml_msg_def(E504
+    "[arduino] Не удалось выбрать плату по mcu '{1}'. Кандидаты: {2}.\nЗадайте arduino.board в stm32_config.yml."
+    "[arduino] Cannot select a board for mcu '{1}'. Candidates: {2}.\nSet arduino.board in stm32_config.yml.")
+
+stm32_yml_msg_def(E505
+    "[arduino] arduino.cmsis_path: нет CMSIS/Core/Include/cmsis_version.h в {1}."
+    "[arduino] arduino.cmsis_path: no CMSIS/Core/Include/cmsis_version.h in {1}.")
+
+stm32_yml_msg_def(E506
+    "[arduino] CMSIS не найден. Места поиска: {1}.\nЗадайте arduino.cmsis_path (каталог с CMSIS/Core/Include) или external."
+    "[arduino] CMSIS not found. Searched: {1}.\nSet arduino.cmsis_path (a directory with CMSIS/Core/Include) or external.")
+
+stm32_yml_msg_def(E507
+    "[arduino] arduino.cmsis_target: цель '{1}' не определена в проекте."
+    "[arduino] arduino.cmsis_target: target '{1}' is not defined in the project.")
+
+stm32_yml_msg_def(E508
+    "[arduino] Цель '{1}' уже существует: имя совпадает с идентификатором платы. Переименуйте цель проекта."
+    "[arduino] Target '{1}' already exists: the name equals the board ID. Rename the project target.")
+
+stm32_yml_msg_def(E509
+    "[arduino] Формат базы плат не распознан: {1}."
+    "[arduino] Unrecognized board database format: {1}.")
+
+stm32_yml_msg_def(W505
+    "[arduino] CMSIS из STM32Cube (CMSIS 5 вместо ожидаемого ядром CMSIS 6): {1}"
+    "[arduino] CMSIS from STM32Cube (CMSIS 5 instead of CMSIS 6 expected by the core): {1}")
+
+stm32_yml_msg_def(I508
+    "Режим Arduino: {1}"
+    "Arduino integration: {1}")
+
+stm32_yml_msg_def(I509
+    "Плата Arduino: {1} (arduino.board: {2})"
+    "Arduino board: {1} (arduino.board: {2})")
+
+stm32_yml_msg_def(I510
+    "Arduino::Platform не создан: mcu не задан."
+    "Arduino::Platform not created: mcu is not set.")
+
+stm32_yml_msg_def(I511
+    "Arduino::Platform не создан: плату по mcu '{1}' выбрать не удалось (кандидаты: {2}). Задайте arduino.board."
+    "Arduino::Platform not created: no board for mcu '{1}' (candidates: {2}). Set arduino.board.")
+
+stm32_yml_msg_def(I512
+    "Arduino::Platform не создан: CMSIS не найден (места поиска: {1}). Задайте arduino.cmsis_path."
+    "Arduino::Platform not created: CMSIS not found (searched: {1}). Set arduino.cmsis_path.")
+
+stm32_yml_msg_def(I513
+    "Arduino::Platform создан: {1}."
+    "Arduino::Platform created: {1}.")
+
+stm32_yml_msg_def(I514
+    "CMSIS для Arduino: {1} ({2})"
+    "CMSIS for Arduino: {1} ({2})")
+
+stm32_yml_msg_def(I515
+    "CMSIS для Arduino подключает цель проекта {1} (arduino.cmsis_path: external)."
+    "CMSIS for Arduino comes from the project target {1} (arduino.cmsis_path: external).")
+
+stm32_yml_msg_def(I517
+    "Arduino::Platform не создан: нет базы плат {1}."
+    "Arduino::Platform not created: no board database {1}.")
+
+stm32_yml_msg_def(I518
+    "CMSIS из STM32Cube (CMSIS 5 вместо ожидаемого ядром CMSIS 6): {1}"
+    "CMSIS from STM32Cube (CMSIS 5 instead of CMSIS 6 expected by the core): {1}")
+
+stm32_yml_msg_def(I516
+    "CMSIS для Arduino подключает проект (arduino.cmsis_path: external)."
+    "CMSIS for Arduino is provided by the project (arduino.cmsis_path: external).")
+
 # --- 6xx: скрипт компоновщика -------------------------------------------------
 
 stm32_yml_msg_def(E601

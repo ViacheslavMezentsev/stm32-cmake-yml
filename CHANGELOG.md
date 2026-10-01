@@ -32,6 +32,15 @@
   вместо отказа `find_package` внутри stm32-cmake.
 - **`system_library: none`** (ТЗ 4.10.2) явно отключает системную библиотеку без
   предупреждения.
+- **Цели `Arduino::Options` и `Arduino::Platform` в режиме `wrappers`** (ТЗ 4.9.8, 4.9.10,
+  4.9.14–4.9.16). Ключ `arduino.integration` (пока `wrappers`, как в 0.9.3). `Arduino::Options`
+  — общие и языковые `compile_options`; `Arduino::Platform` — флаги ядра и FPU, определения и
+  include-каталоги платы и CMSIS, так что обёртка ядра, связанная с ней, не зависит от
+  семейства MCU. Плата — `arduino.board` или выбор по `mcu` (`STM32F103C8T6` →
+  `GENERIC_F103C8TX`) из `boards_db.cmake` ядра без Python; CMSIS — `arduino.cmsis_path`, поиск
+  в Arduino IDE, кэше загрузок ядра и STM32Cube или `external` с `arduino.cmsis_target`. Если
+  при значениях по умолчанию плату или CMSIS определить нельзя, `Arduino::Platform` не
+  создаётся, а прежние конфигурации работают как раньше.
 
 ### Изменено
 

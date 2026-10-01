@@ -38,10 +38,13 @@ def verify(case, build, source):
     for key, values in case.get("properties", {}).items():
         actual = observed(key).split(";")
         for value in values:
+            # "{source}" is the project source directory of the case.
+            value = value.replace("{source}", source.as_posix())
             require(value in actual, f"{key}: missing {value!r} in {actual!r}")
     for key, values in case.get("absent_properties", {}).items():
         actual = observed(key).split(";")
         for value in values:
+            value = value.replace("{source}", source.as_posix())
             require(value not in actual, f"{key}: unexpected {value!r}")
     if "sources" in case:
         actual = [Path(p).relative_to(source).as_posix() for p in observed("SOURCES").split(";")]
@@ -197,8 +200,10 @@ def verify(case, build, source):
     for check in case.get("command_checks", []):
         command = command_for(source / check["file"])
         for token in check.get("present", []):
+            token = token.replace("{run}", build.parent.as_posix())
             require(token in command, f"{check['file']}: missing {token}")
         for token in check.get("absent", []):
+            token = token.replace("{run}", build.parent.as_posix())
             require(token not in command, f"{check['file']}: leaked {token}")
         for directory in check.get("includes", []):
             token = "-I" + str(source / directory)
@@ -349,7 +354,16 @@ def main():
                f"-DSTM32_YML_LANG={case.get('lang', 'en')}", *case.get("args", [])]
     catalog = messages_catalog.load(args.framework / "cmake/stm32_yml_messages_catalog.cmake")
     catalog.update(messages_catalog.load(source / "test_messages.cmake"))
-    env = dict(os.environ, **case.get("env", {}))
+    # "{run}" in environment values is the case directory (spec 4.9.14 search places).
+    env = dict(os.environ, **{key: value.replace("{run}", str(run))
+                              for key, value in case.get("env", {}).items()})
+    for relative in case.get("cmsis_dirs", []):
+        # Spec 4.9.14, TC-71: a CMSIS directory with CMSIS/Core/Include from the
+        # pinned STM32CubeF1 package (CMSIS 5) at a search place of the case.
+        cube = Path(os.environ.get("CMAKE_USER_HOME", "/opt")) / "STM32Cube/Repository"
+        include = sorted(cube.glob("STM32Cube_FW_F1_V*/Drivers/CMSIS/Core/Include"))[-1]
+        (run / relative / "CMSIS/Core").mkdir(parents=True)
+        (run / relative / "CMSIS/Core/Include").symlink_to(include, target_is_directory=True)
     for index, step in enumerate(case.get("steps", [{}]), start=1):
         expectation = dict(case, **step)
         step_command = command + step.get("args", [])
@@ -383,6 +397,13 @@ def main():
                 require(result.returncode == 0, f"CMake returned {result.returncode}")
                 verify(expectation, build, source)
             verify_messages(expectation, build, catalog, normalized)
+            for target in expectation.get("build_targets", []) if "error" not in expectation else []:
+                # Spec 4.9.15, TC-72: the wrapper compiles with Arduino::Platform alone.
+                result = subprocess.run([args.cmake, "--build", str(build), "--target", target],
+                                        capture_output=True, text=True, timeout=300)
+                if result.returncode != 0:
+                    print(result.stdout + result.stderr, flush=True)
+                require(result.returncode == 0, f"Build of {target} returned {result.returncode}")
             if "built" in expectation and "error" not in expectation:
                 # After the message checks: the build appends to the build message file.
                 verify_built(expectation["built"], args.cmake, build, report)
