@@ -161,7 +161,8 @@ Firmware на GitHub запускается вручную на границах
 - [x] `codex/configure-ci-speedup` слита: `7628218`, все CI PASS; первый Configure 10:23 вместо 17:55, тесты 2:38 вместо 8:06.
 - [x] `codex/config-formats` слита: `753b5bc`, TOML, автовыбор файла, 19 новых сценариев; 1452 Configure PASS, Docs/Configure для отправленного коммита PASS.
 - [x] `codex/config-schema-presets` слита в main (`e5d93c6`): Schema и совместный пример Presets + YAML. Полный локальный L0–L5 PASS: 1452 Configure, 618 сборок, 336 QEMU + 612 Renode; Docs, Configure, CI environment и ручной [Firmware](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/actions/runs/36925400885) для этого SHA PASS.
-- [ ] В работе `codex/migration-guide`: руководство перехода RU/EN, навигация и фиксация результатов этапа 4. Локально Docs (87 страниц), Schema (95 конфигураций), 14 тестов Schema/Presets, каталог сообщений и строгая проверка ТЗ PASS. Ожидаются commit/push/CI/land. Версия не меняется; выпуск и полный финальный прогон — отдельный шаг.
+- [x] `codex/migration-guide` слита в main (`e5e7b3f`): руководство перехода RU/EN, навигация, итоги этапа 4; Docs/Configure/CI environment на коммите ветки PASS.
+- [ ] В работе `codex/release-docs-review`: заключительная сверка README, статуса и границ версий справочника. Следующий шаг — смена версии и финальная приёмка выпуска.
 - [x] **Этап 4. Расширения конфигурации:** `include:`, TOML, имена файла по умолчанию,
   итоговая конфигурация, JSON Schema, пример пресета в документации.
 - [ ] **Этап 5. Тесты и CI — перенесён на версию после 0.10.0** (решение заказчика, ТЗ 2.6):
@@ -341,7 +342,8 @@ at the end of each stage. Branches are merged by fast-forward (`git land`).
 - [x] `codex/configure-ci-speedup` merged: `7628218`, all CI PASS; first Configure 10:23 vs 17:55, tests 2:38 vs 8:06.
 - [x] `codex/config-formats` merged: `753b5bc`, TOML, file discovery, 19 new cases; 1452 Configure PASS, Docs/Configure for the pushed commit PASS.
 - [x] `codex/config-schema-presets` merged into main (`e5d93c6`): Schema and paired Presets + YAML example. Full local L0–L5 PASS: 1452 Configure, 618 builds, 336 QEMU + 612 Renode; Docs, Configure, CI environment and manual [Firmware](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/actions/runs/36925400885) for that SHA PASS.
-- [ ] In progress: `codex/migration-guide`: RU/EN migration guide, navigation and stage 4 results. Local Docs (87 pages), Schema (95 configurations), 14 Schema/Presets tests, message catalog and strict spec check PASS. Awaiting commit/push/CI/land. No version change; release preparation and the final full run remain a separate step.
+- [x] `codex/migration-guide` merged into main (`e5e7b3f`): RU/EN migration guide, navigation, stage 4 results; Docs/Configure/CI environment for the branch commit PASS.
+- [ ] In progress: `codex/release-docs-review`: final review of README, status and reference version boundaries. Next: version update and final release acceptance.
 - [x] **Stage 4. Configuration extensions:** `include:`, TOML, default file names,
   effective configuration, JSON Schema, a preset example in the documentation.
 - [ ] **Stage 5. Tests and CI — moved to the version after 0.10.0** (customer decision,

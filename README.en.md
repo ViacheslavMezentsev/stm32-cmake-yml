@@ -11,7 +11,8 @@
 `stm32-cmake-yml` is a set of CMake scripts that reads `stm32_config.yml` and
 configures the MCU, sources, drivers, libraries, flags and output artifacts.
 The main backend uses [stm32-cmake](https://github.com/ObKo/stm32-cmake).
-A separate Arduino Core STM32 backend uses CMake wrappers supplied by your project.
+A separate Arduino Core STM32 backend supports project-owned CMake wrappers
+or direct Core integration (`native`, since 0.10.0).
 
 `Builds (Checks)` shows built configurations and QEMU/Renode execution checks from
 the last successful Firmware CI run on main. [Reading the counter](docs/en/status.md) ·
@@ -54,7 +55,8 @@ files are not automatically collected recursively.
 - **Prototypes and learning:** start from an example and select your MCU and components.
 - **CubeMX and CMSIS/HAL/LL projects:** use generated code while explicitly controlling what gets built.
 - **Multiple configurations:** share sources across board revisions or feature profiles.
-- **Arduino Core STM32:** connect Core, variant and libraries through project-owned CMake wrappers.
+- **Arduino Core STM32:** connect Core, variant and libraries through project-owned
+  wrappers or `native` mode; [choosing a mode and its limits](docs/en/arduino.md).
 - **Bare metal:** disable CMSIS and HAL/LL and supply startup code, vectors, required flags and memory layout yourself. With CMSIS enabled, stm32-cmake handles part of that setup.
 
 ## Getting started
@@ -83,7 +85,7 @@ precedence. Check [semantics](docs/en/reference/0.9.2/semantics.md) and
 ## Documentation and skills
 
 [Documentation map](docs/en/index.md) · [Scenarios](docs/en/scenarios.md) ·
-[Reference 0.9.2 with 0.9.3 changes](docs/en/reference/0.9.2/index.md) · [Manual (Russian)](docs/user_manual.md) ·
+[Reference: 0.9.2 baseline, 0.9.3 and 0.10.0 changes](docs/en/reference/0.9.2/index.md) · [Manual (Russian)](docs/user_manual.md) ·
 [Troubleshooting](docs/en/troubleshooting.md) · [Roadmap](TODO.md) · [Migrating to 0.10.0](docs/en/migration-0.10.md)
 
 The `skills/` directory contains instructions for AI agents. Provide a skill to

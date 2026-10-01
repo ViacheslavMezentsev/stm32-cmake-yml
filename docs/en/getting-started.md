@@ -37,8 +37,9 @@ stm32_yml_setup_project(${PROJECT_NAME})
 Create stm32_config.yml for your MCU and existing sources. Install the required
 Cube dependencies and select the compiler/toolchain for your environment;
 including this framework does not download every dependency automatically.
-Arduino projects need their own toolchain and Core/library wrappers instead of
-assuming the standard STM32 setup above covers them.
+Arduino projects need an appropriate toolchain and a choice of `wrappers` or
+`native` integration; the standard STM32 setup above does not cover these details.
+See the [Arduino guide](arduino.md).
 
 Next: [scenarios](scenarios.md), [option reference](reference/0.9.2/index.md),
 [cache and bare metal](development.md).

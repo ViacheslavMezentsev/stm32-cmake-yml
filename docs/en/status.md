@@ -2,9 +2,10 @@
 
 [Documentation](index.md) · [README](../../README.en.md) · [Русский](../ru/status.md)
 
-The reference (0.9.2 directory with 0.9.3 change notes) and regressions describe
-**version 0.9.3**. This page records the
-suite in this checkout and its scope. See [GitHub Actions](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/actions?query=branch%3Amain)
+This page describes the test suite being prepared for **0.10.0**, rather than
+only the published 0.9.3 release. The reference retains its 0.9.2 directory and
+historical baseline, with separate 0.9.3 and 0.10.0 change notes. Release 0.10.0
+is not complete; see the [roadmap](../../TODO.md) and [migration guide](migration-0.10.md). See [GitHub Actions](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/actions?query=branch%3Amain)
 for current `main` results. The three status badges show latest completed workflows; Builds (Checks) shows the verified firmware matrix size.
 
 ## Configuration
@@ -31,11 +32,17 @@ four H7/H5 ones (Renode only) and eight Arduino `native` firmwares (build only) 
 initial data, C++ construction, metadata, software CRC and controlled termination;
 negative cases distinguish guest failure from timeout.
 
-The firmware targets STM32F103C8T6, STM32F030R8T6, STM32F411CEU6, STM32F401CCU6, STM32G431CBU6, STM32G474CEU6 and STM32F746ZGT6 and runs on QEMU 11.0.0 `netduino2`
-(Cortex-M3/F205) and `netduinoplus2` (Cortex-M4F/F405). This checks the selected startup path and image contents,
-not F1 peripheral emulation. Renode checks the same ELFs on the f103-smoke, f030-smoke (Cortex-M0 core), f4-smoke, g4-smoke (Cortex-M4) and f7-smoke (Cortex-M7) CPU/NVIC/SysTick/memory models
-with RCC/FLASH controller stubs and a semihosting exit adapter. [Firmware contract](firmware-testing.md) ·
-[QEMU/Renode environment](emulation.md).
+QEMU 11.0.0 checks only F103 and F030 on `netduino2` (Cortex-M3/F205),
+and F411/F401 on `netduinoplus2` (Cortex-M4F/F405). This checks the selected
+startup path and image contents: for example, F030 runs on M3 instead of M0.
+It does not verify the original MCU's peripherals.
+
+Renode checks F103, F030, F411/F401, G431/G474, F746, H743 and H503/H563
+on minimal family-specific CPU/NVIC/SysTick/memory models, with selected
+register stubs and a semihosting exit adapter. G4, F7, H7 and H5 are not run in
+QEMU. Arduino `native` is currently build-only; execution requires RCC/PWR
+models. [Firmware contract](firmware-testing.md) ·
+[Environment and models per family](emulation.md).
 
 ## Documentation and further work
 

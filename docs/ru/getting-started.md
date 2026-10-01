@@ -75,6 +75,10 @@ project(${PROJECT_NAME} LANGUAGES ${PROJECT_LANGUAGES})
 stm32_yml_setup_project(${PROJECT_NAME})
 ```
 
+Для Arduino нужен подходящий toolchain и выбор режима `wrappers` или `native`;
+приведённый стандартный STM32-пример не заменяет настройку backend.
+См. [руководство Arduino](arduino.md).
+
 Создайте `stm32_config.yml` и настройте под ваш проект. Подробное описание всех
 параметров — в [справочнике опций](reference/0.9.2/index.md).
 

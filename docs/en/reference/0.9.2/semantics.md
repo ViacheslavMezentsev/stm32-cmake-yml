@@ -18,11 +18,16 @@ records departures from expected results. Fixes do not rewrite 0.9.2 history.
 Update the compatibility record for a new implementation; do not invent an
 option's introduction version without historical evidence.
 
+**Preparing 0.10.0:** cards mark new rules separately. The `0.9.2` directory
+and historical baseline fields in the index do not imply that every documented
+feature exists in 0.9.2. Release 0.10.0 is not complete.
+[Migration from 0.9.x](../../migration-0.10.md) · [Test status](../../status.md).
+
 ## Loading and precedence
 
 The consumer includes `stm32_yml.cmake`, calls `stm32_yml_prepare_project_data`,
 then `project()` with the returned name/languages, then `stm32_yml_setup_project`.
-The project chooses its toolchain before `project()`. `yq` converts YAML to JSON;
+The project chooses its toolchain before `project()`. `yq` converts YAML (also TOML since 0.10.0) to JSON;
 CMake 3.21+ (3.19+ before 0.10.0) parses it. Card examples are fragments, not standalone firmware.
 
 Precedence: defaults → IOC → YAML → selected profile → `STM32_YML_OVERRIDE_*`.
