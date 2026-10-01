@@ -1,0 +1,24 @@
+stm32_cmake_yml_version: 0.9.3
+project_name: include_probe
+mcu: STM32F103C8T6
+languages: [C, CXX, ASM]
+use_cmsis: false
+use_hal: false
+use_freertos: false
+validate_linker_script: false
+sources: [main.c, helper.cpp]
+compile_definitions: [BASE=1]
+build_artifacts: []
+stack_size: 1K
+arduino:
+  core_path: untouched
+  libraries: [Wire]
+custom:
+  enabled: true
+  zero: 5
+  text: original
+profiles:
+  Demo:
+    compile_definitions: [PROFILE=1]
+    compile_definitions_append: [PA=1]
+    stack_size: 2K

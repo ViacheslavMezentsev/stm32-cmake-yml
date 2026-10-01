@@ -218,14 +218,23 @@ function(stm32_yml_parse_config config_file)
         stm32_yml_msg(E004 "${config_file}")
     endif()
 
-    execute_process(
-        COMMAND ${YQ_EXECUTABLE} -o=json "${_yq_expression}" ${config_file}
-        OUTPUT_VARIABLE YAML_AS_JSON
-        RESULT_VARIABLE YQ_RESULT
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-    )
-    if(NOT YQ_RESULT EQUAL 0)
-        stm32_yml_msg(E005 "${config_file}")
+    if(ARGC GREATER 1)
+        # profiles_file remains a separate source: only profiles are read;
+        # its other keys (including include) must not affect the base config.
+        execute_process(
+            COMMAND ${YQ_EXECUTABLE} -o=json "${_yq_expression}" ${config_file}
+            OUTPUT_VARIABLE YAML_AS_JSON
+            RESULT_VARIABLE YQ_RESULT
+            OUTPUT_STRIP_TRAILING_WHITESPACE
+        )
+        if(NOT YQ_RESULT EQUAL 0)
+            stm32_yml_msg(E005 "${config_file}")
+        endif()
+
+        stm32_yml_msg(I035 "${config_file}")
+    else()
+        _stm32_yml_load_includes("${config_file}" "{}" "" YAML_AS_JSON)
+        set(_STM32_YML_MERGED_JSON "${YAML_AS_JSON}" PARENT_SCOPE)
     endif()
 
     # Запускаем рекурсивный парсинг с корня
@@ -239,7 +248,6 @@ function(stm32_yml_parse_config config_file)
     # СОХРАНЯЕМ СПИСОК ПЕРЕМЕННЫХ, чтобы следующий модуль мог пробросить их дальше
     set(YAML_PARSED_KEYS "${PARSED_VARS}" PARENT_SCOPE)
 
-    stm32_yml_msg(I035 "${config_file}")
 endfunction()
 
 # ==============================================================================

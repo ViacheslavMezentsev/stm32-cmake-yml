@@ -11,6 +11,7 @@ set(STM32_CMAKE_YML_VERSION "0.9.3")
 # сообщений создаётся заново при каждом Configure до project() (ТЗ 4.16.10).
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/stm32_yml_messages.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/stm32_yml_utils.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/cmake/stm32_yml_include.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/stm32_yml_versions.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/stm32_yml_config.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/stm32_yml_build_dirs.cmake)

@@ -5606,5 +5606,363 @@
         ]
       }
     ]
+  },
+  {
+    "name": "include-merge",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=include-merge.yml"
+    ],
+    "effective": {
+      "compile_definitions": [
+        "BASE=1",
+        "LEAF=1",
+        "SECOND=1",
+        "ROOT=1"
+      ],
+      "sources": [
+        "main.c"
+      ],
+      "arduino": {
+        "core_path": "untouched",
+        "libraries": [
+          "Wire",
+          "EEPROM"
+        ],
+        "use_core_main": false
+      },
+      "profiles": {
+        "Demo": {
+          "compile_definitions": [
+            "PROFILE=1"
+          ],
+          "compile_definitions_append": [
+            "PA=1",
+            "PB=1",
+            "PC=1"
+          ],
+          "stack_size": "2K"
+        }
+      }
+    },
+    "properties": {
+      "COMPILE_DEFINITIONS": [
+        "BASE=1",
+        "LEAF=1",
+        "SECOND=1",
+        "ROOT=1"
+      ]
+    },
+    "sources": [
+      "main.c"
+    ],
+    "configure_depends": [
+      "include-merge.yml",
+      "include/base.yml",
+      "include/nested/leaf.yml",
+      "include/second.yml"
+    ]
+  },
+  {
+    "name": "include-profile",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=include-merge.yml",
+      "-DSTM32_YML_PROFILE=Demo"
+    ],
+    "effective": {
+      "profiles": {
+        "Demo": {
+          "compile_definitions": [
+            "PROFILE=1"
+          ],
+          "compile_definitions_append": [
+            "PA=1",
+            "PB=1",
+            "PC=1"
+          ],
+          "stack_size": "2K"
+        }
+      },
+      "stack_size": "1K"
+    },
+    "observed": {
+      "stack_size": "2K"
+    },
+    "properties": {
+      "COMPILE_DEFINITIONS": [
+        "PROFILE=1",
+        "PA=1",
+        "PB=1",
+        "PC=1"
+      ]
+    },
+    "absent_properties": {
+      "COMPILE_DEFINITIONS": [
+        "BASE=1",
+        "LEAF=1"
+      ]
+    }
+  },
+  {
+    "name": "include-override",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=include-merge.yml",
+      "-DSTM32_YML_PROFILE=Demo",
+      "-DSTM32_YML_OVERRIDE_stack_size=8192"
+    ],
+    "effective": {
+      "stack_size": "1K",
+      "profiles": {
+        "Demo": {
+          "compile_definitions": [
+            "PROFILE=1"
+          ],
+          "compile_definitions_append": [
+            "PA=1",
+            "PB=1",
+            "PC=1"
+          ],
+          "stack_size": "2K"
+        }
+      }
+    },
+    "observed": {
+      "stack_size": "8192"
+    }
+  },
+  {
+    "name": "include-null",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=include-null.yml"
+    ],
+    "effective": {
+      "stack_size": null,
+      "compile_definitions": [],
+      "arduino": null,
+      "custom": {
+        "enabled": false,
+        "zero": 0,
+        "text": "quoted \"value\" and $<CONFIG> and C:\\folder",
+        "empty": []
+      }
+    },
+    "observed": {
+      "stack_size": "1024"
+    },
+    "absent_properties": {
+      "COMPILE_DEFINITIONS": [
+        "BASE=1"
+      ]
+    }
+  },
+  {
+    "name": "include-repeat",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=include-repeat.yml"
+    ],
+    "effective": {
+      "compile_definitions": [
+        "BASE=1",
+        "REPEAT=1",
+        "REPEAT=1"
+      ]
+    }
+  },
+  {
+    "name": "include-replace",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=include-replace.yml"
+    ],
+    "effective": {
+      "compile_definitions": [
+        "REPLACED=1",
+        "AFTER=1"
+      ],
+      "arduino": {
+        "core_path": "untouched",
+        "libraries": [
+          "SPI",
+          "Wire"
+        ]
+      }
+    }
+  },
+  {
+    "name": "include-external",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=include-external.yml",
+      "-DSTM32_YML_PROFILE=External"
+    ],
+    "observed": {
+      "PROJECT_NAME": "include_probe"
+    },
+    "properties": {
+      "COMPILE_DEFINITIONS": [
+        "BASE=1",
+        "EXTERNAL=1"
+      ]
+    },
+    "effective": {
+      "profiles_file": "include/external.yml",
+      "project_name": "include_probe"
+    },
+    "configure_depends": [
+      "include-external.yml",
+      "include/base.yml",
+      "include/external.yml"
+    ]
+  },
+  {
+    "name": "include-profile-reset",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=include-profile-reset.yml",
+      "-DSTM32_YML_PROFILE=Demo"
+    ],
+    "properties": {
+      "COMPILE_DEFINITIONS": [
+        "PROFILE=1"
+      ]
+    },
+    "absent_properties": {
+      "COMPILE_DEFINITIONS": [
+        "PA=1"
+      ]
+    }
+  },
+  {
+    "name": "include-empty",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=include-empty.yml"
+    ],
+    "effective": {
+      "use_cmsis": false
+    }
+  },
+  {
+    "name": "include-reconfigure",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=include-reconfigure.yml"
+    ],
+    "steps": [
+      {
+        "effective": {
+          "compile_definitions": [
+            "BASE=1",
+            "BEFORE=1"
+          ]
+        }
+      },
+      {
+        "write_files": {
+          "include/reconfigure.yml": "compile_definitions_append: [AFTER=1]\n"
+        },
+        "effective": {
+          "compile_definitions": [
+            "BASE=1",
+            "AFTER=1"
+          ]
+        },
+        "absent_properties": {
+          "COMPILE_DEFINITIONS": [
+            "BEFORE=1"
+          ]
+        }
+      },
+      {
+        "write_files": {
+          "include/reconfigure.yml": "{}\n"
+        },
+        "effective": {
+          "compile_definitions": [
+            "BASE=1"
+          ]
+        },
+        "absent_properties": {
+          "COMPILE_DEFINITIONS": [
+            "BEFORE=1",
+            "AFTER=1"
+          ]
+        }
+      },
+      {
+        "write_files": {
+          "include/reconfigure.yml": "include: missing.yml\n"
+        },
+        "error": {
+          "code": "E010"
+        },
+        "effective_exists": false
+      }
+    ]
+  },
+  {
+    "name": "include-cycle",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=include-cycle.yml"
+    ],
+    "error": {
+      "code": "E011"
+    },
+    "log_contains": [
+      "include-cycle.yml ->",
+      "include/cycle.yml ->"
+    ]
+  },
+  {
+    "name": "include-missing",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=include-missing.yml"
+    ],
+    "error": {
+      "code": "E010"
+    },
+    "log_contains": [
+      "include-missing.yml ->",
+      "include/missing.yml"
+    ]
+  },
+  {
+    "name": "include-invalid",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=include-invalid.yml"
+    ],
+    "error": {
+      "code": "E012"
+    }
+  },
+  {
+    "name": "include-invalid-item",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=include-invalid-item.yml"
+    ],
+    "error": {
+      "code": "E012"
+    }
+  },
+  {
+    "name": "include-invalid-root",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=include-invalid-root.yml"
+    ],
+    "error": {
+      "code": "E014"
+    },
+    "steps": [
+      {},
+      {
+        "write_files": {
+          "include-invalid-root.yml": "project_name: first\n---\nproject_name: second\n"
+        }
+      }
+    ]
+  },
+  {
+    "name": "include-invalid-append",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=include-invalid-append.yml"
+    ],
+    "error": {
+      "code": "E013"
+    }
   }
+
 ]

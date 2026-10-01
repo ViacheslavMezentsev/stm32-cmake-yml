@@ -1,0 +1,6 @@
+include: [include/nested/leaf.yml, include/second.yml]
+compile_definitions_append: [ROOT=1]
+sources: [main.c]
+profiles:
+  Demo:
+    compile_definitions_append: [PC=1]

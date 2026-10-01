@@ -1,0 +1,6 @@
+include: null
+use_cmsis: false
+use_hal: false
+mcu: STM32F103C8T6
+sources: [main.c]
+build_artifacts: []

@@ -1,0 +1,4 @@
+include: include/base.yml
+profiles:
+  Demo:
+    compile_definitions_append: null

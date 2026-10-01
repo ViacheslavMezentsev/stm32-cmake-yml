@@ -17,6 +17,11 @@ The list is built from the `cmake/stm32_yml_messages_catalog.cmake` catalog by `
 | `SCY-E007` | FATAL_ERROR | mcu\_core: '{1}' is not valid for {2}: stm32-cmake does not split cores for this MCU. Remove mcu\_core from the configuration. |
 | `SCY-E008` | FATAL_ERROR | {1} has several cores ({2}): set mcu\_core, for example 'mcu\_core: {3}'. |
 | `SCY-E009` | FATAL_ERROR | mcu\_core: '{1}' is not valid for {2}. Valid values: {3}. |
+| `SCY-E010` | FATAL_ERROR | Included file is missing or is a directory. Chain: {1} |
+| `SCY-E011` | FATAL_ERROR | Configuration include cycle: {1} |
+| `SCY-E012` | FATAL_ERROR | Invalid include in {1}: expected a path or a list of non-empty paths. |
+| `SCY-E013` | FATAL_ERROR | Invalid addition '{1}': \_append and its base must be lists or empty values. |
+| `SCY-E014` | FATAL_ERROR | Configuration {1} must contain a single mapping object. |
 | `SCY-W001` | WARNING | Unknown STM32\_YML\_LANG value '{1}': the language is chosen as for auto. Valid values: auto, ru, en. |
 | `SCY-W002` | WARNING | The recommended parameter 'stm32\_cmake\_yml\_version' is not set in '{1}'. Set the framework version the configuration was written for (spec 4.2.3). |
 | `SCY-W003` | WARNING | The framework version ({1}) is older than the configuration requires ({2}). Errors are possible. |

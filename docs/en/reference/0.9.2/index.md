@@ -12,6 +12,7 @@ Baseline: `f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0`. [Semantics and version bou
 - [CMSIS, HAL and FreeRTOS](frameworks.md)
 - [Linking and memory](linker.md)
 - [Profiles](profiles.md)
+- [Configuration includes](includes.md) — 0.10.0
 - [Arduino backend](arduino.md)
 - [Artifacts and CRC](postbuild.md)
 - [Diagnostics](diagnostics.md)
@@ -55,6 +56,7 @@ Baseline: `f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0`. [Semantics and version bou
 | [`hal_components`](frameworks.md#hal-components) | `CFG-HAL-COMPONENTS` |
 | [`heap_size`](linker.md#heap-size) | `CFG-HEAP-SIZE` |
 | [`include_directories`](sources.md#include-directories) | `CFG-INCLUDE-DIRECTORIES` |
+| [`include`](includes.md#include) | `CFG-INCLUDE` |
 | [`ioc_file`](project.md#ioc-file) | `CFG-IOC-FILE` |
 | [`languages`](project.md#languages) | `CFG-LANGUAGES` |
 | [`link_libraries`](sources.md#link-libraries) | `CFG-LINK-LIBRARIES` |

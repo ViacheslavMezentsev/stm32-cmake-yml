@@ -1,0 +1,2 @@
+include: include/base.yml
+compile_definitions_append: 42

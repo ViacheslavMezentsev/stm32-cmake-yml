@@ -157,6 +157,10 @@ Firmware на GitHub запускается вручную на границах
   `Arduino::Options` и `Arduino::Platform`, режим `native`, `arduino.use_core_main`,
   руководство по backend Arduino; прошивки `native` в матрице L4 (сборка). 207 сценариев /
   1242 запуска, 618 сборок. Полный L0–L5 и Firmware на `main` @ `d3cb266`.
+- [ ] В работе `codex/config-include`: YAML include и effective.json, 16 новых сценариев;
+  Локально: 223 × 6 = 1338 Configure PASS, Docs и строгая проверка ТЗ PASS.
+  Ожидаются подписанный коммит владельца, push, CI и land.
+  TOML/автовыбор файла и Schema/пример пресета — отдельные ветки. Полный L0–L5 — в конце этапа.
 - [ ] **Этап 4. Расширения конфигурации:** `include:`, TOML, имена файла по умолчанию,
   итоговая конфигурация, JSON Schema, пример пресета в документации.
 - [ ] **Этап 5. Тесты и CI — перенесён на версию после 0.10.0** (решение заказчика, ТЗ 2.6):
@@ -332,6 +336,10 @@ at the end of each stage. Branches are merged by fast-forward (`git land`).
   mode with the `Arduino::Options` and `Arduino::Platform` targets, the `native` mode,
   `arduino.use_core_main`, the Arduino backend guide; `native` firmware in the L4 matrix
   (build). 207 cases / 1242 runs, 618 builds. Full L0–L5 and Firmware on `main` @ `d3cb266`.
+- [ ] In progress: `codex/config-include`, YAML includes and effective.json, 16 new cases;
+  Local: 223 × 6 = 1338 Configure PASS, Docs and strict specification check PASS.
+  Awaiting the owner’s signed commit, push, CI and land.
+  TOML/file discovery and Schema/preset example follow in separate branches. Full L0–L5 at stage completion.
 - [ ] **Stage 4. Configuration extensions:** `include:`, TOML, default file names,
   effective configuration, JSON Schema, a preset example in the documentation.
 - [ ] **Stage 5. Tests and CI — moved to the version after 0.10.0** (customer decision,

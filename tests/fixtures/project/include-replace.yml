@@ -1,0 +1,6 @@
+include: include/base.yml
+compile_definitions_append: [AFTER=1]
+compile_definitions: [REPLACED=1]
+arduino:
+  libraries: [SPI]
+  libraries_append: [Wire]

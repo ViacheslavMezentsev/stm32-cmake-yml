@@ -41,6 +41,26 @@ in the history stay as they are.
 Each agent has its own workflow, described separately and not generalized. A new agent
 adds its own subsection once its workflow has been verified in practice.
 
+#### Codex on Windows
+
+Verified on 2026-10-01 while preparing YAML includes for 0.10.0.
+
+- Codex uses the local Windows working tree through PowerShell and Windows git,
+  creates `codex/<task>` from current main and preserves line endings according
+  to `.gitattributes`. Local checks precede push; full L0–L5 runs at stage completion.
+- The owner creates the signed commit on Windows (`git commit -S`), pushes and
+  runs `git land` after green CI. Conventional Commit messages are in English
+  without references to agent sessions. Signing configuration stays unchanged.
+- The GitHub connector reads REST API without manually extracting tokens.
+  Check `actions/runs?head_sha=<SHA>` for `git rev-parse HEAD`, then
+  `actions/runs/<ID>/jobs` and `actions/runs/<ID>/artifacts`. All expected
+  workflows need `status: completed` and `conclusion: success`; a missing run
+  or one green job does not establish success of the whole check.
+- API reads do not update local Git references: `git fetch origin` is a separate
+  step. If Git is unavailable, reading `branches/main` through the connector
+  allows comparing SHAs but does not synchronize the working tree.
+  Commit `verification.verified` confirms its signature, not CI results.
+
 #### Claude in Cowork (a cloud session linked to the owner's computer)
 
 Verified on 2026-09-30 during stage 0 of the 0.10.0 plan.
@@ -165,3 +185,39 @@ git config --global gpg.ssh.allowedSignersFile ~/.ssh/allowed_signers
   If it fails again, find which archive did not download.
 - The full job log is not available without signing in to GitHub (the API returns
   403); diagnostic artifacts are kept for 14 days.
+
+## Local Configure tests in Docker Desktop
+
+Many small files on a Windows bind mount slow fixture copies and Configure.
+For a full run, place a source snapshot and temporary test directories on the
+Linux container filesystem, then save diagnostics to Windows as one archive.
+In the include matrix, a typical case dropped from roughly 7–9 s to 0.4–0.8 s;
+this is a measurement of one environment, not a CI timing guarantee.
+Use an image matching the current `ci/dependencies.lock.json`.
+
+PowerShell example (repository root, after building `stm32-yml-ci:local`):
+
+```powershell
+New-Item -ItemType Directory -Force build/configure-local | Out-Null
+docker run --rm --network none --mount "type=bind,source=$($PWD.Path),target=/workspace,readonly" --mount "type=bind,source=$($PWD.Path)/build/configure-local,target=/reports" stm32-yml-ci:local sh -c '
+set -eu
+mkdir /tmp/source /tmp/results
+cp -a /workspace/ci /workspace/tests /workspace/cmake /workspace/scripts /workspace/stm32_yml.cmake /tmp/source/
+result=0
+python3 /tmp/source/ci/run_configure_tests.py --output /tmp/results || result=$?
+tar -czf /reports/configure-results.tar.gz -C /tmp/results .
+exit "$result"
+'
+```
+
+The test exit code is preserved; the archive contains `summary.json`, CTest logs
+and per-case diagnostics. Do not edit sources while creating the snapshot.
+
+`tests/test_component_versions.py` currently targets Linux: on Windows its probe
+CMake script uses paths with `\` and may fail with `Invalid character escape
+'\g'`. This is a test harness limitation, not a library version check result.
+To match Docs CI:
+
+```powershell
+docker run --rm --network none --mount "type=bind,source=$($PWD.Path),target=/workspace,readonly" stm32-yml-ci:local python3 -m unittest discover -s /workspace/tests -p test_component_versions.py
+```

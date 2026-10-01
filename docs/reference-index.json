@@ -868,7 +868,9 @@
         "configure.unknown-profile-warning",
         "configure.reconfigure-profile-lists",
         "configure.reconfigure-profile-name-boundaries",
-        "configure.profile-only-keys"
+        "configure.profile-only-keys",
+        "configure.include-profile",
+        "configure.include-profile-reset"
       ],
       "errata": [
         "E005"
@@ -890,7 +892,8 @@
         "configure.external-list-profiles",
         "configure.reconfigure-external-profile-reset",
         "configure.external-profile-ignores-top-level",
-        "configure.configure-depends"
+        "configure.configure-depends",
+        "configure.include-external"
       ],
       "errata": [
         "E002"
@@ -1316,6 +1319,37 @@
         "configure.cppcheck-custom",
         "configure.cppcheck-empty-fallback",
         "configure.cppcheck-reconfigure"
+      ],
+      "errata": []
+    },
+    {
+      "key": "include",
+      "requirement": "CFG-INCLUDE",
+      "type": "string or array of strings",
+      "since": "0.10.0",
+      "verified_in": "0.10.0 (unreleased)",
+      "source": "cmake/stm32_yml_include.cmake",
+      "pages": {
+        "ru": "docs/ru/reference/0.9.2/includes.md#include",
+        "en": "docs/en/reference/0.9.2/includes.md#include"
+      },
+      "tests": [
+        "configure.include-merge",
+        "configure.include-profile",
+        "configure.include-override",
+        "configure.include-null",
+        "configure.include-repeat",
+        "configure.include-replace",
+        "configure.include-external",
+        "configure.include-profile-reset",
+        "configure.include-empty",
+        "configure.include-reconfigure",
+        "configure.include-cycle",
+        "configure.include-missing",
+        "configure.include-invalid",
+        "configure.include-invalid-item",
+        "configure.include-invalid-root",
+        "configure.include-invalid-append"
       ],
       "errata": []
     }

@@ -47,3 +47,5 @@ profiles_file: profiles.yml
 **Checks (partial coverage):** `configure.external-profile`, `configure.external-list-profiles`, `configure.reconfigure-external-profile-reset`, `configure.external-profile-ignores-top-level`, `configure.configure-depends`. [Test manifest](../../../../tests/cases.json).
 
 **Errata:** [E002](../../errata/E002.md).
+
+**Since 0.10.0:** profile merging and accumulation of `_append` across files are described under [include](includes.md). `include` inside `profiles_file` is ignored.

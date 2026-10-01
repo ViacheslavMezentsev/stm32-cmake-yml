@@ -23,6 +23,13 @@ def require(condition, message):
 
 
 def verify(case, build, source):
+    if "effective" in case:
+        effective = json.loads((build / "stm32_config.effective.json").read_text(encoding="utf-8"))
+        for key, expected in case["effective"].items():
+            require(key in effective and effective[key] == expected,
+                    f"Incorrect merged configuration for {key}: {effective.get(key)!r}")
+        for key in case.get("effective_absent", ["include"]):
+            require(key not in effective, f"Unexpected merged key: {key}")
     # TC-79: the generator may be selected per case; Makefiles have no build.ninja.
     ninja_generator = case.get("generator", "Ninja").startswith("Ninja")
     build_file = "build.ninja" if ninja_generator else "Makefile"
@@ -380,6 +387,12 @@ def main():
                 for path in sorted(core.rglob("*")) if path.is_file()}
     core_before = core_state() if case.get("core_unchanged") else None
     for index, step in enumerate(case.get("steps", [{}]), start=1):
+        # TC-80: edit a private fixture copy, then reconfigure the same build.
+        for relative, content in step.get("write_files", {}).items():
+            destination = (source / relative).resolve()
+            require(destination.is_relative_to(source), "Fixture edit escapes the case source")
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            destination.write_text(content, encoding="utf-8")
         expectation = dict(case, **step)
         step_command = command + step.get("args", [])
         # Preserve outputs for every step, including intermediate generated .ld.
@@ -391,7 +404,7 @@ def main():
             log.write(shlex.join(step_command) + "\n\n")
             log.flush()
             result = subprocess.run(step_command, env=env, stdout=log, stderr=subprocess.STDOUT, timeout=100)
-        for filename in ("CMakeCache.txt", "build.ninja", "compile_commands.json"):
+        for filename in ("CMakeCache.txt", "build.ninja", "compile_commands.json", "stm32_config.effective.json"):
             if (build / filename).is_file():
                 shutil.copy2(build / filename, report)
         for linker in build.glob("*.ld"):
@@ -403,6 +416,9 @@ def main():
         output = log_path.read_text(encoding="utf-8")
         normalized = " ".join(output.split())
         try:
+            if "effective_exists" in expectation:
+                require((build / "stm32_config.effective.json").is_file() == expectation["effective_exists"],
+                        "Stale or missing merged configuration snapshot")
             if "error" in expectation:
                 require(result.returncode != 0, "Invalid configuration unexpectedly succeeded")
                 if isinstance(expectation["error"], str):

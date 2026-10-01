@@ -1,0 +1,3 @@
+compile_definitions_append: [SECOND=1]
+arduino:
+  use_core_main: false

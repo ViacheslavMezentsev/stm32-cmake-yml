@@ -12,6 +12,7 @@
 - [CMSIS, HAL и FreeRTOS](frameworks.md)
 - [Компоновка и память](linker.md)
 - [Профили](profiles.md)
+- [Подключение конфигураций](includes.md) — 0.10.0
 - [Arduino backend](arduino.md)
 - [Артефакты и CRC](postbuild.md)
 - [Диагностика](diagnostics.md)
@@ -55,6 +56,7 @@
 | [`hal_components`](frameworks.md#hal-components) | `CFG-HAL-COMPONENTS` |
 | [`heap_size`](linker.md#heap-size) | `CFG-HEAP-SIZE` |
 | [`include_directories`](sources.md#include-directories) | `CFG-INCLUDE-DIRECTORIES` |
+| [`include`](includes.md#include) | `CFG-INCLUDE` |
 | [`ioc_file`](project.md#ioc-file) | `CFG-IOC-FILE` |
 | [`languages`](project.md#languages) | `CFG-LANGUAGES` |
 | [`link_libraries`](sources.md#link-libraries) | `CFG-LINK-LIBRARIES` |

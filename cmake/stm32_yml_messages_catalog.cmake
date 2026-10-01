@@ -70,6 +70,21 @@ stm32_yml_msg_def(E008
 stm32_yml_msg_def(E009
     "mcu_core: '{1}' недопустим для {2}. Допустимые значения: {3}."
     "mcu_core: '{1}' is not valid for {2}. Valid values: {3}.")
+stm32_yml_msg_def(E010
+    "Подключаемый файл не найден или является каталогом. Цепочка: {1}"
+    "Included file is missing or is a directory. Chain: {1}")
+stm32_yml_msg_def(E011
+    "Циклическое подключение конфигурации: {1}"
+    "Configuration include cycle: {1}")
+stm32_yml_msg_def(E012
+    "Недопустимый include в {1}: ожидается путь или список непустых путей."
+    "Invalid include in {1}: expected a path or a list of non-empty paths.")
+stm32_yml_msg_def(E013
+    "Недопустимое дополнение '{1}': _append и дополняемое значение должны быть списками или пустыми."
+    "Invalid addition '{1}': _append and its base must be lists or empty values.")
+stm32_yml_msg_def(E014
+    "Конфигурация {1} должна содержать один объект с ключами."
+    "Configuration {1} must contain a single mapping object.")
 stm32_yml_msg_def(W005
     "Неизвестное значение '{1}' параметра '{2}'. Известные значения: {3}. Применяется '{4}'."
     "Unknown value '{1}' of parameter '{2}'. Known values: {3}. '{4}' is applied.")

@@ -13,8 +13,12 @@ function(stm32_yml_prepare_project_data OUT_PROJECT_NAME_VAR OUT_LANGUAGES_VAR)
     set(PROJECT_CONFIG_FILE "stm32_config.yml" CACHE STRING "...")
     set(CONFIG_FILE_PATH "${CMAKE_SOURCE_DIR}/${PROJECT_CONFIG_FILE}")
 
+    # Spec 3.8.7: never leave a stale successful snapshot after a load error.
+    file(REMOVE "${CMAKE_BINARY_DIR}/stm32_config.effective.json")
     # Парсим конфиг (YAML -> JSON)
     stm32_yml_parse_config("${CONFIG_FILE_PATH}")
+    # Merged file data, before profiles, overrides, IOC and conditional defaults.
+    file(WRITE "${CMAKE_BINARY_DIR}/stm32_config.effective.json" "${_STM32_YML_MERGED_JSON}\n")
     # Изменение конфигурации перезапускает Configure при следующей сборке (ТЗ 3.6.5).
     set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${CONFIG_FILE_PATH}")
 

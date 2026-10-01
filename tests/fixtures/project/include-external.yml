@@ -1,0 +1,2 @@
+include: include/base.yml
+profiles_file: include/external.yml

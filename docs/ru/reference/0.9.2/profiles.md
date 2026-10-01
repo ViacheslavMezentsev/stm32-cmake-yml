@@ -47,3 +47,5 @@ profiles_file: profiles.yml
 **Проверки (частичное покрытие):** `configure.external-profile`, `configure.external-list-profiles`, `configure.reconfigure-external-profile-reset`, `configure.external-profile-ignores-top-level`, `configure.configure-depends`. [Test manifest](../../../../tests/cases.json).
 
 **Errata:** [E002](../../errata/E002.md).
+
+**С 0.10.0:** объединение профилей и накопление `_append` между файлами описаны в [include](includes.md). `include` внутри `profiles_file` игнорируется.

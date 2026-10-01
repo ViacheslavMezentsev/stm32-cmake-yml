@@ -1,0 +1,9 @@
+include: include/base.yml
+stack_size: null
+compile_definitions: []
+arduino: null
+custom:
+  enabled: false
+  zero: 0
+  text: 'quoted "value" and $<CONFIG> and C:\folder'
+  empty: []

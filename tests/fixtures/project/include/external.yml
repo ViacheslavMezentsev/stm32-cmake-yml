@@ -1,0 +1,5 @@
+include: does-not-exist.yml
+project_name: must_not_leak
+profiles:
+  External:
+    compile_definitions_append: [EXTERNAL=1]

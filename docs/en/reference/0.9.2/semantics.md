@@ -103,3 +103,5 @@ no automated coverage, not a known defect. Errata separately states its evidence
 Target names, MCU families and library versions also depend on pinned external
 dependencies; this reference does not promise arbitrary Cube/Arduino/stm32-cmake
 combinations will work.
+
+**Includes since 0.10.0:** [merge rules and the effective.json boundary](includes.md).

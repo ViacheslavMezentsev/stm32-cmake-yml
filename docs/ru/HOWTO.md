@@ -40,6 +40,27 @@ Force push в main и в чужие ветки запрещён. Ссылки PR
 Каждый агент работает по своей схеме; здесь она описана отдельно для каждого и не
 обобщается. Новый агент добавляет свой подраздел, когда его схема проверена на практике.
 
+#### Codex в Windows
+
+Проверено 2026-10-01 при подготовке YAML include к 0.10.0.
+
+- Codex работает в локальной копии Windows через PowerShell и git Windows,
+  создаёт ветку `codex/<задача>` от актуального main и сохраняет концы строк
+  согласно `.gitattributes`. Локальные проверки выполняются до отправки ветки;
+  полный L0–L5 — на завершении этапа.
+- Владелец создаёт подписанный коммит из Windows (`git commit -S`), выполняет
+  push и после зелёного CI — `git land`. Сообщение Conventional Commits — на
+  английском, без ссылок на сессии агентов. Схема подписи не меняется.
+- GitHub-коннектор позволяет прочитать REST API без извлечения токенов вручную.
+  Проверяйте `actions/runs?head_sha=<SHA>` именно для `git rev-parse HEAD`, затем
+  `actions/runs/<ID>/jobs` и `actions/runs/<ID>/artifacts`. Требуются все ожидаемые
+  workflow со `status: completed` и `conclusion: success`; отсутствие запуска
+  или зелёный отдельный job не означает успех всей проверки.
+- Чтение API не обновляет локальные Git-ссылки: `git fetch origin` — отдельный
+  шаг. Если Git недоступен, чтение `branches/main` через коннектор позволяет
+  сравнить SHA, но не заменяет синхронизацию рабочей копии. Подпись коммита
+  `verification.verified` подтверждает подпись, а не результат CI.
+
 #### Claude в Cowork (облачная сессия, связанная с компьютером владельца)
 
 Проверено 2026-09-30 на этапе 0 плана 0.10.0.
@@ -161,3 +182,39 @@ git config --global gpg.ssh.allowedSignersFile ~/.ssh/allowed_signers
   смотрите, какой архив не скачался.
 - Полный лог job без входа в GitHub недоступен (API отвечает 403); артефакты
   диагностики хранятся 14 дней.
+
+## Локальные Configure-тесты в Docker Desktop
+
+Большое количество мелких файлов в Windows bind mount замедляет копирование
+fixtures и Configure. Для полного набора размещайте снимок исходников и временные
+каталоги тестов на файловой системе Linux-контейнера. На Windows сохраняйте отчёты
+одним архивом. Проверено на матрице include: типовой сценарий сократился примерно
+с 7–9 с до 0,4–0,8 с; это измерение конкретного окружения, не обещание времени CI.
+Контейнер должен использовать актуальный `ci/dependencies.lock.json`.
+
+Пример PowerShell (из корня репозитория, после сборки `stm32-yml-ci:local`):
+
+```powershell
+New-Item -ItemType Directory -Force build/configure-local | Out-Null
+docker run --rm --network none --mount "type=bind,source=$($PWD.Path),target=/workspace,readonly" --mount "type=bind,source=$($PWD.Path)/build/configure-local,target=/reports" stm32-yml-ci:local sh -c '
+set -eu
+mkdir /tmp/source /tmp/results
+cp -a /workspace/ci /workspace/tests /workspace/cmake /workspace/scripts /workspace/stm32_yml.cmake /tmp/source/
+result=0
+python3 /tmp/source/ci/run_configure_tests.py --output /tmp/results || result=$?
+tar -czf /reports/configure-results.tar.gz -C /tmp/results .
+exit "$result"
+'
+```
+
+Код выхода тестов сохраняется; архив включает `summary.json`, CTest и диагностику
+каждого сценария. Не изменяйте исходники во время создания снимка.
+
+`tests/test_component_versions.py` пока ориентирован на Linux: на Windows он
+записывает в пробный CMake-скрипт путь с `\` и может получить `Invalid character
+escape '\g'`. Это ограничение тестового harness, а не результат проверки версии
+библиотеки. Проверка, совпадающая с Docs CI:
+
+```powershell
+docker run --rm --network none --mount "type=bind,source=$($PWD.Path),target=/workspace,readonly" stm32-yml-ci:local python3 -m unittest discover -s /workspace/tests -p test_component_versions.py
+```
