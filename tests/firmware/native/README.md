@@ -11,4 +11,4 @@ selected by `mcu` (`board: auto`), the board variant linker script is used.
 `ci/build_firmware_smoke.py` builds both on every tool pair and checks the ELF:
 vector table, FLASH and RAM use, `main()`, `premain()` and the board ID. The
 firmware does not run in QEMU or Renode yet: the core clock setup needs RCC and
-PWR models (stage 5).
+PWR models (TC-86, after 0.10.0).

@@ -150,28 +150,19 @@ Firmware на GitHub запускается вручную на границах
   сборки, перечень кодов в справочнике, поле в форме Issue; версии компонентов;
   `system_library: none`; TC-41, TC-42, TC-45; ошибка `SCY-E415` для отсутствующей версии
   STM32Cube. 163 сценария / 978 запусков.
-- [ ] **Этап 3. Изменения для пользователей:** CMake ≥ 3.21; режимы Arduino `wrappers`
-  и `native`, `arduino.use_core_main`, прошивка Arduino в матрице; каталоги сборки
-  `_deps/…`; артефакты по итоговому имени ELF. В ревизии ТЗ 2.6: в п. 4.14.4 — `BYPRODUCTS`
-  по итоговым свойствам цели в конце её каталога (выражения генератора цели в `BYPRODUCTS`
-  CMake не допускает); TC-79 — из «предлагаемых» в действующие.
-  Там же: в режиме `wrappers` при значениях по умолчанию неудачный выбор платы или поиск CMSIS —
-  сообщение без `Arduino::Platform` (совместимость с 0.9.3), ошибки п. 4.9.10 и 4.9.14 — только
-  при явных `arduino.board`/`arduino.cmsis_path`, `SCY-W505` (CMSIS из STM32Cube) — только при явной
-  плате, иначе сообщение `SCY-I518`; плата читается из блока `boards_db.cmake`;
-  состав `Arduino::Platform` (параметры компоновки — только флаги ядра и FPU); TC-69, TC-71,
-  TC-72 — в действующие (TC-69 — после режима `native`).
-  Режим `native`: флаги YAML только через `user_settings`; без шаблона — скрипт variant с
-  сообщением `SCY-I521` (heap/stack не применяются), FLASH для BIN — из базы плат; ключи
-  `wrappers` — `SCY-W506`; цель проекта с именем цели ядра — `SCY-E510`; SrcWrapper всегда,
-  `arduino.libraries` по одной; TC-73 разделить: сборка (этап 3), запуск в QEMU/Renode с
-  моделями RCC/PWR (этап 5); TC-69, TC-70, TC-85 — в действующие. П. 4.9.2: без
-  `arduino.mcu_target` предупреждение только если `Arduino::Platform` не создана.
+- [x] **Этап 3. Изменения для пользователей** — ветки `claude/cmake-3.21`, `claude/build-dirs`,
+  `claude/artifacts`, `claude/arduino-wrappers`, `claude/arduino-native`, `claude/arduino-docs`,
+  `claude/arduino-mcu-target`, ТЗ 2.6: CMake ≥ 3.21; каталоги сборки по пути, внешние в `_deps/`;
+  артефакты по итоговому имени ELF рядом с ELF; режим Arduino `wrappers` с целями
+  `Arduino::Options` и `Arduino::Platform`, режим `native`, `arduino.use_core_main`,
+  руководство по backend Arduino; прошивки `native` в матрице L4 (сборка). 207 сценариев /
+  1242 запуска, 618 сборок. Полный L0–L5 и Firmware на `main` @ `d3cb266`.
 - [ ] **Этап 4. Расширения конфигурации:** `include:`, TOML, имена файла по умолчанию,
   итоговая конфигурация, JSON Schema, пример пресета в документации.
-- [ ] **Этап 5. Тесты и CI:** периферия в эмуляторах (группа 5), в том числе модели RCC/PWR
-  для запуска прошивок Arduino `native` (TC-73), задание CI на Windows,
-  пример `.gitlab-ci.yml`, распараллеливание при необходимости.
+- [ ] **Этап 5. Тесты и CI — перенесён на версию после 0.10.0** (решение заказчика, ТЗ 2.6):
+  периферия в эмуляторах (группа 5), модели RCC/PWR для запуска прошивок Arduino `native`
+  (TC-86), задание CI на Windows (TC-44), пример `.gitlab-ci.yml` (TC-53),
+  распараллеливание при необходимости.
 - [ ] **Этап 6. Выпуск 0.10.0:** руководство по переходу с 0.9.x (в том числе таблица
   путей артефактов и фрагменты из CHANGELOG), карточки справочника
   с отметками 0.10.0, CHANGELOG, ТЗ к выпуску, L0–L5, Firmware в CI, тег `v0.10.0`.
@@ -334,29 +325,19 @@ at the end of each stage. Branches are merged by fast-forward (`git land`).
   message files, the code list in the reference, the issue form field; component versions;
   `system_library: none`; TC-41, TC-42, TC-45; `SCY-E415` for a missing STM32Cube
   version. 163 cases / 978 runs.
-- [ ] **Stage 3. User-facing changes:** CMake ≥ 3.21; Arduino `wrappers` and `native`
-  modes, `arduino.use_core_main`, Arduino firmware in the matrix; `_deps/…` build
-  directories; artifacts named after the final ELF. In spec revision 2.6: item 4.14.4 —
-  `BYPRODUCTS` from the final target properties at the end of its directory (CMake does not
-  allow target generator expressions in `BYPRODUCTS`); TC-79 from proposed to current.
-  Also: in the `wrappers` mode with defaults a failed board selection or CMSIS search is a
-  message without `Arduino::Platform` (0.9.3 compatibility), the errors of 4.9.10 and 4.9.14
-  only with an explicit `arduino.board`/`arduino.cmsis_path`, `SCY-W505` (CMSIS from STM32Cube)
-  only with an explicit board, otherwise message `SCY-I518`; the board is read from its
-  `boards_db.cmake` block; the `Arduino::Platform` contents (link options are only core and FPU
-  flags); TC-69, TC-71, TC-72 to current (TC-69 after the `native` mode).
-  The `native` mode: YAML flags only through `user_settings`; without a template the
-  variant script with message `SCY-I521` (heap/stack do not apply), FLASH for BIN from the
-  board database; `wrappers` keys warn with `SCY-W506`; a project target named like a core
-  target fails with `SCY-E510`; SrcWrapper always, `arduino.libraries` one by one; split
-  TC-73: build (stage 3), QEMU/Renode runs with RCC/PWR models (stage 5); TC-69, TC-70,
-  TC-85 to current. Item 4.9.2: without `arduino.mcu_target` warn only if
-  `Arduino::Platform` is not created.
+- [x] **Stage 3. User-facing changes** — branches `claude/cmake-3.21`, `claude/build-dirs`,
+  `claude/artifacts`, `claude/arduino-wrappers`, `claude/arduino-native`, `claude/arduino-docs`,
+  `claude/arduino-mcu-target`, spec 2.6: CMake ≥ 3.21; build directories by path, out-of-tree
+  ones in `_deps/`; artifacts named after the final ELF next to it; the Arduino `wrappers`
+  mode with the `Arduino::Options` and `Arduino::Platform` targets, the `native` mode,
+  `arduino.use_core_main`, the Arduino backend guide; `native` firmware in the L4 matrix
+  (build). 207 cases / 1242 runs, 618 builds. Full L0–L5 and Firmware on `main` @ `d3cb266`.
 - [ ] **Stage 4. Configuration extensions:** `include:`, TOML, default file names,
   effective configuration, JSON Schema, a preset example in the documentation.
-- [ ] **Stage 5. Tests and CI:** peripherals in emulators (group 5), including RCC/PWR
-  models to run Arduino `native` firmware (TC-73), a Windows CI job,
-  a `.gitlab-ci.yml` example, parallelism if needed.
+- [ ] **Stage 5. Tests and CI — moved to the version after 0.10.0** (customer decision,
+  spec 2.6): peripherals in emulators (group 5), RCC/PWR models to run Arduino `native`
+  firmware (TC-86), a Windows CI job (TC-44), a `.gitlab-ci.yml` example (TC-53),
+  parallelism if needed.
 - [ ] **Stage 6. 0.10.0 release:** migration guide from 0.9.x (including the artifact
   path table and snippets from the CHANGELOG), reference cards marked
   0.10.0, CHANGELOG, release spec, L0–L5, Firmware in CI, tag `v0.10.0`.
