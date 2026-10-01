@@ -1,5 +1,5 @@
 """Build the semihosting fixtures inside the compiler image (one tool pair)."""
-from firmware_cases import BUILD_ONLY_PROFILES, BUILD_PROFILES, ENABLED_TARGETS, TARGETS, case_name
+from firmware_cases import BUILD_ONLY_PROFILES, BUILD_PROFILES, ENABLED_TARGETS, NATIVE_CASES, TARGETS, case_name, split_case
 import argparse
 import json
 import os
@@ -174,6 +174,68 @@ def build_only(root, output):
     return results
 
 
+def build_native(root, output, arduino):
+    """Build the Arduino native firmware (TC-73, TC-85) and inspect the ELF."""
+    source = root / 'tests/firmware/native'
+    core = os.path.relpath(arduino['destination'], source)
+    results = []
+    for case in NATIVE_CASES:
+        target_name, profile = split_case(case)
+        target = TARGETS[target_name]
+        build = Path(tempfile.mkdtemp(prefix=case.replace(':', '-') + '-', dir=output))
+        build.chmod(0o755)
+        commands = [
+            ['cmake', '-S', str(source), '-B', str(build), '-G', 'Ninja', f'-DSTM32_YML_FRAMEWORK_DIR={root}',
+             f'-DCMAKE_TOOLCHAIN_FILE={root / "tests/firmware/semihosting/arduino-toolchain.cmake"}',
+             f'-DSTM32_YML_PROFILE={profile}', f'-DSTM32_YML_OVERRIDE_mcu={target["mcu"]}',
+             f'-DSTM32_YML_OVERRIDE_arduino_core_path={core}', '-DCMAKE_BUILD_TYPE=Debug',
+             '-DCMAKE_EXPORT_COMPILE_COMMANDS=ON'],
+            ['cmake', '--build', str(build), '--parallel', '4'],
+        ]
+        for name, command in zip(('configure', 'build'), commands):
+            with (build / (name + '.log')).open('w') as log:
+                subprocess.run(command, stdout=log, stderr=subprocess.STDOUT, check=True, timeout=300)
+        elf = build / 'native_probe.elf'
+        for extension in ('elf', 'bin', 'hex', 'map'):
+            if not (build / ('native_probe.' + extension)).stat().st_size:
+                raise ValueError(f'Empty {extension} artifact: {case}')
+        data = elf.read_bytes()
+        if data[:7] != b'\x7fELF\x01\x01\x01' or struct.unpack_from('<HH', data, 16) != (2, 40):
+            raise ValueError(f'Expected a little-endian ELF32 ARM image: {case}')
+        origin, length = target['flash']
+        ram_low, ram_size = target['ram']
+        vector = build / 'vectors.bin'
+        subprocess.run(['arm-none-eabi-objcopy', '--dump-section', f'.isr_vector={vector}', str(elf),
+                        str(build / 'inspection.elf')], check=True, timeout=30)
+        sp, reset = struct.unpack_from('<II', vector.read_bytes())
+        if not (ram_low < sp <= ram_low + ram_size and sp % 4 == 0):
+            raise ValueError(f'Invalid initial stack pointer {sp:#x}: {case}')
+        if not (reset & 1 and origin <= (reset & ~1) < origin + length):
+            raise ValueError(f'Invalid reset vector {reset:#x}: {case}')
+        sizes = subprocess.check_output(['arm-none-eabi-size', '-A', str(elf)], text=True, timeout=30)
+        text, data_size, bss = (int(v) for v in subprocess.check_output(
+            ['arm-none-eabi-size', str(elf)], text=True, timeout=30).splitlines()[1].split()[:3])
+        (build / 'size.log').write_text(sizes)
+        if text + data_size > length or data_size + bss > ram_size:
+            raise ValueError(f'Image does not fit FLASH/RAM: {case}')
+        symbols = subprocess.check_output(['arm-none-eabi-nm', '--defined-only', str(elf)], text=True, timeout=30)
+        names = {line.split()[-1] for line in symbols.splitlines() if line.split()}
+        own_main = profile == 'nativeOwnMain'
+        required = {'main', 'native_main_marker', '_write'} if own_main else {'main', '_Z7premainv', 'setup', 'loop', 'native_sketch_marker'}
+        forbidden = {'_Z7premainv', 'setup', 'loop'} if own_main else set()
+        if not required <= names or names & forbidden:
+            raise ValueError(f'Unexpected main()/premain() symbols: {case}')
+        commands_db = json.loads((build / 'compile_commands.json').read_text())
+        all_commands = '\n'.join(c['command'] for c in commands_db)
+        board = 'GENERIC_' + target['mcu'][5:12] + 'X'
+        if f'-DARDUINO_{board}' not in all_commands or '/opt/modules/stm32-cmake' in all_commands:
+            raise ValueError(f'Unexpected board or stm32-cmake in the native build: {case}')
+        results.append({'profile': case, 'target': target_name, 'board': board, 'elf': str(elf.relative_to(output)),
+                        'text': text, 'data': data_size, 'bss': bss, 'initial_sp': sp, 'reset_vector': reset})
+        print(f'PASS native build/ELF: {case}', flush=True)
+    return results
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, required=True)
@@ -202,6 +264,7 @@ def main():
             build_target(root, output, report, target_name, target, baseline, lock, etl, arduino, kernel, rtos_profiles)
         report['crc_limit_negative'] = crc_limit_negative(root, output, report)
         report['build_only'] = build_only(root, output)
+        report['native'] = build_native(root, output, arduino)
         report['status'] = 'passed'
     except (OSError, ValueError, KeyError, struct.error, subprocess.SubprocessError) as error:
         report['error'] = str(error)

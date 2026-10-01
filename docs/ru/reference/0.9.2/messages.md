@@ -146,11 +146,13 @@
 | `SCY-E507` | FATAL_ERROR | \[arduino\] arduino.cmsis\_target: цель '{1}' не определена в проекте. |
 | `SCY-E508` | FATAL_ERROR | \[arduino\] Цель '{1}' уже существует: имя совпадает с идентификатором платы. Переименуйте цель проекта. |
 | `SCY-E509` | FATAL_ERROR | \[arduino\] Формат базы плат не распознан: {1}. |
+| `SCY-E510` | FATAL_ERROR | \[arduino\] Цель '{1}' уже существует: в режиме native это имя цели ядра Arduino. Переименуйте цель проекта. |
 | `SCY-W501` | WARNING | \[arduino\] Параметр arduino.mcu\_target не задан. CMakeLists.txt библиотек, зависящих от MCU\_TARGET, могут завершиться ошибкой. |
 | `SCY-W502` | WARNING | \[arduino\] CMakeLists.txt ядра Arduino не найден: {1}<br>Укажите правильный путь через arduino.core\_cmake\_dir в stm32\_config.yml. |
 | `SCY-W503` | WARNING | \[arduino\] Библиотека '{1}' не найдена в {2}.<br>Проверьте имя в arduino.libraries и наличие CMakeLists.txt. |
 | `SCY-W504` | WARNING | \[arduino\] Кастомная библиотека не найдена: {1}. |
 | `SCY-W505` | WARNING | \[arduino\] CMSIS из STM32Cube (CMSIS 5 вместо ожидаемого ядром CMSIS 6): {1} |
+| `SCY-W506` | WARNING | \[arduino\] {1} не используется в режиме native. |
 | `SCY-I501` | STATUS | Arduino Core STM32: {1} |
 | `SCY-I502` | STATUS | Arduino MCU\_TARGET: {1} |
 | `SCY-I503` | STATUS | Arduino::Definitions создан. |
@@ -169,6 +171,9 @@
 | `SCY-I516` | STATUS | CMSIS для Arduino подключает проект (arduino.cmsis\_path: external). |
 | `SCY-I517` | STATUS | Arduino::Platform не создан: нет базы плат {1}. |
 | `SCY-I518` | STATUS | CMSIS из STM32Cube (CMSIS 5 вместо ожидаемого ядром CMSIS 6): {1} |
+| `SCY-I519` | STATUS | Arduino main(): из ядра (cores/arduino/main.cpp). |
+| `SCY-I520` | STATUS | Arduino main(): из проекта; main.cpp ядра исключён, добавлен --undefined=\_write. main() проекта вызывает init() и initVariant(). |
+| `SCY-I521` | STATUS | Скрипт компоновщика variant платы: {1}. heap\_size и stack\_size не применяются; для них задайте шаблон .ld.in или linker\_script. |
 
 ## 6xx — Скрипт компоновщика
 

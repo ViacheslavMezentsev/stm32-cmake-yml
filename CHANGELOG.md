@@ -41,6 +41,13 @@
   в Arduino IDE, кэше загрузок ядра и STM32Cube или `external` с `arduino.cmsis_target`. Если
   при значениях по умолчанию плату или CMSIS определить нельзя, `Arduino::Platform` не
   создаётся, а прежние конфигурации работают как раньше.
+- **Режим Arduino `native`** (ТЗ 4.9.9–4.9.13, 4.9.18): `arduino.integration: native`
+  подключает CMake-файлы Arduino_Core_STM32 напрямую, без обёрток проекта, Python и сети;
+  плата выбирается по `mcu`, флаги YAML передаются ядру и проекту через `user_settings`
+  (по умолчанию `-Os` и newlib-nano), шаблон `.ld.in` или `linker_script` заменяет скрипт
+  variant платы, `arduino.libraries` подключаются собственными `CMakeLists.txt` ядра,
+  `arduino.use_core_main: false` позволяет использовать свою `main()`. Прошивки режима
+  собираются в матрице L4 для всех целей; запуск в эмуляторах — после моделей RCC/PWR.
 
 ### Изменено
 

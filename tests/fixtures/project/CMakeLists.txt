@@ -42,9 +42,11 @@ foreach(KEY IN ITEMS SOURCES COMPILE_DEFINITIONS COMPILE_OPTIONS LINK_OPTIONS LI
 endforeach()
 # Arduino interface targets (spec 4.9.3, 4.9.15; TC-72).
 set(ARDUINO_TARGETS "")
-foreach(TARGET_NAME IN ITEMS ArduinoDefinitions ArduinoOptions ArduinoPlatform)
+foreach(TARGET_NAME IN ITEMS ArduinoDefinitions ArduinoOptions ArduinoPlatform board user_settings)
     if(TARGET ${TARGET_NAME})
-        list(APPEND ARDUINO_TARGETS ${TARGET_NAME})
+        if(TARGET_NAME MATCHES "^Arduino")
+            list(APPEND ARDUINO_TARGETS ${TARGET_NAME})
+        endif()
         foreach(KEY IN ITEMS INTERFACE_COMPILE_DEFINITIONS INTERFACE_COMPILE_OPTIONS
                 INTERFACE_INCLUDE_DIRECTORIES INTERFACE_LINK_OPTIONS INTERFACE_LINK_LIBRARIES)
             get_target_property(VALUE ${TARGET_NAME} ${KEY})

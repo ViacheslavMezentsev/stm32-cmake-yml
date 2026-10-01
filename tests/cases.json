@@ -5102,7 +5102,7 @@
         "args": [
           "bridge",
           "arduino_integration",
-          "wrappers",
+          "wrappers, native",
           "wrappers"
         ]
       },
@@ -5165,6 +5165,397 @@
     ],
     "messages_absent": [
       "I518"
+    ]
+  },
+  {
+    "name": "arduino-native-core-main",
+    "backend": "arduino",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=arduino-native.yml",
+      "-DSTM32_YML_PROFILE="
+    ],
+    "env": {
+      "HOME": "{run}/home",
+      "CMAKE_USER_HOME": "{run}/nocube"
+    },
+    "cmsis_dirs": [
+      "home/.arduino15/packages/STMicroelectronics/tools/CMSIS/5.9.0"
+    ],
+    "messages": [
+      {
+        "code": "I508",
+        "args": [
+          "native"
+        ]
+      },
+      {
+        "code": "I509",
+        "args": [
+          "GENERIC_F103C8TX",
+          "auto"
+        ]
+      },
+      {
+        "code": "I514",
+        "args": [
+          null,
+          "Arduino15"
+        ]
+      },
+      {
+        "code": "I519"
+      }
+    ],
+    "messages_absent": [
+      "I513",
+      "I521",
+      "W506"
+    ],
+    "observed": {
+      "ARDUINO_TARGETS": ""
+    },
+    "command_checks": [
+      {
+        "file": "native_sketch.cpp",
+        "present": [
+          "-DNATIVE_PROBE=1",
+          "-DNATIVE_CXX=1",
+          "-Wall",
+          "-Os",
+          "-DARDUINO_GENERIC_F103C8TX",
+          "-DUSE_HAL_DRIVER",
+          "-mcpu=cortex-m3"
+        ],
+        "absent": [
+          "-Wstrict-prototypes"
+        ]
+      },
+      {
+        "file": "modules/Arduino_Core_STM32/cores/arduino/wiring_digital.c",
+        "present": [
+          "-DNATIVE_PROBE=1",
+          "-Wstrict-prototypes",
+          "-Os"
+        ],
+        "absent": [
+          "-DNATIVE_CXX=1"
+        ]
+      }
+    ],
+    "built": {
+      "elf": "arduino_native",
+      "files": [
+        "bin",
+        "map"
+      ],
+      "symbols": [
+        "main",
+        "_Z7premainv",
+        "setup",
+        "loop",
+        "native_sketch_marker"
+      ]
+    },
+    "no_warnings": true,
+    "core_unchanged": true
+  },
+  {
+    "name": "arduino-native-own-main",
+    "backend": "arduino",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=arduino-native.yml",
+      "-DSTM32_YML_PROFILE=ownmain"
+    ],
+    "env": {
+      "HOME": "{run}/home",
+      "CMAKE_USER_HOME": "{run}/nocube"
+    },
+    "cmsis_dirs": [
+      "home/.arduino15/packages/STMicroelectronics/tools/CMSIS/5.9.0"
+    ],
+    "messages": [
+      {
+        "code": "I520"
+      },
+      {
+        "code": "I506",
+        "args": [
+          "Wire"
+        ]
+      }
+    ],
+    "messages_absent": [
+      "I519"
+    ],
+    "built": {
+      "elf": "arduino_native",
+      "files": [
+        "bin",
+        "map"
+      ],
+      "symbols": [
+        "main",
+        "native_main_marker",
+        "_write",
+        "_ZN7TwoWire5beginEb"
+      ],
+      "symbols_absent": [
+        "_Z7premainv",
+        "setup",
+        "loop"
+      ]
+    }
+  },
+  {
+    "name": "arduino-native-variant-script",
+    "backend": "arduino",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=arduino-native.yml",
+      "-DSTM32_YML_PROFILE=variantscript"
+    ],
+    "env": {
+      "HOME": "{run}/home",
+      "CMAKE_USER_HOME": "{run}/nocube"
+    },
+    "cmsis_dirs": [
+      "home/.arduino15/packages/STMicroelectronics/tools/CMSIS/5.9.0"
+    ],
+    "messages": [
+      {
+        "code": "I521",
+        "args": [
+          null
+        ]
+      }
+    ],
+    "properties": {
+      "board.INTERFACE_LINK_OPTIONS": [
+        "LINKER:--default-script={source}/modules/Arduino_Core_STM32/variants/STM32F1xx/F103C8T_F103CB(T-U)/ldscript.ld"
+      ]
+    }
+  },
+  {
+    "name": "arduino-native-explicit-script",
+    "backend": "arduino",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=arduino-native.yml",
+      "-DSTM32_YML_PROFILE=explicitscript"
+    ],
+    "env": {
+      "HOME": "{run}/home",
+      "CMAKE_USER_HOME": "{run}/nocube"
+    },
+    "cmsis_dirs": [
+      "home/.arduino15/packages/STMicroelectronics/tools/CMSIS/5.9.0"
+    ],
+    "properties": {
+      "board.INTERFACE_LINK_OPTIONS": [
+        "LINKER:--default-script={source}/linker/custom.ld"
+      ]
+    },
+    "absent_properties": {
+      "board.INTERFACE_LINK_OPTIONS": [
+        "LINKER:--default-script={source}/modules/Arduino_Core_STM32/variants/STM32F1xx/F103C8T_F103CB(T-U)/ldscript.ld"
+      ]
+    }
+  },
+  {
+    "name": "arduino-native-wrapper-keys",
+    "backend": "arduino",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=arduino-native.yml",
+      "-DSTM32_YML_PROFILE=wrapperkeys"
+    ],
+    "env": {
+      "HOME": "{run}/home",
+      "CMAKE_USER_HOME": "{run}/nocube"
+    },
+    "cmsis_dirs": [
+      "home/.arduino15/packages/STMicroelectronics/tools/CMSIS/5.9.0"
+    ],
+    "messages": [
+      {
+        "code": "W506",
+        "args": [
+          "arduino.core_cmake_dir"
+        ]
+      },
+      {
+        "code": "W506",
+        "args": [
+          "arduino.mcu_target"
+        ]
+      }
+    ],
+    "messages_absent": [
+      "I505",
+      "W501"
+    ]
+  },
+  {
+    "name": "arduino-native-missing-library",
+    "backend": "arduino",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=arduino-native.yml",
+      "-DSTM32_YML_PROFILE=missinglib"
+    ],
+    "env": {
+      "HOME": "{run}/home",
+      "CMAKE_USER_HOME": "{run}/nocube"
+    },
+    "cmsis_dirs": [
+      "home/.arduino15/packages/STMicroelectronics/tools/CMSIS/5.9.0"
+    ],
+    "messages": [
+      {
+        "code": "W503",
+        "args": [
+          "Missing",
+          null
+        ]
+      }
+    ]
+  },
+  {
+    "name": "arduino-native-cmsis-external",
+    "backend": "arduino",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=arduino-native.yml",
+      "-DSTM32_YML_PROFILE=external",
+      "-DSTM32_YML_TEST_CMSIS_TARGET=ON"
+    ],
+    "env": {
+      "HOME": "{run}/home",
+      "CMAKE_USER_HOME": "{run}/nocube"
+    },
+    "messages": [
+      {
+        "code": "I515",
+        "args": [
+          "ProjectCmsis"
+        ]
+      }
+    ],
+    "properties": {
+      "user_settings.INTERFACE_LINK_LIBRARIES": [
+        "ProjectCmsis"
+      ]
+    }
+  },
+  {
+    "name": "arduino-native-no-cmsis",
+    "backend": "arduino",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=arduino-native.yml",
+      "-DSTM32_YML_PROFILE="
+    ],
+    "env": {
+      "HOME": "{run}/home",
+      "CMAKE_USER_HOME": "{run}/nocube"
+    },
+    "error": {
+      "code": "E506",
+      "args": [
+        null
+      ]
+    }
+  },
+  {
+    "name": "arduino-native-short-mcu",
+    "backend": "arduino",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=arduino-native.yml",
+      "-DSTM32_YML_PROFILE=shortmcu"
+    ],
+    "env": {
+      "HOME": "{run}/home",
+      "CMAKE_USER_HOME": "{run}/nocube"
+    },
+    "cmsis_dirs": [
+      "home/.arduino15/packages/STMicroelectronics/tools/CMSIS/5.9.0"
+    ],
+    "error": {
+      "code": "E504",
+      "args": [
+        "STM32F103C8",
+        null
+      ]
+    }
+  },
+  {
+    "name": "arduino-native-explicit-board",
+    "backend": "arduino",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=arduino-native.yml",
+      "-DSTM32_YML_PROFILE=explicitboard"
+    ],
+    "env": {
+      "HOME": "{run}/home",
+      "CMAKE_USER_HOME": "{run}/nocube"
+    },
+    "cmsis_dirs": [
+      "home/.arduino15/packages/STMicroelectronics/tools/CMSIS/5.9.0"
+    ],
+    "messages": [
+      {
+        "code": "I509",
+        "args": [
+          "GENERIC_F103CBTX",
+          "GENERIC_F103CBTX"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "arduino-native-target-clash",
+    "backend": "arduino",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=arduino-native.yml",
+      "-DSTM32_YML_PROFILE=",
+      "-DSTM32_YML_OVERRIDE_project_name=core"
+    ],
+    "env": {
+      "HOME": "{run}/home",
+      "CMAKE_USER_HOME": "{run}/nocube"
+    },
+    "cmsis_dirs": [
+      "home/.arduino15/packages/STMicroelectronics/tools/CMSIS/5.9.0"
+    ],
+    "error": {
+      "code": "E510",
+      "args": [
+        "core"
+      ]
+    }
+  },
+  {
+    "name": "arduino-integration-native",
+    "backend": "arduino",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=arduino-native.yml",
+      "-DSTM32_YML_PROFILE="
+    ],
+    "env": {
+      "HOME": "{run}/home",
+      "CMAKE_USER_HOME": "{run}/nocube"
+    },
+    "cmsis_dirs": [
+      "home/.arduino15/packages/STMicroelectronics/tools/CMSIS/5.9.0"
+    ],
+    "messages": [
+      {
+        "code": "I508",
+        "args": [
+          "native"
+        ]
+      }
+    ],
+    "messages_absent": [
+      "W005"
+    ],
+    "binary_dirs": [
+      "modules/Arduino_Core_STM32/cores/arduino",
+      "modules/Arduino_Core_STM32/libraries/SrcWrapper"
     ]
   }
 ]

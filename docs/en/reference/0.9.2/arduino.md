@@ -31,6 +31,8 @@ Root-relative consumer CMake wrapper directory. Its CMakeLists.txt is added with
 
 **Change in 0.10.0** (spec 4.6.8): the build directory of an added directory is its path from the project root; a directory outside the project uses `_deps/<path without leading ..>` (for example, `../modules/etl` → `build/_deps/modules/etl`); clashing paths get a `-<4 SHA-1 characters>` suffix. The former `external_*`, `arduino_lib_*`, `arduino_custom_*` and `arduino_core` names are gone; after upgrading from 0.9.x build in a clean directory.
 
+**Change in 0.10.0** (spec 4.9.4): applies only in the `wrappers` mode; in `native` it warns with `SCY-W506`.
+
 **Omission and emptiness:** see [shared rules](semantics.md#empty-values); exceptions are stated above. Profiles/overrides apply before defaults. Backend/path restrictions are stated in the description.
 
 ```yaml
@@ -40,7 +42,7 @@ arduino:
 
 [0.9.2 implementation](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_arduino.cmake) · [Index](index.md)
 
-**Checks (partial coverage):** `configure.arduino-defaults`. [Test manifest](../../../../tests/cases.json).
+**Checks (partial coverage):** `configure.arduino-defaults`, `configure.arduino-native-wrapper-keys`. [Test manifest](../../../../tests/cases.json).
 
 <a id="arduino-mcu-target"></a>
 ## `arduino.mcu_target`
@@ -48,6 +50,8 @@ arduino:
 `CFG-ARDUINO-MCU-TARGET` · **Type:** string · **Default:** existing MCU_TARGET cache / warning
 
 Passes a variant identifier to consumer wrappers via MCU_TARGET CACHE FORCE. The framework itself does not select a variant. If YAML omits it, existing MCU_TARGET is retained; if neither exists, a warning is emitted.
+
+**Change in 0.10.0** (spec 4.9.2): applies only in the `wrappers` mode; in `native` it warns with `SCY-W506`.
 
 **Omission and emptiness:** see [shared rules](semantics.md#empty-values); exceptions are stated above. Profiles/overrides apply before defaults. Backend/path restrictions are stated in the description.
 
@@ -58,7 +62,7 @@ arduino:
 
 [0.9.2 implementation](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_arduino.cmake) · [Index](index.md)
 
-**Checks (partial coverage):** `configure.arduino-profile`. [Test manifest](../../../../tests/cases.json).
+**Checks (partial coverage):** `configure.arduino-profile`, `configure.arduino-native-wrapper-keys`. [Test manifest](../../../../tests/cases.json).
 
 <a id="arduino-use-core-main"></a>
 ## `arduino.use_core_main`
@@ -66,6 +70,8 @@ arduino:
 `CFG-ARDUINO-USE-CORE-MAIN` · **Type:** boolean · **Default:** not set by framework
 
 When present, exports USE_CORE_MAIN CACHE BOOL FORCE to the wrapper. Absence does not guarantee false: wrapper behavior and previous cache matter. Does not add a main file by itself.
+
+**Change in 0.10.0** (spec 4.9.18): in the `native` mode the default is `true`: the core `main()` (`initVariant()`, `setup()`, `loop()`), the `premain()` constructor calls `init()` (`SCY-I519`). With `false` the framework drops `main.cpp` from `core_bin` and adds `--undefined=_write` (`SCY-I520`); the project `main()` calls `init()` and `initVariant()`, on Cortex-M7 also the `premain()` settings (NVIC priority grouping, caches). A project `main()` with `true` gives the link error `undefined reference to '_write'` or an image without `premain()`.
 
 **Omission and emptiness:** see [shared rules](semantics.md#empty-values); exceptions are stated above. Profiles/overrides apply before defaults. Backend/path restrictions are stated in the description.
 
@@ -76,7 +82,7 @@ arduino:
 
 [0.9.2 implementation](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_arduino.cmake) · [Index](index.md)
 
-**Checks (partial coverage):** `configure.arduino-defaults`. [Test manifest](../../../../tests/cases.json).
+**Checks (partial coverage):** `configure.arduino-defaults`, `configure.arduino-native-core-main`, `configure.arduino-native-own-main`. [Test manifest](../../../../tests/cases.json).
 
 <a id="arduino-libraries"></a>
 ## `arduino.libraries`
@@ -87,6 +93,8 @@ Looks for CMakeLists.txt under <core_path>/libraries/<name>. Absence warns; Ardu
 
 **Change in 0.10.0** (spec 4.6.8): the build directory of an added directory is its path from the project root; a directory outside the project uses `_deps/<path without leading ..>` (for example, `../modules/etl` → `build/_deps/modules/etl`); clashing paths get a `-<4 SHA-1 characters>` suffix. The former `external_*`, `arduino_lib_*`, `arduino_custom_*` and `arduino_core` names are gone; after upgrading from 0.9.x build in a clean directory.
 
+**Change in 0.10.0** (spec 4.9.13): in the `native` mode libraries are added by their core `CMakeLists.txt` and linked through `link_libraries` by core target names (`Wire`); `SrcWrapper` is always added. Libraries needing extra core dependencies (USBDevice, VirtIO, CMSIS_DSP) are not supported.
+
 **Omission and emptiness:** see [shared rules](semantics.md#empty-values); exceptions are stated above. Profiles/overrides apply before defaults. Backend/path restrictions are stated in the description.
 
 ```yaml
@@ -96,7 +104,7 @@ arduino:
 
 [0.9.2 implementation](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_arduino.cmake) · [Index](index.md)
 
-**Checks (partial coverage):** `configure.arduino-library-linked`, `configure.arduino-library-unlinked`, `configure.arduino-library-missing`, `configure.arduino-library-no-wrapper`, `configure.arduino-library-reconfigure`. [Test manifest](../../../../tests/cases.json).
+**Checks (partial coverage):** `configure.arduino-library-linked`, `configure.arduino-library-unlinked`, `configure.arduino-library-missing`, `configure.arduino-library-no-wrapper`, `configure.arduino-library-reconfigure`, `configure.arduino-native-own-main`, `configure.arduino-native-missing-library`. [Test manifest](../../../../tests/cases.json).
 
 <a id="arduino-custom-libraries"></a>
 ## `arduino.custom_libraries`
@@ -123,9 +131,11 @@ arduino:
 
 `CFG-ARDUINO-INTEGRATION` · **Type:** string: wrappers · **Default:** wrappers
 
-Arduino backend mode (spec 4.9.8). An empty or missing value means `wrappers`, the 0.9.3 behaviour: project wrappers add the core and libraries. An unknown value warns with `SCY-W005` and uses `wrappers`. The mode is logged (`SCY-I508`). The `native` value (the core CMake files added directly) arrives in the same version as a separate change.
+Arduino backend mode (spec 4.9.8). An empty or missing value means `wrappers`, the 0.9.3 behaviour: project wrappers add the core and libraries. An unknown value warns with `SCY-W005` and uses `wrappers`. The mode is logged (`SCY-I508`).
 
 **New in 0.10.0** (spec 4.9.8–4.9.16).
+
+The `native` value (spec 4.9.9–4.9.13): the framework adds the core CMake files from `arduino.core_path` directly — `environment`, `set_base_arduino_config`, the selected board variant, `cores/arduino`, `libraries/SrcWrapper` and the `arduino.libraries` libraries; `set_board()`, `updatedb()`, `ensure_core_deps()` and `overall_settings()` are not called, Python and network are not needed, core files are not changed. The `board` target is a copy of the board target with the serial `generic`, USB `none`, VirtIO `disable` variants; the `user_settings` target holds `-Os`, `--specs=nano.specs`, then common and language `compile_definitions`/`compile_options` from YAML (not added to the executable directly). The executable links `stm32_runtime`. A `.ld.in` template or an explicit `linker_script` replaces `--default-script` of `board`; without them the variant script is used (`SCY-I521`, heap/stack do not apply). A project target named like a core target (`core`, `board`, `user_settings` and others) fails with `SCY-E510`. `Arduino::Definitions`, `Arduino::Options` and `Arduino::Platform` exist only in `wrappers`.
 
 **Omission and emptiness:** see [shared rules](semantics.md#empty-values); exceptions are stated above. Profiles/overrides apply before defaults. Backend/path restrictions are stated in the description.
 
@@ -136,7 +146,7 @@ arduino:
 
 [Implementation](../../../../cmake/stm32_yml_arduino.cmake) · [Index](index.md)
 
-**Checks:** `configure.arduino-integration-wrappers`, `configure.arduino-integration-unknown`, `configure.arduino-defaults`. [Test manifest](../../../../tests/cases.json).
+**Checks:** `configure.arduino-integration-wrappers`, `configure.arduino-integration-unknown`, `configure.arduino-defaults`, `configure.arduino-integration-native`, `configure.arduino-native-core-main`, `configure.arduino-native-variant-script`, `configure.arduino-native-explicit-script`, `configure.arduino-native-target-clash`. [Test manifest](../../../../tests/cases.json).
 
 <a id="arduino-board"></a>
 ## `arduino.board`
@@ -147,6 +157,8 @@ A board from the core `boards.txt` (spec 4.9.10, 4.9.16). With `auto` the ID is 
 
 **New in 0.10.0** (spec 4.9.8–4.9.16).
 
+In the `native` mode the default is `auto`; a failed selection fails with `SCY-E504` for any value.
+
 **Omission and emptiness:** see [shared rules](semantics.md#empty-values); exceptions are stated above. Profiles/overrides apply before defaults. Backend/path restrictions are stated in the description.
 
 ```yaml
@@ -156,7 +168,7 @@ arduino:
 
 [Implementation](../../../../cmake/stm32_yml_arduino_board.cmake) · [Index](index.md)
 
-**Checks:** `configure.arduino-platform-arduino15`, `configure.arduino-board-explicit`, `configure.arduino-board-unknown`, `configure.arduino-board-short-mcu`, `configure.arduino-board-auto-explicit`, `configure.arduino-board-suffix`, `configure.arduino-board-ambiguous`, `configure.arduino-board-malformed`, `configure.arduino-board-target-clash`, `configure.arduino-platform-no-mcu`. [Test manifest](../../../../tests/cases.json).
+**Checks:** `configure.arduino-platform-arduino15`, `configure.arduino-board-explicit`, `configure.arduino-board-unknown`, `configure.arduino-board-short-mcu`, `configure.arduino-board-auto-explicit`, `configure.arduino-board-suffix`, `configure.arduino-board-ambiguous`, `configure.arduino-board-malformed`, `configure.arduino-board-target-clash`, `configure.arduino-platform-no-mcu`, `configure.arduino-native-explicit-board`, `configure.arduino-native-short-mcu`. [Test manifest](../../../../tests/cases.json).
 
 <a id="arduino-cmsis-path"></a>
 ## `arduino.cmsis_path`
@@ -167,6 +179,8 @@ The CMSIS source for `Arduino::Platform` (spec 4.9.14). A path from the project 
 
 **New in 0.10.0** (spec 4.9.8–4.9.16).
 
+In the `native` mode CMSIS is required: the path goes to the core as `CMSIS6_PATH`; not found — `SCY-E506`; with `external` the `arduino.cmsis_target` target is linked to `user_settings`.
+
 **Omission and emptiness:** see [shared rules](semantics.md#empty-values); exceptions are stated above. Profiles/overrides apply before defaults. Backend/path restrictions are stated in the description.
 
 ```yaml
@@ -176,7 +190,7 @@ arduino:
 
 [Implementation](../../../../cmake/stm32_yml_arduino_board.cmake) · [Index](index.md)
 
-**Checks:** `configure.arduino-platform-arduino15`, `configure.arduino-platform-dl-cache`, `configure.arduino-platform-cube`, `configure.arduino-platform-cube-explicit`, `configure.arduino-platform-no-cmsis`, `configure.arduino-platform-no-cmsis-explicit`, `configure.arduino-cmsis-path`, `configure.arduino-cmsis-path-invalid`, `configure.arduino-cmsis-external`. [Test manifest](../../../../tests/cases.json).
+**Checks:** `configure.arduino-platform-arduino15`, `configure.arduino-platform-dl-cache`, `configure.arduino-platform-cube`, `configure.arduino-platform-cube-explicit`, `configure.arduino-platform-no-cmsis`, `configure.arduino-platform-no-cmsis-explicit`, `configure.arduino-cmsis-path`, `configure.arduino-cmsis-path-invalid`, `configure.arduino-cmsis-external`, `configure.arduino-native-no-cmsis`, `configure.arduino-native-cmsis-external`. [Test manifest](../../../../tests/cases.json).
 
 <a id="arduino-cmsis-target"></a>
 ## `arduino.cmsis_target`
@@ -186,6 +200,8 @@ arduino:
 The project INTERFACE target with CMSIS for `arduino.cmsis_path: external` (spec 4.9.14): linked to `Arduino::Platform` (`SCY-I515`). The target may be defined after the framework call; if it does not exist at the end of `CMakeLists.txt`, `SCY-E507`. Without `cmsis_target` a message says that the project supplies CMSIS (`SCY-I516`). The minimal CMSIS Core file set is in the `native` mode documentation.
 
 **New in 0.10.0** (spec 4.9.8–4.9.16).
+
+In the `native` mode the target is linked to `user_settings`.
 
 **Omission and emptiness:** see [shared rules](semantics.md#empty-values); exceptions are stated above. Profiles/overrides apply before defaults. Backend/path restrictions are stated in the description.
 
@@ -197,4 +213,4 @@ arduino:
 
 [Implementation](../../../../cmake/stm32_yml_arduino_board.cmake) · [Index](index.md)
 
-**Checks:** `configure.arduino-cmsis-external-target`, `configure.arduino-cmsis-external-missing`, `configure.arduino-cmsis-external`. [Test manifest](../../../../tests/cases.json).
+**Checks:** `configure.arduino-cmsis-external-target`, `configure.arduino-cmsis-external-missing`, `configure.arduino-cmsis-external`, `configure.arduino-native-cmsis-external`. [Test manifest](../../../../tests/cases.json).

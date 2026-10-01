@@ -135,6 +135,7 @@ function(stm32_yml_arduino_load_board CORE BOARD)
         endif()
     endforeach()
     set(ARDUINO_VARIANT_PATH "${${BOARD}_VARIANT_PATH}" PARENT_SCOPE)
+    set(ARDUINO_FLASH_SIZE "${${BOARD}_MAXSIZE}" PARENT_SCOPE)
 endfunction()
 
 # Каталог с CMSIS/Core/Include/cmsis_version.h.

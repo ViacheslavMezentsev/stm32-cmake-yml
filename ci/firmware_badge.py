@@ -37,8 +37,9 @@ def collect(build, run, lock, revision, emulator="qemu"):
                 or any(c['passed'] is not True or c['metadata_ok'] is not True
                        or c['expected_metadata'] != expected[c['profile']] for c in cases)):
             raise ValueError(f'Missing, failed or mismatched {emulator} cases')
-        # Build-only firmware (H7/H5, TC-57) counts as builds, not simulator checks.
-        builds += len(compiled['cases']) + len(compiled['build_only'])
+        # Build-only firmware (H7/H5, TC-57) and Arduino native firmware (TC-73)
+        # count as builds, not simulator checks.
+        builds += len(compiled['cases']) + len(compiled['build_only']) + len(compiled['native'])
         checks += len(cases)
         if emulator == 'renode':
             # H7/H5 firmware runs in Renode only; QEMU has no matching machine.

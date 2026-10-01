@@ -3,7 +3,7 @@
 [Documentation](index.md) · [Русский](../ru/firmware-plan.md) · [Execution contract](firmware-testing.md)
 
 The goal is to cover use cases with an observable contract on a selected model.
-The 193 Configure cases are not 193 firmwares: malformed YAML, reconfiguration
+The 205 Configure cases are not 205 firmwares: malformed YAML, reconfiguration
 and synthetic libraries do not need executable counterparts. Each new group gets
 its own branch.
 
@@ -69,8 +69,8 @@ If 42 profiles can run on both simulators and 18 on one, the result would be
 corrupted-ELF runs at the time of the estimate. This illustrative allocation requires model audits;
 an incompatible model reduces execution counts rather than creating a false pass.
 
-Configure is separate: the current 193 scenarios give 1158 checks, including
+Configure is separate: the current 205 scenarios give 1230 checks, including
 22 expected-error scenarios and 26 multistep scenarios. They do not need to
-become 193 distinct firmwares. Keeping that suite, the example above would total
+become 205 distinct firmwares. Keeping that suite, the example above would total
 **about 1458 Configure + simulator checks**, besides 360 builds and script/docs
 checks. The Builds (Checks) badge counts only the firmware matrix.

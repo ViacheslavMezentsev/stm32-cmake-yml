@@ -19,7 +19,7 @@ on three GCC × two CMake versions.
 | L1 | Documentation: links, bilingual `CFG-*` cards, errata, option-to-test mappings | `ci/check_reference.py`, `docs/reference-index.json` | `python ci/check_reference.py` | 55 cards, 8 errata, 75 pages |
 | L2 | CI script logic: QEMU/Renode runners, CRC, matrix, badges | `tests/test_firmware*.py`, `ci/emulation/test_check.py` | `python -m unittest discover -s tests -p "test_firmware*.py"` | 42 tests |
 | L3 | Framework behaviour at Configure/Generate | `tests/cases.json`, `tests/run_case.py`, `tests/CMakeLists.txt`, `tests/fixtures/project/` | `python ci/run_configure_tests.py --output <dir>` (in the image) | 139 scenarios × 6 = 834 |
-| L4 | Firmware builds; ELF, layout, CRC and metadata checks | `tests/firmware/semihosting/`, `tests/firmware/buildonly/`, `ci/build_firmware_smoke.py`, `ci/firmware_cases.py` | `python ci/firmware_matrix.py build --output <dir>` | 570 builds |
+| L4 | Firmware builds; ELF, layout, CRC and metadata checks | `tests/firmware/semihosting/`, `tests/firmware/buildonly/`, `tests/firmware/native/`, `ci/build_firmware_smoke.py`, `ci/firmware_cases.py` | `python ci/firmware_matrix.py build --output <dir>` | 618 builds |
 | L5 | Firmware execution in emulators | `ci/run_qemu_smoke.py`, `ci/run_renode_smoke.py`, `tests/firmware/renode/` | `python ci/firmware_matrix.py run [--emulator renode] --build <builds> --output <logs>` | 336 QEMU, 612 Renode runs |
 
 ```text
@@ -159,8 +159,8 @@ package or the resulting image bytes. Ubuntu snapshots are not required.
 
 ## Framework configuration tests
 
-[tests/cases.json](../../tests/cases.json) defines 193 scenarios, run with each of
-the three GCC and two CMake versions from the lockfile: **1158 case executions**.
+[tests/cases.json](../../tests/cases.json) defines 205 scenarios, run with each of
+the three GCC and two CMake versions from the lockfile: **1230 case executions**.
 Twenty-seven scenarios perform two to thirteen consecutive configurations in the same build tree.
 
 | Area | Checks |
@@ -448,6 +448,10 @@ Five `arduino-custom-*` cases exercise `arduino.custom_libraries` with an empty 
 ### Arduino::Options and Arduino::Platform targets
 
 Twenty-two cases check the `wrappers` mode (spec 4.9.8, 4.9.10, 4.9.14–4.9.16; TC-69, TC-71, TC-72 and board selection of TC-70) on the pinned 2.12.0 core with the `arduino-platform.yml` fixture. `arduino-integration-*` cover an explicit `wrappers` and an unknown value (`SCY-W005`). `arduino-platform-*` and `arduino-cmsis-*` cover the CMSIS source: Arduino15 (the newer of two versions), the core download cache, STM32Cube (`SCY-I518`, `SCY-W505` with an explicit board), an explicit path, a wrong path (`SCY-E505`), `external` with a project target, without one and with a missing target (`SCY-E507`), no CMSIS with defaults (`SCY-I512`, no target) and with an explicit board (`SCY-E506`). `arduino-board-*` cover `auto` for `STM32F103C8T6`, the suffixed `GENERIC_U575ZITXQ`, an explicit ID, an unknown ID (`SCY-E503`), a short MCU name by default (`SCY-I511`) and with an explicit `auto` (`SCY-E504`), two candidates and a malformed block in the `arduino-boards-core` test database (`SCY-E504`, `SCY-E509`), a project target named like the board (`SCY-E508`) and no `mcu` (`SCY-I510`). Search places come from case environment variables (`env` with `{run}`) and the `cmsis_dirs` key, which creates `CMSIS/Core/Include` from the pinned STM32CubeF1 package. Checks cover target properties (the fixture writes them to `observed/<target>.<property>.txt`), compile commands of core files in the `Arduino/PlatformCore` wrapper linked only to `Arduino::Platform`, and a build of that wrapper (the `build_targets` key).
+
+### Arduino native mode
+
+Twelve cases check the `native` mode (spec 4.9.9–4.9.13, 4.9.18; TC-69, TC-70, TC-85) with the `arduino-native.yml` fixture and the pinned core. `arduino-native-core-main` builds firmware with the core `main()` and the `linker-native/STM32F103C8_FLASH.ld.in` template: YAML flags reach the sketch and core files through `user_settings` (language flags only their language), the ELF has `main`, `_Z7premainv`, `setup`, `loop`; the core `cmake/` files do not change and no core download directory appears (the `core_unchanged` key). `arduino-native-own-main` builds a project `main()` with `Wire`: the ELF has no `premain()`, `setup()`, `loop()` and has `_write` (the `symbols`, `symbols_absent` keys of `built`). The others: the variant script without a template (`SCY-I521`) and an explicit `linker_script` in `--default-script` of `board`, `wrappers` keys (`SCY-W506`), a missing library (`SCY-W503`), `external` CMSIS with a project target in `user_settings`, no CMSIS (`SCY-E506`), a short MCU name (`SCY-E504`), an explicit board, a `core` project target (`SCY-E510`), and `arduino-integration-native` — the mode and the core build directories per 4.6.8.
 
 Assertions cover owning targets, transitive definitions/includes, separate C/C++ flags, absence of automatic linkage, warnings for missing directories/CMakeLists.txt, and selected → empty → unlinked profile transitions. The wrappers are synthetic, inspired by a consumer pattern with Core/SrcWrapper/peripheral libraries; they do not implement or validate SPI, Wire or HAL. Compilation, object inclusion at link time and firmware execution remain outside this suite.
 

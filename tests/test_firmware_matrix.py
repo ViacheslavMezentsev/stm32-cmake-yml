@@ -8,7 +8,7 @@ import unittest.mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'ci'))
 import firmware_cases
-from firmware_cases import BUILD_CASES, BUILD_ONLY_PROFILES, ENABLED_TARGETS, case_name, split_case
+from firmware_cases import BUILD_CASES, BUILD_ONLY_PROFILES, ENABLED_TARGETS, case_name, split_case, NATIVE_CASES
 from firmware_matrix import pairs, verify_build, verify_matrix
 
 
@@ -41,6 +41,7 @@ class MatrixTests(unittest.TestCase):
                 'cases': [{'profile': p} for p in BUILD_CASES],
                 'crc_negatives': [{'profile': case_name(t, 'crc-corrupt')} for t in ENABLED_TARGETS],
                 'build_only': [{'profile': p} for p in BUILD_ONLY_PROFILES],
+                'native': [{'profile': p} for p in NATIVE_CASES],
                 'crc_limit_negative': {'status': 'failed-as-expected'}}
         verify_build(good, '14.2.1-1.1', '3.21.7')
         for key, value in [('gcc', '13.3.1'), ('cmake', 'cmake version 3.28.3'),
@@ -48,6 +49,7 @@ class MatrixTests(unittest.TestCase):
                            ('cases', [{'profile': 'success'}] * 3), ('build_only', []), ('crc_negatives', []),
                            ('crc_negatives', [{'profile': 'crc-corrupt'}]),
                            ('build_only', [{'profile': p} for p in BUILD_ONLY_PROFILES[:-1]]),
+                           ('native', []), ('native', [{'profile': p} for p in NATIVE_CASES[:-1]]),
                            ('crc_limit_negative', {'status': 'built'})]:
             report = copy.deepcopy(good)
             report[key] = value

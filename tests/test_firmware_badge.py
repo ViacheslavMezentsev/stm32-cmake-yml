@@ -9,7 +9,7 @@ from unittest.mock import patch
 import xml.etree.ElementTree as ET
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'ci'))
-from firmware_cases import BUILD_CASES, BUILD_ONLY_PROFILES, ENABLED_TARGETS, case_name, run_cases
+from firmware_cases import BUILD_CASES, BUILD_ONLY_PROFILES, ENABLED_TARGETS, NATIVE_CASES, case_name, run_cases
 from firmware_badge import collect, svg, main
 from publish_firmware_badge import publish
 
@@ -26,6 +26,7 @@ class BadgeTests(unittest.TestCase):
         compiled = {'status': 'passed', 'gcc': '14.2.1', 'cmake': 'cmake version 3.28.3',
                     'git_revision': 'abc', 'git_dirty': '0', 'cases': cases, 'crc_negatives': negatives,
                     'build_only': [{'profile': p, 'status': 'build-only'} for p in BUILD_ONLY_PROFILES],
+                    'native': [{'profile': p} for p in NATIVE_CASES],
                     'crc_limit_negative': {'status': 'failed-as-expected'}}
         executed = {'status': 'passed', 'cases': [dict(profile=c['profile'], passed=True,
                     metadata_ok=True, expected_metadata=c['metadata']) for c in cases + negatives
@@ -38,7 +39,8 @@ class BadgeTests(unittest.TestCase):
 
     def test_counts_builds_separately_from_negative_checks(self):
         result = self.count(self.reports)
-        builds = len(BUILD_CASES) + len(BUILD_ONLY_PROFILES)
+        # Arduino native firmware (TC-73) counts as builds only.
+        builds = len(BUILD_CASES) + len(BUILD_ONLY_PROFILES) + len(NATIVE_CASES)
         checks = len(run_cases('qemu'))
         self.assertEqual((result['builds'], result['checks']), (builds, checks))
         badge = ET.fromstring(svg(result))
@@ -66,7 +68,7 @@ class BadgeTests(unittest.TestCase):
                 collect(Path('build'), Path('run'), self.lock, 'abc', 'renode')
 
     def test_rejects_failed_missing_duplicate_or_stale_results(self):
-        for change in ('failed', 'missing', 'duplicate', 'stale', 'dirty', 'metadata', 'matrix', 'buildonly'):
+        for change in ('failed', 'missing', 'duplicate', 'stale', 'dirty', 'metadata', 'matrix', 'buildonly', 'native'):
             reports = copy.deepcopy(self.reports)
             if change == 'failed': reports[3]['cases'][0]['passed'] = False
             if change == 'missing': reports[3]['cases'].pop()
@@ -76,6 +78,7 @@ class BadgeTests(unittest.TestCase):
             if change == 'metadata': reports[3]['cases'][0]['expected_metadata'] = {}
             if change == 'matrix': reports[1]['pairs'] = []
             if change == 'buildonly': reports[2]['build_only'].pop()
+            if change == 'native': reports[2]['native'].pop()
             with self.subTest(change=change), self.assertRaises(ValueError):
                 self.count(reports)
 

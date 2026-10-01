@@ -1,0 +1,45 @@
+stm32_cmake_yml_version: 0.9.3
+project_name: arduino_native
+toolchain_backend: arduino
+mcu: STM32F103C8T6
+languages: [C, CXX, ASM]
+sources: [native_sketch.cpp]
+compile_definitions: [NATIVE_PROBE=1]
+compile_definitions_cxx: [NATIVE_CXX=1]
+compile_options: [Wall]
+compile_options_c: [Wstrict-prototypes]
+linker_script_dir: linker-native
+heap_size: 512
+stack_size: 1K
+build_artifacts: [bin, map]
+arduino:
+  integration: native
+  core_path: modules/Arduino_Core_STM32
+profiles:
+  ownmain:
+    sources: [native_main.cpp]
+    arduino:
+      use_core_main: false
+      libraries: [Wire]
+    link_libraries: [Wire]
+  variantscript:
+    linker_script_dir: linker-empty
+  explicitscript:
+    linker_script: custom.ld
+    linker_script_dir: linker
+  wrapperkeys:
+    arduino:
+      core_cmake_dir: Arduino/Core
+      mcu_target: F103
+  missinglib:
+    arduino:
+      libraries: [Missing]
+  external:
+    arduino:
+      cmsis_path: external
+      cmsis_target: ProjectCmsis
+  shortmcu:
+    mcu: STM32F103C8
+  explicitboard:
+    arduino:
+      board: GENERIC_F103CBTX

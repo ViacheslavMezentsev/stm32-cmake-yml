@@ -18,6 +18,7 @@
 # ==============================================================================
 
 include("${CMAKE_CURRENT_LIST_DIR}/stm32_yml_arduino_board.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/stm32_yml_arduino_native.cmake")
 
 # ==============================================================================
 # @brief Настраивает Arduino Core STM32 как backend сборки.
@@ -36,7 +37,7 @@ function(stm32_yml_setup_arduino TARGET_NAME)
         stm32_yml_msg(E501)
     endif()
 
-    set(_core_abs "${CMAKE_SOURCE_DIR}/${arduino_core_path}")
+    get_filename_component(_core_abs "${arduino_core_path}" ABSOLUTE BASE_DIR "${CMAKE_SOURCE_DIR}")
 
     if(NOT EXISTS "${_core_abs}")
         stm32_yml_msg(E502 "${_core_abs}")
@@ -44,17 +45,19 @@ function(stm32_yml_setup_arduino TARGET_NAME)
 
     stm32_yml_msg(I501 "${_core_abs}")
 
-    # Режим backend (ТЗ 4.9.8): пусто — wrappers, как в 0.9.3.
-    stm32_yml_check_enum_value(arduino_integration "wrappers" wrappers)
-    if("${arduino_integration}" STREQUAL "")
-        set(arduino_integration "wrappers")
-    endif()
+    # Режим backend (ТЗ 4.9.8); значение проверено в stm32_yml_setup_project().
     stm32_yml_msg(I508 "${arduino_integration}")
 
     # Пробрасываем путь в CACHE — CMakeLists.txt библиотек используют его
     # через get_filename_component(STM32_CORE_DIR ... ABSOLUTE).
     set(ARDUINO_CORE_DIR "${_core_abs}" CACHE PATH
         "Абсолютный путь к Arduino Core STM32." FORCE)
+
+    if(arduino_integration STREQUAL "native")
+        stm32_yml_setup_arduino_native(${TARGET_NAME} "${_core_abs}")
+        _stm32_yml_arduino_custom_libraries()
+        return()
+    endif()
 
     # ------------------------------------------------------------------
     # Шаг 2: пробрасываем MCU_TARGET в CACHE.
@@ -160,11 +163,16 @@ function(stm32_yml_setup_arduino TARGET_NAME)
         endforeach()
     endif()
 
-    # ------------------------------------------------------------------
-    # Шаг 6: подключаем кастомные библиотеки пользователя.
-    # Список задаётся через arduino.custom_libraries в yml.
-    # Пути — относительно корня проекта.
-    # ------------------------------------------------------------------
+    # Шаг 6: кастомные библиотеки пользователя.
+    _stm32_yml_arduino_custom_libraries()
+
+endfunction()
+
+# ------------------------------------------------------------------
+# Кастомные библиотеки пользователя (arduino.custom_libraries) в обоих
+# режимах. Пути — относительно корня проекта.
+# ------------------------------------------------------------------
+function(_stm32_yml_arduino_custom_libraries)
     if(DEFINED arduino_custom_libraries AND arduino_custom_libraries)
         foreach(_custom_lib IN LISTS arduino_custom_libraries)
             set(_custom_lib_dir "${CMAKE_SOURCE_DIR}/${_custom_lib}")

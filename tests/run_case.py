@@ -306,6 +306,15 @@ def verify_built(expected, cmake, build, report):
             require(actual == wanted, f"{extension} differs from objcopy -O {bfd}")
     for relative in expected.get("absent", []):
         require(not (build / relative).exists(), f"Unexpected built file {relative}")
+    if "symbols" in expected or "symbols_absent" in expected:
+        # Spec 4.9.18 (TC-85): which main() and premain() the image contains.
+        nm = objcopy.replace("objcopy", "nm")
+        listing = subprocess.run([nm, str(elf)], capture_output=True, text=True, check=True, timeout=60).stdout
+        names = {line.split()[-1] for line in listing.splitlines() if line.split()}
+        for name in expected.get("symbols", []):
+            require(name in names, f"Missing symbol {name}")
+        for name in expected.get("symbols_absent", []):
+            require(name not in names, f"Unexpected symbol {name}")
 
 
 def main():
@@ -364,6 +373,12 @@ def main():
         include = sorted(cube.glob("STM32Cube_FW_F1_V*/Drivers/CMSIS/Core/Include"))[-1]
         (run / relative / "CMSIS/Core").mkdir(parents=True)
         (run / relative / "CMSIS/Core/Include").symlink_to(include, target_is_directory=True)
+    def core_state():
+        # Spec 4.9.9 (TC-70): the native mode does not touch the core files.
+        core = source / "modules/Arduino_Core_STM32/cmake"
+        return {str(path): (path.stat().st_mtime_ns, path.stat().st_size)
+                for path in sorted(core.rglob("*")) if path.is_file()}
+    core_before = core_state() if case.get("core_unchanged") else None
     for index, step in enumerate(case.get("steps", [{}]), start=1):
         expectation = dict(case, **step)
         step_command = command + step.get("args", [])
@@ -414,6 +429,10 @@ def main():
         except AssertionError:
             print(output, flush=True)
             raise
+    if core_before is not None:
+        require(core_state() == core_before, "Arduino core files changed")
+        # ensure_core_deps() would download into ~/.Arduino_Core_STM32_dl.
+        require(not (run / "home/.Arduino_Core_STM32_dl").exists(), "Arduino core downloads created")
     print(f"PASS {args.case}")
 
 

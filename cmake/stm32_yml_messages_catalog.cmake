@@ -455,6 +455,26 @@ stm32_yml_msg_def(I518
     "CMSIS из STM32Cube (CMSIS 5 вместо ожидаемого ядром CMSIS 6): {1}"
     "CMSIS from STM32Cube (CMSIS 5 instead of CMSIS 6 expected by the core): {1}")
 
+stm32_yml_msg_def(E510
+    "[arduino] Цель '{1}' уже существует: в режиме native это имя цели ядра Arduino. Переименуйте цель проекта."
+    "[arduino] Target '{1}' already exists: in the native mode this is an Arduino core target name. Rename the project target.")
+
+stm32_yml_msg_def(W506
+    "[arduino] {1} не используется в режиме native."
+    "[arduino] {1} is not used in the native mode.")
+
+stm32_yml_msg_def(I519
+    "Arduino main(): из ядра (cores/arduino/main.cpp)."
+    "Arduino main(): from the core (cores/arduino/main.cpp).")
+
+stm32_yml_msg_def(I520
+    "Arduino main(): из проекта; main.cpp ядра исключён, добавлен --undefined=_write. main() проекта вызывает init() и initVariant()."
+    "Arduino main(): from the project; the core main.cpp is excluded, --undefined=_write is added. The project main() calls init() and initVariant().")
+
+stm32_yml_msg_def(I521
+    "Скрипт компоновщика variant платы: {1}. heap_size и stack_size не применяются; для них задайте шаблон .ld.in или linker_script."
+    "Board variant linker script: {1}. heap_size and stack_size do not apply; use a .ld.in template or linker_script.")
+
 stm32_yml_msg_def(I516
     "CMSIS для Arduino подключает проект (arduino.cmsis_path: external)."
     "CMSIS for Arduino is provided by the project (arduino.cmsis_path: external).")

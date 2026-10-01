@@ -925,7 +925,8 @@
         "en": "docs/en/reference/0.9.2/arduino.md#arduino-core-cmake-dir"
       },
       "tests": [
-        "configure.arduino-defaults"
+        "configure.arduino-defaults",
+        "configure.arduino-native-wrapper-keys"
       ],
       "errata": []
     },
@@ -941,7 +942,8 @@
         "en": "docs/en/reference/0.9.2/arduino.md#arduino-mcu-target"
       },
       "tests": [
-        "configure.arduino-profile"
+        "configure.arduino-profile",
+        "configure.arduino-native-wrapper-keys"
       ],
       "errata": []
     },
@@ -957,7 +959,9 @@
         "en": "docs/en/reference/0.9.2/arduino.md#arduino-use-core-main"
       },
       "tests": [
-        "configure.arduino-defaults"
+        "configure.arduino-defaults",
+        "configure.arduino-native-core-main",
+        "configure.arduino-native-own-main"
       ],
       "errata": []
     },
@@ -977,7 +981,9 @@
         "configure.arduino-library-unlinked",
         "configure.arduino-library-missing",
         "configure.arduino-library-no-wrapper",
-        "configure.arduino-library-reconfigure"
+        "configure.arduino-library-reconfigure",
+        "configure.arduino-native-own-main",
+        "configure.arduino-native-missing-library"
       ],
       "errata": []
     },
@@ -1016,7 +1022,12 @@
       "tests": [
         "configure.arduino-integration-wrappers",
         "configure.arduino-integration-unknown",
-        "configure.arduino-defaults"
+        "configure.arduino-defaults",
+        "configure.arduino-integration-native",
+        "configure.arduino-native-core-main",
+        "configure.arduino-native-variant-script",
+        "configure.arduino-native-explicit-script",
+        "configure.arduino-native-target-clash"
       ],
       "errata": []
     },
@@ -1041,7 +1052,9 @@
         "configure.arduino-board-ambiguous",
         "configure.arduino-board-malformed",
         "configure.arduino-board-target-clash",
-        "configure.arduino-platform-no-mcu"
+        "configure.arduino-platform-no-mcu",
+        "configure.arduino-native-explicit-board",
+        "configure.arduino-native-short-mcu"
       ],
       "errata": []
     },
@@ -1065,7 +1078,9 @@
         "configure.arduino-platform-no-cmsis-explicit",
         "configure.arduino-cmsis-path",
         "configure.arduino-cmsis-path-invalid",
-        "configure.arduino-cmsis-external"
+        "configure.arduino-cmsis-external",
+        "configure.arduino-native-no-cmsis",
+        "configure.arduino-native-cmsis-external"
       ],
       "errata": []
     },
@@ -1083,7 +1098,8 @@
       "tests": [
         "configure.arduino-cmsis-external-target",
         "configure.arduino-cmsis-external-missing",
-        "configure.arduino-cmsis-external"
+        "configure.arduino-cmsis-external",
+        "configure.arduino-native-cmsis-external"
       ],
       "errata": []
     },

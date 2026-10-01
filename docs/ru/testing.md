@@ -19,7 +19,7 @@
 | L1 | Документация: ссылки, двуязычные карточки `CFG-*`, errata, привязки опций к тестам | `ci/check_reference.py`, `docs/reference-index.json` | `python ci/check_reference.py` | 55 карточек, 8 errata, 75 страниц |
 | L2 | Логика скриптов CI: runner'ы QEMU/Renode, CRC, матрица, бейджи | `tests/test_firmware*.py`, `ci/emulation/test_check.py` | `python -m unittest discover -s tests -p "test_firmware*.py"` | 42 теста |
 | L3 | Поведение фреймворка на Configure/Generate | `tests/cases.json`, `tests/run_case.py`, `tests/CMakeLists.txt`, `tests/fixtures/project/` | `python ci/run_configure_tests.py --output <каталог>` (в образе) | 139 сценариев × 6 = 834 |
-| L4 | Сборка прошивок, проверки ELF, раскладки, CRC, метаданных | `tests/firmware/semihosting/`, `tests/firmware/buildonly/`, `ci/build_firmware_smoke.py`, `ci/firmware_cases.py` | `python ci/firmware_matrix.py build --output <каталог>` | 570 сборок |
+| L4 | Сборка прошивок, проверки ELF, раскладки, CRC, метаданных | `tests/firmware/semihosting/`, `tests/firmware/buildonly/`, `tests/firmware/native/`, `ci/build_firmware_smoke.py`, `ci/firmware_cases.py` | `python ci/firmware_matrix.py build --output <каталог>` | 618 сборок |
 | L5 | Исполнение прошивок в эмуляторах | `ci/run_qemu_smoke.py`, `ci/run_renode_smoke.py`, `tests/firmware/renode/` | `python ci/firmware_matrix.py run [--emulator renode] --build <сборки> --output <логи>` | 336 запусков QEMU, 612 Renode |
 
 ```text
@@ -163,9 +163,9 @@ CMake 3.28.3 — фиксированная опорная версия, а не
 
 ## Проверки конфигурации фреймворка
 
-[tests/cases.json](../../tests/cases.json) описывает 193 сценария, каждый из
+[tests/cases.json](../../tests/cases.json) описывает 205 сценариев, каждый из
 которых запускается на трёх версиях GCC и двух версиях CMake из lock-файла:
-**1158 выполнений тестов**. Двадцать семь сценариев выполняют от двух до тринадцати
+**1230 выполнений тестов**. Двадцать семь сценариев выполняют от двух до тринадцати
 последовательных конфигураций в одной build-папке.
 
 | Область | Проверки |
@@ -456,6 +456,10 @@ CMake 3.21 записывает команду в `CMakeFiles/rules.ninja`, а 3
 ### Цели Arduino::Options и Arduino::Platform
 
 Двадцать два сценария проверяют режим `wrappers` (ТЗ 4.9.8, 4.9.10, 4.9.14–4.9.16; TC-69, TC-71, TC-72 и выбор платы из TC-70) на закреплённом ядре 2.12.0 и фикстуре `arduino-platform.yml`. `arduino-integration-*` — явный `wrappers` и неизвестное значение (`SCY-W005`). `arduino-platform-*` и `arduino-cmsis-*` — источник CMSIS: Arduino15 (выбор новейшей из двух версий), кэш загрузок ядра, STM32Cube (`SCY-I518`, при явной плате — `SCY-W505`), явный путь, неверный путь (`SCY-E505`), `external` с целью проекта, без неё и с отсутствующей целью (`SCY-E507`), отсутствие CMSIS при значениях по умолчанию (`SCY-I512`, цели нет) и при явной плате (`SCY-E506`). `arduino-board-*` — `auto` для `STM32F103C8T6`, суффиксный `GENERIC_U575ZITXQ`, явный ID, неизвестный ID (`SCY-E503`), короткое имя MCU по умолчанию (`SCY-I511`) и с явным `auto` (`SCY-E504`), два кандидата и нераспознанный блок в тестовой базе `arduino-boards-core` (`SCY-E504`, `SCY-E509`), цель проекта с именем платы (`SCY-E508`), отсутствие `mcu` (`SCY-I510`). Места поиска задаются переменными окружения сценария (`env` с `{run}`) и ключом `cmsis_dirs`, который создаёт `CMSIS/Core/Include` из закреплённого пакета STM32CubeF1. Проверяются свойства целей (фикстура записывает их в `observed/<цель>.<свойство>.txt`), команды компиляции файлов ядра в обёртке `Arduino/PlatformCore`, связанной только с `Arduino::Platform`, и сборка этой обёртки (ключ `build_targets`).
+
+### Режим Arduino native
+
+Двенадцать сценариев проверяют режим `native` (ТЗ 4.9.9–4.9.13, 4.9.18; TC-69, TC-70, TC-85) с фикстурой `arduino-native.yml` и закреплённым ядром. `arduino-native-core-main` собирает прошивку с `main()` ядра и шаблоном `linker-native/STM32F103C8_FLASH.ld.in`: флаги YAML приходят к скетчу и файлам ядра через `user_settings` (языковые — только своему языку), в ELF есть `main`, `_Z7premainv`, `setup`, `loop`; файлы `cmake/` ядра не меняются и каталог загрузок ядра не создаётся (ключ `core_unchanged`). `arduino-native-own-main` собирает `main()` проекта с `Wire`: в ELF нет `premain()`, `setup()`, `loop()`, есть `_write` (ключи `symbols`, `symbols_absent` в `built`). Остальные: скрипт variant без шаблона (`SCY-I521`) и явный `linker_script` в `--default-script` цели `board`, ключи `wrappers` (`SCY-W506`), отсутствующая библиотека (`SCY-W503`), CMSIS `external` с целью проекта в `user_settings`, отсутствие CMSIS (`SCY-E506`), короткое имя MCU (`SCY-E504`), явная плата, цель проекта `core` (`SCY-E510`), `arduino-integration-native` — режим и каталоги сборки ядра по п. 4.6.8.
 
 Проверяются принадлежность исходников целям, транзитивные определения/include-пути, раздельные флаги C/C++, отсутствие автоматической линковки, предупреждения при отсутствии каталога/CMakeLists.txt и переходы профилей выбранные библиотеки → пустой список → без подключения к основной цели. Обёртки синтетические, по схеме пользовательского проекта с Core/SrcWrapper/периферией; они не реализуют и не проверяют SPI, Wire или HAL. Компиляция, включение объектных файлов при линковке и выполнение прошивки остаются вне этого набора.
 

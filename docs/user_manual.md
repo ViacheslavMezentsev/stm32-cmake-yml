@@ -602,6 +602,10 @@ arduino:
    `Arduino::Platform`, не зависит от семейства MCU. Если плату или CMSIS
    при значениях по умолчанию определить нельзя, `Arduino::Platform` не
    создаётся и в лог выводится причина.
+   В режиме `arduino.integration: native` обёртки не нужны: фреймворк
+   подключает CMake-файлы ядра напрямую, создаёт цели `board` и
+   `user_settings` и связывает прошивку с `stm32_runtime` ядра; шаги 2–4
+   и 5 (`arduino.libraries`) выполняются средствами ядра.
 4. Вызывает `add_subdirectory` для `arduino.core_cmake_dir` (ядро Arduino).
 5. Вызывает `add_subdirectory` для каждой библиотеки из `arduino.libraries`.
 6. Вызывает `add_subdirectory` для каждой библиотеки из `arduino.custom_libraries`.

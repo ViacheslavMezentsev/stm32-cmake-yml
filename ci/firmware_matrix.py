@@ -1,5 +1,5 @@
 """Build or run the locked firmware toolchain matrix in separate containers."""
-from firmware_cases import BUILD_CASES, BUILD_ONLY_PROFILES, ENABLED_TARGETS, case_name, run_cases
+from firmware_cases import BUILD_CASES, BUILD_ONLY_PROFILES, ENABLED_TARGETS, NATIVE_CASES, case_name, run_cases
 import argparse
 import itertools
 import json
@@ -25,6 +25,8 @@ def verify_build(report, gcc, cmake):
         raise ValueError('Missing corrupted CRC copies')
     if sorted(c['profile'] for c in report.get('build_only', [])) != sorted(BUILD_ONLY_PROFILES):
         raise ValueError('Missing or failed build-only profiles')
+    if sorted(c['profile'] for c in report.get('native', [])) != sorted(NATIVE_CASES):
+        raise ValueError('Missing or failed Arduino native builds')
     if report.get('crc_limit_negative', {}).get('status') != 'failed-as-expected':
         raise ValueError('Missing negative CRC flash-limit build (TC-52)')
     if report['gcc'] != gcc.split('-')[0] or report['cmake'] != 'cmake version ' + cmake:

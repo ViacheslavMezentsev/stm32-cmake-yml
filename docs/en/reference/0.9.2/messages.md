@@ -146,11 +146,13 @@ The list is built from the `cmake/stm32_yml_messages_catalog.cmake` catalog by `
 | `SCY-E507` | FATAL_ERROR | \[arduino\] arduino.cmsis\_target: target '{1}' is not defined in the project. |
 | `SCY-E508` | FATAL_ERROR | \[arduino\] Target '{1}' already exists: the name equals the board ID. Rename the project target. |
 | `SCY-E509` | FATAL_ERROR | \[arduino\] Unrecognized board database format: {1}. |
+| `SCY-E510` | FATAL_ERROR | \[arduino\] Target '{1}' already exists: in the native mode this is an Arduino core target name. Rename the project target. |
 | `SCY-W501` | WARNING | \[arduino\] arduino.mcu\_target is not set. CMakeLists.txt of libraries that depend on MCU\_TARGET may fail. |
 | `SCY-W502` | WARNING | \[arduino\] Arduino core CMakeLists.txt not found: {1}<br>Set the correct path with arduino.core\_cmake\_dir in stm32\_config.yml. |
 | `SCY-W503` | WARNING | \[arduino\] Library '{1}' not found in {2}.<br>Check the name in arduino.libraries and that CMakeLists.txt exists. |
 | `SCY-W504` | WARNING | \[arduino\] Custom library not found: {1}. |
 | `SCY-W505` | WARNING | \[arduino\] CMSIS from STM32Cube (CMSIS 5 instead of CMSIS 6 expected by the core): {1} |
+| `SCY-W506` | WARNING | \[arduino\] {1} is not used in the native mode. |
 | `SCY-I501` | STATUS | Arduino Core STM32: {1} |
 | `SCY-I502` | STATUS | Arduino MCU\_TARGET: {1} |
 | `SCY-I503` | STATUS | Arduino::Definitions created. |
@@ -169,6 +171,9 @@ The list is built from the `cmake/stm32_yml_messages_catalog.cmake` catalog by `
 | `SCY-I516` | STATUS | CMSIS for Arduino is provided by the project (arduino.cmsis\_path: external). |
 | `SCY-I517` | STATUS | Arduino::Platform not created: no board database {1}. |
 | `SCY-I518` | STATUS | CMSIS from STM32Cube (CMSIS 5 instead of CMSIS 6 expected by the core): {1} |
+| `SCY-I519` | STATUS | Arduino main(): from the core (cores/arduino/main.cpp). |
+| `SCY-I520` | STATUS | Arduino main(): from the project; the core main.cpp is excluded, --undefined=\_write is added. The project main() calls init() and initVariant(). |
+| `SCY-I521` | STATUS | Board variant linker script: {1}. heap\_size and stack\_size do not apply; use a .ld.in template or linker\_script. |
 
 ## 6xx — Linker script
 

@@ -161,9 +161,15 @@ Firmware на GitHub запускается вручную на границах
   плате, иначе сообщение `SCY-I518`; плата читается из блока `boards_db.cmake`;
   состав `Arduino::Platform` (параметры компоновки — только флаги ядра и FPU); TC-69, TC-71,
   TC-72 — в действующие (TC-69 — после режима `native`).
+  Режим `native`: флаги YAML только через `user_settings`; без шаблона — скрипт variant с
+  сообщением `SCY-I521` (heap/stack не применяются), FLASH для BIN — из базы плат; ключи
+  `wrappers` — `SCY-W506`; цель проекта с именем цели ядра — `SCY-E510`; SrcWrapper всегда,
+  `arduino.libraries` по одной; TC-73 разделить: сборка (этап 3), запуск в QEMU/Renode с
+  моделями RCC/PWR (этап 5); TC-69, TC-70, TC-85 — в действующие.
 - [ ] **Этап 4. Расширения конфигурации:** `include:`, TOML, имена файла по умолчанию,
   итоговая конфигурация, JSON Schema, пример пресета в документации.
-- [ ] **Этап 5. Тесты и CI:** периферия в эмуляторах (группа 5), задание CI на Windows,
+- [ ] **Этап 5. Тесты и CI:** периферия в эмуляторах (группа 5), в том числе модели RCC/PWR
+  для запуска прошивок Arduino `native` (TC-73), задание CI на Windows,
   пример `.gitlab-ci.yml`, распараллеливание при необходимости.
 - [ ] **Этап 6. Выпуск 0.10.0:** руководство по переходу с 0.9.x (в том числе таблица
   путей артефактов и фрагменты из CHANGELOG), карточки справочника
@@ -338,9 +344,16 @@ at the end of each stage. Branches are merged by fast-forward (`git land`).
   only with an explicit board, otherwise message `SCY-I518`; the board is read from its
   `boards_db.cmake` block; the `Arduino::Platform` contents (link options are only core and FPU
   flags); TC-69, TC-71, TC-72 to current (TC-69 after the `native` mode).
+  The `native` mode: YAML flags only through `user_settings`; without a template the
+  variant script with message `SCY-I521` (heap/stack do not apply), FLASH for BIN from the
+  board database; `wrappers` keys warn with `SCY-W506`; a project target named like a core
+  target fails with `SCY-E510`; SrcWrapper always, `arduino.libraries` one by one; split
+  TC-73: build (stage 3), QEMU/Renode runs with RCC/PWR models (stage 5); TC-69, TC-70,
+  TC-85 to current.
 - [ ] **Stage 4. Configuration extensions:** `include:`, TOML, default file names,
   effective configuration, JSON Schema, a preset example in the documentation.
-- [ ] **Stage 5. Tests and CI:** peripherals in emulators (group 5), a Windows CI job,
+- [ ] **Stage 5. Tests and CI:** peripherals in emulators (group 5), including RCC/PWR
+  models to run Arduino `native` firmware (TC-73), a Windows CI job,
   a `.gitlab-ci.yml` example, parallelism if needed.
 - [ ] **Stage 6. 0.10.0 release:** migration guide from 0.9.x (including the artifact
   path table and snippets from the CHANGELOG), reference cards marked

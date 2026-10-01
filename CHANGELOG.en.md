@@ -42,6 +42,13 @@ on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
   cache and STM32Cube, or `external` with `arduino.cmsis_target`. If the board or CMSIS cannot
   be found with defaults, `Arduino::Platform` is not created and older configurations work as
   before.
+- **Arduino `native` mode** (spec 4.9.9–4.9.13, 4.9.18): `arduino.integration: native`
+  adds the Arduino_Core_STM32 CMake files directly, without project wrappers, Python or
+  network; the board is selected by `mcu`, YAML flags reach the core and the project through
+  `user_settings` (`-Os` and newlib-nano by default), a `.ld.in` template or `linker_script`
+  replaces the board variant script, `arduino.libraries` are added by the core's own
+  `CMakeLists.txt`, `arduino.use_core_main: false` allows an own `main()`. Firmware of the
+  mode is built in the L4 matrix for every target; emulator runs follow the RCC/PWR models.
 
 ### Changed
 

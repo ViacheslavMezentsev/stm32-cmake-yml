@@ -10,7 +10,7 @@ for current `main` results. The three status badges show latest completed workfl
 ## Configuration
 
 <!-- configure-counts -->
-**193 scenarios × 6 tool pairs = 1158 configure executions**
+**205 scenarios × 6 tool pairs = 1230 configure executions**
 <!-- /configure-counts -->
 
 This is suite size, not the number of passing runs. CI verifies it against the
@@ -26,8 +26,8 @@ working firmware. [Coverage and commands](testing.md).
 
 ## Building and execution
 
-A separate matrix contains **570 builds, 336 QEMU runs and 612 Renode runs**: thirteen profiles for each of the F103, F030, F411, F401, G431, G474 and F746 targets (G4 and F7 in Renode only)
-and four H7/H5 ones (Renode only) across six tool pairs, plus one corrupted ELF copy per target and pair. It checks ELF layout,
+A separate matrix contains **618 builds, 336 QEMU runs and 612 Renode runs**: thirteen profiles for each of the F103, F030, F411, F401, G431, G474 and F746 targets (G4 and F7 in Renode only)
+four H7/H5 ones (Renode only) and eight Arduino `native` firmwares (build only) across six tool pairs, plus one corrupted ELF copy per target and pair. It checks ELF layout,
 initial data, C++ construction, metadata, software CRC and controlled termination;
 negative cases distinguish guest failure from timeout.
 
@@ -55,9 +55,9 @@ consumer projects to be restructured.
 
 The README `Builds (Checks)` badge reports built configurations and completed checks from the
 last successful Firmware run on main. A full run currently gives
-`Builds (Checks): 570 (948)`. Expected failure, timeout and CRC rejection count as
+`Builds (Checks): 618 (948)`. Expected failure, timeout and CRC rejection count as
 successful contract checks; this does not mean 948 normally exiting firmwares
-or 570 different MCUs. Builds are counted once; QEMU and Renode checks are added (336 + 612).
+or 618 different MCUs. Builds are counted once; QEMU and Renode checks are added (336 + 612).
 
 Counts come from complete matching build/QEMU/Renode reports, checked for clean checkout
 SHA, matrix membership, results and metadata. Codex branches produce a preview

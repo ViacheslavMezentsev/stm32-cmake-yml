@@ -65,6 +65,9 @@ def split_case(name):
 
 
 BUILD_CASES = tuple(case_name(t, p) for t in ENABLED_TARGETS for p in BUILD_PROFILES)
+# Arduino native mode (spec 4.9.9-4.9.13, 4.9.18; TC-73, TC-85): built and
+# inspected on every pair; emulator runs need RCC/PWR models (stage 5).
+NATIVE_CASES = tuple(case_name(t, 'native') for t in ENABLED_TARGETS) + ('nativeOwnMain',)
 
 
 def run_cases(emulator):

@@ -3,7 +3,7 @@
 [Documentation](index.md) · [Русский](../ru/firmware-testing.md) · [Environment](emulation.md)
 
 The first firmware test adapts the author's F1 [02-semihosting example](../../tests/firmware/semihosting/README.md).
-It is separate from the 193 configure scenarios: **570 builds, 336 QEMU runs and 612 Renode runs**:
+It is separate from the 205 configure scenarios: **618 builds, 336 QEMU runs and 612 Renode runs**:
 thirteen profiles per target (F103, F030, F411, F401, G431, G474, F746; G4 and F7 in Renode only), one corrupted copy per target and four H7/H5 profiles (Renode only) per tool pair; three xPack GCC versions × two CMake versions from the
 [lockfile](../../ci/dependencies.lock.json), CubeF1 1.8.7, CubeF0 1.11.6, CubeF4 1.28.3, CubeG4 1.6.3, CubeF7 1.17.3, CubeH7 1.13.0, CubeH5 1.7.0, FreeRTOS-Kernel 11.3.1, QEMU 11.0.0.
 The Windows QEMU 11.1.0 installation was also checked locally; CI uses the pinned image.
@@ -153,9 +153,13 @@ For each tool pair and target, a copy of success ELF has one bit changed in .fw_
 Code, startup data and the injected CRC remain unchanged. The derived negative case,
 crc-corrupt, must report CRC_RESULT=FAIL and TEST_RESULT=FAIL and exit 3. A crash
 or timeout cannot pass this case. This adds one run per target and pair without extra compilations:
-with the four H7/H5 profiles this gives 570 builds, 336 QEMU runs and 612 Renode runs. Reports distinguish thirteen profiles from fourteen executions per target.
+with the four H7/H5 profiles and eight Arduino `native` firmwares this gives 618 builds, 336 QEMU runs and 612 Renode runs. Reports distinguish thirteen profiles from fourteen executions per target.
 
 A separate negative build (TC-52) on each pair configures the `success` profile with `flash_size: 4K` and requires both the build and a rebuild to fail at the CRC step: `stm32_yml_build_messages.jsonl` contains `SCY-E706` (image larger than the Flash limit) and `SCY-E708`. The badge does not count it.
+
+## Arduino native firmware
+
+`tests/firmware/native` is firmware of the `arduino.integration: native` mode (spec 4.9.9–4.9.13, 4.9.18): the CMake files of the locked Arduino_Core_STM32 are added directly, the board is selected by `mcu` (`board: auto`), the board variant linker script is used, CMSIS comes from STM32Cube in the CI image (CMSIS 5). The `native` profile (TC-73) with the core `main()`, `setup()` and `loop()` is built for every matrix target; `nativeOwnMain` (TC-85) with the project `main()` calling `init()`/`initVariant()` and the core `Wire` library is built for F103. `ci/build_firmware_smoke.py` (`build_native`) checks on every pair the `elf`/`bin`/`hex`/`map` artifacts, the vector table (SP in the target RAM, Reset in FLASH), the image fitting the target FLASH and RAM, `main()` and `_Z7premainv` (for `nativeOwnMain` only the project `main()`, without `premain()`, `setup()`, `loop()`), the `ARDUINO_GENERIC_<board>` definition in compile commands and no stm32-cmake. The eight builds per pair count as builds in the badge. They do not run in QEMU or Renode yet: the core `SystemClock_Config()` waits for RCC ready bits (and PWR on F4/F7) that the minimal models lack; per-family RCC/PWR models and runs come in stage 5.
 
 This verifies software CRC over loaded FLASH, not the STM32 CRC peripheral.
 Since 0.9.3 (E004, E006) the CRC image comes from FLASH sections and a failure stops the build. Old manifests must be rebuilt to include CRC expectations.
@@ -399,7 +403,7 @@ still fail. configASSERT remains enabled.
 ## CI duration and timeouts
 
 The measurements below predate the F0, F4, G4 and F7 targets (78 runs per simulator).
-The full matrix is now 570 builds and 948 runs; locally on 2 vCPUs it takes about
+The full matrix is now 618 builds and 948 runs; locally on 2 vCPUs it takes about
 23 minutes (builds 15, QEMU 5, Renode 3.5), and 24 minutes on GitHub (main
 `29e64a4`), so the Firmware job limit is raised to 90 minutes.
 

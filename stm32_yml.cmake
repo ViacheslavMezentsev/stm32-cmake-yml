@@ -40,6 +40,19 @@ function(stm32_yml_setup_project TARGET_NAME)
     # фреймворка и при настройке линкера.
     stm32_yml_ensure_default_value(toolchain_backend "stm32-cmake")
 
+    # Режим backend Arduino (ТЗ 4.9.8): пусто — wrappers, как в 0.9.3. В режиме
+    # native флаги YAML передаются через цель user_settings ядра (ТЗ 4.9.12).
+    set(_stm32_yml_native FALSE)
+    if(toolchain_backend STREQUAL "arduino")
+        stm32_yml_check_enum_value(arduino_integration "wrappers" wrappers native)
+        if("${arduino_integration}" STREQUAL "")
+            set(arduino_integration "wrappers")
+        endif()
+        if(arduino_integration STREQUAL "native")
+            set(_stm32_yml_native TRUE)
+        endif()
+    endif()
+
     stm32_yml_ensure_default_value(verbose_build "false")
     if(verbose_build)
         stm32_yml_msg(I010)
@@ -78,17 +91,19 @@ function(stm32_yml_setup_project TARGET_NAME)
 
     # --- Общие флаги (для всех языков) — обратная совместимость ---
     target_include_directories(${TARGET_NAME} PRIVATE ${include_directories})
-    target_compile_definitions(${TARGET_NAME} PRIVATE ${compile_definitions})
-    target_compile_options(${TARGET_NAME} PRIVATE ${compile_options})
+    if(NOT _stm32_yml_native)
+        target_compile_definitions(${TARGET_NAME} PRIVATE ${compile_definitions})
+        target_compile_options(${TARGET_NAME} PRIVATE ${compile_options})
+    endif()
 
     # --- Флаги только для C ---
-    if(compile_options_c)
+    if(compile_options_c AND NOT _stm32_yml_native)
         target_compile_options(${TARGET_NAME} PRIVATE
             $<$<COMPILE_LANGUAGE:C>:${compile_options_c}>)
         string(REPLACE ";" " " _c_opts_str "${compile_options_c}")
         stm32_yml_msg(I011 "${_c_opts_str}")
     endif()
-    if(compile_definitions_c)
+    if(compile_definitions_c AND NOT _stm32_yml_native)
         target_compile_definitions(${TARGET_NAME} PRIVATE
             $<$<COMPILE_LANGUAGE:C>:${compile_definitions_c}>)
         string(REPLACE ";" " " _c_defs_str "${compile_definitions_c}")
@@ -96,13 +111,13 @@ function(stm32_yml_setup_project TARGET_NAME)
     endif()
 
     # --- Флаги только для C++ ---
-    if(compile_options_cxx)
+    if(compile_options_cxx AND NOT _stm32_yml_native)
         target_compile_options(${TARGET_NAME} PRIVATE
             $<$<COMPILE_LANGUAGE:CXX>:${compile_options_cxx}>)
         string(REPLACE ";" " " _cxx_opts_str "${compile_options_cxx}")
         stm32_yml_msg(I013 "${_cxx_opts_str}")
     endif()
-    if(compile_definitions_cxx)
+    if(compile_definitions_cxx AND NOT _stm32_yml_native)
         target_compile_definitions(${TARGET_NAME} PRIVATE
             $<$<COMPILE_LANGUAGE:CXX>:${compile_definitions_cxx}>)
         string(REPLACE ";" " " _cxx_defs_str "${compile_definitions_cxx}")

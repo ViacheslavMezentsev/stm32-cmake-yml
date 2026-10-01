@@ -88,7 +88,11 @@ function(stm32_yml_collect_subdirectories OUT_VAR)
         endif()
     endforeach()
     if(toolchain_backend STREQUAL "arduino")
-        if(DEFINED arduino_core_cmake_dir AND NOT arduino_core_cmake_dir STREQUAL "")
+        if(arduino_integration STREQUAL "native")
+            # Каталоги ядра (ТЗ 4.9.9); каталог variant известен после выбора платы.
+            list(APPEND _dirs "${CMAKE_SOURCE_DIR}/${arduino_core_path}/cores/arduino"
+                              "${CMAKE_SOURCE_DIR}/${arduino_core_path}/libraries/SrcWrapper")
+        elseif(DEFINED arduino_core_cmake_dir AND NOT arduino_core_cmake_dir STREQUAL "")
             list(APPEND _dirs "${CMAKE_SOURCE_DIR}/${arduino_core_cmake_dir}")
         else()
             list(APPEND _dirs "${CMAKE_SOURCE_DIR}/Arduino/Core")
