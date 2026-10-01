@@ -221,3 +221,11 @@ To match Docs CI:
 ```powershell
 docker run --rm --network none --mount "type=bind,source=$($PWD.Path),target=/workspace,readonly" stm32-yml-ci:local python3 -m unittest discover -s /workspace/tests -p test_component_versions.py
 ```
+
+## Configure diagnostics after CI sharding
+
+- `configure-summary` contains the combined `summary.json`; `configure-summary-<GCC>` contains both pairs for one GCC version.
+- `configure-diagnostics-<GCC>` contains logs, step snapshots, cache, Ninja files and observed properties. Extract `configure-diagnostics.tar.gz` after downloading.
+- Missing jobs or incomplete reports fail the final `configure` job even when other jobs are green.
+- To run one version locally inside the pinned container: `python3 /workspace/ci/run_configure_tests.py --output /results --gcc-version 14.2.1-1.1`. Omit the last argument for the full matrix.
+- To refresh Ubuntu packages: Actions → Configure → Run workflow → `rebuild_environment`. Test results are never cached.

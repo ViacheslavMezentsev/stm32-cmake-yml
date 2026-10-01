@@ -57,6 +57,8 @@ on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 
 ### Changed
 
+- **Configure CI:** three parallel GCC jobs, cached environment layers, packed diagnostics and a final completeness check for all six tool pairs. The test set is unchanged; Firmware remains manual at stage boundaries and runs on tags.
+
 - **Minimum CMake is 3.21** (spec 2.5.1). `stm32_yml.cmake` and the test projects require
   `cmake_minimum_required(VERSION 3.21)`; the check matrix is CMake 3.21.7 and 3.28.3
   instead of 3.19.8 and 3.28.3. Projects on CMake 3.19–3.20 must upgrade.

@@ -200,31 +200,39 @@ Firmware with all images cached took 5:34 instead of 10:04. QEMU compilation in
 the image was later replaced by the prebuilt [tools/qemu](../../tools/qemu/README.md)
 archive, so uncached emulator image builds no longer compile QEMU either.
 
-## CI speed-up: options considered
+## Configure CI speed-up
 
-Adopted (measured on GitHub jobs): one Renode process per pair (3:42 → 0:33), the
-layer cache for the emulator image only, prebuilt QEMU in `tools/qemu`, parallel
-dependency installation and Cube without `Projects`/`Utilities`. The compiler
-image build dropped from ~2:45 to 1:09–1:29; Configure takes about 4:47 and
-Firmware 4:39 (branch `claude/faster-ci-image`, `f3f1309`).
+Configure run 36911172126 on `main` @ `c77eebd` took 17:55:
+image 8:27 (Ubuntu installation 7:11), tests 8:06, reports 1:21.
+The branch run on the same SHA built the image in 1:22; network delays matter.
 
-Little headroom remains inside a job: `ctest -j 4` and `cmake --build --parallel 4`
-already use the runner's 4 cores. The next option is **not adopted** and kept for
-later:
+`codex/configure-ci-speedup` prepares three parallel jobs, one per GCC version,
+each running both CMake versions with `ctest -j 4`. The lock file supplies the
+matrix; at most three jobs run concurrently. `fail-fast: false` preserves
+diagnostics from other jobs after a failure. All 223 × 6 = 1338 Configure checks
+remain. Without `--gcc-version`, local `ci/run_configure_tests.py` still runs all six pairs.
 
-- Split GCC/CMake pairs across jobs (`strategy.matrix`): 6 Configure and 6
-  Firmware jobs, one pair each; summary jobs `configure` and `smoke` check matrix
-  completeness and assemble `matrix-summary.json` and the badge; a `pairs` job
-  derives the matrix from `ci/dependencies.lock.json`. 15 jobs instead of 2.
-- Estimate: Configure ~2:00, Firmware ~2:45 instead of ~4:45. The floor is the
-  image build in every job.
-- Cost: runner time per push grows from ~9.5 to ~25 minutes (the image builds in
-  12 jobs); pair selection in `run_configure_tests.py` and `firmware_matrix.py`,
-  report merging and reworked workflows and badge.
+The compiler image uses the BuildKit GitHub Actions layer cache; one job writes
+the shared scope and the others read it. Dockerfile and copied-file changes
+invalidate corresponding layers. Test results are not cached. The image is
+verified offline before tests even on cache hits. Cache export failures do not
+block checks but may slow the next build. To refresh Ubuntu packages, dispatch
+Configure with `rebuild_environment: true`; first runs and cache misses can be slow.
 
-Revisit when the matrix grows (new GCC/CMake versions or families) or push time
-becomes the bottleneck. Shrink the compiler image first, since its build repeats
-in every job.
+Each job saves the same diagnostics in `configure-diagnostics-<GCC>`
+(containing `configure-diagnostics.tar.gz`) and a small `configure-summary-<GCC>`.
+The final `configure` job requires all six unique pairs with the expected case
+count and zero exit codes. Missing, failed or cancelled jobs cannot produce PASS.
+The combined `summary.json` is in `configure-summary`. Retention is 14 days.
+
+The warm-cache target is 4–6 minutes instead of 18; this remains an estimate
+until measured on GitHub. The cost is more total runner minutes preparing three
+environments and cache storage. Firmware remains manual at stage boundaries
+and before release, plus tag-triggered runs. Firmware parallelism, Windows CI
+and peripheral models are outside this branch.
+
+Sources: [Docker cache](https://docs.docker.com/build/ci/github-actions/cache/),
+[GitHub matrices](https://docs.github.com/en/actions/how-tos/write-workflows/choose-what-workflows-do/run-job-variations).
 
 ## GitHub checks
 
@@ -234,7 +242,7 @@ every push:
 | Workflow | When it runs |
 | --- | --- |
 | Docs | every push |
-| Configure (6 pairs, 1242 runs, ~6 min) | every push except pushes without inputs (below) |
+| Configure (6 pairs, 1338 runs) | every push except pushes without inputs (below) |
 | CI environment, Emulation environment | pushes changing their own image files |
 | Firmware (618 builds, 948 runs, ~24 min) | manually (Actions → Firmware → Run workflow) and on a `v*` tag |
 

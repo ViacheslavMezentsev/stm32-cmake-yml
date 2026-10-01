@@ -11,15 +11,19 @@ import sys
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--gcc-version", help="Run both pinned CMake versions for one pinned GCC")
     args = parser.parse_args()
     root = Path(__file__).resolve().parent.parent
     lock = json.loads((root / "ci/dependencies.lock.json").read_text())
+    if args.gcc_version and args.gcc_version not in lock["gcc_versions"]:
+        parser.error(f"GCC {args.gcc_version} is not in dependencies.lock.json")
+    gcc_versions = [args.gcc_version] if args.gcc_version else lock["gcc_versions"]
     cases = json.loads((root / "tests/cases.json").read_text())
     if not cases or len({case["name"] for case in cases}) != len(cases):
         raise ValueError("Test cases must have unique names and must not be empty")
     args.output.mkdir(parents=True, exist_ok=True)
     summary = []
-    for gcc in lock["gcc_versions"]:
+    for gcc in gcc_versions:
         for cmake in lock["cmake_versions"]:
             build = (args.output / f"gcc-{gcc}_cmake-{cmake}").resolve()
             build.mkdir(parents=True, exist_ok=True)

@@ -10,6 +10,11 @@ on:
       - docs/reference-index.json
       - LICENSE
   workflow_dispatch:
+    inputs:
+      rebuild_environment:
+        description: Rebuild Docker layers without cache (refresh Ubuntu packages)
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -19,40 +24,97 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  configure:
+  matrix:
+    runs-on: ubuntu-24.04
+    outputs:
+      matrix: ${{ steps.matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - id: matrix
+        run: echo "matrix=$(python3 ci/configure_reports.py matrix)" >> "$GITHUB_OUTPUT"
+
+  toolchains:
+    needs: matrix
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix: ${{ fromJSON(needs.matrix.outputs.matrix) }}
+    name: GCC ${{ matrix.gcc }} / both CMake versions
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
       - name: Build test environment
-        run: docker build --platform linux/amd64 --progress plain -f ci/docker/Dockerfile -t stm32-yml-ci:check .
-      - name: Configure with all GCC and CMake versions offline
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        env:
+          DOCKER_BUILD_SUMMARY: 'false'
+          DOCKER_BUILD_RECORD_UPLOAD: 'false'
+        with:
+          context: .
+          file: ci/docker/Dockerfile
+          platforms: linux/amd64
+          load: true
+          tags: stm32-yml-ci:check
+          cache-from: type=gha,scope=configure-environment
+          # One writer avoids concurrent exports overwriting the same cache scope.
+          cache-to: ${{ matrix.cache_writer && 'type=gha,scope=configure-environment,mode=max,ignore-error=true' || '' }}
+          no-cache: ${{ inputs.rebuild_environment || false }}
+      - name: Verify environment offline (also on cache hits)
+        run: docker run --rm --network none stm32-yml-ci:check
+      - name: Configure with both CMake versions offline
+        env:
+          GCC_VERSION: ${{ matrix.gcc }}
         run: |
           mkdir -p build/configure-tests
           docker run --rm --network none \
             --user "$(id -u):$(id -g)" \
             --mount "type=bind,source=$PWD,target=/workspace,readonly" \
             --mount "type=bind,source=$PWD/build/configure-tests,target=/results" \
-            stm32-yml-ci:check python3 /workspace/ci/run_configure_tests.py --output /results
+            stm32-yml-ci:check python3 /workspace/ci/run_configure_tests.py --output /results --gcc-version "$GCC_VERSION"
+      - name: Pack configure diagnostics
+        if: always()
+        run: python3 ci/configure_reports.py pack --source build/configure-tests --output build/configure-diagnostics.tar.gz
       - name: Upload configure diagnostics
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: configure-diagnostics
+          name: configure-diagnostics-${{ matrix.gcc }}
+          compression-level: 0
           retention-days: 14
           if-no-files-found: warn
-          path: |
-            build/configure-tests/summary.json
-            build/configure-tests/*/configure-tests.log
-            build/configure-tests/*/ctest.log
-            build/configure-tests/*/Testing/Temporary/*.log
-            build/configure-tests/*/cases/*/step-*/*
-            build/configure-tests/*/cases/*/step-*/observed/*.txt
-            build/configure-tests/*/cases/*/build/CMakeCache.txt
-            build/configure-tests/*/cases/*/build/build.ninja
-            build/configure-tests/*/cases/*/build/compile_commands.json
-            build/configure-tests/*/cases/*/build/observed/*.txt
-            build/configure-tests/*/cases/*/build/*.ld
-            build/configure-tests/*/cases/*/build/CMakeFiles/CMakeConfigureLog.yaml
-            build/configure-tests/*/cases/*/build/CMakeFiles/CMakeOutput.log
-            build/configure-tests/*/cases/*/build/CMakeFiles/CMakeError.log
+          path: build/configure-diagnostics.tar.gz
+      - name: Upload shard summary
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: configure-summary-${{ matrix.gcc }}
+          retention-days: 14
+          if-no-files-found: error
+          path: build/configure-tests/summary.json
+
+  configure:
+    needs: [matrix, toolchains]
+    if: always()
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Download all shard summaries
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          pattern: configure-summary-*
+          path: build/configure-summaries
+      - name: Require the complete successful matrix
+        env:
+          MATRIX_RESULT: ${{ needs.toolchains.result }}
+        run: python3 ci/configure_reports.py collect --source build/configure-summaries --output build/configure-tests/summary.json --job-result "$MATRIX_RESULT"
+      - name: Upload combined summary
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: configure-summary
+          retention-days: 14
+          if-no-files-found: warn
+          path: build/configure-tests/summary.json

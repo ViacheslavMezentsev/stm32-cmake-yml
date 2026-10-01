@@ -22,3 +22,5 @@ jobs:
         run: python3 -m unittest discover -s tests -p test_check_messages.py
       - name: Test component version detection
         run: python3 -m unittest discover -s tests -p test_component_versions.py
+      - name: Test Configure matrix completeness and diagnostics
+        run: python3 -m unittest discover -s tests -p test_configure_reports.py

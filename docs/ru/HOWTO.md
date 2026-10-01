@@ -218,3 +218,11 @@ escape '\g'`. Это ограничение тестового harness, а не 
 ```powershell
 docker run --rm --network none --mount "type=bind,source=$($PWD.Path),target=/workspace,readonly" stm32-yml-ci:local python3 -m unittest discover -s /workspace/tests -p test_component_versions.py
 ```
+
+## Диагностика Configure после разделения CI
+
+- `configure-summary` — общий `summary.json`; `configure-summary-<GCC>` — две пары одной версии GCC.
+- `configure-diagnostics-<GCC>` — архив логов, снимков шагов, кэша, Ninja и наблюдаемых свойств. После скачивания распакуйте `configure-diagnostics.tar.gz`.
+- Пропавшее задание или неполный отчёт — ошибка итогового `configure`, даже если другие задания зелёные.
+- Для отдельной версии локально: `python3 /workspace/ci/run_configure_tests.py --output /results --gcc-version 14.2.1-1.1` внутри закреплённого контейнера; без последнего аргумента — полная матрица.
+- Для сброса слоёв при устаревших пакетах Ubuntu: Actions → Configure → Run workflow → `rebuild_environment`. Результаты тестов никогда не кэшируются.

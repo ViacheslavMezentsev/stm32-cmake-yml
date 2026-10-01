@@ -157,9 +157,8 @@ Firmware на GitHub запускается вручную на границах
   `Arduino::Options` и `Arduino::Platform`, режим `native`, `arduino.use_core_main`,
   руководство по backend Arduino; прошивки `native` в матрице L4 (сборка). 207 сценариев /
   1242 запуска, 618 сборок. Полный L0–L5 и Firmware на `main` @ `d3cb266`.
-- [ ] В работе `codex/config-include`: YAML include и effective.json, 16 новых сценариев;
-  Локально: 223 × 6 = 1338 Configure PASS, Docs и строгая проверка ТЗ PASS.
-  Ожидаются подписанный коммит владельца, push, CI и land.
+- [x] `codex/config-include` слита: `main` @ `c77eebd`, Docs/Configure PASS; YAML include, effective.json и 16 новых сценариев.
+- [ ] В работе `codex/configure-ci-speedup`: три задания GCC, кэш окружения, архивы диагностики и проверка полноты матрицы. Локально: 1338 Configure PASS, 10 тестов отчётов PASS, actionlint PASS. Проверка скорости и кэша на GitHub — после push.
   TOML/автовыбор файла и Schema/пример пресета — отдельные ветки. Полный L0–L5 — в конце этапа.
 - [ ] **Этап 4. Расширения конфигурации:** `include:`, TOML, имена файла по умолчанию,
   итоговая конфигурация, JSON Schema, пример пресета в документации.
@@ -336,9 +335,8 @@ at the end of each stage. Branches are merged by fast-forward (`git land`).
   mode with the `Arduino::Options` and `Arduino::Platform` targets, the `native` mode,
   `arduino.use_core_main`, the Arduino backend guide; `native` firmware in the L4 matrix
   (build). 207 cases / 1242 runs, 618 builds. Full L0–L5 and Firmware on `main` @ `d3cb266`.
-- [ ] In progress: `codex/config-include`, YAML includes and effective.json, 16 new cases;
-  Local: 223 × 6 = 1338 Configure PASS, Docs and strict specification check PASS.
-  Awaiting the owner’s signed commit, push, CI and land.
+- [x] `codex/config-include` merged: `main` @ `c77eebd`, Docs/Configure PASS; YAML includes, effective.json and 16 new cases.
+- [ ] In progress: `codex/configure-ci-speedup`, three GCC jobs, environment cache, diagnostic archives and matrix completeness gate. Local: 1338 Configure PASS, 10 report tests PASS, actionlint PASS. GitHub timing and cache validation await push.
   TOML/file discovery and Schema/preset example follow in separate branches. Full L0–L5 at stage completion.
 - [ ] **Stage 4. Configuration extensions:** `include:`, TOML, default file names,
   effective configuration, JSON Schema, a preset example in the documentation.

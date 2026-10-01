@@ -456,3 +456,11 @@ Twelve cases check the `native` mode (spec 4.9.9–4.9.13, 4.9.18; TC-69, TC-70,
 Assertions cover owning targets, transitive definitions/includes, separate C/C++ flags, absence of automatic linkage, warnings for missing directories/CMakeLists.txt, and selected → empty → unlinked profile transitions. The wrappers are synthetic, inspired by a consumer pattern with Core/SrcWrapper/peripheral libraries; they do not implement or validate SPI, Wire or HAL. Compilation, object inclusion at link time and firmware execution remain outside this suite.
 
 [QEMU/Renode environment and firmware roadmap](emulation.md).
+
+## Configure CI sharding (TC-87)
+
+The matrix and final gate are described in [maintenance](maintenance.md#configure-ci-speed-up).
+`ci/configure_reports.py` derives the matrix from the lock, packs diagnostics and
+validates combined results; `tests/test_configure_reports.py` covers failed and
+incomplete reports. Run `python -m unittest discover -s tests -p test_configure_reports.py`.
+These checks run in Docs CI. L3 remains 223 × 6 = 1338; Firmware is a separate manual run.
