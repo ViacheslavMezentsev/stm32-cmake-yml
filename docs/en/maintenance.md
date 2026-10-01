@@ -234,7 +234,7 @@ every push:
 | Workflow | When it runs |
 | --- | --- |
 | Docs | every push |
-| Configure (6 pairs, 1230 runs, ~6 min) | every push except pushes without inputs (below) |
+| Configure (6 pairs, 1242 runs, ~6 min) | every push except pushes without inputs (below) |
 | CI environment, Emulation environment | pushes changing their own image files |
 | Firmware (618 builds, 948 runs, ~24 min) | manually (Actions → Firmware → Run workflow) and on a `v*` tag |
 

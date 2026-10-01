@@ -51,7 +51,7 @@ arduino:
 
 Передаёт идентификатор variant пользовательским обёрткам через MCU_TARGET CACHE FORCE. Сам фреймворк variant не выбирает. При отсутствии YAML сохраняется существующий MCU_TARGET; если нет и его — предупреждение.
 
-**Изменение в 0.10.0** (ТЗ 4.9.2): действует только в режиме `wrappers`; в `native` — предупреждение `SCY-W506`.
+**Изменение в 0.10.0** (ТЗ 4.9.2): действует только в режиме `wrappers`; в `native` — предупреждение `SCY-W506`. Если ключ не задан, а цель `Arduino::Platform` создана, предупреждения `SCY-W501` нет: обёртки на её основе `MCU_TARGET` не используют.
 
 **Пропуск и пустота:** см. [общие правила](semantics.md#empty-values); исключения указаны выше. Профиль/override применяется до выбора defaults. Ограничения backend и путей указаны в описании.
 
@@ -62,7 +62,7 @@ arduino:
 
 [Реализация 0.9.2](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_arduino.cmake) · [Index](index.md)
 
-**Проверки (частичное покрытие):** `configure.arduino-profile`, `configure.arduino-native-wrapper-keys`. [Test manifest](../../../../tests/cases.json).
+**Проверки (частичное покрытие):** `configure.arduino-profile`, `configure.arduino-native-wrapper-keys`, `configure.arduino-mcu-target-platform`, `configure.arduino-mcu-target-missing`. [Test manifest](../../../../tests/cases.json).
 
 <a id="arduino-use-core-main"></a>
 ## `arduino.use_core_main`

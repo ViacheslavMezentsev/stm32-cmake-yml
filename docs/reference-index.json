@@ -943,7 +943,9 @@
       },
       "tests": [
         "configure.arduino-profile",
-        "configure.arduino-native-wrapper-keys"
+        "configure.arduino-native-wrapper-keys",
+        "configure.arduino-mcu-target-platform",
+        "configure.arduino-mcu-target-missing"
       ],
       "errata": []
     },

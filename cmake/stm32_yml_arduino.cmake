@@ -71,7 +71,9 @@ function(stm32_yml_setup_arduino TARGET_NAME)
         # Уже задан снаружи через -DMCU_TARGET= — не перезаписываем.
         set(_mcu_target_val "${MCU_TARGET}")
     else()
-        stm32_yml_msg(W501)
+        # Предупреждение — после создания Arduino::Platform: обёртки на её основе
+        # MCU_TARGET не используют.
+        set(_mcu_target_missing TRUE)
         set(_mcu_target_val "")
     endif()
 
@@ -121,6 +123,9 @@ function(stm32_yml_setup_arduino TARGET_NAME)
     # Arduino::Options и Arduino::Platform (ТЗ 4.9.15, 4.9.16) — до подключения
     # обёрток, чтобы они могли связываться с этими целями.
     stm32_yml_arduino_setup_wrappers_targets("${_core_abs}")
+    if(_mcu_target_missing AND NOT TARGET ArduinoPlatform)
+        stm32_yml_msg(W501)
+    endif()
 
     # ------------------------------------------------------------------
     # Шаг 4: подключаем пользовательское ядро Arduino (Arduino/Core).

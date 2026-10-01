@@ -5557,5 +5557,54 @@
       "modules/Arduino_Core_STM32/cores/arduino",
       "modules/Arduino_Core_STM32/libraries/SrcWrapper"
     ]
+  },
+  {
+    "name": "arduino-mcu-target-platform",
+    "backend": "arduino",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=arduino-platform.yml",
+      "-DSTM32_YML_PROFILE=nomcutarget"
+    ],
+    "env": {
+      "HOME": "{run}/home",
+      "CMAKE_USER_HOME": "{run}/nocube"
+    },
+    "cmsis_dirs": [
+      "home/.arduino15/packages/STMicroelectronics/tools/CMSIS/6.2.0"
+    ],
+    "observed": {
+      "ARDUINO_TARGETS": "ArduinoDefinitions;ArduinoOptions;ArduinoPlatform",
+      "MCU_TARGET": ""
+    },
+    "messages_absent": [
+      "W501"
+    ],
+    "no_warnings": true
+  },
+  {
+    "name": "arduino-mcu-target-missing",
+    "backend": "arduino",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=arduino-platform.yml",
+      "-DSTM32_YML_PROFILE=nomcutarget"
+    ],
+    "env": {
+      "HOME": "{run}/home",
+      "CMAKE_USER_HOME": "{run}/nocube"
+    },
+    "observed": {
+      "ARDUINO_TARGETS": "ArduinoDefinitions;ArduinoOptions"
+    },
+    "messages": [
+      {
+        "code": "W501"
+      },
+      {
+        "code": "I512",
+        "args": [
+          null
+        ]
+      }
+    ]
   }
 ]

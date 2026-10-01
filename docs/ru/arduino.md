@@ -72,7 +72,6 @@ linker_directives: [--gc-sections]
 linker_script_dir: linker          # шаблон STM32F103C8_FLASH.ld.in
 arduino:
   core_path: modules/Arduino_Core_STM32
-  mcu_target: F103                 # шаблон не использует; без ключа — предупреждение
   custom_libraries: [Arduino/libraries/Wire]
 link_libraries: [Arduino::Wire, Arduino::Core]
 ```

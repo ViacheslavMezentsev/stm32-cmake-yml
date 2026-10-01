@@ -65,3 +65,6 @@ profiles:
   nomcu:
     mcu: ""
     linker_script: custom.ld
+  nomcutarget:
+    arduino:
+      mcu_target: ""

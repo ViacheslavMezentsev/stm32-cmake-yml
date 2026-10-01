@@ -88,6 +88,8 @@ on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
   messages are printed in English, for example "stm32-cmake-yml version: …". For Russian
   output use `-DSTM32_YML_LANG=ru`. Scripts that parse the log should use the codes from
   `stm32_yml_messages.jsonl` rather than the text.
+- **The `arduino.mcu_target` warning** (`SCY-W501`) appears only if `Arduino::Platform` is
+  not created: wrappers based on it do not need `MCU_TARGET`.
 - **`mcu_core` hint.** The dual-core error suggests one core (`mcu_core: M7`) instead of
   the `M7;M4` list.
 - **Unknown enumerated value.** The end of the warning is capitalized:

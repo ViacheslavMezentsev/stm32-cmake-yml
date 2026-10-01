@@ -3,7 +3,7 @@
 [Документация](index.md) · [English](../en/firmware-testing.md) · [Окружение](emulation.md)
 
 Первый тест адаптирует [пример автора 02-semihosting для F1](../../tests/firmware/semihosting/README.md).
-Он отделён от 205 configure-сценариев: **618 сборок, 336 запусков QEMU и 612 запусков Renode**:
+Он отделён от 207 configure-сценариев: **618 сборок, 336 запусков QEMU и 612 запусков Renode**:
 тринадцать профилей на каждую цель (F103, F030, F411, F401, G431, G474, F746; G4 и F7 — только Renode), повреждённая копия на цель и четыре профиля H7/H5 (только Renode) для каждой пары инструментов; три версии xPack GCC × два CMake из
 [lock-файла](../../ci/dependencies.lock.json), CubeF1 1.8.7, CubeF0 1.11.6, CubeF4 1.28.3, CubeG4 1.6.3, CubeF7 1.17.3, CubeH7 1.13.0, CubeH5 1.7.0, FreeRTOS-Kernel 11.3.1, QEMU 11.0.0.
 Локально проверен также Windows QEMU 11.1.0; CI использует закреплённый образ.

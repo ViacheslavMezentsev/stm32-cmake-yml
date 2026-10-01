@@ -73,7 +73,6 @@ linker_directives: [--gc-sections]
 linker_script_dir: linker          # STM32F103C8_FLASH.ld.in template
 arduino:
   core_path: modules/Arduino_Core_STM32
-  mcu_target: F103                 # unused by the template; without it a warning
   custom_libraries: [Arduino/libraries/Wire]
 link_libraries: [Arduino::Wire, Arduino::Core]
 ```

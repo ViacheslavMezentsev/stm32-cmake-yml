@@ -165,7 +165,8 @@ Firmware на GitHub запускается вручную на границах
   сообщением `SCY-I521` (heap/stack не применяются), FLASH для BIN — из базы плат; ключи
   `wrappers` — `SCY-W506`; цель проекта с именем цели ядра — `SCY-E510`; SrcWrapper всегда,
   `arduino.libraries` по одной; TC-73 разделить: сборка (этап 3), запуск в QEMU/Renode с
-  моделями RCC/PWR (этап 5); TC-69, TC-70, TC-85 — в действующие.
+  моделями RCC/PWR (этап 5); TC-69, TC-70, TC-85 — в действующие. П. 4.9.2: без
+  `arduino.mcu_target` предупреждение только если `Arduino::Platform` не создана.
 - [ ] **Этап 4. Расширения конфигурации:** `include:`, TOML, имена файла по умолчанию,
   итоговая конфигурация, JSON Schema, пример пресета в документации.
 - [ ] **Этап 5. Тесты и CI:** периферия в эмуляторах (группа 5), в том числе модели RCC/PWR
@@ -349,7 +350,8 @@ at the end of each stage. Branches are merged by fast-forward (`git land`).
   board database; `wrappers` keys warn with `SCY-W506`; a project target named like a core
   target fails with `SCY-E510`; SrcWrapper always, `arduino.libraries` one by one; split
   TC-73: build (stage 3), QEMU/Renode runs with RCC/PWR models (stage 5); TC-69, TC-70,
-  TC-85 to current.
+  TC-85 to current. Item 4.9.2: without `arduino.mcu_target` warn only if
+  `Arduino::Platform` is not created.
 - [ ] **Stage 4. Configuration extensions:** `include:`, TOML, default file names,
   effective configuration, JSON Schema, a preset example in the documentation.
 - [ ] **Stage 5. Tests and CI:** peripherals in emulators (group 5), including RCC/PWR

@@ -51,7 +51,7 @@ arduino:
 
 Passes a variant identifier to consumer wrappers via MCU_TARGET CACHE FORCE. The framework itself does not select a variant. If YAML omits it, existing MCU_TARGET is retained; if neither exists, a warning is emitted.
 
-**Change in 0.10.0** (spec 4.9.2): applies only in the `wrappers` mode; in `native` it warns with `SCY-W506`.
+**Change in 0.10.0** (spec 4.9.2): applies only in the `wrappers` mode; in `native` it warns with `SCY-W506`. Without the key and with `Arduino::Platform` created there is no `SCY-W501` warning: wrappers based on it do not use `MCU_TARGET`.
 
 **Omission and emptiness:** see [shared rules](semantics.md#empty-values); exceptions are stated above. Profiles/overrides apply before defaults. Backend/path restrictions are stated in the description.
 
@@ -62,7 +62,7 @@ arduino:
 
 [0.9.2 implementation](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_arduino.cmake) · [Index](index.md)
 
-**Checks (partial coverage):** `configure.arduino-profile`, `configure.arduino-native-wrapper-keys`. [Test manifest](../../../../tests/cases.json).
+**Checks (partial coverage):** `configure.arduino-profile`, `configure.arduino-native-wrapper-keys`, `configure.arduino-mcu-target-platform`, `configure.arduino-mcu-target-missing`. [Test manifest](../../../../tests/cases.json).
 
 <a id="arduino-use-core-main"></a>
 ## `arduino.use_core_main`
