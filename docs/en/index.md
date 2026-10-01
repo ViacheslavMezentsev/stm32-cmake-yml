@@ -5,6 +5,8 @@
 | Task | Destination |
 | --- | --- |
 | Connect the framework | [Getting started](getting-started.md) |
+| Combine Presets and YAML | [Three-file example](presets.md) |
+| Check configuration structure | [JSON Schema](schema.md) |
 | Choose IOC, profiles or Arduino | [Short scenarios](scenarios.md) |
 | Add Arduino Core: wrappers or native | [Arduino backend](arduino.md) |
 | Add files to the main target | [Sources and language flags](simple-sources.md) |

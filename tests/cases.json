@@ -4335,7 +4335,7 @@
     "name": "build-dirs-same-key",
     "args": [
       "-DPROJECT_CONFIG_FILE=build-dirs.yml",
-      "-DSTM32_YML_PROFILE=same_key"
+      "-DSTM32_YML_PROFILE=samekey"
     ],
     "extra_dirs": [
       "../modules/etl",
@@ -4372,7 +4372,7 @@
     "name": "build-dirs-deps-clash",
     "args": [
       "-DPROJECT_CONFIG_FILE=build-dirs.yml",
-      "-DSTM32_YML_PROFILE=deps_clash"
+      "-DSTM32_YML_PROFILE=depsclash"
     ],
     "extra_dirs": [
       "_deps/local",

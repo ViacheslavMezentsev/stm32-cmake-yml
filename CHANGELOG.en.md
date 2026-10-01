@@ -14,6 +14,8 @@ on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 
 ### Added
 
+- **JSON Schema and a paired Presets + YAML example** (spec 5.1.4, 6.6.4): the reference index generates the schema; Docs checks consistency, fixture YAML/TOML and explicit negative expectations. Unknown keys and empty values remain allowed; Configure is unchanged. The bilingual example explains preset, YAML and custom CMake connections. [Schema](docs/en/schema.md) · [Example](docs/en/presets.md).
+
 - **TOML and file discovery** (spec 3.1.5, 3.8): main files, includes and external profiles support `.toml`; YAML and TOML may be mixed. Without an explicit `PROJECT_CONFIG_FILE`, the only `stm32_config.yml`/`.yaml`/`.toml` is selected. Multiple candidates fail. An empty value restores discovery; discovered names are not cached. [Rules and old-cache migration](docs/en/reference/0.9.2/formats.md).
 
 - **YAML `include` files** (spec 3.8): recursive object merging, list replacement and `_append`, with profile additions accumulated until activation. Include paths are relative to the declaring file; cycles and missing files report their chain. All files are Configure dependencies. `stm32_config.effective.json` records the tree before profiles, overrides, IOC and defaults. The `_append` suffix outside profiles is now reserved; the configuration root must be a single object. [Rules and limits](docs/en/reference/0.9.2/includes.md). TOML and file discovery will follow separately.

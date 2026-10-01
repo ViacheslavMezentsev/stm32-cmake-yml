@@ -5,6 +5,8 @@
 | Задача | Куда перейти |
 | --- | --- |
 | Подключить фреймворк | [Начало работы](getting-started.md) |
+| Совместить Presets и YAML | [Пример трёх файлов](presets.md) |
+| Проверить структуру конфигурации | [JSON Schema](schema.md) |
 | Выбрать IOC, профили или Arduino | [Краткие сценарии](scenarios.md) |
 | Подключить Arduino Core: обёртки или native | [Backend Arduino](arduino.md) |
 | Подключить файлы к основной цели | [Исходники и языковые флаги](simple-sources.md) |

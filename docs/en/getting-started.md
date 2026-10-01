@@ -42,3 +42,5 @@ assuming the standard STM32 setup above covers them.
 
 Next: [scenarios](scenarios.md), [option reference](reference/0.9.2/index.md),
 [cache and bare metal](development.md).
+
+For selecting build configurations in CMake and VS Code, see the [paired Presets and YAML example](presets.md). Check file structure with [JSON Schema](schema.md).

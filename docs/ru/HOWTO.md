@@ -226,3 +226,16 @@ docker run --rm --network none --mount "type=bind,source=$($PWD.Path),target=/wo
 - Пропавшее задание или неполный отчёт — ошибка итогового `configure`, даже если другие задания зелёные.
 - Для отдельной версии локально: `python3 /workspace/ci/run_configure_tests.py --output /results --gcc-version 14.2.1-1.1` внутри закреплённого контейнера; без последнего аргумента — полная матрица.
 - Для сброса слоёв при устаревших пакетах Ubuntu: Actions → Configure → Run workflow → `rebuild_environment`. Результаты тестов никогда не кэшируются.
+
+## Установка зависимостей проверки схемы
+
+Используйте отдельный venv по [инструкции](schema.md); для проектов пользователей
+эти пакеты не нужны. Если Windows pip не соединяется с PyPI, повторите проверку
+в доступном Linux-контейнере с Python 3.11+, pip, CMake и Ninja. В контейнере
+можно установить зависимости в временный каталог без изменения системного Python:
+
+```sh
+python3 -m pip install --target /tmp/schema-deps -r ci/schema-requirements.txt
+PYTHONPATH=/tmp/schema-deps python3 ci/check_schema.py
+PYTHONPATH=/tmp/schema-deps python3 -m unittest discover -s tests -p test_config_schema.py
+```

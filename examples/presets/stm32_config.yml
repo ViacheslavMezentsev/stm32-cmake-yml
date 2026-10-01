@@ -1,0 +1,27 @@
+# Excerpt: requires the project's toolchain, wrappers, sources and linker scripts.
+project_name: example_board
+toolchain_backend: arduino
+languages: [C, CXX, ASM]
+c_standard: 17
+cpp_standard: 17
+sources: [app]
+
+profiles:
+  G431:
+    mcu: STM32G431CB
+    linker_script: resources/STM32G431XX_FLASH.ld
+    arduino:
+      mcu_target: G431
+  G474:
+    mcu: STM32G474CE
+    linker_script: resources/STM32G474XX_FLASH.ld
+    arduino:
+      mcu_target: G474
+
+arduino:
+  core_path: modules/Arduino_Core_STM32
+  core_cmake_dir: Arduino/Core
+  use_core_main: false
+
+link_libraries: [Arduino::Core, AppSettings]
+build_artifacts: [bin, hex, map]

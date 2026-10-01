@@ -16,9 +16,9 @@ on three GCC × two CMake versions.
 | Level | What it checks | Where in the tree | How to run | Size |
 | --- | --- | --- | --- | --- |
 | L0 | Environment readiness: tool versions, sources from the lockfile, Configure/Generate of a small project; QEMU, Renode and machines | `ci/docker/verify.py`, `ci/emulation/check.py` | `docker run --rm --network none stm32-yml-ci:local`; `python ci/emulation/check.py` | 6 pairs; 2 emulators |
-| L1 | Documentation: links, bilingual `CFG-*` cards, errata, option-to-test mappings | `ci/check_reference.py`, `docs/reference-index.json` | `python ci/check_reference.py` | 55 cards, 8 errata, 75 pages |
+| L1 | Documentation, JSON Schema, fixture YAML/TOML and paired Presets + YAML example | `ci/check_reference.py`, `ci/check_schema.py`, `tests/test_config_schema.py` | [Schema check commands](schema.md) and `python ci/check_reference.py` | Schema, 60 cards, 8 errata; coverage checked automatically |
 | L2 | CI script logic: QEMU/Renode runners, CRC, matrix, badges | `tests/test_firmware*.py`, `ci/emulation/test_check.py` | `python -m unittest discover -s tests -p "test_firmware*.py"` | 42 tests |
-| L3 | Framework behaviour at Configure/Generate | `tests/cases.json`, `tests/run_case.py`, `tests/CMakeLists.txt`, `tests/fixtures/project/` | `python ci/run_configure_tests.py --output <dir>` (in the image) | 139 scenarios × 6 = 834 |
+| L3 | Framework behaviour at Configure/Generate | `tests/cases.json`, `tests/run_case.py`, `tests/CMakeLists.txt`, `tests/fixtures/project/` | `python ci/run_configure_tests.py --output <dir>` (in the image) | [Current matrix size](status.md) |
 | L4 | Firmware builds; ELF, layout, CRC and metadata checks | `tests/firmware/semihosting/`, `tests/firmware/buildonly/`, `tests/firmware/native/`, `ci/build_firmware_smoke.py`, `ci/firmware_cases.py` | `python ci/firmware_matrix.py build --output <dir>` | 618 builds |
 | L5 | Firmware execution in emulators | `ci/run_qemu_smoke.py`, `ci/run_renode_smoke.py`, `tests/firmware/renode/` | `python ci/firmware_matrix.py run [--emulator renode] --build <builds> --output <logs>` | 336 QEMU, 612 Renode runs |
 

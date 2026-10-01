@@ -3,8 +3,8 @@
 [Documentation](index.md) → Maintenance · [Русский](../ru/maintenance.md)
 
 Edit Markdown directly. No documentation generator is required;
-`docs/reference-index.json` is a navigation/coverage index, not a YAML Schema
-or a second set of defaults. RU/EN cards are the shared specification for people
+`docs/reference-index.json` is a navigation/coverage index and the source for
+[JSON Schema](schema.md) generation, not a second set of defaults. RU/EN cards are the shared specification for people
 and agents. The skill links to them rather than copying tables.
 
 ## Working with the project
@@ -270,3 +270,11 @@ validated reports, not entered into README manually.
 explain mixed changes, pattern ordering and skipped required checks. If branch
 protection requires an omitted workflow, adjust that policy before relying on
 MD-only merges. No protection setting is changed by this branch.
+
+## Updating the configuration schema
+
+When changing an option type or supported values, update `yaml_paths` and `schema`
+in the index, then run `python ci/config_schema.py` and the [L1 checks](schema.md).
+Do not add defaults to the schema: they remain in CMake. New options require
+explicit metadata. The preset example lives in `examples/presets/`; a test compares
+its files with the code blocks on both translated pages.

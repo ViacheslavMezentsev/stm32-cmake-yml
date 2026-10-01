@@ -30,7 +30,7 @@ profiles:
 <a id="profiles-file"></a>
 ## `profiles_file`
 
-`CFG-PROFILES-FILE` · **Type:** string: relative YAML path · **Default:** inline profiles
+`CFG-PROFILES-FILE` · **Type:** string: relative YAML or TOML path · **Default:** inline profiles
 
 External root-relative YAML file containing profiles. Selection loads it as the profile source; a merge of both profile catalogs is not guaranteed. A missing file warns. Baseline 0.9.2 list does not read this file; since 0.9.3 (`858013a`) it does (E002).
 

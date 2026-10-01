@@ -229,3 +229,16 @@ docker run --rm --network none --mount "type=bind,source=$($PWD.Path),target=/wo
 - Missing jobs or incomplete reports fail the final `configure` job even when other jobs are green.
 - To run one version locally inside the pinned container: `python3 /workspace/ci/run_configure_tests.py --output /results --gcc-version 14.2.1-1.1`. Omit the last argument for the full matrix.
 - To refresh Ubuntu packages: Actions → Configure → Run workflow → `rebuild_environment`. Test results are never cached.
+
+## Installing schema-check dependencies
+
+Use a separate venv as [documented](schema.md); consumer projects do not need
+these packages. If Windows pip cannot reach PyPI, run the check in an available
+Linux container with Python 3.11+, pip, CMake and Ninja. Install dependencies
+into a temporary directory without changing the container system Python:
+
+```sh
+python3 -m pip install --target /tmp/schema-deps -r ci/schema-requirements.txt
+PYTHONPATH=/tmp/schema-deps python3 ci/check_schema.py
+PYTHONPATH=/tmp/schema-deps python3 -m unittest discover -s tests -p test_config_schema.py
+```

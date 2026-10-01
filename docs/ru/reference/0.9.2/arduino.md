@@ -129,7 +129,7 @@ arduino:
 <a id="arduino-integration"></a>
 ## `arduino.integration`
 
-`CFG-ARDUINO-INTEGRATION` · **Тип:** string: wrappers · **Default:** wrappers
+`CFG-ARDUINO-INTEGRATION` · **Тип:** string: wrappers / native · **Default:** wrappers
 
 Режим backend Arduino (ТЗ 4.9.8). Пустое или отсутствующее значение — `wrappers`, поведение 0.9.3: ядро и библиотеки подключают обёртки проекта. Неизвестное значение — предупреждение `SCY-W005` и `wrappers`. Режим выводится в лог (`SCY-I508`).
 

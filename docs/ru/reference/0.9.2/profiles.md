@@ -30,7 +30,7 @@ profiles:
 <a id="profiles-file"></a>
 ## `profiles_file`
 
-`CFG-PROFILES-FILE` · **Тип:** string: relative YAML path · **Default:** inline profiles
+`CFG-PROFILES-FILE` · **Тип:** string: relative YAML or TOML path · **Default:** inline profiles
 
 Внешний файл от корня с секцией profiles. При выборе загружается как источник профилей; не является гарантированным merge двух каталогов профилей. Отсутствие файла предупреждает. В исходной 0.9.2 команда list этот файл не читает; с 0.9.3 (`858013a`) читает (E002).
 

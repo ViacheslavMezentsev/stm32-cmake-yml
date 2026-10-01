@@ -129,7 +129,7 @@ arduino:
 <a id="arduino-integration"></a>
 ## `arduino.integration`
 
-`CFG-ARDUINO-INTEGRATION` · **Type:** string: wrappers · **Default:** wrappers
+`CFG-ARDUINO-INTEGRATION` · **Type:** string: wrappers / native · **Default:** wrappers
 
 Arduino backend mode (spec 4.9.8). An empty or missing value means `wrappers`, the 0.9.3 behaviour: project wrappers add the core and libraries. An unknown value warns with `SCY-W005` and uses `wrappers`. The mode is logged (`SCY-I508`).
 

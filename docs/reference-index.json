@@ -75,7 +75,19 @@
         "configure.versions-stm32-cmake",
         "configure.versions-arduino"
       ],
-      "errata": []
+      "errata": [],
+      "yaml_paths": [
+        [
+          "stm32_cmake_yml",
+          "version"
+        ],
+        [
+          "stm32_cmake_yml_version"
+        ]
+      ],
+      "schema": {
+        "type": "string"
+      }
     },
     {
       "key": "stm32_cmake_yml_version_check",
@@ -98,7 +110,33 @@
         "configure.version-before-profile",
         "configure.version-before-override"
       ],
-      "errata": []
+      "errata": [],
+      "yaml_paths": [
+        [
+          "stm32_cmake_yml",
+          "version_check"
+        ],
+        [
+          "stm32_cmake_yml_version_check"
+        ]
+      ],
+      "schema": {
+        "anyOf": [
+          {
+            "type": "boolean"
+          },
+          {
+            "enum": [
+              0,
+              1
+            ]
+          },
+          {
+            "type": "string",
+            "pattern": "^([Tt][Rr][Uu][Ee]|[Ff][Aa][Ll][Ss][Ee]|[Oo][Nn]|[Oo][Ff][Ff]|[Yy][Ee][Ss]|[Nn][Oo]|[Yy]|[Nn]|0|1)$"
+          }
+        ]
+      }
     },
     {
       "key": "toolchain_backend",
@@ -118,7 +156,18 @@
         "configure.empty-and-null-defaults",
         "configure.unknown-keys-no-warning"
       ],
-      "errata": []
+      "errata": [],
+      "yaml_paths": [
+        [
+          "toolchain_backend"
+        ]
+      ],
+      "schema": {
+        "enum": [
+          "stm32-cmake",
+          "arduino"
+        ]
+      }
     },
     {
       "key": "ioc_file",
@@ -149,7 +198,15 @@
         "configure.ioc-missing-values-defaults",
         "configure.configure-depends"
       ],
-      "errata": []
+      "errata": [],
+      "yaml_paths": [
+        [
+          "ioc_file"
+        ]
+      ],
+      "schema": {
+        "type": "string"
+      }
     },
     {
       "key": "project_name",
@@ -167,7 +224,15 @@
         "configure.yaml-over-ioc",
         "configure.ioc-missing-values-defaults"
       ],
-      "errata": []
+      "errata": [],
+      "yaml_paths": [
+        [
+          "project_name"
+        ]
+      ],
+      "schema": {
+        "type": "string"
+      }
     },
     {
       "key": "mcu",
@@ -191,7 +256,15 @@
       ],
       "errata": [
         "E001"
-      ]
+      ],
+      "yaml_paths": [
+        [
+          "mcu"
+        ]
+      ],
+      "schema": {
+        "type": "string"
+      }
     },
     {
       "key": "mcu_core",
@@ -210,7 +283,15 @@
         "configure.mcu-core-invalid",
         "configure.h7-freertos-cube"
       ],
-      "errata": []
+      "errata": [],
+      "yaml_paths": [
+        [
+          "mcu_core"
+        ]
+      ],
+      "schema": {
+        "type": "string"
+      }
     },
     {
       "key": "languages",
@@ -227,7 +308,30 @@
         "configure.defaults-blackpill",
         "configure.ioc-bluepill-defaults"
       ],
-      "errata": []
+      "errata": [],
+      "yaml_paths": [
+        [
+          "languages"
+        ]
+      ],
+      "schema": {
+        "anyOf": [
+          {
+            "type": "array",
+            "items": {
+              "type": [
+                "string",
+                "number",
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          {
+            "type": "string"
+          }
+        ]
+      }
     },
     {
       "key": "sources",
@@ -255,7 +359,30 @@
         "configure.build-dirs-nested",
         "configure.build-dirs-deps-clash"
       ],
-      "errata": []
+      "errata": [],
+      "yaml_paths": [
+        [
+          "sources"
+        ]
+      ],
+      "schema": {
+        "anyOf": [
+          {
+            "type": "array",
+            "items": {
+              "type": [
+                "string",
+                "number",
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          {
+            "type": "string"
+          }
+        ]
+      }
     },
     {
       "key": "include_directories",
@@ -273,7 +400,30 @@
         "configure.baremetal-empty-list",
         "configure.diagnostics-missing-hal-conf"
       ],
-      "errata": []
+      "errata": [],
+      "yaml_paths": [
+        [
+          "include_directories"
+        ]
+      ],
+      "schema": {
+        "anyOf": [
+          {
+            "type": "array",
+            "items": {
+              "type": [
+                "string",
+                "number",
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          {
+            "type": "string"
+          }
+        ]
+      }
     },
     {
       "key": "custom_libraries",
@@ -293,7 +443,30 @@
         "configure.custom-library-named",
         "configure.custom-library-reconfigure"
       ],
-      "errata": []
+      "errata": [],
+      "yaml_paths": [
+        [
+          "custom_libraries"
+        ]
+      ],
+      "schema": {
+        "anyOf": [
+          {
+            "type": "array",
+            "items": {
+              "type": [
+                "string",
+                "number",
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          {
+            "type": "string"
+          }
+        ]
+      }
     },
     {
       "key": "link_libraries",
@@ -313,7 +486,30 @@
         "configure.module-missing-target",
         "configure.custom-library-named"
       ],
-      "errata": []
+      "errata": [],
+      "yaml_paths": [
+        [
+          "link_libraries"
+        ]
+      ],
+      "schema": {
+        "anyOf": [
+          {
+            "type": "array",
+            "items": {
+              "type": [
+                "string",
+                "number",
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          {
+            "type": "string"
+          }
+        ]
+      }
     },
     {
       "key": "c_standard",
@@ -330,7 +526,23 @@
         "configure.defaults-blackpill",
         "configure.module-explicit-link"
       ],
-      "errata": []
+      "errata": [],
+      "yaml_paths": [
+        [
+          "c_standard"
+        ]
+      ],
+      "schema": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "string",
+            "pattern": "^[0-9]+$"
+          }
+        ]
+      }
     },
     {
       "key": "cpp_standard",
@@ -347,7 +559,23 @@
         "configure.defaults-blackpill",
         "configure.module-explicit-link"
       ],
-      "errata": []
+      "errata": [],
+      "yaml_paths": [
+        [
+          "cpp_standard"
+        ]
+      ],
+      "schema": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "string",
+            "pattern": "^[0-9]+$"
+          }
+        ]
+      }
     },
     {
       "key": "compile_options",
@@ -365,7 +593,30 @@
         "configure.source-directory-target",
         "configure.module-explicit-link"
       ],
-      "errata": []
+      "errata": [],
+      "yaml_paths": [
+        [
+          "compile_options"
+        ]
+      ],
+      "schema": {
+        "anyOf": [
+          {
+            "type": "array",
+            "items": {
+              "type": [
+                "string",
+                "number",
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          {
+            "type": "string"
+          }
+        ]
+      }
     },
     {
       "key": "compile_definitions",
@@ -384,7 +635,30 @@
         "configure.source-directory-target",
         "configure.module-explicit-link"
       ],
-      "errata": []
+      "errata": [],
+      "yaml_paths": [
+        [
+          "compile_definitions"
+        ]
+      ],
+      "schema": {
+        "anyOf": [
+          {
+            "type": "array",
+            "items": {
+              "type": [
+                "string",
+                "number",
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          {
+            "type": "string"
+          }
+        ]
+      }
     },
     {
       "key": "compile_options_c",
@@ -404,7 +678,30 @@
       ],
       "errata": [
         "E008"
-      ]
+      ],
+      "yaml_paths": [
+        [
+          "compile_options_c"
+        ]
+      ],
+      "schema": {
+        "anyOf": [
+          {
+            "type": "array",
+            "items": {
+              "type": [
+                "string",
+                "number",
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          {
+            "type": "string"
+          }
+        ]
+      }
     },
     {
       "key": "compile_definitions_c",
@@ -424,7 +721,30 @@
       ],
       "errata": [
         "E008"
-      ]
+      ],
+      "yaml_paths": [
+        [
+          "compile_definitions_c"
+        ]
+      ],
+      "schema": {
+        "anyOf": [
+          {
+            "type": "array",
+            "items": {
+              "type": [
+                "string",
+                "number",
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          {
+            "type": "string"
+          }
+        ]
+      }
     },
     {
       "key": "compile_options_cxx",
@@ -444,7 +764,30 @@
       ],
       "errata": [
         "E008"
-      ]
+      ],
+      "yaml_paths": [
+        [
+          "compile_options_cxx"
+        ]
+      ],
+      "schema": {
+        "anyOf": [
+          {
+            "type": "array",
+            "items": {
+              "type": [
+                "string",
+                "number",
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          {
+            "type": "string"
+          }
+        ]
+      }
     },
     {
       "key": "compile_definitions_cxx",
@@ -464,7 +807,30 @@
       ],
       "errata": [
         "E008"
-      ]
+      ],
+      "yaml_paths": [
+        [
+          "compile_definitions_cxx"
+        ]
+      ],
+      "schema": {
+        "anyOf": [
+          {
+            "type": "array",
+            "items": {
+              "type": [
+                "string",
+                "number",
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          {
+            "type": "string"
+          }
+        ]
+      }
     },
     {
       "key": "use_cmsis",
@@ -486,7 +852,29 @@
         "configure.stm32g4-cmsis-hal",
         "configure.stm32f0-bare"
       ],
-      "errata": []
+      "errata": [],
+      "yaml_paths": [
+        [
+          "use_cmsis"
+        ]
+      ],
+      "schema": {
+        "anyOf": [
+          {
+            "type": "boolean"
+          },
+          {
+            "enum": [
+              0,
+              1
+            ]
+          },
+          {
+            "type": "string",
+            "pattern": "^([Tt][Rr][Uu][Ee]|[Ff][Aa][Ll][Ss][Ee]|[Oo][Nn]|[Oo][Ff][Ff]|[Yy][Ee][Ss]|[Nn][Oo]|[Yy]|[Nn]|0|1)$"
+          }
+        ]
+      }
     },
     {
       "key": "use_hal",
@@ -509,7 +897,29 @@
         "configure.stm32g4-cmsis-hal",
         "configure.stm32f0-bare"
       ],
-      "errata": []
+      "errata": [],
+      "yaml_paths": [
+        [
+          "use_hal"
+        ]
+      ],
+      "schema": {
+        "anyOf": [
+          {
+            "type": "boolean"
+          },
+          {
+            "enum": [
+              0,
+              1
+            ]
+          },
+          {
+            "type": "string",
+            "pattern": "^([Tt][Rr][Uu][Ee]|[Ff][Aa][Ll][Ss][Ee]|[Oo][Nn]|[Oo][Ff][Ff]|[Yy][Ee][Ss]|[Nn][Oo]|[Yy]|[Nn]|0|1)$"
+          }
+        ]
+      }
     },
     {
       "key": "cubefw_package",
@@ -535,7 +945,15 @@
         "configure.cubefw-missing-version",
         "configure.cubefw-missing-repository"
       ],
-      "errata": []
+      "errata": [],
+      "yaml_paths": [
+        [
+          "cubefw_package"
+        ]
+      ],
+      "schema": {
+        "type": "string"
+      }
     },
     {
       "key": "hal_components",
@@ -560,7 +978,30 @@
         "configure.h7-single-core-default",
         "configure.h5-cmsis-hal-freertos-external"
       ],
-      "errata": []
+      "errata": [],
+      "yaml_paths": [
+        [
+          "hal_components"
+        ]
+      ],
+      "schema": {
+        "anyOf": [
+          {
+            "type": "array",
+            "items": {
+              "type": [
+                "string",
+                "number",
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          {
+            "type": "string"
+          }
+        ]
+      }
     },
     {
       "key": "use_freertos",
@@ -586,7 +1027,29 @@
         "configure.freertos-ioc-override-disable",
         "configure.freertos-ioc-reconfigure"
       ],
-      "errata": []
+      "errata": [],
+      "yaml_paths": [
+        [
+          "use_freertos"
+        ]
+      ],
+      "schema": {
+        "anyOf": [
+          {
+            "type": "boolean"
+          },
+          {
+            "enum": [
+              0,
+              1
+            ]
+          },
+          {
+            "type": "string",
+            "pattern": "^([Tt][Rr][Uu][Ee]|[Ff][Aa][Ll][Ss][Ee]|[Oo][Nn]|[Oo][Ff][Ff]|[Yy][Ee][Ss]|[Nn][Oo]|[Yy]|[Nn]|0|1)$"
+          }
+        ]
+      }
     },
     {
       "key": "freertos_version",
@@ -617,7 +1080,15 @@
       ],
       "errata": [
         "E007"
-      ]
+      ],
+      "yaml_paths": [
+        [
+          "freertos_version"
+        ]
+      ],
+      "schema": {
+        "type": "string"
+      }
     },
     {
       "key": "freertos_components",
@@ -651,7 +1122,30 @@
         "configure.freertos-ioc-port-unknown-family",
         "configure.freertos-external-missing-component"
       ],
-      "errata": []
+      "errata": [],
+      "yaml_paths": [
+        [
+          "freertos_components"
+        ]
+      ],
+      "schema": {
+        "anyOf": [
+          {
+            "type": "array",
+            "items": {
+              "type": [
+                "string",
+                "number",
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          {
+            "type": "string"
+          }
+        ]
+      }
     },
     {
       "key": "cmsis_rtos_api",
@@ -687,7 +1181,19 @@
         "configure.h7-freertos-cube",
         "configure.h5-cmsis-hal-freertos-external"
       ],
-      "errata": []
+      "errata": [],
+      "yaml_paths": [
+        [
+          "cmsis_rtos_api"
+        ]
+      ],
+      "schema": {
+        "enum": [
+          "none",
+          "v1",
+          "v2"
+        ]
+      }
     },
     {
       "key": "heap_size",
@@ -712,7 +1218,24 @@
       "errata": [
         "E001",
         "E003"
-      ]
+      ],
+      "yaml_paths": [
+        [
+          "heap_size"
+        ]
+      ],
+      "schema": {
+        "anyOf": [
+          {
+            "type": "integer",
+            "minimum": 0
+          },
+          {
+            "type": "string",
+            "pattern": "^[0-9]+[KM]?$"
+          }
+        ]
+      }
     },
     {
       "key": "stack_size",
@@ -739,7 +1262,24 @@
       "errata": [
         "E001",
         "E003"
-      ]
+      ],
+      "yaml_paths": [
+        [
+          "stack_size"
+        ]
+      ],
+      "schema": {
+        "anyOf": [
+          {
+            "type": "integer",
+            "minimum": 0
+          },
+          {
+            "type": "string",
+            "pattern": "^[0-9]+[KM]?$"
+          }
+        ]
+      }
     },
     {
       "key": "linker_script",
@@ -759,7 +1299,15 @@
         "configure.memory-size-unused-warning",
         "configure.h5-cmsis-hal-freertos-external"
       ],
-      "errata": []
+      "errata": [],
+      "yaml_paths": [
+        [
+          "linker_script"
+        ]
+      ],
+      "schema": {
+        "type": "string"
+      }
     },
     {
       "key": "linker_script_dir",
@@ -776,7 +1324,15 @@
         "configure.linker-template",
         "configure.explicit-linker"
       ],
-      "errata": []
+      "errata": [],
+      "yaml_paths": [
+        [
+          "linker_script_dir"
+        ]
+      ],
+      "schema": {
+        "type": "string"
+      }
     },
     {
       "key": "link_options",
@@ -792,7 +1348,30 @@
       "tests": [
         "configure.system-link-options"
       ],
-      "errata": []
+      "errata": [],
+      "yaml_paths": [
+        [
+          "link_options"
+        ]
+      ],
+      "schema": {
+        "anyOf": [
+          {
+            "type": "array",
+            "items": {
+              "type": [
+                "string",
+                "number",
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          {
+            "type": "string"
+          }
+        ]
+      }
     },
     {
       "key": "linker_directives",
@@ -808,7 +1387,30 @@
       "tests": [
         "configure.system-link-options"
       ],
-      "errata": []
+      "errata": [],
+      "yaml_paths": [
+        [
+          "linker_directives"
+        ]
+      ],
+      "schema": {
+        "anyOf": [
+          {
+            "type": "array",
+            "items": {
+              "type": [
+                "string",
+                "number",
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          {
+            "type": "string"
+          }
+        ]
+      }
     },
     {
       "key": "use_newlib_nano",
@@ -827,7 +1429,29 @@
         "configure.system-disabled",
         "configure.system-reconfigure"
       ],
-      "errata": []
+      "errata": [],
+      "yaml_paths": [
+        [
+          "use_newlib_nano"
+        ]
+      ],
+      "schema": {
+        "anyOf": [
+          {
+            "type": "boolean"
+          },
+          {
+            "enum": [
+              0,
+              1
+            ]
+          },
+          {
+            "type": "string",
+            "pattern": "^([Tt][Rr][Uu][Ee]|[Ff][Aa][Ll][Ss][Ee]|[Oo][Nn]|[Oo][Ff][Ff]|[Yy][Ee][Ss]|[Nn][Oo]|[Yy]|[Nn]|0|1)$"
+          }
+        ]
+      }
     },
     {
       "key": "system_library",
@@ -850,7 +1474,19 @@
         "configure.empty-and-null-defaults",
         "configure.system-none"
       ],
-      "errata": []
+      "errata": [],
+      "yaml_paths": [
+        [
+          "system_library"
+        ]
+      ],
+      "schema": {
+        "enum": [
+          "NoSys",
+          "Semihosting",
+          "none"
+        ]
+      }
     },
     {
       "key": "profiles",
@@ -874,12 +1510,20 @@
       ],
       "errata": [
         "E005"
-      ]
+      ],
+      "yaml_paths": [
+        [
+          "profiles"
+        ]
+      ],
+      "schema": {
+        "$ref": "#/$defs/profiles"
+      }
     },
     {
       "key": "profiles_file",
       "requirement": "CFG-PROFILES-FILE",
-      "type": "string: relative YAML path",
+      "type": "string: relative YAML or TOML path",
       "since": null,
       "verified_in": "0.9.2",
       "source": "cmake/stm32_yml_profiles.cmake",
@@ -901,7 +1545,15 @@
       ],
       "errata": [
         "E002"
-      ]
+      ],
+      "yaml_paths": [
+        [
+          "profiles_file"
+        ]
+      ],
+      "schema": {
+        "type": "string"
+      }
     },
     {
       "key": "arduino.core_path",
@@ -918,7 +1570,19 @@
         "configure.arduino-defaults",
         "configure.arduino-missing-core"
       ],
-      "errata": []
+      "errata": [],
+      "yaml_paths": [
+        [
+          "arduino",
+          "core_path"
+        ],
+        [
+          "arduino_core_path"
+        ]
+      ],
+      "schema": {
+        "type": "string"
+      }
     },
     {
       "key": "arduino.core_cmake_dir",
@@ -935,7 +1599,19 @@
         "configure.arduino-defaults",
         "configure.arduino-native-wrapper-keys"
       ],
-      "errata": []
+      "errata": [],
+      "yaml_paths": [
+        [
+          "arduino",
+          "core_cmake_dir"
+        ],
+        [
+          "arduino_core_cmake_dir"
+        ]
+      ],
+      "schema": {
+        "type": "string"
+      }
     },
     {
       "key": "arduino.mcu_target",
@@ -954,7 +1630,19 @@
         "configure.arduino-mcu-target-platform",
         "configure.arduino-mcu-target-missing"
       ],
-      "errata": []
+      "errata": [],
+      "yaml_paths": [
+        [
+          "arduino",
+          "mcu_target"
+        ],
+        [
+          "arduino_mcu_target"
+        ]
+      ],
+      "schema": {
+        "type": "string"
+      }
     },
     {
       "key": "arduino.use_core_main",
@@ -972,7 +1660,33 @@
         "configure.arduino-native-core-main",
         "configure.arduino-native-own-main"
       ],
-      "errata": []
+      "errata": [],
+      "yaml_paths": [
+        [
+          "arduino",
+          "use_core_main"
+        ],
+        [
+          "arduino_use_core_main"
+        ]
+      ],
+      "schema": {
+        "anyOf": [
+          {
+            "type": "boolean"
+          },
+          {
+            "enum": [
+              0,
+              1
+            ]
+          },
+          {
+            "type": "string",
+            "pattern": "^([Tt][Rr][Uu][Ee]|[Ff][Aa][Ll][Ss][Ee]|[Oo][Nn]|[Oo][Ff][Ff]|[Yy][Ee][Ss]|[Nn][Oo]|[Yy]|[Nn]|0|1)$"
+          }
+        ]
+      }
     },
     {
       "key": "arduino.libraries",
@@ -994,7 +1708,34 @@
         "configure.arduino-native-own-main",
         "configure.arduino-native-missing-library"
       ],
-      "errata": []
+      "errata": [],
+      "yaml_paths": [
+        [
+          "arduino",
+          "libraries"
+        ],
+        [
+          "arduino_libraries"
+        ]
+      ],
+      "schema": {
+        "anyOf": [
+          {
+            "type": "array",
+            "items": {
+              "type": [
+                "string",
+                "number",
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          {
+            "type": "string"
+          }
+        ]
+      }
     },
     {
       "key": "arduino.custom_libraries",
@@ -1015,12 +1756,39 @@
         "configure.arduino-custom-no-wrapper",
         "configure.arduino-custom-reconfigure"
       ],
-      "errata": []
+      "errata": [],
+      "yaml_paths": [
+        [
+          "arduino",
+          "custom_libraries"
+        ],
+        [
+          "arduino_custom_libraries"
+        ]
+      ],
+      "schema": {
+        "anyOf": [
+          {
+            "type": "array",
+            "items": {
+              "type": [
+                "string",
+                "number",
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          {
+            "type": "string"
+          }
+        ]
+      }
     },
     {
       "key": "arduino.integration",
       "requirement": "CFG-ARDUINO-INTEGRATION",
-      "type": "string: wrappers",
+      "type": "string: wrappers / native",
       "since": "0.10.0",
       "verified_in": "0.10.0",
       "source": "cmake/stm32_yml_arduino.cmake",
@@ -1038,7 +1806,22 @@
         "configure.arduino-native-explicit-script",
         "configure.arduino-native-target-clash"
       ],
-      "errata": []
+      "errata": [],
+      "yaml_paths": [
+        [
+          "arduino",
+          "integration"
+        ],
+        [
+          "arduino_integration"
+        ]
+      ],
+      "schema": {
+        "enum": [
+          "wrappers",
+          "native"
+        ]
+      }
     },
     {
       "key": "arduino.board",
@@ -1065,7 +1848,19 @@
         "configure.arduino-native-explicit-board",
         "configure.arduino-native-short-mcu"
       ],
-      "errata": []
+      "errata": [],
+      "yaml_paths": [
+        [
+          "arduino",
+          "board"
+        ],
+        [
+          "arduino_board"
+        ]
+      ],
+      "schema": {
+        "type": "string"
+      }
     },
     {
       "key": "arduino.cmsis_path",
@@ -1091,7 +1886,19 @@
         "configure.arduino-native-no-cmsis",
         "configure.arduino-native-cmsis-external"
       ],
-      "errata": []
+      "errata": [],
+      "yaml_paths": [
+        [
+          "arduino",
+          "cmsis_path"
+        ],
+        [
+          "arduino_cmsis_path"
+        ]
+      ],
+      "schema": {
+        "type": "string"
+      }
     },
     {
       "key": "arduino.cmsis_target",
@@ -1110,7 +1917,19 @@
         "configure.arduino-cmsis-external",
         "configure.arduino-native-cmsis-external"
       ],
-      "errata": []
+      "errata": [],
+      "yaml_paths": [
+        [
+          "arduino",
+          "cmsis_target"
+        ],
+        [
+          "arduino_cmsis_target"
+        ]
+      ],
+      "schema": {
+        "type": "string"
+      }
     },
     {
       "key": "build_artifacts",
@@ -1136,7 +1955,32 @@
         "configure.artifacts-makefiles",
         "configure.empty-and-null-defaults"
       ],
-      "errata": []
+      "errata": [],
+      "yaml_paths": [
+        [
+          "build_artifacts"
+        ]
+      ],
+      "schema": {
+        "anyOf": [
+          {
+            "type": "array",
+            "items": {
+              "enum": [
+                "bin",
+                "hex",
+                "srec",
+                "map",
+                "lss"
+              ]
+            }
+          },
+          {
+            "type": "string",
+            "pattern": "^(bin|hex|srec|map|lss)(;(bin|hex|srec|map|lss))*$"
+          }
+        ]
+      }
     },
     {
       "key": "crc_enable",
@@ -1158,7 +2002,33 @@
       ],
       "errata": [
         "E006"
-      ]
+      ],
+      "yaml_paths": [
+        [
+          "crc",
+          "enable"
+        ],
+        [
+          "crc_enable"
+        ]
+      ],
+      "schema": {
+        "anyOf": [
+          {
+            "type": "boolean"
+          },
+          {
+            "enum": [
+              0,
+              1
+            ]
+          },
+          {
+            "type": "string",
+            "pattern": "^([Tt][Rr][Uu][Ee]|[Ff][Aa][Ll][Ss][Ee]|[Oo][Nn]|[Oo][Ff][Ff]|[Yy][Ee][Ss]|[Nn][Oo]|[Yy]|[Nn]|0|1)$"
+          }
+        ]
+      }
     },
     {
       "key": "crc_section_name",
@@ -1175,7 +2045,19 @@
         "configure.crc-command-generation",
         "configure.crc-explicit-script-without-section"
       ],
-      "errata": []
+      "errata": [],
+      "yaml_paths": [
+        [
+          "crc",
+          "section_name"
+        ],
+        [
+          "crc_section_name"
+        ]
+      ],
+      "schema": {
+        "type": "string"
+      }
     },
     {
       "key": "crc_algorithm",
@@ -1193,7 +2075,21 @@
       ],
       "errata": [
         "E004"
-      ]
+      ],
+      "yaml_paths": [
+        [
+          "crc",
+          "algorithm"
+        ],
+        [
+          "crc_algorithm"
+        ]
+      ],
+      "schema": {
+        "enum": [
+          "STM32_HW_DEFAULT"
+        ]
+      }
     },
     {
       "key": "flash_size",
@@ -1213,7 +2109,24 @@
       ],
       "errata": [
         "E006"
-      ]
+      ],
+      "yaml_paths": [
+        [
+          "flash_size"
+        ]
+      ],
+      "schema": {
+        "anyOf": [
+          {
+            "type": "integer",
+            "minimum": 0
+          },
+          {
+            "type": "string",
+            "pattern": "^([0-9]+[KM]?|auto)$"
+          }
+        ]
+      }
     },
     {
       "key": "validate_linker_script",
@@ -1234,7 +2147,29 @@
         "configure.h7-dual-core",
         "configure.h5-cmsis-hal-freertos-external"
       ],
-      "errata": []
+      "errata": [],
+      "yaml_paths": [
+        [
+          "validate_linker_script"
+        ]
+      ],
+      "schema": {
+        "anyOf": [
+          {
+            "type": "boolean"
+          },
+          {
+            "enum": [
+              0,
+              1
+            ]
+          },
+          {
+            "type": "string",
+            "pattern": "^([Tt][Rr][Uu][Ee]|[Ff][Aa][Ll][Ss][Ee]|[Oo][Nn]|[Oo][Ff][Ff]|[Yy][Ee][Ss]|[Nn][Oo]|[Yy]|[Nn]|0|1)$"
+          }
+        ]
+      }
     },
     {
       "key": "log_target_properties",
@@ -1250,7 +2185,29 @@
       "tests": [
         "configure.diagnostics-toggle"
       ],
-      "errata": []
+      "errata": [],
+      "yaml_paths": [
+        [
+          "log_target_properties"
+        ]
+      ],
+      "schema": {
+        "anyOf": [
+          {
+            "type": "boolean"
+          },
+          {
+            "enum": [
+              0,
+              1
+            ]
+          },
+          {
+            "type": "string",
+            "pattern": "^([Tt][Rr][Uu][Ee]|[Ff][Aa][Ll][Ss][Ee]|[Oo][Nn]|[Oo][Ff][Ff]|[Yy][Ee][Ss]|[Nn][Oo]|[Yy]|[Nn]|0|1)$"
+          }
+        ]
+      }
     },
     {
       "key": "verbose_build",
@@ -1266,7 +2223,29 @@
       "tests": [
         "configure.verbose-build"
       ],
-      "errata": []
+      "errata": [],
+      "yaml_paths": [
+        [
+          "verbose_build"
+        ]
+      ],
+      "schema": {
+        "anyOf": [
+          {
+            "type": "boolean"
+          },
+          {
+            "enum": [
+              0,
+              1
+            ]
+          },
+          {
+            "type": "string",
+            "pattern": "^([Tt][Rr][Uu][Ee]|[Ff][Aa][Ll][Ss][Ee]|[Oo][Nn]|[Oo][Ff][Ff]|[Yy][Ee][Ss]|[Nn][Oo]|[Yy]|[Nn]|0|1)$"
+          }
+        ]
+      }
     },
     {
       "key": "cppcheck_enable",
@@ -1286,7 +2265,33 @@
         "configure.cppcheck-unavailable",
         "configure.cppcheck-reconfigure"
       ],
-      "errata": []
+      "errata": [],
+      "yaml_paths": [
+        [
+          "cppcheck",
+          "enable"
+        ],
+        [
+          "cppcheck_enable"
+        ]
+      ],
+      "schema": {
+        "anyOf": [
+          {
+            "type": "boolean"
+          },
+          {
+            "enum": [
+              0,
+              1
+            ]
+          },
+          {
+            "type": "string",
+            "pattern": "^([Tt][Rr][Uu][Ee]|[Ff][Aa][Ll][Ss][Ee]|[Oo][Nn]|[Oo][Ff][Ff]|[Yy][Ee][Ss]|[Nn][Oo]|[Yy]|[Nn]|0|1)$"
+          }
+        ]
+      }
     },
     {
       "key": "cppcheck_args",
@@ -1305,7 +2310,34 @@
         "configure.cppcheck-empty-fallback",
         "configure.cppcheck-reconfigure"
       ],
-      "errata": []
+      "errata": [],
+      "yaml_paths": [
+        [
+          "cppcheck",
+          "args"
+        ],
+        [
+          "cppcheck_args"
+        ]
+      ],
+      "schema": {
+        "anyOf": [
+          {
+            "type": "array",
+            "items": {
+              "type": [
+                "string",
+                "number",
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          {
+            "type": "string"
+          }
+        ]
+      }
     },
     {
       "key": "cppcheck_ignores",
@@ -1324,7 +2356,34 @@
         "configure.cppcheck-empty-fallback",
         "configure.cppcheck-reconfigure"
       ],
-      "errata": []
+      "errata": [],
+      "yaml_paths": [
+        [
+          "cppcheck",
+          "ignores"
+        ],
+        [
+          "cppcheck_ignores"
+        ]
+      ],
+      "schema": {
+        "anyOf": [
+          {
+            "type": "array",
+            "items": {
+              "type": [
+                "string",
+                "number",
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          {
+            "type": "string"
+          }
+        ]
+      }
     },
     {
       "key": "include",
@@ -1358,7 +2417,25 @@
         "configure.formats-toml-empty-reset",
         "configure.formats-extension-include"
       ],
-      "errata": []
+      "errata": [],
+      "yaml_paths": [
+        [
+          "include"
+        ]
+      ],
+      "schema": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        ]
+      }
     }
   ],
   "errata": [

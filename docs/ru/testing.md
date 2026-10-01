@@ -16,9 +16,9 @@
 | Уровень | Что проверяет | Где в дереве | Как запустить | Объём |
 | --- | --- | --- | --- | --- |
 | L0 | Готовность окружения: версии инструментов, исходники из lock-файла, Configure/Generate маленького проекта; наличие QEMU, Renode и машин | `ci/docker/verify.py`, `ci/emulation/check.py` | `docker run --rm --network none stm32-yml-ci:local`; `python ci/emulation/check.py` | 6 пар; 2 эмулятора |
-| L1 | Документация: ссылки, двуязычные карточки `CFG-*`, errata, привязки опций к тестам | `ci/check_reference.py`, `docs/reference-index.json` | `python ci/check_reference.py` | 55 карточек, 8 errata, 75 страниц |
+| L1 | Документация, JSON Schema, тестовые YAML/TOML и пример Presets + YAML | `ci/check_reference.py`, `ci/check_schema.py`, `tests/test_config_schema.py` | [Команды проверки схемы](schema.md) и `python ci/check_reference.py` | Схема, 60 карточек, 8 errata; состав проверяется автоматически |
 | L2 | Логика скриптов CI: runner'ы QEMU/Renode, CRC, матрица, бейджи | `tests/test_firmware*.py`, `ci/emulation/test_check.py` | `python -m unittest discover -s tests -p "test_firmware*.py"` | 42 теста |
-| L3 | Поведение фреймворка на Configure/Generate | `tests/cases.json`, `tests/run_case.py`, `tests/CMakeLists.txt`, `tests/fixtures/project/` | `python ci/run_configure_tests.py --output <каталог>` (в образе) | 139 сценариев × 6 = 834 |
+| L3 | Поведение фреймворка на Configure/Generate | `tests/cases.json`, `tests/run_case.py`, `tests/CMakeLists.txt`, `tests/fixtures/project/` | `python ci/run_configure_tests.py --output <каталог>` (в образе) | [Текущий объём матрицы](status.md) |
 | L4 | Сборка прошивок, проверки ELF, раскладки, CRC, метаданных | `tests/firmware/semihosting/`, `tests/firmware/buildonly/`, `tests/firmware/native/`, `ci/build_firmware_smoke.py`, `ci/firmware_cases.py` | `python ci/firmware_matrix.py build --output <каталог>` | 618 сборок |
 | L5 | Исполнение прошивок в эмуляторах | `ci/run_qemu_smoke.py`, `ci/run_renode_smoke.py`, `tests/firmware/renode/` | `python ci/firmware_matrix.py run [--emulator renode] --build <сборки> --output <логи>` | 336 запусков QEMU, 612 Renode |
 

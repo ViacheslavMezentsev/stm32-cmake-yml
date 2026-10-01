@@ -1,0 +1,29 @@
+{
+  "tests/fixtures/project/arduino-platform.yml": {
+    "/profiles/unknownmode/arduino/integration": "arduino-integration-unknown: unsupported integration mode tests Configure diagnostics."
+  },
+  "tests/fixtures/project/artifacts.yml": {
+    "/profiles/unknown/build_artifacts": "artifacts-unknown: unsupported artifact tests the warning and supported output handling."
+  },
+  "tests/fixtures/project/formats/bad.toml": {
+    "<parse>": "formats-malformed-toml: intentionally incomplete TOML value."
+  },
+  "tests/fixtures/project/include-invalid-append.yml": {
+    "/compile_definitions_append": "include-invalid-append: scalar 42 must fail append validation."
+  },
+  "tests/fixtures/project/include-invalid-item.yml": {
+    "/include": "include-invalid-item: boolean array member must fail include validation."
+  },
+  "tests/fixtures/project/include-invalid-root.yml": {
+    "/": "include-invalid-root: a sequence cannot be the configuration root."
+  },
+  "tests/fixtures/project/include-invalid.yml": {
+    "/include": "include-invalid: numeric include must fail Configure."
+  },
+  "tests/fixtures/project/malformed.yml": {
+    "<parse>": "malformed-yaml: deliberately unterminated flow sequence."
+  },
+  "case:include-invalid-root:1:include-invalid-root.yml": {
+    "<parse>": "include-invalid-root: multiple YAML documents are deliberately rejected."
+  }
+}

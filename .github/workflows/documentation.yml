@@ -24,3 +24,11 @@ jobs:
         run: python3 -m unittest discover -s tests -p test_component_versions.py
       - name: Test Configure matrix completeness and diagnostics
         run: python3 -m unittest discover -s tests -p test_configure_reports.py
+      - name: Install configuration schema check dependencies
+        run: |
+          python3 -m venv .schema-venv
+          .schema-venv/bin/python -m pip install -r ci/schema-requirements.txt
+      - name: Validate generated schema and configuration fixtures
+        run: .schema-venv/bin/python ci/check_schema.py
+      - name: Test schema contracts and paired presets example
+        run: .schema-venv/bin/python -m unittest discover -s tests -p test_config_schema.py

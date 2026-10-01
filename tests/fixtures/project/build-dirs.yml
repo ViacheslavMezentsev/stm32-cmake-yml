@@ -16,9 +16,9 @@ compile_options: [mcpu=cortex-m3, mthumb]
 profiles:
   external:
     sources_append: [Module, ../modules/etl]
-  same_key:
+  samekey:
     sources_append: [../modules/etl, ../../modules/etl]
   nested:
     sources_append: [../a/x, ../a/x/y, ../a/xy]
-  deps_clash:
+  depsclash:
     sources_append: [_deps/local, ../modules/etl]

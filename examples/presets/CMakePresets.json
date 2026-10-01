@@ -1,0 +1,82 @@
+{
+  "version": 3,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 21,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "base",
+      "hidden": true,
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "cacheVariables": {
+        "PROJECT_CONFIG_FILE": "${sourceDir}/stm32_config.yml",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": true
+      }
+    },
+    {
+      "name": "G431",
+      "hidden": true,
+      "inherits": "base",
+      "cacheVariables": {
+        "STM32_YML_PROFILE": "G431"
+      }
+    },
+    {
+      "name": "Debug-G431",
+      "inherits": "G431",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "Release-G431",
+      "inherits": "G431",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "G474",
+      "hidden": true,
+      "inherits": "base",
+      "cacheVariables": {
+        "STM32_YML_PROFILE": "G474"
+      }
+    },
+    {
+      "name": "Debug-G474",
+      "inherits": "G474",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "Release-G474",
+      "inherits": "G474",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "Debug-G431",
+      "configurePreset": "Debug-G431"
+    },
+    {
+      "name": "Release-G431",
+      "configurePreset": "Release-G431"
+    },
+    {
+      "name": "Debug-G474",
+      "configurePreset": "Debug-G474"
+    },
+    {
+      "name": "Release-G474",
+      "configurePreset": "Release-G474"
+    }
+  ]
+}
