@@ -471,4 +471,4 @@ CMake 3.21 записывает команду в `CMakeFiles/rules.ninja`, а 3
 `ci/configure_reports.py` формирует матрицу из lock-файла, упаковывает диагностику
 и проверяет совокупность результатов; `tests/test_configure_reports.py` проверяет
 ошибочные и неполные отчёты. Запуск: `python -m unittest discover -s tests -p test_configure_reports.py`.
-Проверки включены в Docs CI. Набор L3 остаётся 223 × 6 = 1338; Firmware — отдельный ручной запуск.
+Проверки включены в Docs CI. Набор L3 остаётся 242 × 6 = 1452; Firmware — отдельный ручной запуск.

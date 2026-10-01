@@ -1,0 +1,21 @@
+stm32_cmake_yml_version = "0.9.3"
+project_name = "formats_probe"
+mcu = "STM32F103C8T6"
+languages = ["C", "CXX", "ASM"]
+use_cmsis = false
+use_hal = false
+use_freertos = false
+validate_linker_script = false
+sources = ["main.c"]
+build_artifacts = []
+compile_definitions = ["BASE=1"]
+stack_size = "1K"
+
+[custom]
+enabled = false
+count = 0
+text = 'quoted "value" and C:\folder'
+
+[profiles.Demo]
+stack_size = "2K"
+compile_definitions_append = ["PROFILE=1"]

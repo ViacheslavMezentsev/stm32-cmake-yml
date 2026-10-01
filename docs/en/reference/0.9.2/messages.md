@@ -22,6 +22,9 @@ The list is built from the `cmake/stm32_yml_messages_catalog.cmake` catalog by `
 | `SCY-E012` | FATAL_ERROR | Invalid include in {1}: expected a path or a list of non-empty paths. |
 | `SCY-E013` | FATAL_ERROR | Invalid addition '{1}': \_append and its base must be lists or empty values. |
 | `SCY-E014` | FATAL_ERROR | Configuration {1} must contain a single mapping object. |
+| `SCY-E015` | FATAL_ERROR | Unsupported configuration extension in {1}: expected .yml, .yaml or .toml. |
+| `SCY-E016` | FATAL_ERROR | Multiple configuration files found: {1}. Set PROJECT\_CONFIG\_FILE explicitly. |
+| `SCY-E017` | FATAL_ERROR | No stm32\_config.yml, stm32\_config.yaml or stm32\_config.toml found in {1}. |
 | `SCY-W001` | WARNING | Unknown STM32\_YML\_LANG value '{1}': the language is chosen as for auto. Valid values: auto, ru, en. |
 | `SCY-W002` | WARNING | The recommended parameter 'stm32\_cmake\_yml\_version' is not set in '{1}'. Set the framework version the configuration was written for (spec 4.2.3). |
 | `SCY-W003` | WARNING | The framework version ({1}) is older than the configuration requires ({2}). Errors are possible. |

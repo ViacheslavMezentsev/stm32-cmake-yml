@@ -81,7 +81,7 @@ Cppcheck и CRC выполняются позднее. Clock tree из IOC, на
 
 | Параметр (не YAML-опция) | Контракт |
 | --- | --- |
-| `PROJECT_CONFIG_FILE` | CACHE STRING, default `stm32_config.yml`; путь от корня |
+| `PROJECT_CONFIG_FILE` | CACHE STRING: в 0.9.2/0.9.3 `stm32_config.yml`; с 0.10.0 пусто = [автовыбор](formats.md#project-config-file) |
 | `STM32_YML_PROFILE` | CACHE STRING, пусто = база; `list` печатает список и завершает Configure ошибкой |
 | `STM32_YML_OVERRIDE_<param>` | CACHE STRING, непустой скаляр поверх профиля; вложенный параметр использует `_` |
 | `CMAKE_USER_HOME` | Переменная окружения для каталога STM32Cube/Repository |
@@ -107,3 +107,5 @@ Errata содержит способы подтверждения отдельн
 справочник не обещает поддержку любых сочетаний Cube, Arduino и stm32-cmake.
 
 **Подключения с 0.10.0:** [правила слияния и граница effective.json](includes.md).
+
+**С 0.10.0:** [YAML/TOML и выбор файла](formats.md); `profiles_file` также поддерживает TOML.

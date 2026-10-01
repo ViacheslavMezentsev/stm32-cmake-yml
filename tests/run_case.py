@@ -23,6 +23,11 @@ def require(condition, message):
 
 
 def verify(case, build, source):
+    if "cache_values" in case:
+        cache = (build / "CMakeCache.txt").read_text(encoding="utf-8")
+        for key, value in case["cache_values"].items():
+            match = re.search(r"^" + re.escape(key) + r":[^=]+=(.*)$", cache, re.M)
+            require(match is not None and match.group(1) == value, f"Unexpected cache value: {key}")
     if "effective" in case:
         effective = json.loads((build / "stm32_config.effective.json").read_text(encoding="utf-8"))
         for key, expected in case["effective"].items():
@@ -387,6 +392,11 @@ def main():
                 for path in sorted(core.rglob("*")) if path.is_file()}
     core_before = core_state() if case.get("core_unchanged") else None
     for index, step in enumerate(case.get("steps", [{}]), start=1):
+        # TC-81: remove only named files in the private fixture copy.
+        for relative in step.get("remove_files", []):
+            destination = (source / relative).resolve()
+            require(destination.is_relative_to(source), "Fixture removal escapes the case source")
+            destination.unlink()
         # TC-80: edit a private fixture copy, then reconfigure the same build.
         for relative, content in step.get("write_files", {}).items():
             destination = (source / relative).resolve()
@@ -442,6 +452,30 @@ def main():
                 require(message in normalized, f"Missing diagnostic {message!r}")
             for message in expectation.get("log_absent", []):
                 require(message not in normalized, f"Unexpected diagnostic {message!r}")
+            if expectation.get("probe_discovery"):
+                # TC-81: adding a candidate must trigger Configure via Ninja,
+                # without an explicit cmake invocation or firmware compilation.
+                (source / "stm32_config.toml").write_text('project_name = "ambiguous"\n', encoding="utf-8")
+                probe = subprocess.run(["ninja", "-C", str(build), "build.ninja"],
+                                       capture_output=True, text=True, timeout=100)
+                probe_output = probe.stdout + probe.stderr
+                (report / "autodiscovery.log").write_text(probe_output, encoding="utf-8")
+                shutil.copy2(build / "stm32_yml_messages.jsonl", report / "autodiscovery.messages.jsonl")
+                require(probe.returncode != 0, "New default candidate did not fail regeneration")
+                verify_messages({"error": {"code": "E016"}}, build, catalog, " ".join(probe_output.split()))
+                require(not (build / "stm32_config.effective.json").exists(), "Regeneration left stale JSON")
+            if expectation.get("probe_discovery"):
+                # TC-81: adding a candidate must trigger Configure via Ninja,
+                # without an explicit cmake invocation or firmware compilation.
+                (source / "stm32_config.toml").write_text('project_name = "ambiguous"\n', encoding="utf-8")
+                probe = subprocess.run(["ninja", "-C", str(build), "build.ninja"],
+                                       capture_output=True, text=True, timeout=100)
+                probe_output = probe.stdout + probe.stderr
+                (report / "autodiscovery.log").write_text(probe_output, encoding="utf-8")
+                shutil.copy2(build / "stm32_yml_messages.jsonl", report / "autodiscovery.messages.jsonl")
+                require(probe.returncode != 0, "New default candidate did not fail regeneration")
+                verify_messages({"error": {"code": "E016"}}, build, catalog, " ".join(probe_output.split()))
+                require(not (build / "stm32_config.effective.json").exists(), "Regeneration left stale JSON")
         except AssertionError:
             print(output, flush=True)
             raise

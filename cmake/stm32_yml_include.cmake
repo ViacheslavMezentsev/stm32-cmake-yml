@@ -2,6 +2,19 @@
 # Keep types until all files have been merged; flatten only once afterwards.
 include_guard(GLOBAL)
 
+# Spec 3.8.1: use the declared extension, not yq's content/filename guessing.
+function(_stm32_yml_input_format FILE OUT)
+    get_filename_component(_extension "${FILE}" LAST_EXT)
+    if(_extension STREQUAL ".yml" OR _extension STREQUAL ".yaml")
+        set(_format "yaml")
+    elseif(_extension STREQUAL ".toml")
+        set(_format "toml")
+    else()
+        stm32_yml_msg(E015 "${FILE}")
+    endif()
+    set(${OUT} "${_format}" PARENT_SCOPE)
+endfunction()
+
 # Extract a JSON value without losing string/boolean/null types.
 function(_stm32_yml_json_value JSON KEY OUT)
     string(JSON _type TYPE "${JSON}" "${KEY}")
@@ -105,6 +118,7 @@ endfunction()
 # legitimate repeated includes remain ordered operations (spec 3.8.4).
 function(_stm32_yml_load_includes FILE BASE STACK OUT)
     get_filename_component(_absolute "${FILE}" ABSOLUTE)
+    _stm32_yml_input_format("${_absolute}" _format)
     if(NOT EXISTS "${_absolute}" OR IS_DIRECTORY "${_absolute}")
         set(_chain ${STACK} "${_absolute}")
         list(JOIN _chain " -> " _chain)
@@ -122,7 +136,7 @@ function(_stm32_yml_load_includes FILE BASE STACK OUT)
     set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${_absolute}" "${_file}")
     # CMake's JSON reader accepts trailing documents. Wrap the complete YAML
     # stream in an array so a second document cannot be silently discarded.
-    execute_process(COMMAND "${YQ_EXECUTABLE}" eval-all -o=json "[.]" "${_file}"
+    execute_process(COMMAND "${YQ_EXECUTABLE}" eval-all "-p=${_format}" -o=json "[.]" "${_file}"
         OUTPUT_VARIABLE _json RESULT_VARIABLE _status OUTPUT_STRIP_TRAILING_WHITESPACE)
     if(NOT _status EQUAL 0)
         stm32_yml_msg(E005 "${_file}")

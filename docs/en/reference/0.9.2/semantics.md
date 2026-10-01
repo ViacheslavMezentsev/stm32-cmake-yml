@@ -79,7 +79,7 @@ by these configure tests.
 
 | Control (not a YAML option) | Contract |
 | --- | --- |
-| `PROJECT_CONFIG_FILE` | CACHE STRING, default `stm32_config.yml`; root-relative path |
+| `PROJECT_CONFIG_FILE` | CACHE STRING: `stm32_config.yml` in 0.9.2/0.9.3; empty = [discovery](formats.md#project-config-file) since 0.10.0 |
 | `STM32_YML_PROFILE` | CACHE STRING, empty = base; `list` prints names and ends Configure with an error |
 | `STM32_YML_OVERRIDE_<param>` | Nonempty CACHE STRING scalar overriding the profile; nested names use `_` |
 | `CMAKE_USER_HOME` | Environment variable locating STM32Cube/Repository |
@@ -105,3 +105,5 @@ dependencies; this reference does not promise arbitrary Cube/Arduino/stm32-cmake
 combinations will work.
 
 **Includes since 0.10.0:** [merge rules and the effective.json boundary](includes.md).
+
+**Since 0.10.0:** [YAML/TOML and file selection](formats.md); `profiles_file` also supports TOML.

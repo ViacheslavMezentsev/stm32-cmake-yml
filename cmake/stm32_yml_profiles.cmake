@@ -225,6 +225,7 @@ endfunction()
 macro(_stm32_yml_load_profiles_file)
     if(DEFINED profiles_file AND NOT "${profiles_file}" STREQUAL "")
         set(_profiles_src_path "${CMAKE_SOURCE_DIR}/${profiles_file}")
+        _stm32_yml_input_format("${_profiles_src_path}" _profiles_format)
         if(EXISTS "${_profiles_src_path}")
             stm32_yml_msg(I109 "${_profiles_src_path}")
             # При заданном profiles_file встроенные профили не используются

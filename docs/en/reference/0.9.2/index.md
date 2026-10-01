@@ -6,6 +6,7 @@ Baseline: `f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0`. [Semantics and version bou
 
 ## By topic
 
+- [Formats and file selection](formats.md) — 0.10.0
 - [Project and version](project.md)
 - [Sources and libraries](sources.md)
 - [Compilation](compiler.md)

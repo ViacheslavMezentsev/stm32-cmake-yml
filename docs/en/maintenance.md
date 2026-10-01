@@ -209,7 +209,7 @@ The branch run on the same SHA built the image in 1:22; network delays matter.
 `codex/configure-ci-speedup` prepares three parallel jobs, one per GCC version,
 each running both CMake versions with `ctest -j 4`. The lock file supplies the
 matrix; at most three jobs run concurrently. `fail-fast: false` preserves
-diagnostics from other jobs after a failure. All 223 × 6 = 1338 Configure checks
+diagnostics from other jobs after a failure. All 242 × 6 = 1452 Configure checks
 remain. Without `--gcc-version`, local `ci/run_configure_tests.py` still runs all six pairs.
 
 The compiler image uses the BuildKit GitHub Actions layer cache; one job writes
@@ -242,7 +242,7 @@ every push:
 | Workflow | When it runs |
 | --- | --- |
 | Docs | every push |
-| Configure (6 pairs, 1338 runs) | every push except pushes without inputs (below) |
+| Configure (6 pairs, 1452 runs) | every push except pushes without inputs (below) |
 | CI environment, Emulation environment | pushes changing their own image files |
 | Firmware (618 builds, 948 runs, ~24 min) | manually (Actions → Firmware → Run workflow) and on a `v*` tag |
 

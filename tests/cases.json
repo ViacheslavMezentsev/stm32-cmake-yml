@@ -5963,6 +5963,547 @@
     "error": {
       "code": "E013"
     }
+  },
+  {
+    "name": "formats-equivalent-toml",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=formats/base.toml"
+    ],
+    "effective": {
+      "project_name": "formats_probe",
+      "mcu": "STM32F103C8T6",
+      "use_cmsis": false,
+      "compile_definitions": [
+        "BASE=1"
+      ],
+      "stack_size": "1K",
+      "custom": {
+        "enabled": false,
+        "count": 0,
+        "text": "quoted \"value\" and C:\\folder"
+      },
+      "profiles": {
+        "Demo": {
+          "stack_size": "2K",
+          "compile_definitions_append": [
+            "PROFILE=1"
+          ]
+        }
+      }
+    },
+    "observed": {
+      "PROJECT_NAME": "formats_probe",
+      "stack_size": "1K",
+      "use_cmsis": "FALSE"
+    },
+    "properties": {
+      "COMPILE_DEFINITIONS": [
+        "BASE=1"
+      ]
+    },
+    "configure_depends": [
+      "formats/base.toml"
+    ]
+  },
+  {
+    "name": "formats-equivalent-yaml",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=formats/base.yaml"
+    ],
+    "effective": {
+      "project_name": "formats_probe",
+      "mcu": "STM32F103C8T6",
+      "use_cmsis": false,
+      "compile_definitions": [
+        "BASE=1"
+      ],
+      "stack_size": "1K",
+      "custom": {
+        "enabled": false,
+        "count": 0,
+        "text": "quoted \"value\" and C:\\folder"
+      },
+      "profiles": {
+        "Demo": {
+          "stack_size": "2K",
+          "compile_definitions_append": [
+            "PROFILE=1"
+          ]
+        }
+      }
+    },
+    "observed": {
+      "PROJECT_NAME": "formats_probe",
+      "stack_size": "1K",
+      "use_cmsis": "FALSE"
+    },
+    "properties": {
+      "COMPILE_DEFINITIONS": [
+        "BASE=1"
+      ]
+    },
+    "configure_depends": [
+      "formats/base.yaml"
+    ]
+  },
+  {
+    "name": "formats-toml-profile",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=formats/base.toml",
+      "-DSTM32_YML_PROFILE=Demo",
+      "-DSTM32_YML_OVERRIDE_stack_size=8192"
+    ],
+    "effective": {
+      "project_name": "formats_probe",
+      "mcu": "STM32F103C8T6",
+      "use_cmsis": false,
+      "compile_definitions": [
+        "BASE=1"
+      ],
+      "stack_size": "1K",
+      "custom": {
+        "enabled": false,
+        "count": 0,
+        "text": "quoted \"value\" and C:\\folder"
+      },
+      "profiles": {
+        "Demo": {
+          "stack_size": "2K",
+          "compile_definitions_append": [
+            "PROFILE=1"
+          ]
+        }
+      }
+    },
+    "observed": {
+      "stack_size": "8192"
+    },
+    "properties": {
+      "COMPILE_DEFINITIONS": [
+        "BASE=1",
+        "PROFILE=1"
+      ]
+    }
+  },
+  {
+    "name": "formats-external-yml",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=formats/external.yml",
+      "-DSTM32_YML_PROFILE=External"
+    ],
+    "observed": {
+      "PROJECT_NAME": "formats_probe",
+      "stack_size": "4096"
+    },
+    "properties": {
+      "COMPILE_DEFINITIONS": [
+        "BASE=1",
+        "EXTERNAL=1"
+      ]
+    },
+    "configure_depends": [
+      "formats/profiles.toml"
+    ]
+  },
+  {
+    "name": "formats-external-toml",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=formats/external.toml",
+      "-DSTM32_YML_PROFILE=External"
+    ],
+    "observed": {
+      "PROJECT_NAME": "formats_probe",
+      "stack_size": "4096"
+    },
+    "properties": {
+      "COMPILE_DEFINITIONS": [
+        "BASE=1",
+        "EXTERNAL=1"
+      ]
+    },
+    "configure_depends": [
+      "formats/profiles.toml"
+    ]
+  },
+  {
+    "name": "formats-external-list",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=formats/external.toml",
+      "-DSTM32_YML_PROFILE=list"
+    ],
+    "error": {
+      "code": "E101"
+    },
+    "log_contains": [
+      "External"
+    ],
+    "messages": [
+      {
+        "code": "I107",
+        "args": [
+          "External"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "formats-mixed-profile",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=formats/mixed.yml",
+      "-DSTM32_YML_PROFILE=Demo"
+    ],
+    "effective": {
+      "compile_definitions": [
+        "BASE=1",
+        "MIDDLE=1",
+        "TOP=1"
+      ],
+      "profiles": {
+        "Demo": {
+          "stack_size": "2K",
+          "compile_definitions_append": [
+            "PROFILE=1",
+            "MIDDLEPROFILE=1",
+            "TOPPROFILE=1"
+          ]
+        }
+      }
+    },
+    "properties": {
+      "COMPILE_DEFINITIONS": [
+        "BASE=1",
+        "MIDDLE=1",
+        "TOP=1",
+        "PROFILE=1",
+        "MIDDLEPROFILE=1",
+        "TOPPROFILE=1"
+      ]
+    },
+    "configure_depends": [
+      "formats/base.yaml",
+      "formats/middle.toml",
+      "formats/mixed.yml"
+    ]
+  },
+  {
+    "name": "formats-toml-empty-reset",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=formats/mixed.toml"
+    ],
+    "effective": {
+      "stack_size": "",
+      "compile_definitions": []
+    },
+    "observed": {
+      "stack_size": "1024"
+    },
+    "absent_properties": {
+      "COMPILE_DEFINITIONS": [
+        "BASE=1",
+        "MIDDLE=1",
+        "TOP=1"
+      ]
+    }
+  },
+  {
+    "name": "formats-malformed-toml",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=formats/bad.toml"
+    ],
+    "error": {
+      "code": "E005"
+    }
+  },
+  {
+    "name": "formats-extension-main",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=formats/fragment.json"
+    ],
+    "error": {
+      "code": "E015"
+    }
+  },
+  {
+    "name": "formats-extension-include",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=formats/include-bad-extension.yml"
+    ],
+    "error": {
+      "code": "E015"
+    }
+  },
+  {
+    "name": "formats-extension-profiles",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=formats/profiles-bad-extension.yml"
+    ],
+    "error": {
+      "code": "E015"
+    }
+  },
+  {
+    "name": "formats-discover-yaml",
+    "steps": [
+      {
+        "remove_files": [
+          "stm32_config.yml"
+        ],
+        "write_files": {
+          "stm32_config.yaml": "stm32_cmake_yml_version: 0.9.3\nproject_name: formats_probe\nmcu: STM32F103C8T6\nlanguages: [C, CXX, ASM]\nuse_cmsis: false\nuse_hal: false\nuse_freertos: false\nvalidate_linker_script: false\nsources: [main.c]\nbuild_artifacts: []\ncompile_definitions: [BASE=1]\nstack_size: 1K\ncustom:\n  enabled: false\n  count: 0\n  text: 'quoted \"value\" and C:\\folder'\nprofiles:\n  Demo:\n    stack_size: 2K\n    compile_definitions_append: [PROFILE=1]\n"
+        }
+      }
+    ],
+    "effective": {
+      "project_name": "formats_probe",
+      "mcu": "STM32F103C8T6",
+      "use_cmsis": false,
+      "compile_definitions": [
+        "BASE=1"
+      ],
+      "stack_size": "1K",
+      "custom": {
+        "enabled": false,
+        "count": 0,
+        "text": "quoted \"value\" and C:\\folder"
+      },
+      "profiles": {
+        "Demo": {
+          "stack_size": "2K",
+          "compile_definitions_append": [
+            "PROFILE=1"
+          ]
+        }
+      }
+    },
+    "cache_values": {
+      "PROJECT_CONFIG_FILE": ""
+    }
+  },
+  {
+    "name": "formats-discover-toml",
+    "steps": [
+      {
+        "remove_files": [
+          "stm32_config.yml"
+        ],
+        "write_files": {
+          "stm32_config.toml": "stm32_cmake_yml_version = \"0.9.3\"\nproject_name = \"formats_probe\"\nmcu = \"STM32F103C8T6\"\nlanguages = [\"C\", \"CXX\", \"ASM\"]\nuse_cmsis = false\nuse_hal = false\nuse_freertos = false\nvalidate_linker_script = false\nsources = [\"main.c\"]\nbuild_artifacts = []\ncompile_definitions = [\"BASE=1\"]\nstack_size = \"1K\"\n\n[custom]\nenabled = false\ncount = 0\ntext = 'quoted \"value\" and C:\\folder'\n\n[profiles.Demo]\nstack_size = \"2K\"\ncompile_definitions_append = [\"PROFILE=1\"]\n"
+        }
+      }
+    ],
+    "effective": {
+      "project_name": "formats_probe",
+      "mcu": "STM32F103C8T6",
+      "use_cmsis": false,
+      "compile_definitions": [
+        "BASE=1"
+      ],
+      "stack_size": "1K",
+      "custom": {
+        "enabled": false,
+        "count": 0,
+        "text": "quoted \"value\" and C:\\folder"
+      },
+      "profiles": {
+        "Demo": {
+          "stack_size": "2K",
+          "compile_definitions_append": [
+            "PROFILE=1"
+          ]
+        }
+      }
+    },
+    "cache_values": {
+      "PROJECT_CONFIG_FILE": ""
+    }
+  },
+  {
+    "name": "formats-discover-missing",
+    "steps": [
+      {
+        "remove_files": [
+          "stm32_config.yml"
+        ]
+      }
+    ],
+    "error": {
+      "code": "E017"
+    },
+    "effective_exists": false
+  },
+  {
+    "name": "formats-discover-ambiguous",
+    "steps": [
+      {
+        "write_files": {
+          "stm32_config.toml": "stm32_cmake_yml_version = \"0.9.3\"\nproject_name = \"formats_probe\"\nmcu = \"STM32F103C8T6\"\nlanguages = [\"C\", \"CXX\", \"ASM\"]\nuse_cmsis = false\nuse_hal = false\nuse_freertos = false\nvalidate_linker_script = false\nsources = [\"main.c\"]\nbuild_artifacts = []\ncompile_definitions = [\"BASE=1\"]\nstack_size = \"1K\"\n\n[custom]\nenabled = false\ncount = 0\ntext = 'quoted \"value\" and C:\\folder'\n\n[profiles.Demo]\nstack_size = \"2K\"\ncompile_definitions_append = [\"PROFILE=1\"]\n"
+        }
+      }
+    ],
+    "error": {
+      "code": "E016"
+    },
+    "log_contains": [
+      "stm32_config.yml",
+      "stm32_config.toml"
+    ],
+    "effective_exists": false
+  },
+  {
+    "name": "formats-explicit-wins",
+    "steps": [
+      {
+        "args": [
+          "-DPROJECT_CONFIG_FILE=formats/base.toml"
+        ],
+        "write_files": {
+          "stm32_config.toml": "stm32_cmake_yml_version = \"0.9.3\"\nproject_name = \"formats_probe\"\nmcu = \"STM32F103C8T6\"\nlanguages = [\"C\", \"CXX\", \"ASM\"]\nuse_cmsis = false\nuse_hal = false\nuse_freertos = false\nvalidate_linker_script = false\nsources = [\"main.c\"]\nbuild_artifacts = []\ncompile_definitions = [\"BASE=1\"]\nstack_size = \"1K\"\n\n[custom]\nenabled = false\ncount = 0\ntext = 'quoted \"value\" and C:\\folder'\n\n[profiles.Demo]\nstack_size = \"2K\"\ncompile_definitions_append = [\"PROFILE=1\"]\n"
+        }
+      },
+      {},
+      {
+        "args": [
+          "-DPROJECT_CONFIG_FILE="
+        ],
+        "error": {
+          "code": "E016"
+        },
+        "effective_exists": false
+      }
+    ],
+    "effective": {
+      "project_name": "formats_probe",
+      "mcu": "STM32F103C8T6",
+      "use_cmsis": false,
+      "compile_definitions": [
+        "BASE=1"
+      ],
+      "stack_size": "1K",
+      "custom": {
+        "enabled": false,
+        "count": 0,
+        "text": "quoted \"value\" and C:\\folder"
+      },
+      "profiles": {
+        "Demo": {
+          "stack_size": "2K",
+          "compile_definitions_append": [
+            "PROFILE=1"
+          ]
+        }
+      }
+    },
+    "cache_values": {
+      "PROJECT_CONFIG_FILE": "formats/base.toml"
+    }
+  },
+  {
+    "name": "formats-discover-reconfigure",
+    "steps": [
+      {
+        "write_files": {
+          "stm32_config.yml": "stm32_cmake_yml_version: 0.9.3\nproject_name: formats_probe\nmcu: STM32F103C8T6\nlanguages: [C, CXX, ASM]\nuse_cmsis: false\nuse_hal: false\nuse_freertos: false\nvalidate_linker_script: false\nsources: [main.c]\nbuild_artifacts: []\ncompile_definitions: [BASE=1]\nstack_size: 1K\ncustom:\n  enabled: false\n  count: 0\n  text: 'quoted \"value\" and C:\\folder'\nprofiles:\n  Demo:\n    stack_size: 2K\n    compile_definitions_append: [PROFILE=1]\n"
+        },
+        "effective": {
+          "project_name": "formats_probe",
+          "mcu": "STM32F103C8T6",
+          "use_cmsis": false,
+          "compile_definitions": [
+            "BASE=1"
+          ],
+          "stack_size": "1K",
+          "custom": {
+            "enabled": false,
+            "count": 0,
+            "text": "quoted \"value\" and C:\\folder"
+          },
+          "profiles": {
+            "Demo": {
+              "stack_size": "2K",
+              "compile_definitions_append": [
+                "PROFILE=1"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "remove_files": [
+          "stm32_config.yml"
+        ],
+        "write_files": {
+          "stm32_config.toml": "stm32_cmake_yml_version = \"0.9.3\"\nproject_name = \"formats_probe\"\nmcu = \"STM32F103C8T6\"\nlanguages = [\"C\", \"CXX\", \"ASM\"]\nuse_cmsis = false\nuse_hal = false\nuse_freertos = false\nvalidate_linker_script = false\nsources = [\"main.c\"]\nbuild_artifacts = []\ncompile_definitions = [\"BASE=1\"]\nstack_size = \"1K\"\n\n[custom]\nenabled = false\ncount = 0\ntext = 'quoted \"value\" and C:\\folder'\n\n[profiles.Demo]\nstack_size = \"2K\"\ncompile_definitions_append = [\"PROFILE=1\"]\n"
+        },
+        "effective": {
+          "project_name": "formats_probe",
+          "mcu": "STM32F103C8T6",
+          "use_cmsis": false,
+          "compile_definitions": [
+            "BASE=1"
+          ],
+          "stack_size": "1K",
+          "custom": {
+            "enabled": false,
+            "count": 0,
+            "text": "quoted \"value\" and C:\\folder"
+          },
+          "profiles": {
+            "Demo": {
+              "stack_size": "2K",
+              "compile_definitions_append": [
+                "PROFILE=1"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "write_files": {
+          "stm32_config.yaml": "stm32_cmake_yml_version: 0.9.3\nproject_name: formats_probe\nmcu: STM32F103C8T6\nlanguages: [C, CXX, ASM]\nuse_cmsis: false\nuse_hal: false\nuse_freertos: false\nvalidate_linker_script: false\nsources: [main.c]\nbuild_artifacts: []\ncompile_definitions: [BASE=1]\nstack_size: 1K\ncustom:\n  enabled: false\n  count: 0\n  text: 'quoted \"value\" and C:\\folder'\nprofiles:\n  Demo:\n    stack_size: 2K\n    compile_definitions_append: [PROFILE=1]\n"
+        },
+        "error": {
+          "code": "E016"
+        },
+        "effective_exists": false
+      },
+      {
+        "remove_files": [
+          "stm32_config.toml"
+        ],
+        "effective": {
+          "project_name": "formats_probe",
+          "mcu": "STM32F103C8T6",
+          "use_cmsis": false,
+          "compile_definitions": [
+            "BASE=1"
+          ],
+          "stack_size": "1K",
+          "custom": {
+            "enabled": false,
+            "count": 0,
+            "text": "quoted \"value\" and C:\\folder"
+          },
+          "profiles": {
+            "Demo": {
+              "stack_size": "2K",
+              "compile_definitions_append": [
+                "PROFILE=1"
+              ]
+            }
+          }
+        }
+      }
+    ],
+    "cache_values": {
+      "PROJECT_CONFIG_FILE": ""
+    }
+  },
+  {
+    "name": "formats-discovery-ninja",
+    "probe_discovery": true,
+    "cache_values": {
+      "PROJECT_CONFIG_FILE": ""
+    }
   }
 
 ]

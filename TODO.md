@@ -158,8 +158,9 @@ Firmware на GitHub запускается вручную на границах
   руководство по backend Arduino; прошивки `native` в матрице L4 (сборка). 207 сценариев /
   1242 запуска, 618 сборок. Полный L0–L5 и Firmware на `main` @ `d3cb266`.
 - [x] `codex/config-include` слита: `main` @ `c77eebd`, Docs/Configure PASS; YAML include, effective.json и 16 новых сценариев.
-- [ ] В работе `codex/configure-ci-speedup`: три задания GCC, кэш окружения, архивы диагностики и проверка полноты матрицы. Локально: 1338 Configure PASS, 10 тестов отчётов PASS, actionlint PASS. Проверка скорости и кэша на GitHub — после push.
-  TOML/автовыбор файла и Schema/пример пресета — отдельные ветки. Полный L0–L5 — в конце этапа.
+- [x] `codex/configure-ci-speedup` слита: `7628218`, все CI PASS; первый Configure 10:23 вместо 17:55, тесты 2:38 вместо 8:06.
+- [ ] В работе `codex/config-formats`: TOML, автовыбор файла, 19 новых сценариев; локально 1452 Configure PASS, ожидаются commit/push/CI/land.
+  Далее Schema/пример пресета — отдельная ветка. Полный L0–L5 — в конце этапа.
 - [ ] **Этап 4. Расширения конфигурации:** `include:`, TOML, имена файла по умолчанию,
   итоговая конфигурация, JSON Schema, пример пресета в документации.
 - [ ] **Этап 5. Тесты и CI — перенесён на версию после 0.10.0** (решение заказчика, ТЗ 2.6):
@@ -336,8 +337,9 @@ at the end of each stage. Branches are merged by fast-forward (`git land`).
   `arduino.use_core_main`, the Arduino backend guide; `native` firmware in the L4 matrix
   (build). 207 cases / 1242 runs, 618 builds. Full L0–L5 and Firmware on `main` @ `d3cb266`.
 - [x] `codex/config-include` merged: `main` @ `c77eebd`, Docs/Configure PASS; YAML includes, effective.json and 16 new cases.
-- [ ] In progress: `codex/configure-ci-speedup`, three GCC jobs, environment cache, diagnostic archives and matrix completeness gate. Local: 1338 Configure PASS, 10 report tests PASS, actionlint PASS. GitHub timing and cache validation await push.
-  TOML/file discovery and Schema/preset example follow in separate branches. Full L0–L5 at stage completion.
+- [x] `codex/configure-ci-speedup` merged: `7628218`, all CI PASS; first Configure 10:23 vs 17:55, tests 2:38 vs 8:06.
+- [ ] In progress: `codex/config-formats`, TOML, file discovery, 19 new cases; local 1452 Configure PASS, awaiting commit/push/CI/land.
+  Schema/preset example follows in a separate branch. Full L0–L5 at stage completion.
 - [ ] **Stage 4. Configuration extensions:** `include:`, TOML, default file names,
   effective configuration, JSON Schema, a preset example in the documentation.
 - [ ] **Stage 5. Tests and CI — moved to the version after 0.10.0** (customer decision,

@@ -12,7 +12,7 @@
 ## Конфигурация
 
 <!-- configure-counts -->
-**223 scenarios × 6 tool pairs = 1338 configure executions**
+**242 scenarios × 6 tool pairs = 1452 configure executions**
 <!-- /configure-counts -->
 
 Это объём набора, а не счётчик успешных запусков. CI сверяет число с

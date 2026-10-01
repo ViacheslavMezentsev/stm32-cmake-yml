@@ -463,4 +463,4 @@ The matrix and final gate are described in [maintenance](maintenance.md#configur
 `ci/configure_reports.py` derives the matrix from the lock, packs diagnostics and
 validates combined results; `tests/test_configure_reports.py` covers failed and
 incomplete reports. Run `python -m unittest discover -s tests -p test_configure_reports.py`.
-These checks run in Docs CI. L3 remains 223 × 6 = 1338; Firmware is a separate manual run.
+These checks run in Docs CI. L3 remains 242 × 6 = 1452; Firmware is a separate manual run.

@@ -1,0 +1,5 @@
+include: middle.toml
+compile_definitions_append: [TOP=1]
+profiles:
+  Demo:
+    compile_definitions_append: [TOPPROFILE=1]

@@ -1,0 +1,5 @@
+include = "missing.yml"
+project_name = "ignored"
+[profiles.External]
+stack_size = 4096
+compile_definitions_append = ["EXTERNAL=1"]

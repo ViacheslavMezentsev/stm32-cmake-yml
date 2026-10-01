@@ -49,3 +49,5 @@ profiles_file: profiles.yml
 **Errata:** [E002](../../errata/E002.md).
 
 **С 0.10.0:** объединение профилей и накопление `_append` между файлами описаны в [include](includes.md). `include` внутри `profiles_file` игнорируется.
+
+**С 0.10.0:** [YAML/TOML и выбор файла](formats.md); `profiles_file` также поддерживает TOML.

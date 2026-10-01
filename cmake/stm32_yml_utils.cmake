@@ -204,6 +204,7 @@ endfunction()
 # Требования: CMake >= 3.21, 'yq' должен быть установлен и доступен в PATH.
 #
 function(stm32_yml_parse_config config_file)
+    _stm32_yml_input_format("${config_file}" _input_format)
     # Необязательный второй аргумент — выражение yq, выбирающее часть файла
     # (например, только секцию profiles: внешнего файла профилей, ТЗ 3.4.8).
     set(_yq_expression ".")
@@ -222,7 +223,7 @@ function(stm32_yml_parse_config config_file)
         # profiles_file remains a separate source: only profiles are read;
         # its other keys (including include) must not affect the base config.
         execute_process(
-            COMMAND ${YQ_EXECUTABLE} -o=json "${_yq_expression}" ${config_file}
+            COMMAND "${YQ_EXECUTABLE}" "-p=${_input_format}" -o=json "${_yq_expression}" "${config_file}"
             OUTPUT_VARIABLE YAML_AS_JSON
             RESULT_VARIABLE YQ_RESULT
             OUTPUT_STRIP_TRAILING_WHITESPACE

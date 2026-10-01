@@ -893,7 +893,11 @@
         "configure.reconfigure-external-profile-reset",
         "configure.external-profile-ignores-top-level",
         "configure.configure-depends",
-        "configure.include-external"
+        "configure.include-external",
+        "configure.formats-external-toml",
+        "configure.formats-external-yml",
+        "configure.formats-external-list",
+        "configure.formats-extension-profiles"
       ],
       "errata": [
         "E002"
@@ -1349,7 +1353,10 @@
         "configure.include-invalid",
         "configure.include-invalid-item",
         "configure.include-invalid-root",
-        "configure.include-invalid-append"
+        "configure.include-invalid-append",
+        "configure.formats-mixed-profile",
+        "configure.formats-toml-empty-reset",
+        "configure.formats-extension-include"
       ],
       "errata": []
     }

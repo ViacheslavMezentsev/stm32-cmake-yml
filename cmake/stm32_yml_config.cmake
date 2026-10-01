@@ -10,11 +10,30 @@ function(stm32_yml_prepare_project_data OUT_PROJECT_NAME_VAR OUT_LANGUAGES_VAR)
     # =======================================================================
     # 1. ЗАГРУЗКА И ПОДГОТОВКА КОНФИГУРАЦИИ
     # =======================================================================
-    set(PROJECT_CONFIG_FILE "stm32_config.yml" CACHE STRING "...")
-    set(CONFIG_FILE_PATH "${CMAKE_SOURCE_DIR}/${PROJECT_CONFIG_FILE}")
-
     # Spec 3.8.7: never leave a stale successful snapshot after a load error.
     file(REMOVE "${CMAKE_BINARY_DIR}/stm32_config.effective.json")
+    # Spec 3.1.5 / TC-81: an empty cache value means discovery on every Configure.
+    # Keep normal variables set by the caller, and never cache a discovered name.
+    if(NOT DEFINED PROJECT_CONFIG_FILE)
+        set(PROJECT_CONFIG_FILE "" CACHE STRING "Configuration path; empty selects the only stm32_config.yml/.yaml/.toml")
+    endif()
+    if("${PROJECT_CONFIG_FILE}" STREQUAL "")
+        file(GLOB _config_candidates LIST_DIRECTORIES false CONFIGURE_DEPENDS
+            "${CMAKE_SOURCE_DIR}/stm32_config.yml"
+            "${CMAKE_SOURCE_DIR}/stm32_config.yaml"
+            "${CMAKE_SOURCE_DIR}/stm32_config.toml")
+        list(LENGTH _config_candidates _config_count)
+        if(_config_count EQUAL 0)
+            stm32_yml_msg(E017 "${CMAKE_SOURCE_DIR}")
+        elseif(_config_count GREATER 1)
+            list(JOIN _config_candidates ", " _config_names)
+            stm32_yml_msg(E016 "${_config_names}")
+        endif()
+        list(GET _config_candidates 0 CONFIG_FILE_PATH)
+        get_filename_component(PROJECT_CONFIG_FILE "${CONFIG_FILE_PATH}" NAME)
+    else()
+        get_filename_component(CONFIG_FILE_PATH "${PROJECT_CONFIG_FILE}" ABSOLUTE BASE_DIR "${CMAKE_SOURCE_DIR}")
+    endif()
     # Парсим конфиг (YAML -> JSON)
     stm32_yml_parse_config("${CONFIG_FILE_PATH}")
     # Merged file data, before profiles, overrides, IOC and conditional defaults.

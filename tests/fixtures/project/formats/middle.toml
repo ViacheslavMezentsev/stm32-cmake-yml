@@ -1,0 +1,4 @@
+include = "base.yaml"
+compile_definitions_append = ["MIDDLE=1"]
+[profiles.Demo]
+compile_definitions_append = ["MIDDLEPROFILE=1"]

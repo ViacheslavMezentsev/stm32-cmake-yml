@@ -14,6 +14,8 @@ on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 
 ### Added
 
+- **TOML and file discovery** (spec 3.1.5, 3.8): main files, includes and external profiles support `.toml`; YAML and TOML may be mixed. Without an explicit `PROJECT_CONFIG_FILE`, the only `stm32_config.yml`/`.yaml`/`.toml` is selected. Multiple candidates fail. An empty value restores discovery; discovered names are not cached. [Rules and old-cache migration](docs/en/reference/0.9.2/formats.md).
+
 - **YAML `include` files** (spec 3.8): recursive object merging, list replacement and `_append`, with profile additions accumulated until activation. Include paths are relative to the declaring file; cycles and missing files report their chain. All files are Configure dependencies. `stm32_config.effective.json` records the tree before profiles, overrides, IOC and defaults. The `_append` suffix outside profiles is now reserved; the configuration root must be a single object. [Rules and limits](docs/en/reference/0.9.2/includes.md). TOML and file discovery will follow separately.
 
 - **Message codes and language** (spec 4.16.5–4.16.10). Messages are printed by
@@ -56,6 +58,8 @@ on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
   minimal CMSIS Core set for `external`.
 
 ### Changed
+
+- **Configuration extensions:** only lowercase `.yml`, `.yaml`, `.toml` are accepted. Other extensions now produce `SCY-E015` instead of implicit yq parser selection.
 
 - **Configure CI:** three parallel GCC jobs, cached environment layers, packed diagnostics and a final completeness check for all six tool pairs. The test set is unchanged; Firmware remains manual at stage boundaries and runs on tags.
 

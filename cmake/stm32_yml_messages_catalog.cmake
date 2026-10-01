@@ -85,6 +85,15 @@ stm32_yml_msg_def(E013
 stm32_yml_msg_def(E014
     "Конфигурация {1} должна содержать один объект с ключами."
     "Configuration {1} must contain a single mapping object.")
+stm32_yml_msg_def(E015
+    "Неподдерживаемое расширение файла конфигурации {1}: ожидается .yml, .yaml или .toml."
+    "Unsupported configuration extension in {1}: expected .yml, .yaml or .toml.")
+stm32_yml_msg_def(E016
+    "Найдено несколько файлов конфигурации: {1}. Задайте PROJECT_CONFIG_FILE явно."
+    "Multiple configuration files found: {1}. Set PROJECT_CONFIG_FILE explicitly.")
+stm32_yml_msg_def(E017
+    "В каталоге {1} не найден stm32_config.yml, stm32_config.yaml или stm32_config.toml."
+    "No stm32_config.yml, stm32_config.yaml or stm32_config.toml found in {1}.")
 stm32_yml_msg_def(W005
     "Неизвестное значение '{1}' параметра '{2}'. Известные значения: {3}. Применяется '{4}'."
     "Unknown value '{1}' of parameter '{2}'. Known values: {3}. '{4}' is applied.")

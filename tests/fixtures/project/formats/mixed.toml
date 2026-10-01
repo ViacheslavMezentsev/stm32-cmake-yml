@@ -1,0 +1,3 @@
+include = "mixed.yml"
+stack_size = ""
+compile_definitions = []

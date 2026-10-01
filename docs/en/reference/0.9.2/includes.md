@@ -7,8 +7,8 @@
 
 `CFG-INCLUDE` · **Type:** path or list of paths · **Default:** no includes
 
-**Since 0.10.0 (unreleased).** This branch implements YAML includes.
-TOML and automatic configuration file discovery are the next parts of stage 4.
+**Since 0.10.0 (unreleased).** YAML and TOML includes are supported, including mixed chains.
+[Formats and file selection](formats.md).
 In 0.9.2/0.9.3 this key does not load files.
 
 ```yaml
@@ -49,7 +49,7 @@ Merge rules, before flattening into CMake variables:
 Missing `include`, `null`, an empty string and `[]` mean no includes.
 Each element of a nonempty list must be a nonempty string. Invalid types produce
 `SCY-E012`, missing files `SCY-E010`, cycles `SCY-E011`; the latter two messages
-include the file chain. Every file must contain a single YAML object
+include the file chain. Every file must contain a single configuration object
 (`SCY-E014`). All files read are registered as Configure dependencies.
 
 ### What effective.json contains
@@ -69,4 +69,5 @@ external profiles do not appear in effective.json. See [profiles](profiles.md).
 **Checks:** 16 `configure.include-*` cases in the [manifest](../../../../tests/cases.json):
 merge order, profiles and overrides, null, repeated includes, replace/append,
 external profiles, Configure dependencies, reconfiguration and errors.
-Mixed formats are not covered yet; TC-80 is partially implemented.
+Mixed formats are covered by `configure.formats-mixed-profile` and
+`configure.formats-toml-empty-reset` (TC-80/TC-81).
