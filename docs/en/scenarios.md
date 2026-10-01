@@ -67,6 +67,10 @@ Profile names must not contain underscores.
 
 ## Arduino Core STM32
 
+The `wrappers` mode with 0.9.3 wrappers is shown below; wrapper templates based on
+`Arduino::Platform` and the `native` mode without wrappers are in the
+[Arduino backend guide](arduino.md).
+
 ```yaml
 toolchain_backend: arduino
 mcu: STM32G474RET6

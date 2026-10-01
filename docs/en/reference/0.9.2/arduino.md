@@ -197,7 +197,7 @@ arduino:
 
 `CFG-ARDUINO-CMSIS-TARGET` · **Type:** string: target · **Default:** not set
 
-The project INTERFACE target with CMSIS for `arduino.cmsis_path: external` (spec 4.9.14): linked to `Arduino::Platform` (`SCY-I515`). The target may be defined after the framework call; if it does not exist at the end of `CMakeLists.txt`, `SCY-E507`. Without `cmsis_target` a message says that the project supplies CMSIS (`SCY-I516`). The minimal CMSIS Core file set is in the `native` mode documentation.
+The project INTERFACE target with CMSIS for `arduino.cmsis_path: external` (spec 4.9.14): linked to `Arduino::Platform` (`SCY-I515`). The target may be defined after the framework call; if it does not exist at the end of `CMakeLists.txt`, `SCY-E507`. Without `cmsis_target` a message says that the project supplies CMSIS (`SCY-I516`). The minimal CMSIS Core file set is in the [Arduino backend guide](../../arduino.md).
 
 **New in 0.10.0** (spec 4.9.8–4.9.16).
 

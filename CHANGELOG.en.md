@@ -49,6 +49,9 @@ on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
   replaces the board variant script, `arduino.libraries` are added by the core's own
   `CMakeLists.txt`, `arduino.use_core_main: false` allows an own `main()`. Firmware of the
   mode is built in the L4 matrix for every target; emulator runs follow the RCC/PWR models.
+- **Arduino backend guide** (spec 4.9.17, `docs/en/arduino.md`): choosing the mode, core and
+  library wrapper templates on `Arduino::Platform`, a `native` example, an own `main()`, the
+  minimal CMSIS Core set for `external`.
 
 ### Changed
 

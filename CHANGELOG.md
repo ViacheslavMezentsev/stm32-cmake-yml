@@ -48,6 +48,9 @@
   variant платы, `arduino.libraries` подключаются собственными `CMakeLists.txt` ядра,
   `arduino.use_core_main: false` позволяет использовать свою `main()`. Прошивки режима
   собираются в матрице L4 для всех целей; запуск в эмуляторах — после моделей RCC/PWR.
+- **Руководство по backend Arduino** (ТЗ 4.9.17, `docs/ru/arduino.md`): выбор режима, шаблоны
+  обёрток ядра и библиотеки на `Arduino::Platform`, пример `native`, собственная `main()`,
+  минимальный набор CMSIS Core для `external`.
 
 ### Изменено
 

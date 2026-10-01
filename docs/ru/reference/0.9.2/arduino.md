@@ -197,7 +197,7 @@ arduino:
 
 `CFG-ARDUINO-CMSIS-TARGET` · **Тип:** string: target · **Default:** not set
 
-Интерфейсная цель проекта с CMSIS при `arduino.cmsis_path: external` (ТЗ 4.9.14): подключается к `Arduino::Platform` (`SCY-I515`). Цель может быть определена после вызова фреймворка; если к концу `CMakeLists.txt` её нет — `SCY-E507`. Без `cmsis_target` выводится сообщение, что CMSIS подключает проект (`SCY-I516`). Минимальный набор файлов CMSIS Core — в документации режима `native`.
+Интерфейсная цель проекта с CMSIS при `arduino.cmsis_path: external` (ТЗ 4.9.14): подключается к `Arduino::Platform` (`SCY-I515`). Цель может быть определена после вызова фреймворка; если к концу `CMakeLists.txt` её нет — `SCY-E507`. Без `cmsis_target` выводится сообщение, что CMSIS подключает проект (`SCY-I516`). Минимальный набор файлов CMSIS Core — в [руководстве по backend Arduino](../../arduino.md).
 
 **Появилось в 0.10.0** (ТЗ 4.9.8–4.9.16).
 

@@ -6,6 +6,7 @@
 | --- | --- |
 | Connect the framework | [Getting started](getting-started.md) |
 | Choose IOC, profiles or Arduino | [Short scenarios](scenarios.md) |
+| Add Arduino Core: wrappers or native | [Arduino backend](arduino.md) |
 | Add files to the main target | [Sources and language flags](simple-sources.md) |
 | Create a standalone library | [Modules and dependencies](modules.md) |
 | Investigate an error or warning | [Phase-specific troubleshooting](troubleshooting.md) |

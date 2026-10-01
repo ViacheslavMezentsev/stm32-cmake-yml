@@ -79,6 +79,8 @@ cmake -DSTM32_YML_PROFILE=G474 -B build/G474 -S .
 
 Для проектов на базе Arduino Core STM32 с сохранением всех возможностей фреймворка:
 профилей, генерации скрипта компоновщика, расчёта CRC, артефактов и нормализации флагов.
+Ниже — режим `wrappers` с обёртками 0.9.3; шаблоны обёрток на основе `Arduino::Platform`
+и режим `native` без обёрток — в [руководстве по backend Arduino](arduino.md).
 
 ```yaml
 stm32_cmake_yml_version: "0.9.3"
