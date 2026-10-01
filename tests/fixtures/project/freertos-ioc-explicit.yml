@@ -1,4 +1,4 @@
-stm32_cmake_yml_version: 0.9.3
+stm32_cmake_yml_version: 0.10.0
 ioc_file: freertos-f4.ioc
 languages: [C, ASM]
 sources: [main.c]

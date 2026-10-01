@@ -162,7 +162,8 @@ Firmware на GitHub запускается вручную на границах
 - [x] `codex/config-formats` слита: `753b5bc`, TOML, автовыбор файла, 19 новых сценариев; 1452 Configure PASS, Docs/Configure для отправленного коммита PASS.
 - [x] `codex/config-schema-presets` слита в main (`e5d93c6`): Schema и совместный пример Presets + YAML. Полный локальный L0–L5 PASS: 1452 Configure, 618 сборок, 336 QEMU + 612 Renode; Docs, Configure, CI environment и ручной [Firmware](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/actions/runs/36925400885) для этого SHA PASS.
 - [x] `codex/migration-guide` слита в main (`e5e7b3f`): руководство перехода RU/EN, навигация, итоги этапа 4; Docs/Configure/CI environment на коммите ветки PASS.
-- [ ] В работе `codex/release-docs-review`: заключительная сверка README, статуса и границ версий справочника. Следующий шаг — смена версии и финальная приёмка выпуска.
+- [x] `codex/release-docs-review` слита в main (`2810579`): README, статус, границы версий справочника.
+- [ ] В работе `codex/release-0.10.0`: версия, CHANGELOG и ТЗ к выпуску. Предварительно PASS: Docs/Schema/ТЗ, 86 unit-тестов, 1452 Configure. Ожидаются подписанный коммит, полный локальный L0–L5, CI/Firmware для того же SHA, land, тег и публикация владельцем.
 - [x] **Этап 4. Расширения конфигурации:** `include:`, TOML, имена файла по умолчанию,
   итоговая конфигурация, JSON Schema, пример пресета в документации.
 - [ ] **Этап 5. Тесты и CI — перенесён на версию после 0.10.0** (решение заказчика, ТЗ 2.6):
@@ -343,7 +344,8 @@ at the end of each stage. Branches are merged by fast-forward (`git land`).
 - [x] `codex/config-formats` merged: `753b5bc`, TOML, file discovery, 19 new cases; 1452 Configure PASS, Docs/Configure for the pushed commit PASS.
 - [x] `codex/config-schema-presets` merged into main (`e5d93c6`): Schema and paired Presets + YAML example. Full local L0–L5 PASS: 1452 Configure, 618 builds, 336 QEMU + 612 Renode; Docs, Configure, CI environment and manual [Firmware](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/actions/runs/36925400885) for that SHA PASS.
 - [x] `codex/migration-guide` merged into main (`e5e7b3f`): RU/EN migration guide, navigation, stage 4 results; Docs/Configure/CI environment for the branch commit PASS.
-- [ ] In progress: `codex/release-docs-review`: final review of README, status and reference version boundaries. Next: version update and final release acceptance.
+- [x] `codex/release-docs-review` merged into main (`2810579`): README, status and reference version boundaries.
+- [ ] In progress: `codex/release-0.10.0`: version, changelogs and release specification. Preliminary PASS: Docs/Schema/spec, 86 unit tests, 1452 Configure. Pending: signed commit, full local L0–L5, CI/Firmware for the same SHA, land, tag and publication by the owner.
 - [x] **Stage 4. Configuration extensions:** `include:`, TOML, default file names,
   effective configuration, JSON Schema, a preset example in the documentation.
 - [ ] **Stage 5. Tests and CI — moved to the version after 0.10.0** (customer decision,

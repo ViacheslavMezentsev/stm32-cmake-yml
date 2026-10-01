@@ -18,9 +18,9 @@ records departures from expected results. Fixes do not rewrite 0.9.2 history.
 Update the compatibility record for a new implementation; do not invent an
 option's introduction version without historical evidence.
 
-**Preparing 0.10.0:** cards mark new rules separately. The `0.9.2` directory
+**Version 0.10.0:** cards mark new rules separately. The `0.9.2` directory
 and historical baseline fields in the index do not imply that every documented
-feature exists in 0.9.2. Release 0.10.0 is not complete.
+feature exists in 0.9.2.
 [Migration from 0.9.x](../../migration-0.10.md) · [Test status](../../status.md).
 
 ## Loading and precedence

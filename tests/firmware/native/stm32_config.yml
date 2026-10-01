@@ -1,7 +1,7 @@
 # Arduino native mode firmware; the MCU of each target is passed with
 # -DSTM32_YML_OVERRIDE_mcu=..., the core path with
 # -DSTM32_YML_OVERRIDE_arduino_core_path=... (ci/build_firmware_smoke.py).
-stm32_cmake_yml_version: 0.9.3
+stm32_cmake_yml_version: 0.10.0
 project_name: native_probe
 toolchain_backend: arduino
 mcu: STM32F103C8T6

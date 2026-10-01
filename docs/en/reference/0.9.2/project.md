@@ -22,7 +22,7 @@ Version the YAML targets. Set it explicitly; it does not select framework code. 
 **Processing order:** version comparison runs immediately after YAML loading, **before** profiles and `STM32_YML_OVERRIDE_*`. Changing these two options through a profile/override cannot change diagnostics already emitted. Set them at the YAML root. Missing or empty versions warn when checking is enabled; configuration continues. An omitted or empty switch defaults to `true` (the empty switch is not separately tested).
 
 ```yaml
-stm32_cmake_yml_version: 0.9.3
+stm32_cmake_yml_version: 0.10.0
 ```
 
 [0.9.2 implementation](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_config.cmake) · [Index](index.md)

@@ -10,13 +10,13 @@ on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 
 ---
 
-## [Unreleased]
+## [0.10.0] - 2026-10-02
 
 ### Added
 
 - **Navigation and version boundaries:** README and status describe both Arduino modes and the current matrix; clarify QEMU/Renode families and the historical reference baseline.
 
-- **Migration guide from 0.9.x** (spec 7.9): [migration steps](docs/en/migration-0.10.md), path comparison, code-based diagnostics and optional changes. Release 0.10.0 remains in preparation.
+- **Migration guide from 0.9.x** (spec 7.9): [migration steps](docs/en/migration-0.10.md), path comparison, code-based diagnostics and optional changes.
 
 - **JSON Schema and a paired Presets + YAML example** (spec 5.1.4, 6.6.4): the reference index generates the schema; Docs checks consistency, fixture YAML/TOML and explicit negative expectations. Unknown keys and empty values remain allowed; Configure is unchanged. The bilingual example explains preset, YAML and custom CMake connections. [Schema](docs/en/schema.md) · [Example](docs/en/presets.md).
 

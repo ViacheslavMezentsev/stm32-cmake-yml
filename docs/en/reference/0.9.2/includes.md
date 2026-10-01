@@ -7,7 +7,7 @@
 
 `CFG-INCLUDE` · **Type:** path or list of paths · **Default:** no includes
 
-**Since 0.10.0 (unreleased).** YAML and TOML includes are supported, including mixed chains.
+**Since 0.10.0.** YAML and TOML includes are supported, including mixed chains.
 [Formats and file selection](formats.md).
 In 0.9.2/0.9.3 this key does not load files.
 

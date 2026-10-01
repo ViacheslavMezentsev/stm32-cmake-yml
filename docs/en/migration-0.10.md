@@ -2,8 +2,8 @@
 
 [Documentation](index.md) → Migration · [Русский](../ru/migration-0.10.md)
 
-This guide describes the changes prepared for 0.10.0. The release is not complete;
-see the [roadmap](../../TODO.md) for its status, the [changelog](../../CHANGELOG.en.md)
+This guide describes migration to 0.10.0. See the [roadmap](../../TODO.md)
+for its status, the [changelog](../../CHANGELOG.en.md)
 for all changes, and section 7.9 of the [specification](../TECHNICAL_SPECIFICATION.md)
 for compatibility requirements.
 

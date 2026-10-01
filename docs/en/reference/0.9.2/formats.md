@@ -6,7 +6,7 @@
 ## `PROJECT_CONFIG_FILE`
 
 A CMake control variable, not a YAML key. **Type:** path; **default since 0.10.0:**
-empty string (discovery). Version 0.10.0 is not released yet.
+empty string (discovery).
 
 Without an explicit path, only `stm32_config.yml`, `stm32_config.yaml` and
 `stm32_config.toml` in the project root are considered. One file selects it;

@@ -1,6 +1,6 @@
 # Keys unknown to the framework are exported without warnings (spec 3.2.7, TC-42);
 # toolchain_backend is omitted and defaults to stm32-cmake.
-stm32_cmake_yml_version: 0.9.3
+stm32_cmake_yml_version: 0.10.0
 project_name: baremetal_probe
 mcu: STM32F103C8T6
 languages: [C, ASM]
