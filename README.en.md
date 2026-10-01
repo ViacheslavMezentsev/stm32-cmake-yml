@@ -84,7 +84,7 @@ precedence. Check [semantics](docs/en/reference/0.9.2/semantics.md) and
 
 [Documentation map](docs/en/index.md) · [Scenarios](docs/en/scenarios.md) ·
 [Reference 0.9.2 with 0.9.3 changes](docs/en/reference/0.9.2/index.md) · [Manual (Russian)](docs/user_manual.md) ·
-[Troubleshooting](docs/en/troubleshooting.md) · [Roadmap](TODO.md)
+[Troubleshooting](docs/en/troubleshooting.md) · [Roadmap](TODO.md) · [Migrating to 0.10.0](docs/en/migration-0.10.md)
 
 The `skills/` directory contains instructions for AI agents. Provide a skill to
 your assistant through the mechanism your tool supports; skills are not required to build.

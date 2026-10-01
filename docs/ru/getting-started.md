@@ -82,3 +82,5 @@ stm32_yml_setup_project(${PROJECT_NAME})
 Дальше: [сценарии](scenarios.md), [кэш и bare metal](development.md).
 
 Для выбора режима сборки в CMake и VS Code см. [совместный пример Presets и YAML](presets.md). Структуру файла можно проверить по [JSON Schema](schema.md).
+
+Для существующего проекта 0.9.x начните с [Переход на 0.10.0](migration-0.10.md).

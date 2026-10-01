@@ -14,11 +14,13 @@ on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 
 ### Added
 
+- **Migration guide from 0.9.x** (spec 7.9): [migration steps](docs/en/migration-0.10.md), path comparison, code-based diagnostics and optional changes. Release 0.10.0 remains in preparation.
+
 - **JSON Schema and a paired Presets + YAML example** (spec 5.1.4, 6.6.4): the reference index generates the schema; Docs checks consistency, fixture YAML/TOML and explicit negative expectations. Unknown keys and empty values remain allowed; Configure is unchanged. The bilingual example explains preset, YAML and custom CMake connections. [Schema](docs/en/schema.md) · [Example](docs/en/presets.md).
 
 - **TOML and file discovery** (spec 3.1.5, 3.8): main files, includes and external profiles support `.toml`; YAML and TOML may be mixed. Without an explicit `PROJECT_CONFIG_FILE`, the only `stm32_config.yml`/`.yaml`/`.toml` is selected. Multiple candidates fail. An empty value restores discovery; discovered names are not cached. [Rules and old-cache migration](docs/en/reference/0.9.2/formats.md).
 
-- **YAML `include` files** (spec 3.8): recursive object merging, list replacement and `_append`, with profile additions accumulated until activation. Include paths are relative to the declaring file; cycles and missing files report their chain. All files are Configure dependencies. `stm32_config.effective.json` records the tree before profiles, overrides, IOC and defaults. The `_append` suffix outside profiles is now reserved; the configuration root must be a single object. [Rules and limits](docs/en/reference/0.9.2/includes.md). TOML and file discovery will follow separately.
+- **YAML `include` files** (spec 3.8): recursive object merging, list replacement and `_append`, with profile additions accumulated until activation. Include paths are relative to the declaring file; cycles and missing files report their chain. All files are Configure dependencies. `stm32_config.effective.json` records the tree before profiles, overrides, IOC and defaults. The `_append` suffix outside profiles is now reserved; the configuration root must be a single object. [Rules and limits](docs/en/reference/0.9.2/includes.md).
 
 - **Message codes and language** (spec 4.16.5–4.16.10). Messages are printed by
   permanent `SCY-<I|W|E><number>` codes from the `cmake/stm32_yml_messages_catalog.cmake`
@@ -39,7 +41,7 @@ on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 - **`system_library: none`** (spec 4.10.2) explicitly disables the system library without
   a warning.
 - **`Arduino::Options` and `Arduino::Platform` targets in the `wrappers` mode** (spec 4.9.8,
-  4.9.10, 4.9.14–4.9.16). The `arduino.integration` key (`wrappers` for now, as in 0.9.3).
+  4.9.10, 4.9.14–4.9.16). The `arduino.integration` key (`wrappers` by default, as in 0.9.3).
   `Arduino::Options` holds common and language `compile_options`; `Arduino::Platform` holds
   the core and FPU flags, board definitions and include directories and CMSIS, so a core
   wrapper linked to it does not depend on the MCU family. The board is `arduino.board` or is

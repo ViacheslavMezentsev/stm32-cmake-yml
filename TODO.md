@@ -160,8 +160,9 @@ Firmware на GitHub запускается вручную на границах
 - [x] `codex/config-include` слита: `main` @ `c77eebd`, Docs/Configure PASS; YAML include, effective.json и 16 новых сценариев.
 - [x] `codex/configure-ci-speedup` слита: `7628218`, все CI PASS; первый Configure 10:23 вместо 17:55, тесты 2:38 вместо 8:06.
 - [x] `codex/config-formats` слита: `753b5bc`, TOML, автовыбор файла, 19 новых сценариев; 1452 Configure PASS, Docs/Configure для отправленного коммита PASS.
-- [ ] В работе `codex/config-schema-presets`: генерируемая JSON Schema, L1 и совместный пример Presets + YAML на двух языках. Локально: 1452 Configure PASS, 95 конфигураций L1, 14 тестов Schema/Presets и остальные проверки Docs PASS. Ожидаются commit/push/CI/land. Полный L0–L5 и ручной Firmware — перед закрытием этапа 4.
-- [ ] **Этап 4. Расширения конфигурации:** `include:`, TOML, имена файла по умолчанию,
+- [x] `codex/config-schema-presets` слита в main (`e5d93c6`): Schema и совместный пример Presets + YAML. Полный локальный L0–L5 PASS: 1452 Configure, 618 сборок, 336 QEMU + 612 Renode; Docs, Configure, CI environment и ручной [Firmware](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/actions/runs/36925400885) для этого SHA PASS.
+- [ ] В работе `codex/migration-guide`: руководство перехода RU/EN, навигация и фиксация результатов этапа 4. Локально Docs (87 страниц), Schema (95 конфигураций), 14 тестов Schema/Presets, каталог сообщений и строгая проверка ТЗ PASS. Ожидаются commit/push/CI/land. Версия не меняется; выпуск и полный финальный прогон — отдельный шаг.
+- [x] **Этап 4. Расширения конфигурации:** `include:`, TOML, имена файла по умолчанию,
   итоговая конфигурация, JSON Schema, пример пресета в документации.
 - [ ] **Этап 5. Тесты и CI — перенесён на версию после 0.10.0** (решение заказчика, ТЗ 2.6):
   периферия в эмуляторах (группа 5), модели RCC/PWR для запуска прошивок Arduino `native`
@@ -339,8 +340,9 @@ at the end of each stage. Branches are merged by fast-forward (`git land`).
 - [x] `codex/config-include` merged: `main` @ `c77eebd`, Docs/Configure PASS; YAML includes, effective.json and 16 new cases.
 - [x] `codex/configure-ci-speedup` merged: `7628218`, all CI PASS; first Configure 10:23 vs 17:55, tests 2:38 vs 8:06.
 - [x] `codex/config-formats` merged: `753b5bc`, TOML, file discovery, 19 new cases; 1452 Configure PASS, Docs/Configure for the pushed commit PASS.
-- [ ] In progress: `codex/config-schema-presets`, generated JSON Schema, L1 and a bilingual paired Presets + YAML example. Local: 1452 Configure PASS, 95 L1 configurations, 14 Schema/Presets tests and remaining Docs checks PASS. Awaiting commit/push/CI/land. Full L0–L5 and manual Firmware before closing stage 4.
-- [ ] **Stage 4. Configuration extensions:** `include:`, TOML, default file names,
+- [x] `codex/config-schema-presets` merged into main (`e5d93c6`): Schema and paired Presets + YAML example. Full local L0–L5 PASS: 1452 Configure, 618 builds, 336 QEMU + 612 Renode; Docs, Configure, CI environment and manual [Firmware](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/actions/runs/36925400885) for that SHA PASS.
+- [ ] In progress: `codex/migration-guide`: RU/EN migration guide, navigation and stage 4 results. Local Docs (87 pages), Schema (95 configurations), 14 Schema/Presets tests, message catalog and strict spec check PASS. Awaiting commit/push/CI/land. No version change; release preparation and the final full run remain a separate step.
+- [x] **Stage 4. Configuration extensions:** `include:`, TOML, default file names,
   effective configuration, JSON Schema, a preset example in the documentation.
 - [ ] **Stage 5. Tests and CI — moved to the version after 0.10.0** (customer decision,
   spec 2.6): peripherals in emulators (group 5), RCC/PWR models to run Arduino `native`
