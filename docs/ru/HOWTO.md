@@ -247,3 +247,12 @@ PYTHONPATH=/tmp/schema-deps python3 -m unittest discover -s tests -p test_config
 Если байты уже UTF-8, но IDE показывает искажения, проверьте
 `cmake.outputLogEncoding` в CMake Tools: декодирование должно быть UTF-8.
 Удаление кэша не исправляет кодировку потоков. [Подробности](errata/E009.md).
+
+## Windows-пути в тестовых CMake-файлах
+
+При генерации CMake из Python используйте `Path.as_posix()` и кавычки:
+обратный слеш в строке CMake интерпретируется как начало escape (`\g` даёт
+Invalid character escape). Не заменяйте PATH тестового Git на /usr/bin:/bin:
+сохраняйте окружение Windows, а настройки автора/подписи изолируйте через
+GIT_CONFIG_GLOBAL и GIT_CONFIG_NOSYSTEM только для временных тестовых репозиториев.
+Правила подписи коммитов рабочего репозитория не меняются.

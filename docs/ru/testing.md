@@ -472,3 +472,20 @@ CMake 3.21 записывает команду в `CMakeFiles/rules.ninja`, а 3
 и проверяет совокупность результатов; `tests/test_configure_reports.py` проверяет
 ошибочные и неполные отчёты. Запуск: `python -m unittest discover -s tests -p test_configure_reports.py`.
 Проверки включены в Docs CI. Набор L3 остаётся 242 × 6 = 1452; Firmware — отдельный ручной запуск.
+
+## Быстрые проверки Host
+
+Workflow `Host` выполняет одинаковый набор на `ubuntu-24.04` и `windows-2022`:
+кодировки CRC/BIN (включая CMake/Ninja POST_BUILD), существующие CRC-тесты и
+определение версий компонентов. Docker, GCC для MCU и эмуляторы не требуются.
+Используются инструменты runner; их версии записываются в summary.json.
+Это не проверка закреплённой пары инструментов TC-44.
+
+Локально: `python ci/run_host_checks.py --output build/host-checks`.
+Отсутствие инструмента, пустой набор или пропуск теста — ошибка. Сохраняются
+`tests.log` и `summary.json`; в Actions они доступны как `host-<ОС>`.
+На push проверяются изменения scripts, cmake, stm32_yml.cmake, tests,
+ci/run_host_checks.py и host.yml. Только Markdown не запускает этот workflow.
+Можно запустить вручную. Лимит job — 10 минут; это предохранитель, не целевая
+длительность. Локальные 19 тестов занимают несколько секунд; время GitHub
+измеряется после push. Полное Windows-задание TC-44 ещё не реализовано.

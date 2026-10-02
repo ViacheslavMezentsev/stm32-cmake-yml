@@ -177,6 +177,13 @@ Firmware на GitHub запускается вручную на границах
 
 ### Согласованный состав 0.10.1 — реализация
 
+Текущая ветка: `codex/windows-ci` (быстрый подэтап). Для `d759e48` успешны Docs
+и Configure; main пока 0500b68. Host CI подготовлен: 19/19 локально Windows/Linux,
+Windows unit-набор — 87 PASS, 3 POSIX-only skip из 90. Исправлены пять ошибок
+TC-83 с путями. ТЗ 2.15. Отчёты: build/host-checks-windows и host-checks-linux.
+Полное Windows-задание TC-44, полный L0–L5 и GitHub нового коммита ещё впереди.
+
+
 План согласован; реализация начата в `codex/utf8-diagnostics` от main с включением
 подписанных коммитов `codex/plan-0.10.1` перемоткой. Тег 0.10.0 не меняется.
 Подготовлено исправление UTF-8 и регрессия TC-88, E009, ТЗ 2.14. Локальные
@@ -545,6 +552,13 @@ at the end of each stage. Branches are merged by fast-forward (`git land`).
   0.10.0, CHANGELOG, release spec, L0–L5, Firmware in CI, tag `v0.10.0`.
 
 ### Agreed 0.10.1 scope — implementation
+
+Current branch: `codex/windows-ci` (fast checks substep). Docs/Configure passed
+for d759e48; main remains 0500b68. Host checks: 19/19 locally on Windows/Linux;
+Windows unit suite: 87 PASS, 3 POSIX-only skips out of 90. Five TC-83 path errors
+fixed. Spec 2.15. Reports: build/host-checks-windows and host-checks-linux.
+Full TC-44, L0–L5 and GitHub checks for the new commit remain pending.
+
 
 Implementation started in `codex/utf8-diagnostics` from main, fast-forwarding the
 signed plan commits. UTF-8 fix, TC-88 regression, E009 and spec 2.14 are prepared;

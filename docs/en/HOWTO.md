@@ -250,3 +250,11 @@ versions, temporarily set `PYTHONIOENCODING=utf-8` in the build environment.
 If bytes are already UTF-8 but IDE text is corrupted, check CMake Tools
 `cmake.outputLogEncoding`: the decoder must use UTF-8. Clearing the cache
 does not fix stream encoding. [Details](errata/E009.md).
+
+## Windows paths in generated CMake tests
+
+Use quoted `Path.as_posix()` values when generating CMake from Python: a
+backslash starts an escape (`\g` produces Invalid character escape). Preserve
+the Windows environment instead of replacing PATH with /usr/bin:/bin. Isolate
+Git configuration with GIT_CONFIG_GLOBAL and GIT_CONFIG_NOSYSTEM only for
+temporary test repositories. Signing rules for the working repository are unchanged.

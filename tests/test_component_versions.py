@@ -5,6 +5,7 @@ a git clone with a tag, a clone without tags (shallow), a copy without .git,
 and a directory without version data.
 """
 from pathlib import Path
+import os
 import shutil
 import subprocess
 import tempfile
@@ -17,21 +18,22 @@ GIT = shutil.which('git')
 
 def git(directory, *args):
     subprocess.run([GIT, '-C', str(directory), *args], check=True, capture_output=True,
-                   env={'GIT_AUTHOR_NAME': 't', 'GIT_AUTHOR_EMAIL': 't@t', 'GIT_COMMITTER_NAME': 't',
-                        'GIT_COMMITTER_EMAIL': 't@t', 'HOME': str(directory), 'PATH': '/usr/bin:/bin'})
+                   env=dict(os.environ, GIT_AUTHOR_NAME='t', GIT_AUTHOR_EMAIL='t@t',
+                            GIT_COMMITTER_NAME='t', GIT_COMMITTER_EMAIL='t@t',
+                            GIT_CONFIG_NOSYSTEM='1', GIT_CONFIG_GLOBAL=os.devnull))
 
 
 @unittest.skipUnless(CMAKE and GIT, 'cmake and git are required')
 class ComponentVersionTests(unittest.TestCase):
     def setUp(self):
-        self.temp = tempfile.TemporaryDirectory()
+        self.temp = tempfile.TemporaryDirectory(prefix='component versions ')
         self.addCleanup(self.temp.cleanup)
         self.dir = Path(self.temp.name)
 
     def version(self, function, directory):
         script = self.dir / 'probe.cmake'
-        script.write_text(f'include("{ROOT}/cmake/stm32_yml_versions.cmake")\n'
-                          f'{function}("{directory}" _v)\nmessage("RESULT=[${{_v}}]")\n', encoding='utf-8')
+        script.write_text(f'include("{ROOT.as_posix()}/cmake/stm32_yml_versions.cmake")\n'
+                          f'{function}("{directory.as_posix()}" _v)\nmessage("RESULT=[${{_v}}]")\n', encoding='utf-8')
         result = subprocess.run([CMAKE, '-P', str(script)], capture_output=True, text=True, check=True)
         return result.stderr.split('RESULT=[', 1)[1].split(']', 1)[0]
 
@@ -73,8 +75,9 @@ class ComponentVersionTests(unittest.TestCase):
     def test_arduino_core(self):
         directory, commit = self.repo('core', {'platform.txt': 'name=STM32\nversion=2.12.0\n'})
         self.assertEqual(self.version('stm32_yml_arduino_core_version', directory), f'2.12.0 ({commit})')
-        shutil.rmtree(directory / '.git')
-        self.assertEqual(self.version('stm32_yml_arduino_core_version', directory), '2.12.0')
+        copied = self.dir / 'core copy'
+        shutil.copytree(directory, copied, ignore=shutil.ignore_patterns('.git'))
+        self.assertEqual(self.version('stm32_yml_arduino_core_version', copied), '2.12.0')
 
 
 if __name__ == '__main__':

@@ -12,6 +12,10 @@ on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 
 ## [Unreleased] — 0.10.1
 
+### Tests
+
+- Added fast Windows/Linux Host CI with logs and path filters; fixed Windows portability of version tests. Full TC-44 remains pending.
+
 ### Fixed
 
 - **E009:** CRC/BIN Python CLI writes stdout/stderr as UTF-8 regardless of the code page; import leaves streams unchanged. TC-88 covers CP1251/CP866, files/pipes, JSONL and CMake/Ninja POST_BUILD. Fix prepared, not yet released.

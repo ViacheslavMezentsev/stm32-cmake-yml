@@ -464,3 +464,19 @@ The matrix and final gate are described in [maintenance](maintenance.md#configur
 validates combined results; `tests/test_configure_reports.py` covers failed and
 incomplete reports. Run `python -m unittest discover -s tests -p test_configure_reports.py`.
 These checks run in Docs CI. L3 remains 242 × 6 = 1452; Firmware is a separate manual run.
+
+## Fast Host checks
+
+The `Host` workflow runs the same suite on `ubuntu-24.04` and `windows-2022`:
+CRC/BIN encoding (including CMake/Ninja POST_BUILD), existing CRC tests and
+component version detection. No Docker, MCU GCC or emulators are required.
+Runner tools are used and their versions recorded in summary.json. This is
+not the pinned toolchain validation required by TC-44.
+
+Local command: `python ci/run_host_checks.py --output build/host-checks`.
+Missing tools, empty suites or skipped tests fail the run. `tests.log` and
+`summary.json` are published as `host-<OS>` artifacts. Pushes affecting scripts,
+cmake, stm32_yml.cmake, tests, ci/run_host_checks.py or host.yml trigger it;
+Markdown-only pushes do not. Manual dispatch is available. The 10-minute job
+limit is a guard, not expected duration. Locally the 19 tests take seconds;
+GitHub timing is measured after push. Full Windows TC-44 remains unimplemented.
