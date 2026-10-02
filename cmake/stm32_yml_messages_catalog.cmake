@@ -581,11 +581,20 @@ stm32_yml_msg_def(I701
     "Настройка механизма внедрения CRC32 в прошивку..."
     "Setting up CRC32 injection into the firmware...")
 stm32_yml_msg_def(I702
-    " Метод: Внедрение в секцию '{1}'"
-    " Method: injection into section '{1}'")
+    "[STM32 CRC32] Секция: '{1}'"
+    "[STM32 CRC32] Section: '{1}'")
 stm32_yml_msg_def(I703
-    " Алгоритм: {1}"
-    " Algorithm: {1}")
+    "[STM32 CRC32] Алгоритм: {1}"
+    "[STM32 CRC32] Algorithm: {1}")
+stm32_yml_msg_def(E712
+    "crc_method: неизвестное значение '{1}'. Допустимы auto и none (синоним auto)."
+    "crc_method: unknown value '{1}'. Expected auto or none (alias of auto).")
+stm32_yml_msg_def(I711
+    "[STM32 CRC32] Метод: {1} (расчёт и размещение CRC)"
+    "[STM32 CRC32] Method: {1} (CRC calculation and placement)")
+stm32_yml_msg_def(I712
+    "[STM32 CRC32] Разместите секцию размером 4 байта в конце образа FLASH с выравниванием 4 байта; разметку задаёт пользовательский скрипт. Configure не проверяет итоговое положение секции."
+    "[STM32 CRC32] Place the 4-byte section at the end of the FLASH image, aligned to 4 bytes, in the user linker script. Configure does not verify the final section position.")
 stm32_yml_msg_def(I704
     " Регион FLASH скрипта: ORIGIN {1}, LENGTH {2} байт"
     " Script FLASH region: ORIGIN {1}, LENGTH {2} bytes")

@@ -54,6 +54,40 @@ crc_enable: false
 
 **Errata:** [E006](../../errata/E006.md).
 
+<a id="crc-method"></a>
+## `crc_method`
+
+`CFG-CRC-METHOD` · **Тип:** string: auto / none · **Default:** auto
+
+**К 0.10.1 (подготовлено):** резервирует выбор полного метода расчёта и
+размещения CRC. Alias: `crc.method`. Отсутствие, `null`, пустая строка и `none`
+означают `auto`; `none` не отключает CRC. Включение задаёт только `crc_enable`.
+Иные значения, включая `false` и `0`, завершают Configure ошибкой `SCY-E712`,
+даже при отключённом CRC. Значения регистрозависимы.
+
+`auto` сохраняет существующий расчёт `STM32_HW_DEFAULT` и запись в
+`crc_section_name`. Пользователь размещает 4-байтовую секцию по выровненному
+на 4 байта адресу в конце образа FLASH, после всех секций с FLASH LMA,
+включая загрузочную копию `.data`. Фреймворк не перемещает секции и не добавляет
+поле длины. Configure показывает метод, алгоритм и фактическое имя секции,
+но не подтверждает правильность её итогового положения в ELF.
+
+Профиль и `STM32_YML_OVERRIDE_crc_method` применяются до нормализации;
+повторный Configure пересчитывает значение. Правила одинаковы для backend
+stm32-cmake и Arduino. В 0.10.0 и раньше опция не имела определённой семантики.
+
+```yaml
+crc:
+  enable: true
+  method: auto
+  section_name: .checksum
+```
+
+Реализация: `cmake/stm32_yml_config.cmake`, `cmake/stm32_yml_postbuild.cmake`.
+Проверки: `configure.crc-method-*` в [manifest](../../../../tests/cases.json)
+покрывают нормализацию, профили, override, отключение и ошибку, RU/EN-сообщения.
+Это Configure-проверки; они не проверяют исполняемый образ в симуляторе.
+
 <a id="crc-section-name"></a>
 ## `crc_section_name`
 

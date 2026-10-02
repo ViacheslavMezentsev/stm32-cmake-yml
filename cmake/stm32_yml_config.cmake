@@ -301,6 +301,14 @@ function(stm32_yml_prepare_project_data OUT_PROJECT_NAME_VAR OUT_LANGUAGES_VAR)
 
     stm32_yml_ensure_default_value(crc_enable "false")
 
+    # Spec 4.15.10: method selection never enables/disables CRC.
+    # Validate after profiles/overrides, even when crc_enable is false.
+    if(NOT DEFINED crc_method OR "${crc_method}" STREQUAL "" OR "${crc_method}" STREQUAL "none")
+        set(crc_method "auto")
+    elseif(NOT "${crc_method}" STREQUAL "auto")
+        stm32_yml_msg(E712 "${crc_method}")
+    endif()
+
     # Нормализуем значение в булево для проверки прямо здесь
     string(TOUPPER "${crc_enable}" _crc_check)
     if(_crc_check STREQUAL "TRUE" OR _crc_check STREQUAL "ON" OR _crc_check STREQUAL "1" OR _crc_check STREQUAL "YES")
@@ -403,6 +411,7 @@ function(stm32_yml_prepare_project_data OUT_PROJECT_NAME_VAR OUT_LANGUAGES_VAR)
     set(crc_enable ${crc_enable} PARENT_SCOPE)
     set(crc_section_name ${crc_section_name} PARENT_SCOPE)
     set(crc_algorithm ${crc_algorithm} PARENT_SCOPE)
+    set(crc_method "${crc_method}" PARENT_SCOPE)
     set(cppcheck_enable ${cppcheck_enable} PARENT_SCOPE)
     set(cppcheck_args ${cppcheck_args} PARENT_SCOPE)
     set(cppcheck_ignores ${cppcheck_ignores} PARENT_SCOPE)

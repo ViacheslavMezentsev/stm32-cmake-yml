@@ -53,6 +53,7 @@ See the [roadmap](../../../../TODO.md) for release status and the
 | [`cppcheck_ignores`](diagnostics.md#cppcheck-ignores) | `CFG-CPPCHECK-IGNORES` |
 | [`crc_algorithm`](postbuild.md#crc-algorithm) | `CFG-CRC-ALGORITHM` |
 | [`crc_enable`](postbuild.md#crc-enable) | `CFG-CRC-ENABLE` |
+| [`crc_method`](postbuild.md#crc-method) | `CFG-CRC-METHOD` |
 | [`crc_section_name`](postbuild.md#crc-section-name) | `CFG-CRC-SECTION-NAME` |
 | [`cubefw_package`](frameworks.md#cubefw-package) | `CFG-CUBEFW-PACKAGE` |
 | [`custom_libraries`](sources.md#custom-libraries) | `CFG-CUSTOM-LIBRARIES` |

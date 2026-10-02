@@ -25,5 +25,8 @@
   },
   "case:include-invalid-root:1:include-invalid-root.yml": {
     "<parse>": "include-invalid-root: multiple YAML documents are deliberately rejected."
+  },
+  "tests/fixtures/project/crc-method.yml": {
+    "/profiles/invalid/crc_method": "crc-method-unknown: unknown method must fail Configure."
   }
 }

@@ -6509,6 +6509,272 @@
     "cache_values": {
       "PROJECT_CONFIG_FILE": ""
     }
+  },
+  {
+    "name": "crc-method-alias",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=crc-method.yml"
+    ],
+    "observed": {
+      "crc_method": "auto",
+      "crc_enable": "TRUE"
+    },
+    "crc_command": true,
+    "crc_section": ".signature",
+    "messages": [
+      {
+        "code": "I711",
+        "args": [
+          "auto"
+        ]
+      },
+      {
+        "code": "I702",
+        "args": [
+          ".signature"
+        ]
+      },
+      {
+        "code": "I712",
+        "args": []
+      }
+    ],
+    "lang": "ru",
+    "crc_flash_limit": 65536
+  },
+  {
+    "name": "crc-method-none",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=crc-method.yml",
+      "-DSTM32_YML_PROFILE=legacy"
+    ],
+    "observed": {
+      "crc_method": "auto",
+      "crc_enable": "TRUE"
+    },
+    "crc_command": true,
+    "crc_section": ".signature",
+    "messages": [
+      {
+        "code": "I711",
+        "args": [
+          "auto"
+        ]
+      },
+      {
+        "code": "I702",
+        "args": [
+          ".signature"
+        ]
+      },
+      {
+        "code": "I712",
+        "args": []
+      }
+    ],
+    "crc_flash_limit": 65536
+  },
+  {
+    "name": "crc-method-empty",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=crc-method.yml",
+      "-DSTM32_YML_PROFILE=empty"
+    ],
+    "observed": {
+      "crc_method": "auto",
+      "crc_enable": "TRUE"
+    },
+    "crc_command": true,
+    "crc_section": ".signature",
+    "messages": [
+      {
+        "code": "I711",
+        "args": [
+          "auto"
+        ]
+      },
+      {
+        "code": "I702",
+        "args": [
+          ".signature"
+        ]
+      },
+      {
+        "code": "I712",
+        "args": []
+      }
+    ],
+    "crc_flash_limit": 65536
+  },
+  {
+    "name": "crc-method-null",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=crc-method.yml",
+      "-DSTM32_YML_PROFILE=nullvalue"
+    ],
+    "observed": {
+      "crc_method": "auto",
+      "crc_enable": "TRUE"
+    },
+    "crc_command": true,
+    "crc_section": ".signature",
+    "messages": [
+      {
+        "code": "I711",
+        "args": [
+          "auto"
+        ]
+      },
+      {
+        "code": "I702",
+        "args": [
+          ".signature"
+        ]
+      },
+      {
+        "code": "I712",
+        "args": []
+      }
+    ],
+    "crc_flash_limit": 65536
+  },
+  {
+    "name": "crc-method-override",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=crc-method.yml",
+      "-DSTM32_YML_PROFILE=invalid",
+      "-DSTM32_YML_OVERRIDE_crc_method=auto"
+    ],
+    "observed": {
+      "crc_method": "auto",
+      "crc_enable": "TRUE"
+    },
+    "crc_command": true,
+    "crc_section": ".signature",
+    "messages": [
+      {
+        "code": "I711",
+        "args": [
+          "auto"
+        ]
+      },
+      {
+        "code": "I702",
+        "args": [
+          ".signature"
+        ]
+      },
+      {
+        "code": "I712",
+        "args": []
+      }
+    ],
+    "crc_flash_limit": 65536
+  },
+  {
+    "name": "crc-method-missing",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=baremetal.yml"
+    ],
+    "observed": {
+      "crc_method": "auto",
+      "crc_enable": "FALSE"
+    },
+    "crc_command": false,
+    "steps": [
+      {},
+      {
+        "args": [
+          "-DSTM32_YML_OVERRIDE_crc_method=bad"
+        ],
+        "error": {
+          "code": "E712",
+          "args": [
+            "bad"
+          ]
+        }
+      },
+      {
+        "args": [
+          "-USTM32_YML_OVERRIDE_crc_method"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "crc-method-disabled",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=crc-method.yml",
+      "-DSTM32_YML_PROFILE=legacy",
+      "-DSTM32_YML_OVERRIDE_crc_enable=false"
+    ],
+    "observed": {
+      "crc_method": "auto",
+      "crc_enable": "FALSE"
+    },
+    "crc_command": false
+  },
+  {
+    "name": "crc-method-unknown",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=crc-method.yml",
+      "-DSTM32_YML_PROFILE=invalid"
+    ],
+    "error": {
+      "code": "E712",
+      "args": [
+        "unsupported"
+      ]
+    }
+  },
+  {
+    "name": "crc-method-unknown-disabled",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=crc-method.yml",
+      "-DSTM32_YML_PROFILE=invalid",
+      "-DSTM32_YML_OVERRIDE_crc_enable=false"
+    ],
+    "error": {
+      "code": "E712",
+      "args": [
+        "unsupported"
+      ]
+    },
+    "steps": [
+      {},
+      {
+        "args": [
+          "-DSTM32_YML_OVERRIDE_crc_method=false"
+        ],
+        "error": {
+          "code": "E712",
+          "args": [
+            "false"
+          ]
+        }
+      },
+      {
+        "args": [
+          "-DSTM32_YML_OVERRIDE_crc_method=0"
+        ],
+        "error": {
+          "code": "E712",
+          "args": [
+            "0"
+          ]
+        }
+      },
+      {
+        "args": [
+          "-DSTM32_YML_OVERRIDE_crc_method=AUTO"
+        ],
+        "error": {
+          "code": "E712",
+          "args": [
+            "AUTO"
+          ]
+        }
+      }
+    ]
   }
-
 ]

@@ -1,0 +1,26 @@
+stm32_cmake_yml_version: 0.10.0
+project_name: crc_method_probe
+mcu: STM32F103C8T6
+languages: [C, ASM]
+sources: [main.c]
+use_cmsis: false
+use_hal: false
+use_freertos: false
+use_newlib_nano: false
+heap_size: 0
+stack_size: 1K
+compile_options: [mcpu=cortex-m3, mthumb]
+linker_script: linker/custom.ld
+crc:
+  enable: true
+  method: auto
+  section_name: .signature
+profiles:
+  legacy:
+    crc_method: none
+  empty:
+    crc_method: ""
+  nullvalue:
+    crc_method: null
+  invalid:
+    crc_method: unsupported

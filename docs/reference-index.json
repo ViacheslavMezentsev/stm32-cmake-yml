@@ -2441,6 +2441,45 @@
           }
         ]
       }
+    },
+    {
+      "key": "crc_method",
+      "requirement": "CFG-CRC-METHOD",
+      "type": "string: auto / none",
+      "since": "0.10.1",
+      "verified_in": "0.10.1",
+      "source": "cmake/stm32_yml_config.cmake",
+      "pages": {
+        "ru": "docs/ru/reference/0.9.2/postbuild.md#crc-method",
+        "en": "docs/en/reference/0.9.2/postbuild.md#crc-method"
+      },
+      "tests": [
+        "configure.crc-method-alias",
+        "configure.crc-method-none",
+        "configure.crc-method-empty",
+        "configure.crc-method-null",
+        "configure.crc-method-override",
+        "configure.crc-method-missing",
+        "configure.crc-method-disabled",
+        "configure.crc-method-unknown",
+        "configure.crc-method-unknown-disabled"
+      ],
+      "errata": [],
+      "yaml_paths": [
+        [
+          "crc",
+          "method"
+        ],
+        [
+          "crc_method"
+        ]
+      ],
+      "schema": {
+        "enum": [
+          "auto",
+          "none"
+        ]
+      }
     }
   ],
   "errata": [

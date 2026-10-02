@@ -13,7 +13,7 @@ Full local L0–L5 and [tag Firmware CI](https://github.com/ViacheslavMezentsev/
 ## Configuration
 
 <!-- configure-counts -->
-**242 scenarios × 6 tool pairs = 1452 configure executions**
+**251 scenarios × 6 tool pairs = 1506 configure executions**
 <!-- /configure-counts -->
 
 This is suite size, not the number of passing runs. CI verifies it against the

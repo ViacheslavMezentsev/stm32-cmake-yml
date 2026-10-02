@@ -177,14 +177,21 @@ Firmware на GitHub запускается вручную на границах
 
 ### Согласованный состав 0.10.1 — реализация
 
-Текущая ветка: `codex/windows-configure`. Предыдущая ветка слита в main
-6d066f0, CI успешен. Подготовлен Windows job в Firmware; пять локальных сценариев
-на CMake 3.21.7 / xPack GCC 14.2.1-1.1 проверены, включая сборку артефактов.
-E010 (sources другого диска) по решению владельца остаётся регрессией без
-исправления; TC-44 частичен. Эмуляторы Windows отложены до необходимости.
-ТЗ 2.16. Новый job на GitHub ещё не запускался; полный L0–L5 не повторялся.
-Локально: 88 unit PASS и 3 POSIX-only skip из 91; пять базовых Linux-сценариев
-PASS. Отчёт Windows: build/windows-tc44-final/summary.json (E010 явно указан).
+Текущая ветка: `codex/crc-method`, от main `4242743`.
+`codex/windows-configure` слита; Docs, Configure, Host, CI environment и ручной
+Firmware успешны на этом SHA. Windows job подтвердил пять сценариев;
+E010 остаётся открытым, TC-44 частичен. Эмуляторы Windows отложены.
+
+Подготовлен первый CRC-подэтап: `crc_method` / `crc.method`, default auto,
+none/null/пустота → auto; неизвестное значение — ошибка Configure.
+Отдельные сообщения метода, алгоритма и секции, RU/EN-карточка, schema и ТЗ 2.17.
+Девять новых сценариев (с повторным Configure, профилями и override) прошли
+локально на Windows 3.21.7 / GCC 14.2.1; отчёт build/crc-method-verified.
+Linux: 14 новых и прежних CRC-сценариев PASS (build/crc-method-linux).
+Reference, messages, schema и strict-проверка ТЗ прошли. Полный L0–L5
+в этом подэтапе не повторялся; запуск CI нового SHA ещё впереди.
+Следующий CRC-подэтап: локализация сообщений post-build, ошибки внедрения,
+документация разметки и проверки длины/остатка CRC в симуляторах.
 
 Предыдущий быстрый подэтап: `codex/windows-ci`. Для `d759e48` успешны Docs
 и Configure; main пока 0500b68. Host CI подготовлен: 19/19 локально Windows/Linux,
@@ -562,13 +569,21 @@ at the end of each stage. Branches are merged by fast-forward (`git land`).
 
 ### Agreed 0.10.1 scope — implementation
 
-Current branch: `codex/windows-configure`; previous branch merged into main
-6d066f0 with successful CI. Windows Firmware job prepared; five local cases
-checked with CMake 3.21.7 / xPack GCC 14.2.1-1.1, including artifact builds.
-Owner deferred E010 (other-drive sources): regression only, TC-44 partial.
-Windows emulators deferred until needed. Spec 2.16. New GitHub job and full
-L0–L5 remain pending. Locally: 88 unit PASS, 3 POSIX-only skips out of 91;
-five unchanged Linux cases passed. Windows report: build/windows-tc44-final/summary.json.
+Current branch: `codex/crc-method`, from main `4242743`.
+`codex/windows-configure` is merged; Docs, Configure, Host, CI environment and
+manual Firmware passed for this SHA. The Windows job passed five cases;
+E010 remains open and TC-44 partial. Windows emulators remain deferred.
+
+First CRC substep prepared: `crc_method` / `crc.method`, default auto,
+none/null/empty → auto; unknown values fail Configure.
+Separate method, algorithm and section messages, RU/EN reference, schema and
+spec 2.17. Nine new scenarios (including reconfigure, profiles and overrides)
+passed locally on Windows 3.21.7 / GCC 14.2.1; build/crc-method-verified.
+Linux: 14 new and existing CRC scenarios passed (build/crc-method-linux).
+Reference, messages, schema and strict spec checks passed. Full L0–L5
+was not repeated in this substep; CI for the new SHA is still pending.
+Next CRC substep: localized post-build messages, injection errors, layout
+documentation and length/residue checks in simulators.
 
 Previous fast substep: `codex/windows-ci`. Docs/Configure passed
 for d759e48; main remains 0500b68. Host checks: 19/19 locally on Windows/Linux;

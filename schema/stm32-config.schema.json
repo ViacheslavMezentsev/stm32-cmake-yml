@@ -2067,6 +2067,27 @@
                 },
                 "algorithm_append": {
                   "$ref": "#/$defs/append"
+                },
+                "method": {
+                  "anyOf": [
+                    {
+                      "enum": [
+                        "auto",
+                        "none"
+                      ]
+                    },
+                    {
+                      "enum": [
+                        null,
+                        "",
+                        []
+                      ]
+                    }
+                  ],
+                  "description": "CFG-CRC-METHOD: string: auto / none"
+                },
+                "method_append": {
+                  "$ref": "#/$defs/append"
                 }
               },
               "additionalProperties": true,
@@ -2596,6 +2617,27 @@
             }
           ],
           "description": "CFG-INCLUDE: string or array of strings"
+        },
+        "crc_method": {
+          "anyOf": [
+            {
+              "enum": [
+                "auto",
+                "none"
+              ]
+            },
+            {
+              "enum": [
+                null,
+                "",
+                []
+              ]
+            }
+          ],
+          "description": "CFG-CRC-METHOD: string: auto / none"
+        },
+        "crc_method_append": {
+          "$ref": "#/$defs/append"
         }
       },
       "additionalProperties": true,

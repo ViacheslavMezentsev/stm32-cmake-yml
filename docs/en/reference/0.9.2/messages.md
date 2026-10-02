@@ -218,6 +218,7 @@ The list is built from the `cmake/stm32_yml_messages_catalog.cmake` catalog by `
 | `SCY-E709` | FATAL_ERROR | Input file '{1}' not found. |
 | `SCY-E710` | FATAL_ERROR | Usage: stm32\_crc.py &lt;input.bin&gt; &lt;output.bin&gt; \[limit\] \| --elf &lt;input.elf&gt; --flash &lt;origin&gt;:&lt;length&gt; --exclude &lt;section&gt; &lt;output.bin&gt; \[limit\] |
 | `SCY-E711` | FATAL_ERROR | I/O error: {1} |
+| `SCY-E712` | FATAL_ERROR | crc\_method: unknown value '{1}'. Expected auto or none (alias of auto). |
 | `SCY-W701` | WARNING | bin: could not find the FLASH region of the linker script or Python3; BIN is created by objcopy -O binary and may be large if the ELF has sections outside Flash. |
 | `SCY-W702` | WARNING | CRC calculation is disabled. Could not determine the FLASH size from {1}. Set 'flash\_size' in stm32\_config.yml. |
 | `SCY-W703` | WARNING | crc\_enable: section '{1}' (crc\_section\_name) is not found in script {2}. The post-build CRC step will fail. |
@@ -226,8 +227,8 @@ The list is built from the `cmake/stm32_yml_messages_catalog.cmake` catalog by `
 | `SCY-W706` | WARNING | objcopy not found. CRC calculation is disabled. |
 | `SCY-W707` | WARNING | CRC script not found: {1}. CRC calculation is disabled. |
 | `SCY-I701` | STATUS | Setting up CRC32 injection into the firmware... |
-| `SCY-I702` | STATUS | Method: injection into section '{1}' |
-| `SCY-I703` | STATUS | Algorithm: {1} |
+| `SCY-I702` | STATUS | \[STM32 CRC32\] Section: '{1}' |
+| `SCY-I703` | STATUS | \[STM32 CRC32\] Algorithm: {1} |
 | `SCY-I704` | STATUS | Script FLASH region: ORIGIN {1}, LENGTH {2} bytes |
 | `SCY-I705` | STATUS | Max Flash Size: {1} bytes ({2}) |
 | `SCY-I706` | STATUS | The build runs WITHOUT adding a checksum. |
@@ -235,6 +236,8 @@ The list is built from the `cmake/stm32_yml_messages_catalog.cmake` catalog by `
 | `SCY-I708` | STATUS | {1} Written {2}: {3} bytes from 0x{4} |
 | `SCY-I709` | STATUS | \[STM32 CRC32\] Calculated: 0x{1} (Size: {2} bytes from 0x{3}) |
 | `SCY-I710` | STATUS | \[STM32 CRC32\] Calculated: 0x{1} (Size: {2} bytes) |
+| `SCY-I711` | STATUS | \[STM32 CRC32\] Method: {1} (CRC calculation and placement) |
+| `SCY-I712` | STATUS | \[STM32 CRC32\] Place the 4-byte section at the end of the FLASH image, aligned to 4 bytes, in the user linker script. Configure does not verify the final section position. |
 
 ## 8xx — Diagnostics
 
