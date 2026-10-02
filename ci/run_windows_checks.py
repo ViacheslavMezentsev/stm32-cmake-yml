@@ -62,10 +62,13 @@ def main():
             host = subprocess.run([sys.executable, str(ROOT / 'ci/run_host_checks.py'), '--output', str(output / 'host')],
                                   env=env, stdout=log, stderr=subprocess.STDOUT, timeout=180)
         report['host_returncode'] = host.returncode
+        if host.returncode:
+            print((output / 'host.log').read_text(encoding='utf-8', errors='replace'), flush=True)
         if host.returncode == 0 and all(c['returncode'] == 0 for c in report['cases']):
             report['status'] = 'passed'
     except (OSError, ValueError, subprocess.SubprocessError) as error:
         report['error'] = str(error)
+        print(f'Windows check error: {error}', flush=True)
     finally:
         report['duration_seconds'] = round(time.monotonic() - start, 3)
         (output / 'summary.json').write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8')

@@ -18,19 +18,12 @@ function(_stm32_yml_git_query DIR OUT_VAR)
     set(_git "${CMAKE_COMMAND}" -E env --unset=GIT_DIR --unset=GIT_WORK_TREE
         --unset=GIT_INDEX_FILE --unset=GIT_COMMON_DIR GIT_OPTIONAL_LOCKS=0
         "${GIT_EXECUTABLE}" --literal-pathspecs -C "${DIR}")
-    execute_process(COMMAND ${_git} rev-parse --show-toplevel
-        OUTPUT_VARIABLE _top RESULT_VARIABLE _result
+    # Git reports an empty prefix only at the working-tree root. Comparing
+    # absolute paths is unreliable for Windows long/8.3 aliases (TC-94).
+    execute_process(COMMAND ${_git} rev-parse --show-prefix
+        OUTPUT_VARIABLE _prefix RESULT_VARIABLE _result
         ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE TIMEOUT 5)
-    if(NOT _result STREQUAL "0" OR _top STREQUAL "")
-        return()
-    endif()
-    file(REAL_PATH "${DIR}" _directory)
-    file(REAL_PATH "${_top}" _top)
-    if(CMAKE_HOST_WIN32)
-        string(TOLOWER "${_directory}" _directory)
-        string(TOLOWER "${_top}" _top)
-    endif()
-    if(NOT _directory STREQUAL _top)
+    if(NOT _result STREQUAL "0" OR NOT _prefix STREQUAL "")
         return()
     endif()
     execute_process(COMMAND ${_git} ${ARGN}

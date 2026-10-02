@@ -19,6 +19,7 @@ def main():
     args.output.mkdir(parents=True, exist_ok=True)
     report = {'status': 'failed', 'platform': sys.platform, 'python': sys.version,
               'patterns': PATTERNS, 'tools': {}}
+    failures = []
     started = time.monotonic()
     try:
         for tool in ('cmake', 'ninja', 'git'):
@@ -36,6 +37,7 @@ def main():
             suite.addTests(selected)
         with (args.output / 'tests.log').open('w', encoding='utf-8') as log:
             result = unittest.TextTestRunner(stream=log, verbosity=2).run(suite)
+        failures = result.failures + result.errors
         report.update(tests=result.testsRun, failures=len(result.failures), errors=len(result.errors),
                       skipped=len(result.skipped), expected_failures=len(result.expectedFailures))
         if result.wasSuccessful() and result.testsRun and not result.skipped and not result.expectedFailures:
@@ -45,6 +47,10 @@ def main():
     finally:
         report['duration_seconds'] = round(time.monotonic() - started, 3)
         (args.output / 'summary.json').write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8')
+    if report['status'] != 'passed':
+        print(json.dumps(report, ensure_ascii=True, indent=2), flush=True)
+        for test, traceback in failures:
+            print(f"{test}\n{traceback}", flush=True)
     print(f"Host checks: {report['status']}; see {args.output}")
     return 0 if report['status'] == 'passed' else 1
 

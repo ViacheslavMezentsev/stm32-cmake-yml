@@ -288,3 +288,20 @@ matching the framework entry point. Otherwise CMake 3.x may apply old
 CMP0012/CMP0130 policies: `while(TRUE)` skips message-catalog initialization,
 and subsequent output fails with recursion. Passing on a newer CMake does
 not establish that the test script supports the minimum version.
+
+## Windows CI: Host fails after successful Configure/Build
+
+`TC-44 incomplete (E010)` is printed on success too: it identifies the known
+cross-drive absolute `sources` limitation, not the cause of every failure.
+Read `windows-checks/host/tests.log` and `host/summary.json` in the
+windows-configure-build artifact. The Download logs ZIP contains Actions
+logs, not these files. Host now prints tracebacks in Actions and the Windows
+runner forwards host.log; failures remain blocking.
+
+Runner TEMP may use an 8.3 alias such as `RUNNER~1`. Git returns its long path,
+whereas CMake 3.21 `file(REAL_PATH)` may retain the short spelling. Comparing
+these strings incorrectly discarded the Git SHA. TC-94 reproduces this with
+GetShortPathNameW. After checking the module's own `.git`, an empty
+`git rev-parse --show-prefix` identifies the root without path comparisons.
+Use the pinned CMake in build/windows-tools locally as well: a newer system
+CMake can hide incompatibilities with the older version.

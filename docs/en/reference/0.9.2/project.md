@@ -38,6 +38,12 @@ JSONL I001 has two arguments (package version, Git suffix); I044 has name/suffix
 YAML comparison uses only the package version. Arduino formatting is unchanged.
 Regressions: `tests/test_component_versions.py` and existing version/messages Configure cases.
 
+Spec 2.21 clarification: an empty Git `rev-parse --show-prefix` identifies the
+own working-tree root after checking `.git`. Absolute path strings are not
+compared: Windows 8.3 and long names can refer to the same directory. TC-94
+checks both spellings when the file system provides a short name.
+
+
 ```yaml
 stm32_cmake_yml_version: 0.10.0
 ```

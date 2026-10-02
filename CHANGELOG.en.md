@@ -12,6 +12,8 @@ on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 
 ## [Unreleased] — 0.10.1
 
+- Fixed Git diagnostics for Windows 8.3 path aliases and added a regression. Host/Windows CI now print failure details in Actions while retaining blocking failures.
+
 - Version diagnostics report each module’s own Git SHA and modified state; copies without Git do not inherit a project commit. Removed the YAML comparison checkmark and added checkout/submodule/worktree and bilingual regressions.
 
 - Documented the CRC32 method, length field and CRC placement. Existing semihosting firmware checks length and zero residue in software; the host independently validates ELF/BIN. Build/run counts are unchanged and user linker layouts are not modified automatically.

@@ -178,6 +178,15 @@ Firmware на GitHub запускается вручную на границах
 ### Согласованный состав 0.10.1 — реализация
 
 Текущая ветка: `codex/module-git-diagnostics`, от main `034a625`.
+
+Исправление после CI `1a2ec16` (ТЗ 2.21): Linux Firmware, Docs, Configure и Host
+прошли, но Host внутри Windows Firmware дал семь ошибок чтения Git-идентичности.
+Причина воспроизведена: короткие пути TEMP 8.3 и CMake 3.21. Проверка корня
+заменена на Git show-prefix; TC-94 дополнен регрессией. Host выводит traceback
+в Actions, Windows runner передаёт этот вывод. Локально Linux unit 106/106,
+Windows unit 103 PASS + 3 skip; нативный Windows Configure/Build и Host 34/34
+прошли. Полные Linux L3–L5 после этого исправления не повторялись; новый
+подписанный SHA и повторный Firmware в CI ещё впереди. E010 не изменён.
 CRC-подэтап и руководство локального L0–L5 слиты; Firmware на `8d3fffc`
 успешен. На main `034a625` успешны Docs, Configure, Host и CI environment.
 E010 остаётся открытым, TC-44 частичен.
@@ -583,6 +592,15 @@ at the end of each stage. Branches are merged by fast-forward (`git land`).
 ### Agreed 0.10.1 scope — implementation
 
 Current branch: `codex/module-git-diagnostics`, from main `034a625`.
+
+Post-CI fix for `1a2ec16` (spec 2.21): Linux Firmware, Docs, Configure and Host
+passed, but Host inside Windows Firmware had seven Git-identity failures.
+Reproduced with 8.3 TEMP aliases and CMake 3.21; root detection now uses Git
+show-prefix and TC-94 covers path aliases. Host prints tracebacks in Actions;
+the Windows runner forwards them. Local Linux units: 106/106; Windows:
+103 PASS + 3 skips; native Windows Configure/Build and Host 34/34 passed.
+Full Linux L3–L5 were not repeated after this fix. A new signed SHA and another
+Firmware CI run remain pending. E010 is unchanged.
 The CRC substep and local L0–L5 guide are merged; Firmware passed on `8d3fffc`.
 Docs, Configure, Host and CI environment passed on main `034a625`.
 E010 remains open and TC-44 partial.

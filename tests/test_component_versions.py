@@ -96,6 +96,20 @@ class ComponentVersionTests(unittest.TestCase):
         (directory / 'new.txt').write_text('untracked')
         self.assertEqual(suffix(), f' (commit: {sha}, modified)')
 
+    def test_git_identity_path_alias(self):
+        directory, sha = self.repo('long module name', {'file': 'original'})
+        aliases = [directory / '..' / directory.name]
+        if os.name == 'nt':
+            import ctypes
+            buffer = ctypes.create_unicode_buffer(32768)
+            size = ctypes.windll.kernel32.GetShortPathNameW(str(directory), buffer, len(buffer))
+            self.assertTrue(0 < size < len(buffer))
+            # On volumes without 8.3 names this is the original spelling.
+            aliases.append(Path(buffer.value))
+        for alias in aliases:
+            with self.subTest(path=str(alias)):
+                self.assertEqual(self.version('_stm32_yml_git_suffix', alias), f' (commit: {sha})')
+
     def test_separate_modules_and_inherited_git_environment(self):
         first, sha1 = self.repo('framework module', {'framework': 'one'})
         second, sha2 = self.repo('backend module', {'backend': 'two'})
