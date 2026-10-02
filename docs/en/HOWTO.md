@@ -312,3 +312,27 @@ Use both texts from [docs/releases](../releases/README.md) included in the tag.
 Paste Russian first, then English inside `<details>` using that template.
 Before tagging, local acceptance and CI must pass on the final signed SHA.
 Change E009 from merged to released after publication.
+
+## Clean release commit: Windows-to-Linux transfer
+
+For acceptance of an **already committed, clean tree**, archive the Git version:
+`git -c core.autocrlf=false archive --format=tar --output=build/release-source.tar HEAD`.
+Append `.git` to that archive as in the snapshot recipe. This separate mode does
+not include uncommitted changes. Require empty `git status --porcelain` and
+record the full SHA before packing.
+
+After extraction **only into the temporary Docker volume**, recreate the index:
+
+```sh
+git -C /work/source read-tree HEAD
+git -C /work/source status --porcelain
+git -C /work/source rev-parse HEAD
+```
+
+The Windows index contains another checkout's stat data and can report false
+changes after transfer. `read-tree HEAD` recreates the temporary copy's index
+without modifying its files or history. Do not run it in the user's working
+copy: it resets staged changes. Before testing, require empty status and the
+expected SHA; never suppress dirty state or alter a report to claim cleanliness.
+Verified during 0.10.1 preparation. Use the normal [working-tree snapshot](local-docker-testing.md)
+when testing uncommitted changes.

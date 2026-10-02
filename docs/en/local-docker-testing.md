@@ -116,6 +116,9 @@ Direct Python dependencies are pinned in `ci/schema-requirements.txt`; transitiv
 pip dependencies and Ubuntu packages can change when rebuilding. Record image
 IDs, lockfiles and installed Python packages for repeatability.
 
+For a clean signed release commit, use the separate
+[Windows-to-Linux transfer recipe](HOWTO.md#clean-release-commit-windows-to-linux-transfer).
+
 ## 2. Capture the working tree
 
 Save the Python snippet as `build/make-local-snapshot.py`. It includes uncommitted

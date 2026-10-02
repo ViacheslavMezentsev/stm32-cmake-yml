@@ -116,6 +116,9 @@ docker image inspect stm32-yml-ci:local stm32-yml-emulation:local stm32-yml-chec
 зависимости pip и Ubuntu-пакеты могут изменяться при пересборке. Для повторяемого
 прогона сохраняйте image ID, lock-файлы и список установленных Python-пакетов.
 
+Для чистого подписанного релизного коммита используйте отдельный
+[рецепт переноса Windows → Linux](HOWTO.md#чистый-релизный-коммит-перенос-windows--linux).
+
 ## 2. Снимок текущего дерева
 
 Сохраните Python-фрагмент в `build/make-local-snapshot.py`. Он включает
