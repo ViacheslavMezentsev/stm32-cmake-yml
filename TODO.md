@@ -164,7 +164,7 @@ Firmware на GitHub запускается вручную на границах
 - [x] `codex/migration-guide` слита в main (`e5e7b3f`): руководство перехода RU/EN, навигация, итоги этапа 4; Docs/Configure/CI environment на коммите ветки PASS.
 - [x] `codex/release-docs-review` слита в main (`2810579`): README, статус, границы версий справочника.
 - [x] `codex/release-0.10.0` слита; [v0.10.0](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/releases/tag/v0.10.0) опубликована 02.10.2026, подписанный тег на `02b335e`. Полный локальный L0–L5 и CI на том же SHA PASS: 1452 Configure, 618 сборок, 336 QEMU + 612 Renode.
-- [ ] `codex/release-0.10.0-close`: документальная фиксация выпуска после публикации; ожидаются commit/push/land.
+- [x] `codex/release-0.10.0-close` слита (`0500b68`): выпуск и полная приёмка зафиксированы, ТЗ 2.13.
 - [x] **Этап 4. Расширения конфигурации:** `include:`, TOML, имена файла по умолчанию,
   итоговая конфигурация, JSON Schema, пример пресета в документации.
 - [ ] **Этап 5. Тесты и CI — перенесён на версию после 0.10.0** (решение заказчика, ТЗ 2.6):
@@ -174,6 +174,78 @@ Firmware на GitHub запускается вручную на границах
 - [x] **Этап 6. Выпуск 0.10.0:** руководство по переходу с 0.9.x (в том числе таблица
   путей артефактов и фрагменты из CHANGELOG), карточки справочника
   с отметками 0.10.0, CHANGELOG, ТЗ к выпуску, L0–L5, Firmware в CI, тег `v0.10.0`.
+
+### Предлагаемый состав 0.10.1 — на согласование
+
+План подготовлен в `codex/plan-0.10.1`. Это предложение состава, не утверждение
+о реализованных исправлениях; требования 0.10.0 и опубликованный тег не меняются.
+Фокус — переносимость диагностики и Windows, без расширения матрицы MCU.
+
+| Шаг / будущая ветка | Объём | Условие завершения |
+| --- | --- | --- |
+| 1. `codex/utf8-diagnostics` | Контракт UTF-8 для stdout и stderr CLI-скрипта, регрессия, errata, карточка диагностики, CHANGELOG RU/EN и ревизия ТЗ | Тест сначала воспроизводит дефект 0.10.0, затем проходит; тексты, коды, код возврата и бинарный результат не меняются |
+| 2. `codex/windows-ci` | Быстрая проверка кодировок на Windows/Linux на релевантные push; отдельное нативное Windows-задание по TC-44 на одной закреплённой паре инструментов | Кодировки, CRLF, пути с обратной косой чертой/другим диском, выбор языка, версии компонентов, минимальная Configure/Build проверены; TC-44 закрывается только при полном выполнении п. 8.5.7 |
+| 3. `codex/gitlab-example` | Отложенный пример GitLab CI (TC-53) в документации RU/EN: Configure, артефакты, закреплённое окружение | Команды проверены локально; запуск на GitLab не объявляется проверенным без реального конвейера |
+| 4. `codex/release-0.10.1` | Согласование версий и документации, приёмка и компактная релизная страница | Полный локальный L0–L5 на итоговом подписанном SHA, CI/Firmware на том же SHA, land, тег и публикация владельцем |
+
+Шаги 1–2 — рекомендуемый обязательный состав исправительного выпуска. Шаг 3 —
+дополнительный небольшой объём: он не должен задерживать исправление кодировки.
+Полные Linux-матрицы не дублируются на Windows; тяжёлое Windows-задание запускается
+вручную на границах этапов и на тегах вместе с Firmware. Правила фильтрации
+изменений сохраняются. Длительность новых jobs измеряется до принятия решения
+о расширении матрицы; обещания фиксированного времени пока нет.
+
+**План проверки кодировок:**
+
+- Читать stdout/stderr дочернего процесса как байты и строго декодировать UTF-8;
+  сравнивать точный русский/английский текст и коды, а не только отсутствие исключения.
+- Перед запуском процесса принудительно задавать `PYTHONIOENCODING=cp1251`, `cp866`
+  и `utf-8`, отключать автоматический UTF-8 mode; проверить также обычное окружение.
+  Проверка должна обнаруживать проблему и на runner с английской локалью.
+- Проверять успешный вывод, ошибки в stderr, pipe, файл, кириллицу в сообщениях
+  и путях, UTF-8 JSONL, коды завершения; сохранить проверку английского fallback.
+- Проверять отсутствие изменения глобальных потоков при импорте Python-модуля.
+  Настройка кодировки выполняется на входе CLI, не на уровне импорта.
+- Минимальная CMake/Ninja-проверка захватывает фактические байты POST_BUILD без
+  подключения к устройствам. Настройки VS Code и интерактивную консоль проверять
+  отдельно: зелёный тест pipe не доказывает правильную настройку любого декодера IDE.
+
+**Вариант реализации для исследования:** предпочесть `TextIOWrapper.reconfigure`
+для существующих stdout/stderr. Предложенный `open(1, ..., closefd=False)` фиксирует
+кодировку stdout, но создаёт новую обёртку и не покрывает stderr; не применять его
+без проверки буферизации, перенаправления и подменённых потоков. Отдельно определить
+поведение для `StringIO`/отсутствующего потока и политику ошибок кодирования.
+Не маскировать ошибку декодирования заменой символов. Python 3.7+ поддерживает
+[reconfigure](https://docs.python.org/3/library/io.html#io.TextIOWrapper.reconfigure).
+У CMake Tools есть настройка
+[cmake.outputLogEncoding](https://github.com/microsoft/vscode-cmake-tools/blob/main/docs/cmake-settings.md);
+её влияние описать в HOWTO, а не пытаться менять настройки IDE из фреймворка.
+
+**Дополнительные наблюдения из пользовательского лога 0.10.0:**
+
+- Русские сообщения Configure читаются корректно, искажается Python POST_BUILD;
+  сборка завершилась кодом 0. Регрессия должна отдельно покрыть успешные CRC/BIN
+  сообщения stdout, а не только ошибки stderr.
+- `Stack Size: 1K байт` — неоднозначная подпись до нормализации; ниже в том же
+  логе значение правильно преобразовано в 1024. Кандидат: помечать исходную
+  запись или показывать нормализованные байты без изменения порядка обработки.
+- Строка «Порт» содержит также Heap и Timers. Кандидат: уточнить название строки
+  как перечня компонентов, сохранив значения и стабильный код сообщения.
+- `stm32-cmake: v2.1.0+` — существующий fallback из CHANGELOG при недоступном
+  git describe, не подтверждение конкретного checkout и не доказательство ошибки.
+  Пояснить в диагностической памятке; не менять глобальный git safe.directory.
+- Версии CMake/yq из лога новее закреплённой матрицы. Успех одного проекта не
+  расширяет заявленное покрытие; дополнительную совместимость планировать отдельно.
+- Предупреждение VS Code о переопределениях пресета и строка поиска FreeRTOS
+  по /opt — не ошибки сами по себе; далее в логе зависимость успешно найдена.
+
+Исправления подписей включать после уточнения контракта в ТЗ, с регрессией
+RU/EN. Не добавлять новые ветки тестирования прошивок ради изменения текста.
+
+**За пределами 0.10.1:** модели RCC/PWR и периферия эмуляторов (TC-86),
+запуск Arduino native в эмуляторах, USBDevice/VirtIO/CMSIS_DSP и расширение
+матрицы семейств. Это самостоятельные функциональные этапы с большей
+неопределённостью, а не условие исправления консольного вывода.
 
 ### Предложения для 0.10.x — на рассмотрение
 
@@ -347,7 +419,7 @@ at the end of each stage. Branches are merged by fast-forward (`git land`).
 - [x] `codex/migration-guide` merged into main (`e5e7b3f`): RU/EN migration guide, navigation, stage 4 results; Docs/Configure/CI environment for the branch commit PASS.
 - [x] `codex/release-docs-review` merged into main (`2810579`): README, status and reference version boundaries.
 - [x] `codex/release-0.10.0` merged; [v0.10.0](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/releases/tag/v0.10.0) published on 2026-10-02, signed tag at `02b335e`. Full local L0–L5 and CI for the same SHA PASS: 1452 Configure, 618 builds, 336 QEMU + 612 Renode.
-- [ ] `codex/release-0.10.0-close`: post-publication release record; commit/push/land pending.
+- [x] `codex/release-0.10.0-close` merged (`0500b68`): published release and full acceptance recorded, specification 2.13.
 - [x] **Stage 4. Configuration extensions:** `include:`, TOML, default file names,
   effective configuration, JSON Schema, a preset example in the documentation.
 - [ ] **Stage 5. Tests and CI — moved to the version after 0.10.0** (customer decision,
@@ -357,6 +429,76 @@ at the end of each stage. Branches are merged by fast-forward (`git land`).
 - [x] **Stage 6. 0.10.0 release:** migration guide from 0.9.x (including the artifact
   path table and snippets from the CHANGELOG), reference cards marked
   0.10.0, CHANGELOG, release spec, L0–L5, Firmware in CI, tag `v0.10.0`.
+
+### Proposed 0.10.1 scope — for agreement
+
+Prepared in `codex/plan-0.10.1`. This is a scope proposal, not a claim that fixes
+exist; the 0.10.0 requirements and published tag remain unchanged. Focus:
+diagnostic portability and Windows, without expanding the MCU matrix.
+
+| Step / future branch | Scope | Completion condition |
+| --- | --- | --- |
+| 1. `codex/utf8-diagnostics` | UTF-8 CLI stdout/stderr contract, regression, errata, diagnostic card, RU/EN changelogs and spec revision | Test reproduces 0.10.0 failure before the fix; text, codes, exit status and binary results remain unchanged |
+| 2. `codex/windows-ci` | Fast Windows/Linux encoding checks on relevant pushes; separate native Windows TC-44 job on one pinned tool pair | Encoding, CRLF, backslash/cross-drive paths, language selection, component versions and minimal Configure/Build verified; close TC-44 only after all of spec 8.5.7 passes |
+| 3. `codex/gitlab-example` | Deferred GitLab CI documentation example (TC-53), RU/EN: Configure, artifacts and pinned environment | Commands tested locally; do not claim GitLab execution without a real pipeline |
+| 4. `codex/release-0.10.1` | Version/documentation alignment, acceptance and compact release notes | Full local L0–L5 on the final signed SHA, CI/Firmware on that SHA, owner performs land, tag and publication |
+
+Steps 1–2 are the recommended required patch-release scope. Step 3 is a small
+optional addition and must not delay the encoding fix. Do not duplicate the full
+Linux matrices on Windows. Run the heavier Windows job manually at stage boundaries
+and on tags alongside Firmware. Preserve change filtering. Measure new job duration
+before expanding coverage; no fixed runtime is promised yet.
+
+**Encoding test plan:**
+
+- Capture child stdout/stderr as bytes, strictly decode UTF-8 and compare exact
+  Russian/English text and codes, rather than merely checking for no exception.
+- Start children with `PYTHONIOENCODING=cp1251`, `cp866` and `utf-8`, disabling
+  automatic UTF-8 mode; also test the default environment. The regression must
+  detect the defect on an English-locale runner too.
+- Cover successful stdout, error stderr, pipes, files, Cyrillic text and paths,
+  UTF-8 JSONL and exit status; retain the English fallback check.
+- Verify that importing the module does not change global streams. Configure
+  encoding at CLI entry, not at import time.
+- A minimal CMake/Ninja check captures actual POST_BUILD bytes without device
+  access. Verify VS Code settings and an interactive console separately: a green
+  pipe test does not establish correct configuration of every IDE decoder.
+
+**Implementation candidate:** prefer `TextIOWrapper.reconfigure` on existing
+stdout/stderr. The proposed `open(1, ..., closefd=False)` fixes stdout encoding but
+creates a new wrapper and does not cover stderr; check buffering, redirection and
+replaced streams before using it. Define behaviour for `StringIO`/missing streams
+and encoding errors separately. Do not hide decode errors with replacement characters.
+Python 3.7+ provides
+[reconfigure](https://docs.python.org/3/library/io.html#io.TextIOWrapper.reconfigure).
+CMake Tools exposes
+[cmake.outputLogEncoding](https://github.com/microsoft/vscode-cmake-tools/blob/main/docs/cmake-settings.md);
+document its effects in HOWTO instead of changing IDE settings from the framework.
+
+**Additional observations from a user-provided 0.10.0 log:**
+
+- Russian Configure output is readable; Python POST_BUILD output is corrupted;
+  the build exits with code 0. Cover successful CRC/BIN stdout as well as stderr
+  failures in the encoding regression.
+- `Stack Size: 1K bytes` is an ambiguous pre-normalization label; the same log
+  later correctly normalizes it to 1024. Candidate: label the original notation
+  or print normalized bytes without changing processing order.
+- The “Port” line also lists Heap and Timers. Candidate: label it as a component
+  list while retaining its values and stable message code.
+- `stm32-cmake: v2.1.0+` is the existing CHANGELOG fallback when git describe is
+  unavailable, not confirmation of an exact checkout or proof of an error.
+  Explain it in HOWTO; do not change global git safe.directory.
+- Logged CMake/yq versions are newer than the pinned matrix. One successful
+  project does not extend verified coverage; plan extra compatibility separately.
+- VS Code preset overrides and a FreeRTOS search under /opt are not failures
+  by themselves; the dependency is subsequently found successfully in the log.
+
+Change labels only after documenting the contract in the spec, with RU/EN
+regression coverage. Do not add firmware matrix branches for wording changes.
+
+**Outside 0.10.1:** RCC/PWR and peripheral emulator models (TC-86), Arduino native
+execution, USBDevice/VirtIO/CMSIS_DSP and more MCU families. These are independent
+feature stages with greater uncertainty, not prerequisites for fixing console output.
 
 ### Proposals for 0.10.x — for consideration
 
