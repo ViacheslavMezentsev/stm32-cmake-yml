@@ -273,6 +273,27 @@ RU/EN. Не добавлять новые ветки тестирования п
   расчёт с сохранённым значением либо проверить остаток полного образа.
   Не фиксировать универсальное смещение поля после векторов: оно зависит от
   таблицы и выравнивания. Исходные проекты пользователя не изменять.
+- Уточнить контракт аппаратного и программного расчёта: 32-битный полином
+  0x04C11DB7, начальное значение 0xFFFFFFFF, без отражения входа/выхода и
+  финального XOR; подача 32-битных слов, прочитанных из little-endian образа.
+  Этот режим выбран для совместимости с блоками CRC с фиксированными настройками;
+  набор доступных полей HAL проверяется для конкретного MCU, не переносится
+  механически между семействами. Для настраиваемого блока описать default
+  polynomial/init, отключённую инверсию и WORDS; отдельно — тактирование/MSP,
+  успешную инициализацию и сброс состояния перед независимым расчётом
+  (HAL_CRC_Calculate в отличие от продолжения HAL_CRC_Accumulate).
+- Для WORDS длина HAL — число слов, а не байтов: перед делением на четыре
+  проверить выравнивание начала и кратность длины. __checksum_size — абсолютный
+  символ линкера, не объект uint32_t в памяти; LONG(__checksum_size) создаёт
+  отдельное поле с этим значением. Поле входит в покрываемые CRC данные.
+  Размер полного образа равен размеру диапазона плюс четыре только при
+  согласованном начале образа, отсутствии хвоста и непосредственном следовании CRC.
+  Диапазон, промежутки и выравнивание должны совпадать с post-build: текущий
+  скрипт строит диапазон по LMA секций, а не по именам linker-символов.
+- Разделить доказательства: вывод сохранённого CRC в QEMU не проверяет целостность;
+  программный расчёт в симуляторе проверяет данные/алгоритм, но не аппаратный CRC.
+  В документации аппаратный пример поясняет условия совместимости, не означает
+  выполненную проверку периферии на всех семействах.
 - Зарезервировать `crc_method` (alias `crc.method`) отдельно от `crc_algorithm`:
   отсутствие/пустое значение/`none` сохраняют текущее поведение и не отключают
   CRC; включением управляет `crc_enable`. Имена будущих методов пока не вводить.
@@ -565,6 +586,26 @@ regression coverage. Do not add firmware matrix branches for wording changes.
   or check the complete image residue. Do not assume a universal length-field
   offset after vectors; vector size and alignment determine it. Do not modify
   the user's application projects.
+- Specify the hardware/software calculation contract: 32-bit polynomial
+  0x04C11DB7, initial value 0xFFFFFFFF, no input/output reflection or final XOR;
+  feed 32-bit words read from a little-endian image. This mode targets compatibility
+  with fixed-configuration CRC units. Check available HAL fields for the specific
+  MCU instead of copying them between families. For configurable units, describe
+  default polynomial/init, disabled inversion and WORDS; separately cover clock/MSP,
+  successful initialization and resetting state for an independent calculation
+  (HAL_CRC_Calculate versus continuation with HAL_CRC_Accumulate).
+- In WORDS mode HAL length counts words, not bytes: check start alignment and
+  length divisibility before dividing by four. __checksum_size is an absolute
+  linker symbol, not a uint32_t object in memory; LONG(__checksum_size) creates
+  a separate stored field containing that value. The field is covered by CRC.
+  Complete image size equals range size plus four only with a matching image
+  start, no trailing data and CRC immediately following the range. Range, gaps
+  and alignment must match post-build: the current script derives its range from
+  section LMAs, not linker-symbol names.
+- Separate evidence: printing stored CRC in QEMU does not verify integrity;
+  software calculation in a simulator checks data/algorithm, not the CRC peripheral.
+  A hardware documentation example explains compatibility conditions, not a
+  completed peripheral validation across all families.
 - Reserve `crc_method` (alias `crc.method`) separately from `crc_algorithm`:
   missing/empty/`none` retains current behavior and does not disable CRC;
   `crc_enable` controls activation. Introduce no future method names yet.
