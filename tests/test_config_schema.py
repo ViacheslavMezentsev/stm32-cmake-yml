@@ -46,7 +46,7 @@ class SchemaTests(unittest.TestCase):
         self.validator.validate({"custom": {"whatever": [1, False, None]},
                                  "arduino": {"vendor_extension": "ok"},
                                  "profiles": {"RevB": {"custom": "override"}},
-                                 "stm32_cmake_yml": {"version": "0.10.0", "version_check": True},
+                                 "stm32_cmake_yml": {"version": "0.10.1", "version_check": True},
                                  "crc": {"enable": True, "algorithm": "STM32_HW_DEFAULT"}})
 
     def test_null_empty_and_zero(self):

@@ -173,25 +173,25 @@ class ComponentVersionTests(unittest.TestCase):
 include("{ROOT.as_posix()}/cmake/stm32_yml_messages.cmake")
 include("{ROOT.as_posix()}/cmake/stm32_yml_versions.cmake")
 _stm32_yml_git_suffix("{framework.as_posix()}" _framework)
-stm32_yml_msg(I001 "0.10.0" "${{_framework}}")
-stm32_yml_msg(I003 "0.10.0")
+stm32_yml_msg(I001 "0.10.1" "${{_framework}}")
+stm32_yml_msg(I003 "0.10.1")
 _stm32_yml_git_suffix("{backend.as_posix()}" _backend)
 stm32_yml_stm32_cmake_version("{backend.as_posix()}" _version)
 _stm32_yml_print_version("stm32-cmake" "${{_version}}" "${{_backend}}")
 _stm32_yml_print_version("unknown-module" "" "${{_backend}}")
-_stm32_yml_print_version("copied-module" "0.10.0")
+_stm32_yml_print_version("copied-module" "0.10.1")
 ''', encoding='utf-8')
             result = subprocess.run([CMAKE, f'-DSTM32_YML_LANG={lang}', '-P', str(script)],
                                     cwd=self.dir, capture_output=True, encoding='utf-8')
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             records = [json.loads(line) for line in (self.dir / 'stm32_yml_messages.jsonl').read_text(encoding='utf-8').splitlines()]
             by_code = {r['code']: r for r in records if r['code'] in ('SCY-I001', 'SCY-I003', 'SCY-I044')}
-            self.assertEqual(by_code['SCY-I001']['args'], ['0.10.0', f' (commit: {first}, modified)'])
-            self.assertEqual(by_code['SCY-I001']['text'], f'stm32-cmake-yml: 0.10.0 (commit: {first}, modified)')
-            self.assertTrue(by_code['SCY-I003']['text'].endswith(f'0.10.0 {matched}'))
+            self.assertEqual(by_code['SCY-I001']['args'], ['0.10.1', f' (commit: {first}, modified)'])
+            self.assertEqual(by_code['SCY-I001']['text'], f'stm32-cmake-yml: 0.10.1 (commit: {first}, modified)')
+            self.assertTrue(by_code['SCY-I003']['text'].endswith(f'0.10.1 {matched}'))
             self.assertIn(f'{unknown} (commit: {second})', by_code['SCY-I044']['text'])
             self.assertIn(f'stm32-cmake: v2.1.0+ (commit: {second})', result.stdout)
-            self.assertIn('copied-module: 0.10.0', result.stdout)
+            self.assertIn('copied-module: 0.10.1', result.stdout)
             self.assertNotIn('✓', result.stdout)
 
 

@@ -1,4 +1,4 @@
-stm32_cmake_yml_version: 0.10.0
+stm32_cmake_yml_version: 0.10.1
 ioc_file: bluepill-hsi.ioc
 languages: [C, ASM]
 sources: [main.c]

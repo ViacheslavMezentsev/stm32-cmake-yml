@@ -122,3 +122,12 @@ same commit. This covers the specific matrix, not every user firmware or periphe
 Arduino `native` is built but not yet executed in emulators because of RCC/PWR
 limitations. See the [test method](firmware-testing.md) and [emulation limits](emulation.md).
 Checks are repeated on the final release commit before publication.
+
+## Updating from 0.10.0 to 0.10.1
+
+Update the module itself to tag `v0.10.1`, then set
+`stm32_cmake_yml_version: 0.10.1` and configure from a clean build directory.
+The YAML version does not select the loaded code. The configuration format
+is retained; `crc_method` may be omitted (`auto`). Section placement is not
+changed automatically. See the [release notes](../releases/v0.10.1.en.md),
+[CRC method](crc-methods.md) and [E010 limitation](errata/E010.md).

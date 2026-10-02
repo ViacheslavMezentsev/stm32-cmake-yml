@@ -61,7 +61,7 @@ def main():
             require(key in options and issue in options[key]["errata"], f"Reverse errata mismatch: {issue}/{key}")
         for target in entry["pages"].values():
             link_exists(ROOT / "index", target)
-    pages = []
+    pages = list((ROOT / "docs/releases").glob("*.md"))
     for language in ("ru", "en"):
         base = ROOT / "docs" / language
         pages += list((base / "reference").rglob("*.md"))

@@ -49,6 +49,9 @@ Markdown-страницы редактируются непосредствен�
 1. `STM32_CMAKE_YML_VERSION` в `stm32_yml.cmake` и `stm32_cmake_yml_version` в
    тестовых YAML и примерах документации.
 2. Раздел `## [X.Y.Z] - дата` в CHANGELOG.md и CHANGELOG.en.md.
+   Подготовить [тексты релиза](../releases/README.md) RU/EN в `docs/releases/<тег>.md`
+   и `<тег>.en.md`; они входят в коммит до тега. GitHub Release: русский текст
+   и свёрнутый English в `<details>` без `open`.
 3. Ревизия ТЗ «к выпуску» с обновлённым приложением E.
 4. Все проверки L0–L5 локально на итоговом коммите ветки выпуска и зелёный CI
    для того же коммита.

@@ -177,7 +177,21 @@ Firmware на GitHub запускается вручную на границах
 
 ### Согласованный состав 0.10.1 — реализация
 
-Текущая ветка: `codex/module-git-diagnostics`, от main `034a625`.
+Текущая ветка: `codex/release-0.10.1`, от main `432d13b`.
+Git-диагностика слита; на 432d13b успешны Docs, Configure, Host, CI environment
+и Firmware (Windows 1:02, Linux 31:40). Готовятся версия 0.10.1, ТЗ 2.22,
+CHANGELOG и тексты docs/releases/v0.10.1.md / v0.10.1.en.md.
+После подписанного коммита владельца — полная локальная приёмка L0–L5,
+push и CI/Firmware того же SHA, land, тег и публикация. E009 до публикации
+имеет статус merged; E010 остаётся open. Выпуск ещё не принят.
+
+Предварительно на рабочем дереве: 1506 Configure PASS в Docker volume,
+Linux unit 106/106, Windows unit 103 PASS + 3 skip, Windows Configure/Build
+и Host 34/34 PASS; Schema, справочник (100 страниц), сообщения и ТЗ PASS.
+Отчёты: build/release-0.10.1-preflight/reports.zip и build/release-0.10.1-windows/.
+Полный L0–L5 на подписанном релизном SHA не заменяется этим прогоном.
+
+История предыдущего подэтапа:
 
 Исправление после CI `1a2ec16` (ТЗ 2.21): Linux Firmware, Docs, Configure и Host
 прошли, но Host внутри Windows Firmware дал семь ошибок чтения Git-идентичности.
@@ -591,7 +605,21 @@ at the end of each stage. Branches are merged by fast-forward (`git land`).
 
 ### Agreed 0.10.1 scope — implementation
 
-Current branch: `codex/module-git-diagnostics`, from main `034a625`.
+Current branch: `codex/release-0.10.1`, from main `432d13b`.
+Git diagnostics merged; Docs, Configure, Host, CI environment and Firmware
+passed on 432d13b (Windows 1:02, Linux 31:40). Preparing version 0.10.1,
+spec 2.22, changelogs and docs/releases/v0.10.1.md / v0.10.1.en.md.
+After the owner's signed commit: full local L0–L5 acceptance, push and
+CI/Firmware on that SHA, land, tag and publication. E009 stays merged until
+publication; E010 remains open. The release has not been accepted yet.
+
+Working-tree preflight: 1506 Configure PASS in a Docker volume; Linux units
+106/106, Windows units 103 PASS + 3 skips; Windows Configure/Build and Host
+34/34 PASS. Schema, reference (100 pages), messages and spec checks passed.
+Reports: build/release-0.10.1-preflight/reports.zip and build/release-0.10.1-windows/.
+This does not replace full L0–L5 acceptance on the signed release SHA.
+
+Previous substep history:
 
 Post-CI fix for `1a2ec16` (spec 2.21): Linux Firmware, Docs, Configure and Host
 passed, but Host inside Windows Firmware had seven Git-identity failures.

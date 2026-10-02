@@ -9,7 +9,7 @@ See [reference](reference/0.9.2/index.md) and [errata](errata/index.md) for cont
 ## CubeMX IOC
 
 ```yaml
-stm32_cmake_yml_version: 0.10.0
+stm32_cmake_yml_version: 0.10.1
 ioc_file: my_project.ioc
 build_artifacts: [bin, hex, map]
 crc_enable: true  # requires an STM32<MCU>_FLASH.ld.in template with a .checksum section
@@ -25,7 +25,7 @@ Configure error, a missing section is a warning, and a CRC failure fails the bui
 ## Manual configuration
 
 ```yaml
-stm32_cmake_yml_version: 0.10.0
+stm32_cmake_yml_version: 0.10.1
 mcu: STM32F411CEU6
 heap_size: 512
 stack_size: 1K

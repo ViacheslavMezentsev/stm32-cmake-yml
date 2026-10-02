@@ -10,7 +10,7 @@ on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 
 ---
 
-## [Unreleased] — 0.10.1
+## [0.10.1] - 2026-10-03
 
 - Fixed Git diagnostics for Windows 8.3 path aliases and added a regression. Host/Windows CI now print failure details in Actions while retaining blocking failures.
 
@@ -22,17 +22,17 @@ on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 
 - Source markers `[yml]`, `[ioc]`, `[auto]` now precede values in the final Configure report; message codes and JSONL argument order are unchanged.
 
-- Prepared for 0.10.1: `crc_method` / `crc.method` with `auto`; none, null and empty normalize to auto, unknown methods fail. Configure reports method, algorithm and section separately without claiming to validate placement.
+- Added: `crc_method` / `crc.method` with `auto`; none, null and empty normalize to auto, unknown methods fail. Configure reports method, algorithm and section separately without claiming to validate placement.
 
 - Added native Windows Configure/Build to Firmware with pinned tools. TC-44 remains partial: E010 (absolute sources on another drive) is covered by a regression, without changing behavior.
 
 ### Tests
 
-- Added fast Windows/Linux Host CI with logs and path filters; fixed Windows portability of version tests. Full TC-44 remains pending.
+- Added fast Windows/Linux Host CI with logs and path filters; fixed Windows portability of version tests. TC-44 remains partial due to E010.
 
 ### Fixed
 
-- **E009:** CRC/BIN Python CLI writes stdout/stderr as UTF-8 regardless of the code page; import leaves streams unchanged. TC-88 covers CP1251/CP866, files/pipes, JSONL and CMake/Ninja POST_BUILD. Fix prepared, not yet released.
+- **E009:** CRC/BIN Python CLI writes stdout/stderr as UTF-8 regardless of the code page; import leaves streams unchanged. TC-88 covers CP1251/CP866, files/pipes, JSONL and CMake/Ninja POST_BUILD.
 
 ## [0.10.0] - 2026-10-02
 

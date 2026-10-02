@@ -2,7 +2,7 @@
 
 [Documentation](index.md) · [README](../../README.en.md) · [Русский](../ru/status.md)
 
-This page describes the test suite for **0.10.0**, rather than
+This page describes the test suite for **0.10.1**, rather than
 only the published 0.9.3 release. The reference retains its 0.9.2 directory and
 historical baseline, with separate 0.9.3 and 0.10.0 change notes. For release status, see the [roadmap](../../TODO.md) and [migration guide](migration-0.10.md). See [GitHub Actions](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/actions?query=branch%3Amain)
 for current `main` results. The three status badges show latest completed workflows; Builds (Checks) shows the verified firmware matrix size.

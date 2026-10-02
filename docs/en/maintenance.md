@@ -49,6 +49,9 @@ the technical specification, whose current revision is stated in its header.
 1. `STM32_CMAKE_YML_VERSION` in `stm32_yml.cmake` and `stm32_cmake_yml_version` in
    test YAML and documentation examples.
 2. A `## [X.Y.Z] - date` section in CHANGELOG.md and CHANGELOG.en.md.
+   Prepare [release texts](../releases/README.md) in `docs/releases/<tag>.md`
+   and `<tag>.en.md`; commit them before tagging. GitHub Release: Russian text
+   followed by collapsed English in `<details>` without `open`.
 3. A release revision of the spec with an updated appendix E.
 4. All L0–L5 checks locally on the final commit of the release branch, and green CI
    for the same commit.

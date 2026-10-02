@@ -305,3 +305,10 @@ GetShortPathNameW. After checking the module's own `.git`, an empty
 `git rev-parse --show-prefix` identifies the root without path comparisons.
 Use the pinned CMake in build/windows-tools locally as well: a newer system
 CMake can hide incompatibilities with the older version.
+
+## GitHub Release text
+
+Use both texts from [docs/releases](../releases/README.md) included in the tag.
+Paste Russian first, then English inside `<details>` using that template.
+Before tagging, local acceptance and CI must pass on the final signed SHA.
+Change E009 from merged to released after publication.
