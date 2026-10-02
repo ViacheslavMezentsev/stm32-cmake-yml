@@ -295,14 +295,39 @@ RU/EN. Не добавлять новые ветки тестирования п
   В документации аппаратный пример поясняет условия совместимости, не означает
   выполненную проверку периферии на всех семействах.
 - Зарезервировать `crc_method` (alias `crc.method`) отдельно от `crc_algorithm`:
-  отсутствие/пустое значение/`none` сохраняют текущее поведение и не отключают
-  CRC; включением управляет `crc_enable`. Имена будущих методов пока не вводить.
-  Предложение для контракта: другие непустые значения отклонять с понятной
-  диагностикой, чтобы не создавать видимость реализованного метода.
+  default — `auto`; отсутствие, пустое значение, YAML null и строка `none`
+  нормализуются в `auto`. CRC включает только `crc_enable`. Для 0.10.1 `auto`
+  сохраняет существующий расчёт/внедрение; это не перемещение секций автоматически.
+  Не менять формат образа незаметно в patch-релизах. Другие непустые значения
+  отклонять. Диагностика отдельно показывает метод, алгоритм и секцию;
+  метод описывает весь контракт, а не только операцию objcopy.
 - Резервирование ключа само по себе не делает предложенную раскладку обязательной
   для всех существующих проектов. Не объявлять наличие проверок расположения
   CRC или символов, которых код пока не выполняет. Новый контракт, карточка,
   индекс/Schema, CHANGELOG и тесты ключа оформляются в соответствующей ветке.
+
+**Аудит CRC (2026-10-02, по исходникам текущей ветки):**
+
+- Программный CRC уже исполняется в semihosting/main.cpp: три constexpr-вектора,
+  сравнение рассчитанного и внедрённого значений. Builder независимо проверяет
+  ELF/BIN, LMA .data, CRC в конце и отсутствие разрывов/перекрытий фикстуры.
+- Уже есть crc-corrupt: изменение байта .fw_version без пересчёта CRC. Оба
+  runner сверяют CRC-метаданные с host-расчётом и требуют гостевой выход 3;
+  таймаут или иной код не считается обнаружением повреждения.
+- Основная фикстура: F103/F030/F411/F401 в QEMU и Renode; G431/G474/F746 только
+  в Renode, на шести парах GCC/CMake. H503/H503bkp также проверяют программный
+  CRC в Renode. Это не покрытие всех H5/H7 и Arduino native; hang проверяет
+  зависание, а не успешный CRC. Проверки подключены к Firmware CI (manual/tags).
+  См. docs/ru/firmware-testing.md, «CRC загруженной прошивки».
+- Ещё нужны: LONG(__checksum_size) после выровненной таблицы и чтение поля;
+  нулевой остаток с включённым CRC; другое имя секции в интеграционном тесте;
+  нормализация нового crc_method, отказ неизвестного значения и RU/EN-диагностика.
+  Сохранить legacy-фикстуру, новую раскладку проверять нейтральным примером.
+  Расширять существующие запуски, где возможно, без дублирования всей матрицы.
+- Локально выполнено 29 unit-тестов CRC/runner/matrix: 28 успешно, один error
+  test_russian_texts_and_records — UnicodeDecodeError при чтении вывода Python
+  как UTF-8, затем TypeError из-за отсутствующего stderr. Это подтверждает
+  запланированную проблему кодировки. Полный прогон симуляторов не повторялся.
 
 **За пределами 0.10.1:** модели RCC/PWR и периферия эмуляторов (TC-86),
 запуск Arduino native в эмуляторах, USBDevice/VirtIO/CMSIS_DSP и расширение
@@ -607,14 +632,39 @@ regression coverage. Do not add firmware matrix branches for wording changes.
   A hardware documentation example explains compatibility conditions, not a
   completed peripheral validation across all families.
 - Reserve `crc_method` (alias `crc.method`) separately from `crc_algorithm`:
-  missing/empty/`none` retains current behavior and does not disable CRC;
-  `crc_enable` controls activation. Introduce no future method names yet.
-  Proposed contract: reject other nonempty values clearly instead of suggesting
-  that an unimplemented method was selected.
+  default to `auto`; missing, empty, YAML null and string `none` normalize
+  to `auto`. Only `crc_enable` controls activation. For 0.10.1, `auto` retains
+  existing calculation/injection; it does not move sections automatically.
+  Do not silently change image format in patch releases. Reject other nonempty
+  values. Report method, algorithm and section separately: the method describes
+  the complete contract, not just the objcopy operation.
 - Reserving the key does not enforce this layout on all existing projects.
   Do not claim CRC-position/symbol checks that the implementation does not perform.
   Add the contract, reference card, index/Schema, changelogs and key tests in the
   corresponding implementation branch.
+
+**CRC audit (2026-10-02, current branch sources):**
+
+- Software CRC already runs in semihosting/main.cpp: three constexpr vectors
+  and calculated/stored comparison. The builder independently checks ELF/BIN,
+  .data LMA, CRC at the end and no gaps/overlaps in this fixture.
+- crc-corrupt already changes one .fw_version byte without recalculating CRC.
+  Both runners compare CRC metadata against host expectations and require guest
+  exit 3; timeout or another exit does not count as corruption detection.
+- Main fixture: F103/F030/F411/F401 in QEMU and Renode; G431/G474/F746 in Renode
+  only, across six GCC/CMake pairs. H503/H503bkp also check software CRC in Renode.
+  This does not cover all H5/H7 and Arduino native cases; hang checks a hang,
+  not CRC success. These checks are wired into Firmware CI (manual/tags).
+  See docs/en/firmware-testing.md for the loaded-image CRC description.
+- Gaps: LONG(__checksum_size) after aligned vectors and reading that field;
+  zero residue including CRC; another section name in an integration test;
+  new crc_method normalization, unknown-value rejection and RU/EN diagnostics.
+  Keep a legacy fixture and cover the new layout with a neutral example.
+  Extend existing executions where possible rather than duplicating the matrix.
+- Local run: 29 CRC/runner/matrix unit tests, 28 passed; one error in
+  test_russian_texts_and_records: UnicodeDecodeError reading Python output as
+  UTF-8, then TypeError because stderr was unavailable. This confirms the planned
+  encoding issue. The complete simulator matrix was not rerun.
 
 **Outside 0.10.1:** RCC/PWR and peripheral emulator models (TC-86), Arduino native
 execution, USBDevice/VirtIO/CMSIS_DSP and more MCU families. These are independent
