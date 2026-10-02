@@ -4,6 +4,12 @@
 
 Shared rules: [semantics](semantics.md). Baseline: `f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0`. Introduction history before 0.9.2 is not established; presence is confirmed in this baseline. Unless stated otherwise, configuration happens at Configure/Generate and actual commands execute at Build/Post-build.
 
+
+**For 0.10.1 (fix prepared):** Python CLI emits CRC/BIN diagnostics in UTF-8
+regardless of the host code page; importing the module leaves streams unchanged.
+Texts and binary artifacts are unchanged. [E009](../../errata/E009.md),
+[TC-88 regression](../../../../tests/test_crc_encoding.py).
+
 <a id="build-artifacts"></a>
 ## `build_artifacts`
 

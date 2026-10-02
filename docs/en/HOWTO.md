@@ -242,3 +242,11 @@ python3 -m pip install --target /tmp/schema-deps -r ci/schema-requirements.txt
 PYTHONPATH=/tmp/schema-deps python3 ci/check_schema.py
 PYTHONPATH=/tmp/schema-deps python3 -m unittest discover -s tests -p test_config_schema.py
 ```
+
+## CRC/BIN encoding
+
+The E009 fix for 0.10.1 sets Python CLI stdout/stderr to UTF-8. For older
+versions, temporarily set `PYTHONIOENCODING=utf-8` in the build environment.
+If bytes are already UTF-8 but IDE text is corrupted, check CMake Tools
+`cmake.outputLogEncoding`: the decoder must use UTF-8. Clearing the cache
+does not fix stream encoding. [Details](errata/E009.md).

@@ -10,6 +10,12 @@ on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 
 ---
 
+## [Unreleased] — 0.10.1
+
+### Fixed
+
+- **E009:** CRC/BIN Python CLI writes stdout/stderr as UTF-8 regardless of the code page; import leaves streams unchanged. TC-88 covers CP1251/CP866, files/pipes, JSONL and CMake/Ninja POST_BUILD. Fix prepared, not yet released.
+
 ## [0.10.0] - 2026-10-02
 
 ### Added

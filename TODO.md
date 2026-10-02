@@ -175,10 +175,18 @@ Firmware на GitHub запускается вручную на границах
   путей артефактов и фрагменты из CHANGELOG), карточки справочника
   с отметками 0.10.0, CHANGELOG, ТЗ к выпуску, L0–L5, Firmware в CI, тег `v0.10.0`.
 
-### Предлагаемый состав 0.10.1 — на согласование
+### Согласованный состав 0.10.1 — реализация
 
-План подготовлен в `codex/plan-0.10.1`. Это предложение состава, не утверждение
-о реализованных исправлениях; требования 0.10.0 и опубликованный тег не меняются.
+План согласован; реализация начата в `codex/utf8-diagnostics` от main с включением
+подписанных коммитов `codex/plan-0.10.1` перемоткой. Тег 0.10.0 не меняется.
+Подготовлено исправление UTF-8 и регрессия TC-88, E009, ТЗ 2.14. Локальные
+4 новых и 10 существующих тестов CRC прошли на Windows; четыре новых теста
+также прошли в локальном Linux-контейнере. Полный L0–L5 ещё не выполнялся.
+Общий локальный Windows-прогон: 90 тестов, 82 PASS, 3 skip (Linux-only),
+5 errors в существующем test_component_versions.py: Windows-пути вставляются
+в CMake без нормализации (Invalid character escape). Исправить на шаге Windows CI.
+Следующий подэтап — включение быстрых проверок Windows/Linux в CI; приёмка
+этапа и выпуск не объявлены завершёнными.
 Фокус — переносимость диагностики и Windows, без расширения матрицы MCU.
 
 | Шаг / будущая ветка | Объём | Условие завершения |
@@ -536,9 +544,16 @@ at the end of each stage. Branches are merged by fast-forward (`git land`).
   path table and snippets from the CHANGELOG), reference cards marked
   0.10.0, CHANGELOG, release spec, L0–L5, Firmware in CI, tag `v0.10.0`.
 
-### Proposed 0.10.1 scope — for agreement
+### Agreed 0.10.1 scope — implementation
 
-Prepared in `codex/plan-0.10.1`. This is a scope proposal, not a claim that fixes
+Implementation started in `codex/utf8-diagnostics` from main, fast-forwarding the
+signed plan commits. UTF-8 fix, TC-88 regression, E009 and spec 2.14 are prepared;
+4 new and 10 existing CRC tests passed on Windows; the four new tests also
+passed in the local Linux container. Full L0–L5 is pending.
+Overall Windows run: 90 tests, 82 PASS, 3 Linux-only skips, 5 existing
+test_component_versions.py errors: unnormalized Windows paths in generated CMake
+(Invalid character escape). Fix during the Windows CI step. Next:
+fast Windows/Linux CI checks. This is not a claim that all fixes
 exist; the 0.10.0 requirements and published tag remain unchanged. Focus:
 diagnostic portability and Windows, without expanding the MCU matrix.
 

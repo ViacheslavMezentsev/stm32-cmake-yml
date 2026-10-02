@@ -239,7 +239,19 @@ def run(argv):
     emit('I710', f"{crc:08X}", len(data))
 
 
+def configure_output():
+    """CLI text is UTF-8, independent of the host code page (spec 4.16.15).
+
+    Keep existing wrappers/buffering. Embedded callers may replace a stream
+    with StringIO or None; leave those alone. Importing this module is inert.
+    """
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, 'reconfigure'):
+            stream.reconfigure(encoding='utf-8', errors='strict')
+
+
 def main():
+    configure_output()
     try:
         run(sys.argv[1:])
     except CrcError as error:

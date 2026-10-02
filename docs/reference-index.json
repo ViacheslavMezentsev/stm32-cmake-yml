@@ -1955,7 +1955,9 @@
         "configure.artifacts-makefiles",
         "configure.empty-and-null-defaults"
       ],
-      "errata": [],
+      "errata": [
+        "E009"
+      ],
       "yaml_paths": [
         [
           "build_artifacts"
@@ -2001,7 +2003,8 @@
         "configure.crc-flash-region-missing"
       ],
       "errata": [
-        "E006"
+        "E006",
+        "E009"
       ],
       "yaml_paths": [
         [
@@ -2571,6 +2574,19 @@
       "fixed_release": "0.9.3",
       "merge_commit": "29e64a43cf8a68a5eb25be31f147bca8e4be9cf4",
       "pr": "https://github.com/ViacheslavMezentsev/stm32-cmake-yml/pull/41"
+    },
+    {
+      "id": "E009",
+      "options": [
+        "crc_enable",
+        "build_artifacts"
+      ],
+      "pages": {
+        "ru": "docs/ru/errata/E009.md",
+        "en": "docs/en/errata/E009.md"
+      },
+      "evidence": "reproduced",
+      "status": "fix-prepared"
     }
   ],
   "audit_date": "2026-09-27",

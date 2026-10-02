@@ -1,4 +1,4 @@
-# Errata 0.9.2
+# Errata
 
 [Documentation](../index.md) → Errata · [Русский](../../ru/errata/index.md)
 
@@ -16,3 +16,9 @@ Applies to baseline `f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0`. Status audited 2
 | [E008](E008.md) | Profile-only language settings are not exported | Fixed in 0.9.3 ([PR #41](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/pull/41), `d8708b4`) |
 
 [Reference](../reference/0.9.2/index.md) · [Maintenance](../maintenance.md)
+
+Addition for 0.10.0, checked 2026-10-02.
+
+| ID | Issue | Status |
+| --- | --- | --- |
+| [E009](E009.md) | Python CRC/BIN diagnostic encoding | Fix prepared for 0.10.1 |
