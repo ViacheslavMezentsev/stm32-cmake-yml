@@ -7,6 +7,7 @@
 | Обновить проект с 0.9.x | [Переход на 0.10.0](migration-0.10.md) |
 | Подключить фреймворк | [Начало работы](getting-started.md) |
 | Совместить Presets и YAML | [Пример трёх файлов](presets.md) |
+| CRC32: алгоритм, разметка и чтение | [Метод CRC](crc-methods.md) |
 | Проверить структуру конфигурации | [JSON Schema](schema.md) |
 | Выбрать IOC, профили или Arduino | [Краткие сценарии](scenarios.md) |
 | Подключить Arduino Core: обёртки или native | [Backend Arduino](arduino.md) |

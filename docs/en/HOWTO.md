@@ -268,3 +268,41 @@ filename from ci/windows.lock.json, then pass that cache to
 The installer verifies SHA-256 again before extraction. Do not skip hash checks
 or disable TLS. TC-44 Configure/Build still runs natively on Windows even when
 a container was used for downloading.
+
+## Slow local Docker runs on Windows
+
+During 0.10.1 CRC acceptance, Configure took 10–15 seconds per scenario on a
+Windows bind mount versus about 0.4 seconds inside a Docker volume. With low
+CPU usage and slow filesystem operations, the Firmware pair limit (1200 seconds)
+can expire without a compilation failure. Do not increase simulator timeouts
+for this problem.
+
+Keep **both sources and results** on the Linux filesystem. The snapshot must
+include current tracked and new non-ignored files (`git ls-files -z --cached
+--others --exclude-standard`) plus `.git`, excluding `build/`. Copy working-tree
+contents: `git archive HEAD` omits uncommitted changes. Retaining local `.git`
+supports version/dirty diagnostics; no signing is needed inside the container.
+
+Extract the snapshot to `/work/source` in a dedicated Docker volume mounted at
+`/work`. Run the regular scripts from the pinned images using these paths:
+
+```text
+ci/run_configure_tests.py --output /work/results/configure
+ci/firmware_matrix.py build --output /work/results/build
+ci/firmware_matrix.py run --build /work/results/build --output /work/results/qemu
+ci/firmware_matrix.py run --emulator renode --build /work/results/build --output /work/results/renode
+```
+
+The first two commands use `stm32-yml-ci:local`, the last two use
+`stm32-yml-emulation:local`, with `--network none` and the same volume for sources,
+ELFs and reports. Script paths start with `/work/source/`. Copy reports and ELFs
+back with `docker cp <container>:/work/results/. <directory>` before removing the
+container/volume. Use fresh volume and report-directory names for each snapshot;
+after code changes refresh the snapshot and verify it against the working tree.
+Test coverage and timeouts stay unchanged. This local procedure does not modify
+CI or replace native Windows tests.
+
+For large file sets, archive results inside the container first
+(`tar -czf /tmp/results.tar.gz -C /work results`), then transfer one archive with
+`docker cp`. This run contains about 479 thousand archive entries; copying each
+file back to Windows separately is substantially more expensive.

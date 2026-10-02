@@ -400,7 +400,12 @@ def build_target(root, output, report, target_name, target, baseline, lock, etl,
                 or lifecycle[0]['args'] != ['.checksum'] or lifecycle[-1]['args'] != ['.checksum']
                 or any(r['level'] == 'FATAL_ERROR' for r in records)):
             raise ValueError(f'Invalid CRC injection messages: {case}')
-        crc_metadata, corrupted, negative = inspect_crc(elf, sum(target['flash']))
+        length_symbols = [line.split() for line in symbols.splitlines()
+                          if line.split() and line.split()[-1] == '__checksum_length_field']
+        if len(length_symbols) != 1:
+            raise ValueError('Missing or ambiguous CRC length field symbol')
+        crc_metadata, corrupted, negative = inspect_crc(
+            elf, sum(target['flash']), length_address=int(length_symbols[0][0], 16))
         metadata.update(crc_metadata)
         compare_gap_fill(build, elf)
         if profile == 'success':

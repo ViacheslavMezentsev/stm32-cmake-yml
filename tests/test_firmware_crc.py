@@ -19,7 +19,7 @@ class CrcTests(unittest.TestCase):
 
     def test_layout_and_artifact_rejections(self):
         start = 0x08000000
-        payload = struct.pack('<3I', 0x12345678, 0xDEADBEEF, 0x00090200)
+        payload = struct.pack('<3I', 12, 0xDEADBEEF, 0x00090200)
         image = payload + struct.pack('<I', crc32_words(payload))
         data = bytearray(512)
         struct.pack_into('<I', data, 28, 52)
@@ -40,25 +40,41 @@ class CrcTests(unittest.TestCase):
             elf = Path(directory) / 'fixture.elf'
             elf.write_bytes(data)
             elf.with_suffix('.bin').write_bytes(image)
-            metadata, corrupted, negative = inspect_crc(elf)
+            metadata, corrupted, negative = inspect_crc(elf, length_address=start)
             self.assertEqual(metadata['CRC_RESULT'], 'PASS')
+            self.assertEqual(metadata['CRC_LENGTH_STORED'], '12')
+            self.assertEqual(metadata['CRC_RESIDUE'], '00000000')
+            self.assertNotEqual(negative['CRC_RESIDUE'], '00000000')
             self.assertEqual(negative['CRC_RESULT'], 'FAIL')
             self.assertNotEqual(metadata['CRC_COMPUTED'], negative['CRC_COMPUTED'])
             self.assertEqual(sum(a != b for a, b in zip(data, corrupted)), 1)
+            for address in (start + 1, start - 4, start + 12):
+                with self.assertRaisesRegex(ValueError, 'length field address'):
+                    inspect_crc(elf, length_address=address)
+            # A wrong length remains invalid even with a newly calculated CRC.
+            wrong = bytearray(data)
+            struct.pack_into('<I', wrong, 160, 16)
+            wrong_image = bytes(wrong[160:172])
+            struct.pack_into('<I', wrong, 172, crc32_words(wrong_image))
+            elf.write_bytes(wrong)
+            elf.with_suffix('.bin').write_bytes(wrong[160:176])
+            with self.assertRaisesRegex(ValueError, 'Stored CRC length'):
+                inspect_crc(elf, length_address=start)
+            elf.with_suffix('.bin').write_bytes(image)
             elf.write_bytes(corrupted)
             with self.assertRaisesRegex(ValueError, 'Injected ELF CRC'):
-                inspect_crc(elf)
+                inspect_crc(elf, length_address=start)
             elf.write_bytes(data)
             elf.with_suffix('.bin').write_bytes(image[:-1] + b'\0')
             with self.assertRaisesRegex(ValueError, 'BIN differs'):
-                inspect_crc(elf)
+                inspect_crc(elf, length_address=start)
             elf.with_suffix('.bin').write_bytes(image)
             for paddr in (start + 9, start + 7, start + 16):
                 broken = bytearray(data)
                 struct.pack_into('<I', broken, 52 + 2 * 32 + 12, paddr)
                 elf.write_bytes(broken)
                 with self.assertRaises(ValueError):
-                    inspect_crc(elf)
+                    inspect_crc(elf, length_address=start)
 
 
 if __name__ == '__main__':

@@ -30,7 +30,7 @@ volatile uint32_t smoke_ctor_probe;
 }
 // Dedicated metadata word: the negative test changes only this unused payload.
 __attribute__((section(".fw_version"), used)) static const uint32_t firmware_version = 0x00090200u;
-extern "C" uint32_t __checksum_start[], __checksum_end[];
+extern "C" uint32_t __checksum_start[], __checksum_end[], __checksum_length_field[];
 constexpr uint32_t crcStepWord(uint32_t crc, uint32_t word) {
     crc ^= word;
     for (int i = 0; i < 32; ++i)
@@ -322,8 +322,15 @@ int main()
     const uint32_t stored = *(volatile const uint32_t*)__checksum_end;
     smoke_printf("CRC_START=%08lX\nCRC_END=%08lX\nCRC_STORED=%08lX\nCRC_COMPUTED=%08lX\n",
            (uint32_t)__checksum_start, (uint32_t)__checksum_end, stored, crc);
-    smoke_printf("CRC_RESULT=%s\n", crc == stored ? "PASS" : "FAIL");
-    if (crc != stored) {
+    // Test-local linker symbol locates the field; vector table sizes differ.
+    const uint32_t length = *(volatile const uint32_t*)__checksum_length_field;
+    const uint32_t expected_length = (uintptr_t)__checksum_end - (uintptr_t)__checksum_start;
+    const uint32_t residue = crcStepWord(crc, stored);
+    smoke_printf("CRC_LENGTH_STORED=%lu\nCRC_LENGTH_EXPECTED=%lu\nCRC_RESIDUE=%08lX\n",
+                 length, expected_length, residue);
+    const bool crc_ok = crc == stored && residue == 0 && length == expected_length;
+    smoke_printf("CRC_RESULT=%s\n", crc_ok ? "PASS" : "FAIL");
+    if (!crc_ok) {
         smoke_printf("TEST_RESULT=FAIL\n");
 
         smoke_exit(3);

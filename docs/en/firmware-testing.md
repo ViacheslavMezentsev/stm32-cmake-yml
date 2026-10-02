@@ -444,3 +444,5 @@ job (images 7:27, builds 1:30, QEMU 0:13). Docker image preparation now takes ab
 three quarters of the job; next opportunities are image caching, then bounded
 parallelism. Both runners record per-case
 duration_seconds; QEMU also records timeout_seconds. Durations do not affect verdicts.
+
+Existing semihosting runs also compare CRC_LENGTH_STORED, CRC_LENGTH_EXPECTED and CRC_RESIDUE (TC-93). [CRC layout and method](crc-methods.md) explain the length field without a fixed offset and the zero-residue criterion. These checks add no builds or simulator runs.

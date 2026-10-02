@@ -13,7 +13,7 @@ def crc32_words(data):
     return crc
 
 
-def inspect_crc(elf, flash_end=0x08010000):
+def inspect_crc(elf, flash_end=0x08010000, *, length_address):
     data = elf.read_bytes()
     shoff = struct.unpack_from('<I', data, 32)[0]
     shsize, shcount, names_index = struct.unpack_from('<HHH', data, 46)
@@ -45,17 +45,26 @@ def inspect_crc(elf, flash_end=0x08010000):
             ram_covered = paddr + ram[3] - vaddr + ram[5] <= version[3]
     if not all(covered) or not ram_covered or version[3] + 4 != end:
         raise ValueError('CRC range has gaps or does not include .data then .fw_version')
+    if length_address % 4 or not start <= length_address <= end - 4:
+        raise ValueError('Invalid CRC length field address')
+    length = struct.unpack_from('<I', image, length_address - start)[0]
+    if length != end - start:
+        raise ValueError('Stored CRC length differs from protected range')
     stored = struct.unpack_from('<I', image, end - start)[0]
     computed = crc32_words(image[:-4])
     if stored != computed:
         raise ValueError('Injected ELF CRC does not match FLASH load bytes')
+    residue = crc32_words(image)
+    if residue != 0:
+        raise ValueError('Nonzero CRC residue including stored word')
     # BIN is generated after injection and must represent the same load image.
     if elf.with_suffix('.bin').read_bytes() != image:
         raise ValueError('BIN differs from injected ELF load image')
     metadata = {'CRC_START': f'{start:08X}', 'CRC_END': f'{end:08X}',
-                'CRC_STORED': f'{stored:08X}', 'CRC_COMPUTED': f'{computed:08X}', 'CRC_RESULT': 'PASS'}
+                'CRC_LENGTH_STORED': str(length), 'CRC_LENGTH_EXPECTED': str(end - start),
+                'CRC_RESIDUE': f'{residue:08X}', 'CRC_STORED': f'{stored:08X}', 'CRC_COMPUTED': f'{computed:08X}', 'CRC_RESULT': 'PASS'}
     corrupted = bytearray(data)
     corrupted[version[4]] ^= 1
     image[version[3] - start] ^= 1
-    negative = dict(metadata, CRC_COMPUTED=f'{crc32_words(image[:-4]):08X}', CRC_RESULT='FAIL')
+    negative = dict(metadata, CRC_RESIDUE=f'{crc32_words(image):08X}', CRC_COMPUTED=f'{crc32_words(image[:-4]):08X}', CRC_RESULT='FAIL')
     return metadata, corrupted, negative

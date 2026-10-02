@@ -7,6 +7,7 @@
 | Upgrade a 0.9.x project | [Migrating to 0.10.0](migration-0.10.md) |
 | Connect the framework | [Getting started](getting-started.md) |
 | Combine Presets and YAML | [Three-file example](presets.md) |
+| CRC32: algorithm, layout and reading | [CRC method](crc-methods.md) |
 | Check configuration structure | [JSON Schema](schema.md) |
 | Choose IOC, profiles or Arduino | [Short scenarios](scenarios.md) |
 | Add Arduino Core: wrappers or native | [Arduino backend](arduino.md) |

@@ -177,24 +177,29 @@ Firmware на GitHub запускается вручную на границах
 
 ### Согласованный состав 0.10.1 — реализация
 
-Текущая ветка: `codex/crc-postbuild-diagnostics`, от main `6c0c9f7`.
-Ветка `codex/crc-method` и косметика отчёта слиты; Docs, Configure и Host
-успешны на этом SHA. E010 остаётся открытым, TC-44 частичен.
+Текущая ветка: `codex/crc-layout-checks`, от main `495595c`.
+`codex/crc-postbuild-diagnostics` слита; Docs, Configure, Host, CI environment
+и Firmware успешны для этого SHA. E010 остаётся открытым, TC-44 частичен.
 
-Подготовлен второй CRC-подэтап: Python вызывает objcopy после расчёта,
-начало/успех/ошибки внедрения проходят через каталог RU/EN и JSONL с именем
-секции. Старые режимы CLI без --objcopy сохранены. ТЗ 2.18, TC-92.
-Локально: Host 26/26 на Windows и Linux; unit-набор Windows — 94 PASS,
-3 POSIX-only skip из 97. Синтетическая сборка настоящим Arm GCC/objcopy:
-RU/.checksum и EN/.signature, успешное внедрение и отсутствующая секция —
-по четыре проверки на Windows и Linux; BIN проверен независимым CRC.
-Отчёты: build/crc-postbuild-host[-linux], build/crc-postbuild-real[-linux].
-14 Configure-регрессий CRC PASS; reference, messages, schema и strict-проверка
-ТЗ прошли. Отчёт Configure: build/crc-method-linux.
-Firmware CI дополнительно сверяет жизненный цикл сообщений после реальной
-сборки. На новом SHA ещё не запускался; полный локальный L0–L5 не повторялся.
-Следующий CRC-подэтап: документация полной разметки, проверки поля длины и
-нулевого остатка в симуляторах. После завершения этапа — полный L0–L5.
+Подготовлен завершающий CRC-подэтап (ТЗ 2.19, TC-93): справочник метода RU/EN,
+поле длины после выровненной таблицы векторов в существующих semihosting-образах,
+независимая проверка поля и нулевого остатка на хосте и в прошивке. Повреждённые
+образы используют прежние отрицательные запуски. Число сборок/запусков не растёт;
+аппаратная периферия CRC и пользовательские linker scripts не изменяются.
+Локальная приёмка L0–L5 рабочего дерева завершена: Windows unit-набор —
+94 PASS, 3 POSIX-only skip из 97; Linux — 97/97. Reference (93 страницы),
+messages (226 кодов), schema (96 конфигураций) и strict-проверка ТЗ прошли.
+Закреплённые GCC/CMake, QEMU 11.0.0 и Renode 1.16.1 проверены. Полная матрица:
+1506 Configure, 618 сборок, 336 QEMU + 612 Renode PASS; шесть отрицательных
+сборок flash_size отклонены ожидаемо. Метаданные длины/остатка проверены для
+всех 546 semihosting-сборок и 42 повреждённых копий.
+Отчёты: build/crc-layout-linux/, полный архив: full-results.tar.gz.
+Первый прогон через Windows bind mount остановлен после общего таймаута пары;
+повторный полный прогон в Docker volume прошёл с прежними таймаутами и составом.
+Сборочная матрица в volume — около 11 минут; способ записан в HOWTO RU/EN.
+Тестируемый код сверён со снимком; после него менялись только документация и
+статус. Подписанный коммит, push, CI/Firmware и land этой ветки ещё впереди.
+После CRC-этапа — диагностика версий/SHA модулей и подготовка выпуска 0.10.1.
 
 Предыдущий быстрый подэтап: `codex/windows-ci`. Для `d759e48` успешны Docs
 и Configure; main пока 0500b68. Host CI подготовлен: 19/19 локально Windows/Linux,
@@ -572,23 +577,29 @@ at the end of each stage. Branches are merged by fast-forward (`git land`).
 
 ### Agreed 0.10.1 scope — implementation
 
-Current branch: `codex/crc-postbuild-diagnostics`, from main `6c0c9f7`.
-The CRC method and report formatting changes are merged; Docs, Configure and
-Host passed for this SHA. E010 remains open and TC-44 partial.
+Current branch: `codex/crc-layout-checks`, from main `495595c`.
+`codex/crc-postbuild-diagnostics` is merged; Docs, Configure, Host, CI environment
+and Firmware passed for this SHA. E010 remains open and TC-44 partial.
 
-Second CRC substep prepared: Python invokes objcopy after calculation;
-injection start/success/failure use the RU/EN catalog and JSONL with the section
-name. Previous CLI modes without --objcopy are preserved. Spec 2.18, TC-92.
-Locally: Host 26/26 on Windows and Linux; Windows unit suite 94 PASS and
-3 POSIX-only skips out of 97. Synthetic builds with real Arm GCC/objcopy:
-RU/.checksum and EN/.signature, successful update and absent section — four
-checks on each OS; independent CRC verification of BIN.
-Reports: build/crc-postbuild-host[-linux], build/crc-postbuild-real[-linux].
-14 CRC Configure regressions passed; reference, messages, schema and strict
-spec checks passed. Configure reports: build/crc-method-linux.
-Firmware CI also checks message ordering after real builds. CI for the new SHA
-and full local L0–L5 are pending. Next CRC substep: complete layout documentation,
-length-field and zero-residue simulator checks; full L0–L5 at stage completion.
+Final CRC substep prepared (spec 2.19, TC-93): bilingual method guide, a length
+field after the aligned vector table in existing semihosting images, independent
+host and firmware checks of the field and zero residue. Corrupted images reuse
+existing negative runs. Build/run counts do not increase; CRC peripherals and
+user linker scripts remain outside this change.
+Local L0–L5 acceptance of the working tree completed: Windows unit suite —
+94 PASS, 3 POSIX-only skips out of 97; Linux — 97/97. Reference (93 pages),
+messages (226 codes), schema (96 configurations) and strict spec checks passed.
+Pinned GCC/CMake, QEMU 11.0.0 and Renode 1.16.1 verified. Complete matrix:
+1506 Configure, 618 builds, 336 QEMU + 612 Renode PASS; six negative flash_size
+builds failed as expected. Length/residue metadata verified for all 546
+semihosting builds and 42 corrupted copies.
+Reports: build/crc-layout-linux/; complete archive: full-results.tar.gz.
+The first Windows bind-mount run was stopped after a pair-level timeout;
+a complete rerun in a Docker volume passed with unchanged timeouts and coverage.
+The volume build matrix took about 11 minutes; procedure recorded in RU/EN HOWTO.
+Tested code was compared against the snapshot; only documentation/status changed
+afterwards. Signed commit, push, CI/Firmware and land for this branch are pending.
+After the CRC stage: module version/SHA diagnostics and 0.10.1 release preparation.
 
 Previous fast substep: `codex/windows-ci`. Docs/Configure passed
 for d759e48; main remains 0500b68. Host checks: 19/19 locally on Windows/Linux;

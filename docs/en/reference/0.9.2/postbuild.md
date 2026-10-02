@@ -76,6 +76,8 @@ Checks: [TC-92](../../../../tests/test_crc_injection.py) in Host CI,
 message ordering in Firmware and independent CRC checks of built images.
 Successful injection does not validate the entire FLASH layout.
 
+Details: [method, layout, length field and reading CRC](../../crc-methods.md).
+
 <a id="crc-method"></a>
 ## `crc_method`
 
