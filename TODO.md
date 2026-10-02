@@ -177,33 +177,34 @@ Firmware на GitHub запускается вручную на границах
 
 ### Согласованный состав 0.10.1 — реализация
 
-Текущая ветка: `codex/crc-layout-checks`, от main `495595c`.
-`codex/crc-postbuild-diagnostics` слита; Docs, Configure, Host, CI environment
-и Firmware успешны для этого SHA. E010 остаётся открытым, TC-44 частичен.
+Текущая ветка: `codex/module-git-diagnostics`, от main `034a625`.
+CRC-подэтап и руководство локального L0–L5 слиты; Firmware на `8d3fffc`
+успешен. На main `034a625` успешны Docs, Configure, Host и CI environment.
+E010 остаётся открытым, TC-44 частичен.
 
-Подготовлен завершающий CRC-подэтап (ТЗ 2.19, TC-93): справочник метода RU/EN,
-поле длины после выровненной таблицы векторов в существующих semihosting-образах,
-независимая проверка поля и нулевого остатка на хосте и в прошивке. Повреждённые
-образы используют прежние отрицательные запуски. Число сборок/запусков не растёт;
-аппаратная периферия CRC и пользовательские linker scripts не изменяются.
-Локальная приёмка L0–L5 рабочего дерева завершена: Windows unit-набор —
-94 PASS, 3 POSIX-only skip из 97; Linux — 97/97. Reference (93 страницы),
-messages (226 кодов), schema (96 конфигураций) и strict-проверка ТЗ прошли.
-Закреплённые GCC/CMake, QEMU 11.0.0 и Renode 1.16.1 проверены. Полная матрица:
-1506 Configure, 618 сборок, 336 QEMU + 612 Renode PASS; шесть отрицательных
-сборок flash_size отклонены ожидаемо. Метаданные длины/остатка проверены для
-всех 546 semihosting-сборок и 42 повреждённых копий.
-Отчёты: build/crc-layout-linux/, полный архив: full-results.tar.gz.
-Первый прогон через Windows bind mount остановлен после общего таймаута пары;
-повторный полный прогон в Docker volume прошёл с прежними таймаутами и составом.
-Сборочная матрица в volume — около 11 минут; способ записан в HOWTO RU/EN.
-Тестируемый код сверён со снимком; после него менялись только документация и
-статус. Изменения подписаны и отправлены как `8d3fffc`; владелец сообщил о
-запуске Firmware. Итог CI и land ещё не подтверждены. Дополнено техническое
-руководство локального L0–L5 RU/EN со ссылками из HOWTO и maintenance.
-Рецепт руководства проверен: снимок/volume, L0–L2 (97 + 6 unit-тестов),
-экспорт/очистка; reference — 97 страниц. L3–L5 повторно не запускались.
-После CRC-этапа — диагностика версий/SHA модулей и подготовка выпуска 0.10.1.
+Подготовлена диагностика версий и собственного SHA модулей (ТЗ 2.20, TC-94):
+отдельное сравнение версии YAML, пометка modified, поддержка submodule/worktree,
+без чужого SHA для скопированного каталога. Отсутствие Git не мешает Configure.
+Добавлены регрессии Windows/Linux, обновлены справочник и CHANGELOG RU/EN.
+Локальная приёмка L0–L5 рабочего дерева прошла: Linux unit — 104/104,
+валидатор эмуляторов — 6/6, Host — 33/33 на Windows/Linux; Windows unit —
+101 PASS и 3 POSIX-only skip из 104. Reference — 97 страниц, messages — 226
+кодов, schema и strict-проверка ТЗ PASS. Полная матрица: 1506 Configure,
+618 сборок, 336 QEMU + 612 Renode PASS; версии инструментов, состав и
+метаданные проверены. Результаты — build/module-git-linux/, полный архив —
+full-results.tar.gz; исходный снимок — build/module-git-stage/.
+Первый Configure-прогон выявил три устаревших ожидания сообщений; после их
+исправления вся Configure-матрица повторена успешно. Код сборки/прошивок
+между прогонами не менялся. Снимок сверён с рабочим деревом: после проверок
+менялась только документация/статус. Это приёмка рабочего дерева, не релиза.
+После этого подэтапа — подготовка выпуска 0.10.1. Владелец выполняет commit,
+push, ручной Firmware и land; CI нового коммита ещё не проверен.
+
+Предыдущая CRC-приёмка: 1506 Configure, 618 сборок, 336 QEMU + 612 Renode PASS.
+Отчёты: build/crc-layout-linux/. Все 546 semihosting-сборок и 42 повреждённые
+копии проверяют метаданные длины/остатка. Сборочная матрица в Docker volume
+заняла около 11 минут вместо остановки по таймауту на Windows bind mount.
+Порядок запуска и сравнение — docs/ru/local-docker-testing.md.
 
 Предыдущий быстрый подэтап: `codex/windows-ci`. Для `d759e48` успешны Docs
 и Configure; main пока 0500b68. Host CI подготовлен: 19/19 локально Windows/Linux,
@@ -581,33 +582,34 @@ at the end of each stage. Branches are merged by fast-forward (`git land`).
 
 ### Agreed 0.10.1 scope — implementation
 
-Current branch: `codex/crc-layout-checks`, from main `495595c`.
-`codex/crc-postbuild-diagnostics` is merged; Docs, Configure, Host, CI environment
-and Firmware passed for this SHA. E010 remains open and TC-44 partial.
+Current branch: `codex/module-git-diagnostics`, from main `034a625`.
+The CRC substep and local L0–L5 guide are merged; Firmware passed on `8d3fffc`.
+Docs, Configure, Host and CI environment passed on main `034a625`.
+E010 remains open and TC-44 partial.
 
-Final CRC substep prepared (spec 2.19, TC-93): bilingual method guide, a length
-field after the aligned vector table in existing semihosting images, independent
-host and firmware checks of the field and zero residue. Corrupted images reuse
-existing negative runs. Build/run counts do not increase; CRC peripherals and
-user linker scripts remain outside this change.
-Local L0–L5 acceptance of the working tree completed: Windows unit suite —
-94 PASS, 3 POSIX-only skips out of 97; Linux — 97/97. Reference (93 pages),
-messages (226 codes), schema (96 configurations) and strict spec checks passed.
-Pinned GCC/CMake, QEMU 11.0.0 and Renode 1.16.1 verified. Complete matrix:
-1506 Configure, 618 builds, 336 QEMU + 612 Renode PASS; six negative flash_size
-builds failed as expected. Length/residue metadata verified for all 546
-semihosting builds and 42 corrupted copies.
-Reports: build/crc-layout-linux/; complete archive: full-results.tar.gz.
-The first Windows bind-mount run was stopped after a pair-level timeout;
-a complete rerun in a Docker volume passed with unchanged timeouts and coverage.
-The volume build matrix took about 11 minutes; procedure recorded in RU/EN HOWTO.
-Tested code was compared against the snapshot; only documentation/status changed
-afterwards. Changes signed and pushed as `8d3fffc`; the owner reported starting
-Firmware. Final CI results and land are not confirmed yet. Added a technical
-local L0–L5 guide in RU/EN, linked from HOWTO and maintenance.
-Guide recipe verified: snapshot/volume, L0–L2 (97 + 6 unit tests), export/cleanup;
-reference — 97 pages. L3–L5 were not rerun for this documentation update.
-After the CRC stage: module version/SHA diagnostics and 0.10.1 release preparation.
+Module version and own-SHA diagnostics prepared (spec 2.20, TC-94): separate
+YAML version comparison, modified marker, submodule/worktree support, and no
+parent SHA for copied directories. Missing Git does not block Configure.
+Windows/Linux regressions, reference and changelogs updated in both languages.
+Local working-tree L0–L5 acceptance passed: Linux units 104/104, emulator
+validator 6/6, Host 33/33 on Windows/Linux; Windows units 101 PASS and three
+POSIX-only skips out of 104. Reference (97 pages), messages (226 codes),
+schema and strict specification checks passed. Full matrix: 1506 Configure,
+618 builds, 336 QEMU + 612 Renode PASS; tool versions, completeness and
+metadata verified. Reports: build/module-git-linux/, full archive:
+full-results.tar.gz; source snapshot: build/module-git-stage/.
+The first Configure run exposed three outdated message expectations; after
+updating them, the complete Configure matrix passed. Build/firmware code
+was unchanged between runs. Snapshot compared with the working tree; only
+documentation/status changed after testing. This is not release acceptance.
+Next is 0.10.1 release preparation. The owner performs commit, push, manual
+Firmware and land; CI for the new commit has not been checked yet.
+
+Previous CRC acceptance: 1506 Configure, 618 builds, 336 QEMU + 612 Renode PASS.
+Reports: build/crc-layout-linux/. All 546 semihosting builds and 42 corrupted
+copies check length/residue metadata. The Docker-volume build matrix took
+about 11 minutes, whereas the Windows bind-mount run reached its timeout.
+Commands and comparison: docs/en/local-docker-testing.md.
 
 Previous fast substep: `codex/windows-ci`. Docs/Configure passed
 for d759e48; main remains 0500b68. Host checks: 19/19 locally on Windows/Linux;

@@ -4,28 +4,67 @@
 # Только функции: модуль подключается и в режиме скрипта (cmake -P) для тестов
 # tests/test_component_versions.py.
 # ==============================================================================
-# git describe --tags --always каталога без блокировок индекса; пусто, если нет
-# git, каталога .git или git завершился ошибкой (например, чужой владелец).
-# ==============================================================================
-function(_stm32_yml_git_describe DIR OUT_VAR)
+# Read only the module's own repository (checkout, submodule or worktree).
+# A copied directory inside another repository must not inherit its parent's SHA.
+function(_stm32_yml_git_query DIR OUT_VAR)
     set(${OUT_VAR} "" PARENT_SCOPE)
-    find_package(Git QUIET)
-    if(NOT GIT_FOUND OR NOT EXISTS "${DIR}/.git")
+    if(NOT EXISTS "${DIR}/.git")
         return()
     endif()
-    execute_process(
-        COMMAND "${CMAKE_COMMAND}" -E env GIT_OPTIONAL_LOCKS=0
-                "${GIT_EXECUTABLE}" -C "${DIR}" describe --tags --always
-        OUTPUT_VARIABLE _describe RESULT_VARIABLE _result
-        ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
-    if(_result EQUAL 0)
-        set(${OUT_VAR} "${_describe}" PARENT_SCOPE)
+    find_package(Git QUIET)
+    if(NOT GIT_FOUND)
+        return()
     endif()
+    set(_git "${CMAKE_COMMAND}" -E env --unset=GIT_DIR --unset=GIT_WORK_TREE
+        --unset=GIT_INDEX_FILE --unset=GIT_COMMON_DIR GIT_OPTIONAL_LOCKS=0
+        "${GIT_EXECUTABLE}" --literal-pathspecs -C "${DIR}")
+    execute_process(COMMAND ${_git} rev-parse --show-toplevel
+        OUTPUT_VARIABLE _top RESULT_VARIABLE _result
+        ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE TIMEOUT 5)
+    if(NOT _result STREQUAL "0" OR _top STREQUAL "")
+        return()
+    endif()
+    file(REAL_PATH "${DIR}" _directory)
+    file(REAL_PATH "${_top}" _top)
+    if(CMAKE_HOST_WIN32)
+        string(TOLOWER "${_directory}" _directory)
+        string(TOLOWER "${_top}" _top)
+    endif()
+    if(NOT _directory STREQUAL _top)
+        return()
+    endif()
+    execute_process(COMMAND ${_git} ${ARGN}
+        OUTPUT_VARIABLE _value RESULT_VARIABLE _result
+        ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE TIMEOUT 5)
+    if(_result STREQUAL "0")
+        set(${OUT_VAR} "${_value}" PARENT_SCOPE)
+    endif()
+endfunction()
+
+function(_stm32_yml_git_describe DIR OUT_VAR)
+    _stm32_yml_git_query("${DIR}" _describe describe --tags --always)
+    set(${OUT_VAR} "${_describe}" PARENT_SCOPE)
+endfunction()
+
+# Spec 4.2.8: Git identity is separate from the package/configuration version.
+function(_stm32_yml_git_suffix DIR OUT_VAR)
+    set(${OUT_VAR} "" PARENT_SCOPE)
+    _stm32_yml_git_query("${DIR}" _sha rev-parse --short=7 HEAD)
+    if(NOT _sha MATCHES "^[0-9a-fA-F]+$")
+        return()
+    endif()
+    _stm32_yml_git_query("${DIR}" _status status --porcelain=v1
+        --untracked-files=normal --ignore-submodules=none -- .)
+    set(_modified "")
+    if(NOT _status STREQUAL "")
+        set(_modified ", modified")
+    endif()
+    set(${OUT_VAR} " (commit: ${_sha}${_modified})" PARENT_SCOPE)
 endfunction()
 
 # ==============================================================================
 # Версия stm32-cmake: тег из git describe; без тегов — последняя версия из
-# CHANGELOG.md с пометкой "+" и коммитом, если он известен ("v2.1.0+ (ecc5acc)").
+# CHANGELOG.md с пометкой "+". Git identity is formatted separately.
 # Пусто, если версию определить нельзя.
 # ==============================================================================
 function(stm32_yml_stm32_cmake_version DIR OUT_VAR)
@@ -40,12 +79,10 @@ function(stm32_yml_stm32_cmake_version DIR OUT_VAR)
     endif()
     if(_describe MATCHES "^v?[0-9]+\\.[0-9]")
         set(_version "${_describe}")
-    elseif(NOT _changelog STREQUAL "" AND NOT _describe STREQUAL "")
-        set(_version "${_changelog}+ (${_describe})")
     elseif(NOT _changelog STREQUAL "")
         set(_version "${_changelog}+")
     else()
-        set(_version "${_describe}")
+        set(_version "")
     endif()
     set(${OUT_VAR} "${_version}" PARENT_SCOPE)
 endfunction()
@@ -75,10 +112,14 @@ endfunction()
 
 # Выводит строку версии компонента или «версия не определена» без предупреждения.
 function(_stm32_yml_print_version NAME VERSION)
+    set(_suffix "")
+    if(ARGC GREATER 2)
+        set(_suffix "${ARGV2}")
+    endif()
     if("${VERSION}" STREQUAL "")
-        stm32_yml_msg(I044 "${NAME}")
+        stm32_yml_msg(I044 "${NAME}" "${_suffix}")
     else()
-        stm32_yml_msg(I041 "${NAME}" "${VERSION}")
+        stm32_yml_msg(I041 "${NAME}" "${VERSION}${_suffix}")
     endif()
 endfunction()
 
@@ -110,13 +151,15 @@ function(stm32_yml_print_component_versions)
         _stm32_yml_print_version("Arduino Core STM32" "${_arduino}")
     else()
         set(_stm32_cmake "")
+        set(_stm32_cmake_git "")
         if(CMAKE_TOOLCHAIN_FILE MATCHES "stm32_gcc\\.cmake$")
             get_filename_component(_toolchain "${CMAKE_TOOLCHAIN_FILE}" ABSOLUTE BASE_DIR "${CMAKE_BINARY_DIR}")
             get_filename_component(_dir "${_toolchain}" DIRECTORY)
             get_filename_component(_dir "${_dir}" DIRECTORY)
             stm32_yml_stm32_cmake_version("${_dir}" _stm32_cmake)
+            _stm32_yml_git_suffix("${_dir}" _stm32_cmake_git)
         endif()
-        _stm32_yml_print_version("stm32-cmake" "${_stm32_cmake}")
+        _stm32_yml_print_version("stm32-cmake" "${_stm32_cmake}" "${_stm32_cmake_git}")
     endif()
 endfunction()
 

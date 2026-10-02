@@ -42,7 +42,8 @@ function(stm32_yml_prepare_project_data OUT_PROJECT_NAME_VAR OUT_LANGUAGES_VAR)
     set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${CONFIG_FILE_PATH}")
 
     # --- Баннер версий -------------------------------------------------------
-    stm32_yml_msg(I001 "${STM32_CMAKE_YML_VERSION}")
+    _stm32_yml_git_suffix("${CMAKE_CURRENT_FUNCTION_LIST_DIR}/.." _framework_git)
+    stm32_yml_msg(I001 "${STM32_CMAKE_YML_VERSION}" "${_framework_git}")
 
     stm32_yml_ensure_default_value(stm32_cmake_yml_version_check "true")
 

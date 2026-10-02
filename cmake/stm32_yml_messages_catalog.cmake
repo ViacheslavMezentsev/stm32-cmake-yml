@@ -26,14 +26,14 @@ stm32_yml_msg_def(W001
     "Unknown STM32_YML_LANG value '{1}': the language is chosen as for auto. Valid values: auto, ru, en.")
 
 stm32_yml_msg_def(I001
-    "stm32-cmake-yml версия: {1}"
-    "stm32-cmake-yml version: {1}")
+    "stm32-cmake-yml: {1}{2}"
+    "stm32-cmake-yml: {1}{2}")
 stm32_yml_msg_def(I002
     "Версия в конфигурации: не указана (stm32_cmake_yml_version в {1})"
     "Configuration version: not set (stm32_cmake_yml_version in {1})")
 stm32_yml_msg_def(I003
-    "Версия в конфигурации: {1}  (совпадают ✓)"
-    "Configuration version: {1}  (match ✓)")
+    "Версия в конфигурации: {1} (совпадают)"
+    "Configuration version: {1} (match)")
 stm32_yml_msg_def(I004
     "Версия в конфигурации: {1}  (конфиг новее — обновите фреймворк !)"
     "Configuration version: {1}  (configuration is newer — update the framework!)")
@@ -191,8 +191,8 @@ stm32_yml_msg_def(I043
     "  Компилятор: версия не определена"
     "  Compiler: version unknown")
 stm32_yml_msg_def(I044
-    "  {1}: версия не определена"
-    "  {1}: version unknown")
+    "  {1}: версия не определена{2}"
+    "  {1}: version unknown{2}")
 
 # --- 1xx: профили -------------------------------------------------------------
 

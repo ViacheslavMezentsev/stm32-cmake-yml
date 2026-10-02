@@ -280,3 +280,11 @@ acceptance the first build pair improved from 917 to 117 seconds; the earlier
 bind-mount run exceeded the 1200-second pair limit on its third pair. Simulator
 timeouts and coverage stayed unchanged. The guide records exact measurements
 and their limits. Transfer large artifact sets as one archive.
+
+## CMake policies in standalone tests
+
+Start generated `cmake -P` tests with `cmake_minimum_required(VERSION 3.21)`,
+matching the framework entry point. Otherwise CMake 3.x may apply old
+CMP0012/CMP0130 policies: `while(TRUE)` skips message-catalog initialization,
+and subsequent output fails with recursion. Passing on a newer CMake does
+not establish that the test script supports the minimum version.

@@ -12,6 +12,8 @@ on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 
 ## [Unreleased] — 0.10.1
 
+- Version diagnostics report each module’s own Git SHA and modified state; copies without Git do not inherit a project commit. Removed the YAML comparison checkmark and added checkout/submodule/worktree and bilingual regressions.
+
 - Documented the CRC32 method, length field and CRC placement. Existing semihosting firmware checks length and zero residue in software; the host independently validates ELF/BIN. Build/run counts are unchanged and user linker layouts are not modified automatically.
 
 - Localized CRC injection start/success and added JSONL diagnostics for objcopy failures with the section and cause. The script updates the ELF after calculation; failures stop post-build without reporting success.

@@ -32,9 +32,9 @@ The list is built from the `cmake/stm32_yml_messages_catalog.cmake` catalog by `
 | `SCY-W005` | WARNING | Unknown value '{1}' of parameter '{2}'. Known values: {3}. '{4}' is applied. |
 | `SCY-W006` | WARNING | Unknown value '{1}' of parameter '{2}'. Known values: {3}. The value is not used. |
 | `SCY-W007` | WARNING | Unknown item '{1}' of parameter '{2}'. Known values: {3}. The item is skipped. |
-| `SCY-I001` | STATUS | stm32-cmake-yml version: {1} |
+| `SCY-I001` | STATUS | stm32-cmake-yml: {1}{2} |
 | `SCY-I002` | STATUS | Configuration version: not set (stm32\_cmake\_yml\_version in {1}) |
-| `SCY-I003` | STATUS | Configuration version: {1}  (match ✓) |
+| `SCY-I003` | STATUS | Configuration version: {1} (match) |
 | `SCY-I004` | STATUS | Configuration version: {1}  (configuration is newer — update the framework!) |
 | `SCY-I005` | STATUS | Configuration version: {1}  (framework is newer — update the configuration) |
 | `SCY-I010` | STATUS | Verbose build output is enabled (CMAKE\_VERBOSE\_MAKEFILE=ON). |
@@ -66,7 +66,7 @@ The list is built from the `cmake/stm32_yml_messages_catalog.cmake` catalog by `
 | `SCY-I041` | STATUS | {1}: {2} |
 | `SCY-I042` | STATUS | Compiler: {1} {2} |
 | `SCY-I043` | STATUS | Compiler: version unknown |
-| `SCY-I044` | STATUS | {1}: version unknown |
+| `SCY-I044` | STATUS | {1}: version unknown{2} |
 
 ## 1xx — Profiles
 

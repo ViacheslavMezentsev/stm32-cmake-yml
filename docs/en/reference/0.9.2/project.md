@@ -21,6 +21,23 @@ Version the YAML targets. Set it explicitly; it does not select framework code. 
 
 **Processing order:** version comparison runs immediately after YAML loading, **before** profiles and `STM32_YML_OVERRIDE_*`. Changing these two options through a profile/override cannot change diagnostics already emitted. Set them at the YAML root. Missing or empty versions warn when checking is enabled; configuration continues. An omitted or empty switch defaults to `true` (the empty switch is not separately tested).
 
+**For 0.10.1** (spec 4.2.2, 4.2.8; TC-94): the banner becomes
+`stm32-cmake-yml: 0.10.0 (commit: 02b335e)` (illustrative values).
+The YAML version and comparison result remain separate, without a checkmark.
+Each loaded module's own checkout/submodule/worktree supplies its SHA. Copies
+without `.git` do not inherit a parent project's SHA. Missing Git/HEAD or access
+errors omit the suffix without failing Configure. Staged/unstaged changes and
+new non-ignored files produce `(commit: 02b335e, modified)`; ignored files and
+changes in other working trees do not count. If status cannot be read, absence
+of modified does not prove cleanliness. Each Git process has a 5-second limit;
+global safe.directory is not modified.
+stm32-cmake retains git describe or the approximate CHANGELOG version with `+`,
+with a separate SHA: `stm32-cmake: v2.1.0+ (commit: ecc5acc)`. An available SHA
+is retained after the unknown-version message when no package version is found.
+JSONL I001 has two arguments (package version, Git suffix); I044 has name/suffix.
+YAML comparison uses only the package version. Arduino formatting is unchanged.
+Regressions: `tests/test_component_versions.py` and existing version/messages Configure cases.
+
 ```yaml
 stm32_cmake_yml_version: 0.10.0
 ```
