@@ -23,6 +23,7 @@
 | Check QEMU and Renode | [Emulation environment](emulation.md) |
 | Understand test coverage and limits | [Project status](status.md) |
 | Run checks | [Testing](testing.md) |
+| Full local L0–L5 and faster Docker runs | [Technical guide](local-docker-testing.md) |
 | Solve a frequent git or CI problem | [How-to](HOWTO.md) |
 | Find tests in the source tree | [Test levels and where to find them](testing.md#test-levels-and-where-to-find-them) |
 | See which emulator checks a family | [Emulators per family](emulation.md#emulators-per-family) |

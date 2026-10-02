@@ -2,6 +2,8 @@
 
 [Документация](index.md) → Сопровождение · [English](../en/maintenance.md)
 
+Перед локальной приёмкой: [L0–L5 в Docker, команды и быстрый запуск](local-docker-testing.md).
+
 Markdown-страницы редактируются непосредственно. Генератор документации не
 требуется; `docs/reference-index.json` — индекс навигации и покрытия и источник
 генерации [JSON Schema](schema.md), но не второй набор defaults.

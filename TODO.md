@@ -198,7 +198,11 @@ messages (226 кодов), schema (96 конфигураций) и strict-про
 повторный полный прогон в Docker volume прошёл с прежними таймаутами и составом.
 Сборочная матрица в volume — около 11 минут; способ записан в HOWTO RU/EN.
 Тестируемый код сверён со снимком; после него менялись только документация и
-статус. Подписанный коммит, push, CI/Firmware и land этой ветки ещё впереди.
+статус. Изменения подписаны и отправлены как `8d3fffc`; владелец сообщил о
+запуске Firmware. Итог CI и land ещё не подтверждены. Дополнено техническое
+руководство локального L0–L5 RU/EN со ссылками из HOWTO и maintenance.
+Рецепт руководства проверен: снимок/volume, L0–L2 (97 + 6 unit-тестов),
+экспорт/очистка; reference — 97 страниц. L3–L5 повторно не запускались.
 После CRC-этапа — диагностика версий/SHA модулей и подготовка выпуска 0.10.1.
 
 Предыдущий быстрый подэтап: `codex/windows-ci`. Для `d759e48` успешны Docs
@@ -598,7 +602,11 @@ The first Windows bind-mount run was stopped after a pair-level timeout;
 a complete rerun in a Docker volume passed with unchanged timeouts and coverage.
 The volume build matrix took about 11 minutes; procedure recorded in RU/EN HOWTO.
 Tested code was compared against the snapshot; only documentation/status changed
-afterwards. Signed commit, push, CI/Firmware and land for this branch are pending.
+afterwards. Changes signed and pushed as `8d3fffc`; the owner reported starting
+Firmware. Final CI results and land are not confirmed yet. Added a technical
+local L0–L5 guide in RU/EN, linked from HOWTO and maintenance.
+Guide recipe verified: snapshot/volume, L0–L2 (97 + 6 unit tests), export/cleanup;
+reference — 97 pages. L3–L5 were not rerun for this documentation update.
 After the CRC stage: module version/SHA diagnostics and 0.10.1 release preparation.
 
 Previous fast substep: `codex/windows-ci`. Docs/Configure passed

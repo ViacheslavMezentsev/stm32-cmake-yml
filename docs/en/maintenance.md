@@ -2,6 +2,8 @@
 
 [Documentation](index.md) → Maintenance · [Русский](../ru/maintenance.md)
 
+Before local acceptance: [L0–L5 in Docker, commands and fast execution](local-docker-testing.md).
+
 Edit Markdown directly. No documentation generator is required;
 `docs/reference-index.json` is a navigation/coverage index and the source for
 [JSON Schema](schema.md) generation, not a second set of defaults. RU/EN cards are the shared specification for people
