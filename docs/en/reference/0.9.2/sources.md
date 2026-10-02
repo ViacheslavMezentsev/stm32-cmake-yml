@@ -73,3 +73,7 @@ link_libraries: [Arduino::Core, Arduino::Probe]
 [0.9.2 implementation](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/stm32_yml.cmake) · [Index](index.md)
 
 **Checks (partial coverage):** `configure.arduino-defaults`, `configure.module-explicit-link`, `configure.module-not-auto-linked`, `configure.module-missing-target`, `configure.custom-library-named`. [Test manifest](../../../../tests/cases.json).
+
+**Windows limitation:** an absolute sources directory on another drive is skipped
+with W302. The regression checks this known limitation; its fix is deferred.
+[E010](../../errata/E010.md).

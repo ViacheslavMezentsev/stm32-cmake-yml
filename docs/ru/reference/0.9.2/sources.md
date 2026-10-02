@@ -73,3 +73,7 @@ link_libraries: [Arduino::Core, Arduino::Probe]
 [Реализация 0.9.2](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/stm32_yml.cmake) · [Index](index.md)
 
 **Проверки (частичное покрытие):** `configure.arduino-defaults`, `configure.module-explicit-link`, `configure.module-not-auto-linked`, `configure.module-missing-target`, `configure.custom-library-named`. [Test manifest](../../../../tests/cases.json).
+
+**Ограничение Windows:** абсолютный каталог на другом диске не подключается
+через sources; появляется W302. Проверяется как известное ограничение,
+исправление отложено. [E010](../../errata/E010.md).

@@ -12,6 +12,8 @@ on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 
 ## [Unreleased] — 0.10.1
 
+- Added native Windows Configure/Build to Firmware with pinned tools. TC-44 remains partial: E010 (absolute sources on another drive) is covered by a regression, without changing behavior.
+
 ### Tests
 
 - Added fast Windows/Linux Host CI with logs and path filters; fixed Windows portability of version tests. Full TC-44 remains pending.

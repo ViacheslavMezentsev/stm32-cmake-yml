@@ -359,7 +359,9 @@
         "configure.build-dirs-nested",
         "configure.build-dirs-deps-clash"
       ],
-      "errata": [],
+      "errata": [
+        "E010"
+      ],
       "yaml_paths": [
         [
           "sources"
@@ -2587,6 +2589,18 @@
       },
       "evidence": "reproduced",
       "status": "fix-prepared"
+    },
+    {
+      "id": "E010",
+      "options": [
+        "sources"
+      ],
+      "pages": {
+        "ru": "docs/ru/errata/E010.md",
+        "en": "docs/en/errata/E010.md"
+      },
+      "evidence": "reproduced",
+      "status": "open"
     }
   ],
   "audit_date": "2026-09-27",

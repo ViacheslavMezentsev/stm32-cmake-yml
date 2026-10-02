@@ -478,5 +478,22 @@ Missing tools, empty suites or skipped tests fail the run. `tests.log` and
 `summary.json` are published as `host-<OS>` artifacts. Pushes affecting scripts,
 cmake, stm32_yml.cmake, tests, ci/run_host_checks.py or host.yml trigger it;
 Markdown-only pushes do not. Manual dispatch is available. The 10-minute job
-limit is a guard, not expected duration. Locally the 19 tests take seconds;
-GitHub timing is measured after push. Full Windows TC-44 remains unimplemented.
+limit is a guard, not expected duration. Locally the 20 tests take seconds;
+GitHub timing is measured after push. Windows Configure/Build is now separate; TC-44 remains partial because of E010.
+
+## Windows Configure/Build (TC-44)
+
+The windows job in Firmware runs on manual Firmware dispatch and v* tags.
+ci/windows.lock.json pins SHA-256, checked before extraction. Python 3.11+ and
+Git come from the runner; CMake 3.21.7, xPack GCC 14.2.1-1.1, Ninja and yq are
+pinned. No STM32Cube is needed for these five bare-metal cases. Local commands
+(output and external-root must be on different drives):
+
+```powershell
+python ci/install_windows.py --output build/windows-tools --cache build/windows-downloads
+python ci/run_windows_checks.py --tools build/windows-tools --output build/windows-checks --external-root "$env:LOCALAPPDATA/Temp"
+```
+
+Reports/logs are in windows-configure-build. Four cases are positive; the fifth
+requires [E010](errata/E010.md), so tc44_complete=false. Job success does not close
+TC-44. Windows emulators are deferred until needed.

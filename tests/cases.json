@@ -355,6 +355,7 @@
   },
   {
     "name": "ioc-baremetal-zero",
+    "windows": {"ioc_backslash": true, "crlf": true},
     "args": ["-DPROJECT_CONFIG_FILE=ioc.yml", "-DSTM32_YML_PROFILE=bare"],
     "env": {"CMAKE_USER_HOME": "/no-cube-repository"},
     "observed": {"use_cmsis": "FALSE", "use_hal": "FALSE", "heap_size": "0"},
@@ -363,6 +364,7 @@
   },
   {
     "name": "baremetal-no-cube",
+    "windows": {"minimal": true},
     "args": ["-DPROJECT_CONFIG_FILE=baremetal.yml"],
     "env": {"CMAKE_USER_HOME": "/no-cube-repository"},
     "observed": {"MCU": "STM32F103C8T6", "use_cmsis": "FALSE", "use_hal": "FALSE", "use_freertos": "FALSE", "heap_size": "0", "crc_enable": "FALSE"},
@@ -372,6 +374,7 @@
   },
   {
     "name": "baremetal-empty-list",
+    "windows": {"external_drive": true, "known_limitation": "E010"},
     "args": ["-DPROJECT_CONFIG_FILE=baremetal.yml", "-DSTM32_YML_PROFILE=empty"],
     "observed": {"include_directories": ""},
     "absent_properties": {"COMPILE_DEFINITIONS": ["BAREMETAL=1"]},
@@ -4060,6 +4063,7 @@
   },
   {
     "name": "versions-stm32-cmake",
+    "windows": {"registry_lang": true},
     "args": [
       "-DPROJECT_CONFIG_FILE=version-equal.yml"
     ],
@@ -4387,6 +4391,7 @@
   },
   {
     "name": "artifacts-build-default",
+    "windows": {"build": true},
     "args": [
       "-DPROJECT_CONFIG_FILE=artifacts.yml",
       "-DSTM32_YML_PROFILE=build",

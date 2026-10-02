@@ -9,7 +9,7 @@ import time
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
-PATTERNS = ('test_crc_encoding.py', 'test_firmware_crc_script.py', 'test_component_versions.py')
+PATTERNS = ('test_crc_encoding.py', 'test_firmware_crc_script.py', 'test_component_versions.py', 'test_windows_tools.py')
 
 
 def main():

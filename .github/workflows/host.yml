@@ -9,6 +9,8 @@ on:
       - stm32_yml.cmake
       - tests/**
       - ci/run_host_checks.py
+      - ci/install_windows.py
+      - ci/windows.lock.json
       - .github/workflows/host.yml
   workflow_dispatch:
 

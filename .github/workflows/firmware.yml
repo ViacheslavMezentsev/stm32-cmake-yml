@@ -15,6 +15,28 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  windows:
+    name: Windows Configure/Build (TC-44, E010 limitation)
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Check Windows installer guards
+        run: python -m unittest discover -s tests -p test_windows_tools.py
+      - name: Install SHA-256 pinned Windows tools
+        run: python ci/install_windows.py --output build/windows-tools --cache build/windows-downloads
+      - name: Run native Configure and minimal build
+        run: python ci/run_windows_checks.py --tools build/windows-tools --output build/windows-checks --external-root "$env:LOCALAPPDATA/Temp"
+      - name: Upload native Windows diagnostics
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: windows-configure-build
+          path: |
+            build/windows-checks
+            build/windows-tools/installed-lock.json
+          if-no-files-found: error
+
   smoke:
     runs-on: ubuntu-24.04
     timeout-minutes: 90

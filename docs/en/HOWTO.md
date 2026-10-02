@@ -258,3 +258,13 @@ backslash starts an escape (`\g` produces Invalid character escape). Preserve
 the Windows environment instead of replacing PATH with /usr/bin:/bin. Isolate
 Git configuration with GIT_CONFIG_GLOBAL and GIT_CONFIG_NOSYSTEM only for
 temporary test repositories. Signing rules for the working repository are unchanged.
+
+## Downloading pinned Windows tools
+
+If direct Windows HTTPS connections reset, pre-download archives through an
+existing Linux container into a local cache directory. Use the exact URL and
+filename from ci/windows.lock.json, then pass that cache to
+`python ci/install_windows.py --cache <directory> --output build/windows-tools`.
+The installer verifies SHA-256 again before extraction. Do not skip hash checks
+or disable TLS. TC-44 Configure/Build still runs natively on Windows even when
+a container was used for downloading.

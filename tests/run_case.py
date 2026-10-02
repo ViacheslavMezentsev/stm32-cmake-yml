@@ -72,7 +72,7 @@ def verify(case, build, source):
                       ".text (READONLY)", "KEEP(*(.checksum))", "_estack = ORIGIN(RAM) + LENGTH(RAM);"):
             require(token in content, f"Generated linker script missing {token!r}")
         require("@" not in content, "Unresolved linker template substitution")
-        require(str(linker) in observed("LINK_OPTIONS"), "Generated linker script not linked")
+        require(linker.as_posix() in observed("LINK_OPTIONS"), "Generated linker script not linked")
 
     ninja = (build / build_file).read_text(encoding="utf-8")
     if "link_byproducts" in case:
@@ -106,6 +106,9 @@ def verify(case, build, source):
         target = observed("PROJECT_NAME")
         post = "\n".join(line for line in ninja.splitlines()
                          if line.strip().startswith("POST_BUILD = "))
+        # Windows tool executables have a suffix; keep the same conversion checks.
+        for tool in ('objcopy', 'objdump'):
+            post = post.replace(f'arm-none-eabi-{tool}.exe', f'arm-none-eabi-{tool}')
         # ТЗ 4.14.2: BIN строится из секций FLASH скриптом, а не objcopy -O binary.
         require("arm-none-eabi-objcopy -O binary" not in post, "BIN must not use objcopy -O binary")
         # ТЗ 4.14.4: артефакты рядом с ELF, BYPRODUCTS — в правиле компоновки.
@@ -331,6 +334,8 @@ def verify_built(expected, cmake, build, report):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--windows", action="store_true", help="TC-44 Windows adaptations from cases.json")
+    parser.add_argument("--external-root", type=Path)
     parser.add_argument("--case", required=True)
     parser.add_argument("--cmake", required=True)
     parser.add_argument("--framework", type=Path, required=True)
@@ -346,6 +351,39 @@ def main():
     source = run / "w1/w2/source" if case.get("extra_dirs") else run / "source"
     build = run / "build"
     shutil.copytree(tests / "fixtures/project", source)
+    external = None
+    if args.windows:
+        require(os.name == 'nt' and case.get('windows'), 'Not a selected Windows case')
+        windows = case['windows']
+        if windows.get('ioc_backslash'):
+            folder = source / 'ioc folder'
+            folder.mkdir()
+            shutil.copy2(source / 'bluepill-hsi.ioc', folder / 'board.ioc')
+            config = source / 'ioc.yml'
+            text = config.read_text(encoding='utf-8').replace('ioc_file: bluepill-hsi.ioc',
+                                                            'ioc_file: ioc folder\\board.ioc')
+            config.write_text(text, encoding='utf-8')
+        if windows.get('crlf'):
+            for file in source.rglob('*'):
+                if file.suffix in ('.yml', '.ioc', '.cmake', '.txt'):
+                    text = file.read_text(encoding='utf-8')
+                    file.write_bytes(text.replace('\r\n', '\n').replace('\n', '\r\n').encode('utf-8'))
+            require(b'\r\n' in (source / 'ioc.yml').read_bytes(), 'CRLF fixture not prepared')
+        if windows.get('external_drive'):
+            require(args.external_root is not None, 'Missing external-root')
+            external = Path(tempfile.mkdtemp(prefix='external module ', dir=args.external_root)).resolve()
+            require(external.drive.lower() != source.drive.lower(), 'External directory must be on another drive')
+            shutil.copytree(tests / 'fixtures/outside-module', external, dirs_exist_ok=True)
+            case['args'] = case.get('args', []) + ['-DSTM32_YML_OVERRIDE_sources=main.c;' + external.as_posix()]
+        if windows.get('registry_lang'):
+            import winreg
+            with winreg.OpenKey(winreg.HKEY_CURRENT_USER, r'Control Panel\International') as key:
+                locale = winreg.QueryValueEx(key, 'LocaleName')[0]
+            case['lang'] = 'auto'
+            case['message_lang'] = 'ru' if locale.lower().startswith('ru') else 'en'
+            case['env'] = dict(case.get('env', {}), LC_ALL='', LC_MESSAGES='', LANG='')
+            (run / 'registry-locale.json').write_text(json.dumps({'LocaleName': locale, 'expected': case['message_lang']}), encoding='utf-8')
+
     for relative in case.get("extra_dirs", []):
         shutil.copytree(tests / "fixtures/outside-module", (source / relative).resolve(), dirs_exist_ok=True)
     if case.get("backend") == "arduino":
@@ -483,6 +521,13 @@ def main():
         require(core_state() == core_before, "Arduino core files changed")
         # ensure_core_deps() would download into ~/.Arduino_Core_STM32_dl.
         require(not (run / "home/.Arduino_Core_STM32_dl").exists(), "Arduino core downloads created")
+    if external is not None:
+        commands = json.loads((build / 'compile_commands.json').read_text(encoding='utf-8'))
+        require(not any(Path(c['file']).resolve() == external / 'extra.c' for c in commands),
+                'E010 changed: revisit the documented limitation and expected regression')
+        records = [json.loads(line) for line in (build / 'stm32_yml_messages.jsonl').read_text(encoding='utf-8').splitlines()]
+        require(any(r['code'] == 'SCY-W302' and r['args'] == [external.as_posix()] for r in records),
+                'E010 must report the exact skipped external directory')
     print(f"PASS {args.case}")
 
 

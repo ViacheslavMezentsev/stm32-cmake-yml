@@ -177,7 +177,16 @@ Firmware на GitHub запускается вручную на границах
 
 ### Согласованный состав 0.10.1 — реализация
 
-Текущая ветка: `codex/windows-ci` (быстрый подэтап). Для `d759e48` успешны Docs
+Текущая ветка: `codex/windows-configure`. Предыдущая ветка слита в main
+6d066f0, CI успешен. Подготовлен Windows job в Firmware; пять локальных сценариев
+на CMake 3.21.7 / xPack GCC 14.2.1-1.1 проверены, включая сборку артефактов.
+E010 (sources другого диска) по решению владельца остаётся регрессией без
+исправления; TC-44 частичен. Эмуляторы Windows отложены до необходимости.
+ТЗ 2.16. Новый job на GitHub ещё не запускался; полный L0–L5 не повторялся.
+Локально: 88 unit PASS и 3 POSIX-only skip из 91; пять базовых Linux-сценариев
+PASS. Отчёт Windows: build/windows-tc44-final/summary.json (E010 явно указан).
+
+Предыдущий быстрый подэтап: `codex/windows-ci`. Для `d759e48` успешны Docs
 и Configure; main пока 0500b68. Host CI подготовлен: 19/19 локально Windows/Linux,
 Windows unit-набор — 87 PASS, 3 POSIX-only skip из 90. Исправлены пять ошибок
 TC-83 с путями. ТЗ 2.15. Отчёты: build/host-checks-windows и host-checks-linux.
@@ -553,7 +562,15 @@ at the end of each stage. Branches are merged by fast-forward (`git land`).
 
 ### Agreed 0.10.1 scope — implementation
 
-Current branch: `codex/windows-ci` (fast checks substep). Docs/Configure passed
+Current branch: `codex/windows-configure`; previous branch merged into main
+6d066f0 with successful CI. Windows Firmware job prepared; five local cases
+checked with CMake 3.21.7 / xPack GCC 14.2.1-1.1, including artifact builds.
+Owner deferred E010 (other-drive sources): regression only, TC-44 partial.
+Windows emulators deferred until needed. Spec 2.16. New GitHub job and full
+L0–L5 remain pending. Locally: 88 unit PASS, 3 POSIX-only skips out of 91;
+five unchanged Linux cases passed. Windows report: build/windows-tc44-final/summary.json.
+
+Previous fast substep: `codex/windows-ci`. Docs/Configure passed
 for d759e48; main remains 0500b68. Host checks: 19/19 locally on Windows/Linux;
 Windows unit suite: 87 PASS, 3 POSIX-only skips out of 90. Five TC-83 path errors
 fixed. Spec 2.15. Reports: build/host-checks-windows and host-checks-linux.

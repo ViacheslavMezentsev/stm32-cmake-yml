@@ -487,5 +487,22 @@ Workflow `Host` выполняет одинаковый набор на `ubuntu-
 На push проверяются изменения scripts, cmake, stm32_yml.cmake, tests,
 ci/run_host_checks.py и host.yml. Только Markdown не запускает этот workflow.
 Можно запустить вручную. Лимит job — 10 минут; это предохранитель, не целевая
-длительность. Локальные 19 тестов занимают несколько секунд; время GitHub
-измеряется после push. Полное Windows-задание TC-44 ещё не реализовано.
+длительность. Локальные 20 тестов занимают несколько секунд; время GitHub
+измеряется после push. Windows Configure/Build теперь добавлен отдельно; TC-44 частичен из-за E010.
+
+## Windows Configure/Build (TC-44)
+
+Задание windows в Firmware запускается вручную вместе с Firmware и на тегах v*.
+Установка по ci/windows.lock.json: SHA-256 проверяется до извлечения. Python
+3.11+ и Git берутся с runner, CMake 3.21.7, xPack GCC 14.2.1-1.1, Ninja и yq
+закреплены. STM32Cube не требуется: пять выбранных сценариев используют bare metal.
+Локальные команды (output и external-root должны быть на разных дисках):
+
+```powershell
+python ci/install_windows.py --output build/windows-tools --cache build/windows-downloads
+python ci/run_windows_checks.py --tools build/windows-tools --output build/windows-checks --external-root "$env:LOCALAPPDATA/Temp"
+```
+
+Отчёт и логи — артефакт windows-configure-build. Четыре сценария положительные;
+пятый требует воспроизведения [E010](errata/E010.md), поэтому tc44_complete=false.
+Успех задания не закрывает TC-44. Эмуляторы на Windows отложены до необходимости.
