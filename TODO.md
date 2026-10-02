@@ -242,6 +242,47 @@ Firmware на GitHub запускается вручную на границах
 Исправления подписей включать после уточнения контракта в ТЗ, с регрессией
 RU/EN. Не добавлять новые ветки тестирования прошивок ради изменения текста.
 
+**Дополнение: локализация CRC и описание формата образа (согласовано по направлению):**
+
+- После исправления UTF-8 выделить `codex/crc-diagnostics`: сообщения начала,
+  успешного завершения и ошибки внедрения через общий каталог RU/EN и JSONL.
+  Префикс `[STM32 CRC32]` относится к операциям CRC; отдельное создание BIN
+  сохраняет `[STM32 BIN]`. Значение CRC и диагностические коды не локализуются.
+- Имя секции берётся из эффективного `crc_section_name` (включая alias
+  `crc.section_name`, профиль и override), а не из литерала `.checksum`.
+  В сообщениях показать секцию, алгоритм и понятное описание текущего способа
+  размещения. Успех выводить только после успешного objcopy; при его отказе
+  сохранить stderr/код возврата и добавить контекст секции/ELF. Проверить
+  отсутствие ложного сообщения успеха при любой ошибке.
+- Ветка `codex/crc-layout-docs`: отдельная страница RU/EN со ссылками из справочника
+  и HOWTO. Различать алгоритм, диапазон данных, размещение CRC и формат метаданных.
+  CRC — контроль целостности, не криптографическая подпись и не аутентификация.
+- Описать предложенную схему как соглашение linker template: все секции с LMA
+  во FLASH, включая загрузочную копию .data, предшествуют слову CRC; после
+  таблицы векторов записан LONG(__checksum_size) с предварительным ALIGN(4).
+  __checksum_start должен совпадать с началом рассчитанного образа;
+  __checksum_end указывает на начало CRC, размер исключает четыре байта CRC.
+  LONG(0) в секции CRC — резерв до post-build, не поле длины.
+- Нулевой остаток подтверждён локально на трёх синтетических наборах существующим
+  stm32_crc32 при дописывании CRC как little-endian слова. Регрессии должны
+  проверять кратность длины четырём, заполнение промежутков 0xFF, диапазон LMA,
+  произвольное имя секции и отсутствие FLASH-данных после CRC. Только при
+  совпадающем образе свойство нулевого остатка применимо к полному файлу.
+- Пример считывания — на нейтральном синтетическом образе: проверить границы и
+  длину, прочитать поле длины и CRC в установленном порядке байтов, сравнить
+  расчёт с сохранённым значением либо проверить остаток полного образа.
+  Не фиксировать универсальное смещение поля после векторов: оно зависит от
+  таблицы и выравнивания. Исходные проекты пользователя не изменять.
+- Зарезервировать `crc_method` (alias `crc.method`) отдельно от `crc_algorithm`:
+  отсутствие/пустое значение/`none` сохраняют текущее поведение и не отключают
+  CRC; включением управляет `crc_enable`. Имена будущих методов пока не вводить.
+  Предложение для контракта: другие непустые значения отклонять с понятной
+  диагностикой, чтобы не создавать видимость реализованного метода.
+- Резервирование ключа само по себе не делает предложенную раскладку обязательной
+  для всех существующих проектов. Не объявлять наличие проверок расположения
+  CRC или символов, которых код пока не выполняет. Новый контракт, карточка,
+  индекс/Schema, CHANGELOG и тесты ключа оформляются в соответствующей ветке.
+
 **За пределами 0.10.1:** модели RCC/PWR и периферия эмуляторов (TC-86),
 запуск Arduino native в эмуляторах, USBDevice/VirtIO/CMSIS_DSP и расширение
 матрицы семейств. Это самостоятельные функциональные этапы с большей
@@ -495,6 +536,44 @@ document its effects in HOWTO instead of changing IDE settings from the framewor
 
 Change labels only after documenting the contract in the spec, with RU/EN
 regression coverage. Do not add firmware matrix branches for wording changes.
+
+**Addition: CRC localization and image layout documentation (direction agreed):**
+
+- After UTF-8, use `codex/crc-diagnostics` for injection start/success/failure
+  messages through the RU/EN catalog and JSONL. `[STM32 CRC32]` labels CRC
+  operations; separate BIN creation retains `[STM32 BIN]`. CRC values and
+  diagnostic codes are not localized.
+- Read the effective `crc_section_name` (including `crc.section_name`, profiles
+  and overrides), never a hardcoded `.checksum`. Report section, algorithm and
+  a description of the current placement convention. Success follows successful
+  objcopy only; on failure preserve stderr/exit status and add section/ELF context.
+  Check that no failure path reports success.
+- `codex/crc-layout-docs`: a dedicated RU/EN page linked from reference/HOWTO.
+  Distinguish algorithm, data range, CRC location and metadata format. CRC checks
+  integrity; it is not a cryptographic signature or authentication mechanism.
+- Describe the proposed linker-template convention: all FLASH LMA sections,
+  including the .data load image, precede CRC. LONG(__checksum_size) follows the
+  vector table with ALIGN(4) before it. __checksum_start matches the calculated
+  image start; __checksum_end points to CRC, and size excludes its four bytes.
+  LONG(0) in the CRC section reserves storage before post-build, not the length field.
+- Zero residue was checked locally on three synthetic inputs using the existing
+  stm32_crc32 with the CRC appended as a little-endian word. Regressions must
+  cover word-aligned length, 0xFF gap fill, LMA ranges, a custom section name and
+  no FLASH data following CRC. The full-file zero residue requires identical bytes.
+- Use a neutral synthetic image for the reading example: validate bounds/length,
+  read length and CRC in the defined byte order, compare calculated/stored values
+  or check the complete image residue. Do not assume a universal length-field
+  offset after vectors; vector size and alignment determine it. Do not modify
+  the user's application projects.
+- Reserve `crc_method` (alias `crc.method`) separately from `crc_algorithm`:
+  missing/empty/`none` retains current behavior and does not disable CRC;
+  `crc_enable` controls activation. Introduce no future method names yet.
+  Proposed contract: reject other nonempty values clearly instead of suggesting
+  that an unimplemented method was selected.
+- Reserving the key does not enforce this layout on all existing projects.
+  Do not claim CRC-position/symbol checks that the implementation does not perform.
+  Add the contract, reference card, index/Schema, changelogs and key tests in the
+  corresponding implementation branch.
 
 **Outside 0.10.1:** RCC/PWR and peripheral emulator models (TC-86), Arduino native
 execution, USBDevice/VirtIO/CMSIS_DSP and more MCU families. These are independent
