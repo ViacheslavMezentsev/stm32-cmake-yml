@@ -7,6 +7,9 @@ only the published 0.9.3 release. The reference retains its 0.9.2 directory and
 historical baseline, with separate 0.9.3 and 0.10.0 change notes. For release status, see the [roadmap](../../TODO.md) and [migration guide](migration-0.10.md). See [GitHub Actions](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/actions?query=branch%3Amain)
 for current `main` results. The three status badges show latest completed workflows; Builds (Checks) shows the verified firmware matrix size.
 
+Release [0.10.0](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/releases/tag/v0.10.0) was published on 2026-10-02, tagged at `02b335e`.
+Full local L0–L5 and [tag Firmware CI](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/actions/runs/36940224457) passed for that SHA.
+
 ## Configuration
 
 <!-- configure-counts -->

@@ -163,14 +163,15 @@ Firmware на GitHub запускается вручную на границах
 - [x] `codex/config-schema-presets` слита в main (`e5d93c6`): Schema и совместный пример Presets + YAML. Полный локальный L0–L5 PASS: 1452 Configure, 618 сборок, 336 QEMU + 612 Renode; Docs, Configure, CI environment и ручной [Firmware](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/actions/runs/36925400885) для этого SHA PASS.
 - [x] `codex/migration-guide` слита в main (`e5e7b3f`): руководство перехода RU/EN, навигация, итоги этапа 4; Docs/Configure/CI environment на коммите ветки PASS.
 - [x] `codex/release-docs-review` слита в main (`2810579`): README, статус, границы версий справочника.
-- [ ] В работе `codex/release-0.10.0`: версия, CHANGELOG и ТЗ к выпуску. Предварительно PASS: Docs/Schema/ТЗ, 86 unit-тестов, 1452 Configure. Ожидаются подписанный коммит, полный локальный L0–L5, CI/Firmware для того же SHA, land, тег и публикация владельцем.
+- [x] `codex/release-0.10.0` слита; [v0.10.0](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/releases/tag/v0.10.0) опубликована 02.10.2026, подписанный тег на `02b335e`. Полный локальный L0–L5 и CI на том же SHA PASS: 1452 Configure, 618 сборок, 336 QEMU + 612 Renode.
+- [ ] `codex/release-0.10.0-close`: документальная фиксация выпуска после публикации; ожидаются commit/push/land.
 - [x] **Этап 4. Расширения конфигурации:** `include:`, TOML, имена файла по умолчанию,
   итоговая конфигурация, JSON Schema, пример пресета в документации.
 - [ ] **Этап 5. Тесты и CI — перенесён на версию после 0.10.0** (решение заказчика, ТЗ 2.6):
   периферия в эмуляторах (группа 5), модели RCC/PWR для запуска прошивок Arduino `native`
   (TC-86), задание CI на Windows (TC-44), пример `.gitlab-ci.yml` (TC-53),
   распараллеливание при необходимости.
-- [ ] **Этап 6. Выпуск 0.10.0:** руководство по переходу с 0.9.x (в том числе таблица
+- [x] **Этап 6. Выпуск 0.10.0:** руководство по переходу с 0.9.x (в том числе таблица
   путей артефактов и фрагменты из CHANGELOG), карточки справочника
   с отметками 0.10.0, CHANGELOG, ТЗ к выпуску, L0–L5, Firmware в CI, тег `v0.10.0`.
 
@@ -345,14 +346,15 @@ at the end of each stage. Branches are merged by fast-forward (`git land`).
 - [x] `codex/config-schema-presets` merged into main (`e5d93c6`): Schema and paired Presets + YAML example. Full local L0–L5 PASS: 1452 Configure, 618 builds, 336 QEMU + 612 Renode; Docs, Configure, CI environment and manual [Firmware](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/actions/runs/36925400885) for that SHA PASS.
 - [x] `codex/migration-guide` merged into main (`e5e7b3f`): RU/EN migration guide, navigation, stage 4 results; Docs/Configure/CI environment for the branch commit PASS.
 - [x] `codex/release-docs-review` merged into main (`2810579`): README, status and reference version boundaries.
-- [ ] In progress: `codex/release-0.10.0`: version, changelogs and release specification. Preliminary PASS: Docs/Schema/spec, 86 unit tests, 1452 Configure. Pending: signed commit, full local L0–L5, CI/Firmware for the same SHA, land, tag and publication by the owner.
+- [x] `codex/release-0.10.0` merged; [v0.10.0](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/releases/tag/v0.10.0) published on 2026-10-02, signed tag at `02b335e`. Full local L0–L5 and CI for the same SHA PASS: 1452 Configure, 618 builds, 336 QEMU + 612 Renode.
+- [ ] `codex/release-0.10.0-close`: post-publication release record; commit/push/land pending.
 - [x] **Stage 4. Configuration extensions:** `include:`, TOML, default file names,
   effective configuration, JSON Schema, a preset example in the documentation.
 - [ ] **Stage 5. Tests and CI — moved to the version after 0.10.0** (customer decision,
   spec 2.6): peripherals in emulators (group 5), RCC/PWR models to run Arduino `native`
   firmware (TC-86), a Windows CI job (TC-44), a `.gitlab-ci.yml` example (TC-53),
   parallelism if needed.
-- [ ] **Stage 6. 0.10.0 release:** migration guide from 0.9.x (including the artifact
+- [x] **Stage 6. 0.10.0 release:** migration guide from 0.9.x (including the artifact
   path table and snippets from the CHANGELOG), reference cards marked
   0.10.0, CHANGELOG, release spec, L0–L5, Firmware in CI, tag `v0.10.0`.
 

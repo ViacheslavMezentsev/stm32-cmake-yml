@@ -9,6 +9,9 @@
 три статусных бейджа README показывают последние завершённые workflow,
 а Builds (Checks) — подтверждённый объём прошивочной матрицы.
 
+Выпуск [0.10.0](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/releases/tag/v0.10.0) опубликован 02.10.2026, тег на `02b335e`.
+Полный локальный L0–L5 и [Firmware на теге](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/actions/runs/36940224457) прошли на этом SHA.
+
 ## Конфигурация
 
 <!-- configure-counts -->
