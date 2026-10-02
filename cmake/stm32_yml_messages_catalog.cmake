@@ -122,32 +122,32 @@ stm32_yml_msg_def(I020
     "Итоговые параметры проекта (источник: [yml]=конфиг / [ioc]=CubeMX / [auto]=авто):"
     "Final project parameters (source: [yml]=configuration / [ioc]=CubeMX / [auto]=automatic):")
 stm32_yml_msg_def(I021
-    "  MCU:        {1}  {2}"
-    "  MCU:        {1}  {2}")
+    "  MCU:        {2} {1}"
+    "  MCU:        {2} {1}")
 stm32_yml_msg_def(I022
-    "  Проект:     {1}  {2}"
-    "  Project:    {1}  {2}")
+    "  Проект:     {2} {1}"
+    "  Project:    {2} {1}")
 stm32_yml_msg_def(I023
-    "  CubeFW:     {1}  {2}"
-    "  CubeFW:     {1}  {2}")
+    "  CubeFW:     {2} {1}"
+    "  CubeFW:     {2} {1}")
 stm32_yml_msg_def(I024
-    "  Heap Size:  {1} байт  {2}"
-    "  Heap Size:  {1} bytes  {2}")
+    "  Heap Size:  {2} {1} байт"
+    "  Heap Size:  {2} {1} bytes")
 stm32_yml_msg_def(I025
-    "  Stack Size: {1} байт  {2}"
-    "  Stack Size: {1} bytes  {2}")
+    "  Stack Size: {2} {1} байт"
+    "  Stack Size: {2} {1} bytes")
 stm32_yml_msg_def(I026
-    "  FreeRTOS:   ОТКЛЮЧЕН (переопределено в .yml)  [yml]"
-    "  FreeRTOS:   DISABLED (overridden in .yml)  [yml]")
+    "  FreeRTOS:   [yml] ОТКЛЮЧЕН (переопределено в .yml)"
+    "  FreeRTOS:   [yml] DISABLED (overridden in .yml)")
 stm32_yml_msg_def(I027
-    "  FreeRTOS:   Включен  {1}"
-    "  FreeRTOS:   Enabled  {1}")
+    "  FreeRTOS:   {1} Включен"
+    "  FreeRTOS:   {1} Enabled")
 stm32_yml_msg_def(I028
-    "    API:      {1}  {2}"
-    "    API:      {1}  {2}")
+    "    API:      {2} {1}"
+    "    API:      {2} {1}")
 stm32_yml_msg_def(I029
-    "    Порт:     {1}  {2}"
-    "    Port:     {1}  {2}")
+    "    Порт:     {2} {1}"
+    "    Port:     {2} {1}")
 stm32_yml_msg_def(I030
     "  FreeRTOS:   Отключен"
     "  FreeRTOS:   Disabled")

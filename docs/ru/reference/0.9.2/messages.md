@@ -43,15 +43,15 @@
 | `SCY-I013` | STATUS | Флаги только для C++: {1} |
 | `SCY-I014` | STATUS | Defines только для C++: {1} |
 | `SCY-I020` | STATUS | Итоговые параметры проекта (источник: \[yml\]=конфиг / \[ioc\]=CubeMX / \[auto\]=авто): |
-| `SCY-I021` | STATUS | MCU:        {1}  {2} |
-| `SCY-I022` | STATUS | Проект:     {1}  {2} |
-| `SCY-I023` | STATUS | CubeFW:     {1}  {2} |
-| `SCY-I024` | STATUS | Heap Size:  {1} байт  {2} |
-| `SCY-I025` | STATUS | Stack Size: {1} байт  {2} |
-| `SCY-I026` | STATUS | FreeRTOS:   ОТКЛЮЧЕН (переопределено в .yml)  \[yml\] |
-| `SCY-I027` | STATUS | FreeRTOS:   Включен  {1} |
-| `SCY-I028` | STATUS | API:      {1}  {2} |
-| `SCY-I029` | STATUS | Порт:     {1}  {2} |
+| `SCY-I021` | STATUS | MCU:        {2} {1} |
+| `SCY-I022` | STATUS | Проект:     {2} {1} |
+| `SCY-I023` | STATUS | CubeFW:     {2} {1} |
+| `SCY-I024` | STATUS | Heap Size:  {2} {1} байт |
+| `SCY-I025` | STATUS | Stack Size: {2} {1} байт |
+| `SCY-I026` | STATUS | FreeRTOS:   \[yml\] ОТКЛЮЧЕН (переопределено в .yml) |
+| `SCY-I027` | STATUS | FreeRTOS:   {1} Включен |
+| `SCY-I028` | STATUS | API:      {2} {1} |
+| `SCY-I029` | STATUS | Порт:     {2} {1} |
 | `SCY-I030` | STATUS | FreeRTOS:   Отключен |
 | `SCY-I031` | STATUS | Режим ручной конфигурации (ioc\_file не указан). |
 | `SCY-I032` | STATUS | Определено имя проекта: {1} |

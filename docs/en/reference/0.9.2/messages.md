@@ -43,15 +43,15 @@ The list is built from the `cmake/stm32_yml_messages_catalog.cmake` catalog by `
 | `SCY-I013` | STATUS | C++-only flags:   {1} |
 | `SCY-I014` | STATUS | C++-only defines: {1} |
 | `SCY-I020` | STATUS | Final project parameters (source: \[yml\]=configuration / \[ioc\]=CubeMX / \[auto\]=automatic): |
-| `SCY-I021` | STATUS | MCU:        {1}  {2} |
-| `SCY-I022` | STATUS | Project:    {1}  {2} |
-| `SCY-I023` | STATUS | CubeFW:     {1}  {2} |
-| `SCY-I024` | STATUS | Heap Size:  {1} bytes  {2} |
-| `SCY-I025` | STATUS | Stack Size: {1} bytes  {2} |
-| `SCY-I026` | STATUS | FreeRTOS:   DISABLED (overridden in .yml)  \[yml\] |
-| `SCY-I027` | STATUS | FreeRTOS:   Enabled  {1} |
-| `SCY-I028` | STATUS | API:      {1}  {2} |
-| `SCY-I029` | STATUS | Port:     {1}  {2} |
+| `SCY-I021` | STATUS | MCU:        {2} {1} |
+| `SCY-I022` | STATUS | Project:    {2} {1} |
+| `SCY-I023` | STATUS | CubeFW:     {2} {1} |
+| `SCY-I024` | STATUS | Heap Size:  {2} {1} bytes |
+| `SCY-I025` | STATUS | Stack Size: {2} {1} bytes |
+| `SCY-I026` | STATUS | FreeRTOS:   \[yml\] DISABLED (overridden in .yml) |
+| `SCY-I027` | STATUS | FreeRTOS:   {1} Enabled |
+| `SCY-I028` | STATUS | API:      {2} {1} |
+| `SCY-I029` | STATUS | Port:     {2} {1} |
 | `SCY-I030` | STATUS | FreeRTOS:   Disabled |
 | `SCY-I031` | STATUS | Manual configuration mode (ioc\_file is not set). |
 | `SCY-I032` | STATUS | Project name: {1} |

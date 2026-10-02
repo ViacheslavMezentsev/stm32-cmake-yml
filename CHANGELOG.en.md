@@ -12,6 +12,8 @@ on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 
 ## [Unreleased] — 0.10.1
 
+- Source markers `[yml]`, `[ioc]`, `[auto]` now precede values in the final Configure report; message codes and JSONL argument order are unchanged.
+
 - Prepared for 0.10.1: `crc_method` / `crc.method` with `auto`; none, null and empty normalize to auto, unknown methods fail. Configure reports method, algorithm and section separately without claiming to validate placement.
 
 - Added native Windows Configure/Build to Firmware with pinned tools. TC-44 remains partial: E010 (absolute sources on another drive) is covered by a regression, without changing behavior.
