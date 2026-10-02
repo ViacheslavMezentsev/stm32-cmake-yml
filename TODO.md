@@ -242,6 +242,25 @@ Firmware на GitHub запускается вручную на границах
 Исправления подписей включать после уточнения контракта в ТЗ, с регрессией
 RU/EN. Не добавлять новые ветки тестирования прошивок ради изменения текста.
 
+**Диагностика версий модулей (согласовано для 0.10.1):**
+
+- Формат: `stm32-cmake-yml: 0.10.0 (commit: 02b335e)`, отдельная строка
+  `Версия в конфигурации: 0.10.0 (совпадают)`, затем
+  `stm32-cmake: <версия> (commit: <короткий SHA>)`. Значения в примере условные;
+  выводить реальные версии и коммиты подключённых модулей. Убрать галочку.
+- Читать Git-данные каждого фактически подключённого каталога отдельно. Не
+  выдавать HEAD родительского проекта за коммит скопированной библиотеки.
+  Поддержать checkout, submodule и worktree; при отсутствии Git/метаданных
+  опускать суффикс commit без ошибки Configure. Не менять global safe.directory.
+- При локальных изменениях модуля добавлять `modified`; не приписывать ему
+  изменения других каталогов. Сравнение с YAML касается только версии пакета.
+  Fallback версии stm32-cmake из CHANGELOG остаётся приблизительным даже с SHA.
+- Регрессии RU/EN: чистый/изменённый модуль, разные SHA двух модулей, копия
+  внутри чужого репозитория, отсутствие Git/метаданных, submodule/worktree,
+  пути с пробелами и совпадение/несовпадение версии YAML. Оформить контракт
+  в ТЗ, документации и обоих CHANGELOG при реализации; полный Firmware ради
+  изменения текста не добавлять.
+
 **Дополнение: локализация CRC и описание формата образа (согласовано по направлению):**
 
 - После исправления UTF-8 выделить `codex/crc-diagnostics`: сообщения начала,
@@ -582,6 +601,25 @@ document its effects in HOWTO instead of changing IDE settings from the framewor
 
 Change labels only after documenting the contract in the spec, with RU/EN
 regression coverage. Do not add firmware matrix branches for wording changes.
+
+**Module version diagnostics (agreed for 0.10.1):**
+
+- Format: `stm32-cmake-yml: 0.10.0 (commit: 02b335e)`, a separate localized
+  configuration-version line ending in `(match)`, then
+  `stm32-cmake: <version> (commit: <short SHA>)`. Example values are illustrative;
+  report actual versions and commits of the loaded modules. Remove the checkmark.
+- Read Git metadata independently for each loaded module directory. Never report
+  the parent application's HEAD as the commit of a copied library. Support
+  checkouts, submodules and worktrees; omit the commit suffix without failing
+  Configure when Git/metadata is unavailable. Do not change global safe.directory.
+- Append `modified` for local module changes, excluding unrelated directories.
+  YAML comparison concerns only the package version. A stm32-cmake CHANGELOG
+  fallback remains approximate even when a commit SHA is available.
+- RU/EN regressions: clean/modified modules, distinct module SHAs, a copy inside
+  another repository, missing Git/metadata, submodules/worktrees, paths with
+  spaces and matching/mismatching YAML versions. Update the spec, documentation
+  and both changelogs during implementation; do not add full Firmware runs just
+  for wording changes.
 
 **Addition: CRC localization and image layout documentation (direction agreed):**
 
