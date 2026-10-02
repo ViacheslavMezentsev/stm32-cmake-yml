@@ -177,21 +177,24 @@ Firmware на GitHub запускается вручную на границах
 
 ### Согласованный состав 0.10.1 — реализация
 
-Текущая ветка: `codex/crc-method`, от main `4242743`.
-`codex/windows-configure` слита; Docs, Configure, Host, CI environment и ручной
-Firmware успешны на этом SHA. Windows job подтвердил пять сценариев;
-E010 остаётся открытым, TC-44 частичен. Эмуляторы Windows отложены.
+Текущая ветка: `codex/crc-postbuild-diagnostics`, от main `6c0c9f7`.
+Ветка `codex/crc-method` и косметика отчёта слиты; Docs, Configure и Host
+успешны на этом SHA. E010 остаётся открытым, TC-44 частичен.
 
-Подготовлен первый CRC-подэтап: `crc_method` / `crc.method`, default auto,
-none/null/пустота → auto; неизвестное значение — ошибка Configure.
-Отдельные сообщения метода, алгоритма и секции, RU/EN-карточка, schema и ТЗ 2.17.
-Девять новых сценариев (с повторным Configure, профилями и override) прошли
-локально на Windows 3.21.7 / GCC 14.2.1; отчёт build/crc-method-verified.
-Linux: 14 новых и прежних CRC-сценариев PASS (build/crc-method-linux).
-Reference, messages, schema и strict-проверка ТЗ прошли. Полный L0–L5
-в этом подэтапе не повторялся; запуск CI нового SHA ещё впереди.
-Следующий CRC-подэтап: локализация сообщений post-build, ошибки внедрения,
-документация разметки и проверки длины/остатка CRC в симуляторах.
+Подготовлен второй CRC-подэтап: Python вызывает objcopy после расчёта,
+начало/успех/ошибки внедрения проходят через каталог RU/EN и JSONL с именем
+секции. Старые режимы CLI без --objcopy сохранены. ТЗ 2.18, TC-92.
+Локально: Host 26/26 на Windows и Linux; unit-набор Windows — 94 PASS,
+3 POSIX-only skip из 97. Синтетическая сборка настоящим Arm GCC/objcopy:
+RU/.checksum и EN/.signature, успешное внедрение и отсутствующая секция —
+по четыре проверки на Windows и Linux; BIN проверен независимым CRC.
+Отчёты: build/crc-postbuild-host[-linux], build/crc-postbuild-real[-linux].
+14 Configure-регрессий CRC PASS; reference, messages, schema и strict-проверка
+ТЗ прошли. Отчёт Configure: build/crc-method-linux.
+Firmware CI дополнительно сверяет жизненный цикл сообщений после реальной
+сборки. На новом SHA ещё не запускался; полный локальный L0–L5 не повторялся.
+Следующий CRC-подэтап: документация полной разметки, проверки поля длины и
+нулевого остатка в симуляторах. После завершения этапа — полный L0–L5.
 
 Предыдущий быстрый подэтап: `codex/windows-ci`. Для `d759e48` успешны Docs
 и Configure; main пока 0500b68. Host CI подготовлен: 19/19 локально Windows/Linux,
@@ -569,21 +572,23 @@ at the end of each stage. Branches are merged by fast-forward (`git land`).
 
 ### Agreed 0.10.1 scope — implementation
 
-Current branch: `codex/crc-method`, from main `4242743`.
-`codex/windows-configure` is merged; Docs, Configure, Host, CI environment and
-manual Firmware passed for this SHA. The Windows job passed five cases;
-E010 remains open and TC-44 partial. Windows emulators remain deferred.
+Current branch: `codex/crc-postbuild-diagnostics`, from main `6c0c9f7`.
+The CRC method and report formatting changes are merged; Docs, Configure and
+Host passed for this SHA. E010 remains open and TC-44 partial.
 
-First CRC substep prepared: `crc_method` / `crc.method`, default auto,
-none/null/empty → auto; unknown values fail Configure.
-Separate method, algorithm and section messages, RU/EN reference, schema and
-spec 2.17. Nine new scenarios (including reconfigure, profiles and overrides)
-passed locally on Windows 3.21.7 / GCC 14.2.1; build/crc-method-verified.
-Linux: 14 new and existing CRC scenarios passed (build/crc-method-linux).
-Reference, messages, schema and strict spec checks passed. Full L0–L5
-was not repeated in this substep; CI for the new SHA is still pending.
-Next CRC substep: localized post-build messages, injection errors, layout
-documentation and length/residue checks in simulators.
+Second CRC substep prepared: Python invokes objcopy after calculation;
+injection start/success/failure use the RU/EN catalog and JSONL with the section
+name. Previous CLI modes without --objcopy are preserved. Spec 2.18, TC-92.
+Locally: Host 26/26 on Windows and Linux; Windows unit suite 94 PASS and
+3 POSIX-only skips out of 97. Synthetic builds with real Arm GCC/objcopy:
+RU/.checksum and EN/.signature, successful update and absent section — four
+checks on each OS; independent CRC verification of BIN.
+Reports: build/crc-postbuild-host[-linux], build/crc-postbuild-real[-linux].
+14 CRC Configure regressions passed; reference, messages, schema and strict
+spec checks passed. Configure reports: build/crc-method-linux.
+Firmware CI also checks message ordering after real builds. CI for the new SHA
+and full local L0–L5 are pending. Next CRC substep: complete layout documentation,
+length-field and zero-residue simulator checks; full L0–L5 at stage completion.
 
 Previous fast substep: `codex/windows-ci`. Docs/Configure passed
 for d759e48; main remains 0500b68. Host checks: 19/19 locally on Windows/Linux;

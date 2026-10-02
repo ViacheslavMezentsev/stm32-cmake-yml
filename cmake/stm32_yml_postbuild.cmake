@@ -136,27 +136,17 @@ function(stm32_yml_setup_postbuild TARGET_NAME)
 
             get_property(_build_messages GLOBAL PROPERTY _STM32_YML_BUILD_MESSAGES)
             add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E echo " "
-                COMMAND ${CMAKE_COMMAND} -E echo "--- Injecting checksum into ${crc_section_name} ---"
-
-                # Шаг 1 (ТЗ 4.15.9, 4.15.7): образ из секций ELF в регионе FLASH без секции
-                # CRC и расчёт CRC; любой сбой завершает сборку ошибкой.
+                # ТЗ 4.15.9, 4.15.12: образ FLASH, расчёт и внедрение CRC.
+                # Любой сбой скрипта или objcopy завершает сборку ошибкой.
                 COMMAND ${Python3_EXECUTABLE} ${CRC_SCRIPT_PATH}
                         --messages ${_build_messages}
                         --elf ${TARGET_ELF}
                         --flash ${CRC_FLASH_ORIGIN}:${CRC_FLASH_LENGTH}
                         --exclude ${crc_section_name}
+                        --objcopy ${CMAKE_OBJCOPY}
                         --image ${BIN_NO_CRC}
                         ${CRC_VAL_BIN} ${EXPECTED_FLASH_BYTES}
 
-                # Шаг 2: Внедряем рассчитанный CRC обратно в ELF файл
-                COMMAND ${CMAKE_OBJCOPY} --update-section ${crc_section_name}=${CRC_VAL_BIN} ${TARGET_ELF}
-
-                # Шаг 3: Выводим подтверждение
-                COMMAND ${CMAKE_COMMAND} -E echo "--- Injection successful! ---"
-                COMMAND ${CMAKE_COMMAND} -E echo " "
-
-                COMMENT "Calculating and injecting CRC32 into firmware..."
                 VERBATIM
             )
         else()

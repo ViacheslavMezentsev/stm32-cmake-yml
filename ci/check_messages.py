@@ -11,7 +11,7 @@ import messages_reference  # noqa: E402
 
 MODULE = "cmake/stm32_yml_messages.cmake"
 SCRIPT = "scripts/stm32_crc.py"
-SCRIPT_USE = re.compile(r"(?<![\w])(?:emit|CrcError)\(\s*'([^']*)'")
+SCRIPT_USE = re.compile(r"(?<![\w])(?:emit|CrcError|InjectionError)\(\s*'([^']*)'")
 CATALOG = "cmake/stm32_yml_messages_catalog.cmake"
 USE = re.compile(r"(?<![\w])stm32_yml_msg\s*\(\s*([^\s)]+)")
 DIRECT = re.compile(r"^\s*message\s*\(", re.M)

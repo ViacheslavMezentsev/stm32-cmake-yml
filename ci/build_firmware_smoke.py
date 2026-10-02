@@ -392,6 +392,14 @@ def build_target(root, output, report, target_name, target, baseline, lock, etl,
         if not trap:
             raise ValueError('Missing semihosting exit trap')
         exit_trap = int(trap[1], 16)
+        # TC-92: real post-build injection must report success only after objcopy.
+        records = [json.loads(line) for line in
+                   (build / 'stm32_yml_build_messages.jsonl').read_text(encoding='utf-8').splitlines()]
+        lifecycle = [r for r in records if r['code'] in ('SCY-I713', 'SCY-I709', 'SCY-I714')]
+        if ([r['code'] for r in lifecycle] != ['SCY-I713', 'SCY-I709', 'SCY-I714']
+                or lifecycle[0]['args'] != ['.checksum'] or lifecycle[-1]['args'] != ['.checksum']
+                or any(r['level'] == 'FATAL_ERROR' for r in records)):
+            raise ValueError(f'Invalid CRC injection messages: {case}')
         crc_metadata, corrupted, negative = inspect_crc(elf, sum(target['flash']))
         metadata.update(crc_metadata)
         compare_gap_fill(build, elf)

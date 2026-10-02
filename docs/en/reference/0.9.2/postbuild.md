@@ -54,6 +54,28 @@ crc_enable: false
 
 **Errata:** [E006](../../errata/E006.md).
 
+**Prepared for 0.10.1 (post-build):** injection start (`SCY-I713`),
+calculated value (`SCY-I709`) and successful update (`SCY-I714`) use the RU/EN
+catalog, the `[STM32 CRC32]` prefix and the build JSONL log. The section name
+comes from effective `crc_section_name`, including profiles and overrides.
+`crc_method: none` still means `auto` and does not disable CRC.
+
+The Python script invokes `objcopy --update-section` after calculation.
+Success is reported only after objcopy exits with zero; any additional tool
+output is retained as `SCY-I715`. A nonzero exit produces `SCY-E713` with the
+section, exit code and tool output; a launch error produces `SCY-E714` with
+the tool path and section. Both fail post-build and stop later artifact commands.
+Existing artifact files are not removed and may belong to an earlier build.
+Injection errors do not falsely report that CRC was not calculated;
+calculation failures retain their existing codes. `--objcopy` requires ELF
+mode, a CRC output file and exactly one `--exclude` section (`SCY-E715`).
+Without `--objcopy`, existing CLI modes are unchanged. External output is decoded
+as UTF-8 with replacement of invalid bytes, preserving the tool's exit status.
+
+Checks: [TC-92](../../../../tests/test_crc_injection.py) in Host CI,
+message ordering in Firmware and independent CRC checks of built images.
+Successful injection does not validate the entire FLASH layout.
+
 <a id="crc-method"></a>
 ## `crc_method`
 

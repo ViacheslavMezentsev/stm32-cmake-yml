@@ -184,7 +184,7 @@ def verify(case, build, source):
             # ТЗ 4.15.9: образ из секций ELF в регионе FLASH скрипта, без gap-fill.
             for token in ("--messages", "stm32_yml_build_messages.json", "--elf",
                           "--flash 0x08000000:524288", "--exclude " + case.get("crc_section", ".checksum"),
-                          "--update-section", " " + str(case.get("crc_flash_limit", 524288))):
+                          "--objcopy", " " + str(case.get("crc_flash_limit", 524288))):
                 require(token in ninja, f"CRC command missing {token!r}")
             require("--gap-fill" not in ninja, "CRC image must not use objcopy --gap-fill")
 

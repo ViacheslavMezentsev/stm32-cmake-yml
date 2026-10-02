@@ -12,6 +12,8 @@ on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 
 ## [Unreleased] — 0.10.1
 
+- Localized CRC injection start/success and added JSONL diagnostics for objcopy failures with the section and cause. The script updates the ELF after calculation; failures stop post-build without reporting success.
+
 - Source markers `[yml]`, `[ioc]`, `[auto]` now precede values in the final Configure report; message codes and JSONL argument order are unchanged.
 
 - Prepared for 0.10.1: `crc_method` / `crc.method` with `auto`; none, null and empty normalize to auto, unknown methods fail. Configure reports method, algorithm and section separately without claiming to validate placement.

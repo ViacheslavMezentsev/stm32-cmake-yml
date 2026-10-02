@@ -651,6 +651,25 @@ stm32_yml_msg_def(I710
     "[STM32 CRC32] Рассчитано: 0x{1} (размер: {2} байт)"
     "[STM32 CRC32] Calculated: 0x{1} (Size: {2} bytes)")
 
+stm32_yml_msg_def(I713
+    "[STM32 CRC32] Внедрение контрольной суммы в '{1}':"
+    "[STM32 CRC32] Injecting checksum into '{1}':")
+stm32_yml_msg_def(I715
+    "[STM32 CRC32] objcopy: {1}"
+    "[STM32 CRC32] objcopy: {1}")
+stm32_yml_msg_def(I714
+    "[STM32 CRC32] Внедрение в '{1}' выполнено успешно!"
+    "[STM32 CRC32] Injection into '{1}' successful!")
+stm32_yml_msg_def(E713
+    "[STM32 CRC32] Не удалось внедрить CRC в '{1}': objcopy завершился с кодом {2}. {3}"
+    "[STM32 CRC32] Injection into '{1}' failed: objcopy exited with code {2}. {3}")
+stm32_yml_msg_def(E714
+    "[STM32 CRC32] Не удалось запустить objcopy '{1}' для секции '{2}': {3}"
+    "[STM32 CRC32] Cannot run objcopy '{1}' for section '{2}': {3}")
+stm32_yml_msg_def(E715
+    "[STM32 CRC32] --objcopy требует выходной файл CRC и ровно одну секцию --exclude."
+    "[STM32 CRC32] --objcopy requires a CRC output file and exactly one --exclude section.")
+
 # --- 8xx: диагностика ---------------------------------------------------------
 
 stm32_yml_msg_def(E801

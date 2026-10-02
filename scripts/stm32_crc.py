@@ -4,7 +4,7 @@
 #   stm32_crc.py <вход.bin> <выход.bin> [предел_байт]
 #       CRC готового двоичного образа.
 #   stm32_crc.py --elf <вход.elf> --flash <начало>:<длина> --exclude <секция>
-#                [--image <образ.bin>] <выход.bin> [предел_байт]
+#                [--image <образ.bin>] [--objcopy <путь>] <выход.bin> [предел_байт]
 #       Образ Flash строится из секций ELF с адресом загрузки в регионе FLASH
 #       (ТЗ 4.15.9) и не раздувается секциями вне Flash.
 #   stm32_crc.py --elf <вход.elf> --flash <начало>:<длина> --image <образ.bin>
@@ -22,6 +22,7 @@ import json
 import os
 import re
 import struct
+import subprocess
 import sys
 
 # Английские тексты каталога cmake/stm32_yml_messages_catalog.cmake для запуска
@@ -43,6 +44,12 @@ FALLBACK = {
     'E710': "Usage: stm32_crc.py <input.bin> <output.bin> [limit] | "
             "--elf <input.elf> --flash <origin>:<length> --exclude <section> <output.bin> [limit]",
     'E711': "I/O error: {1}",
+    'I713': "[STM32 CRC32] Injecting checksum into '{1}':",
+    'I715': "[STM32 CRC32] objcopy: {1}",
+    'I714': "[STM32 CRC32] Injection into '{1}' successful!",
+    'E713': "[STM32 CRC32] Injection into '{1}' failed: objcopy exited with code {2}. {3}",
+    'E714': "[STM32 CRC32] Cannot run objcopy '{1}' for section '{2}': {3}",
+    'E715': "[STM32 CRC32] --objcopy requires a CRC output file and exactly one --exclude section.",
 }
 PARAM = re.compile(r"\{(\d+)\}")
 MESSAGES = {'lang': 'en', 'codes': False, 'texts': {}, 'log': None}
@@ -92,6 +99,28 @@ class CrcError(Exception):
     def __init__(self, code, *args):
         super().__init__(render(code, [str(arg) for arg in args]))
         self.code, self.args_list = code, args
+
+
+class InjectionError(CrcError):
+    """CRC was calculated, but writing it into the ELF failed (spec 4.15.12)."""
+
+
+def inject_crc(objcopy, section, crc_file, elf):
+    # Argument list preserves spaces and never invokes a command shell.
+    try:
+        result = subprocess.run([objcopy, '--update-section', f'{section}={crc_file}', elf],
+                                capture_output=True)
+    except OSError as error:
+        raise InjectionError('E714', objcopy, section, str(error)) from error
+    # External tool output may use the host code page. Keep it in UTF-8
+    # diagnostics even if some bytes cannot be decoded; never hide a failure.
+    output = b'\n'.join(part for part in (result.stdout, result.stderr) if part)
+    detail = output.decode('utf-8', errors='replace').replace('\r\n', '\n').strip()
+    if result.returncode:
+        raise InjectionError('E713', section, result.returncode, detail)
+    if detail:
+        emit('I715', detail)
+    emit('I714', section)
 
 
 def stm32_crc32(data):
@@ -202,9 +231,14 @@ def run(argv):
         parser.add_argument('--flash', required=True, type=str)
         parser.add_argument('--exclude', action='append', default=[])
         parser.add_argument('--image')
+        parser.add_argument('--objcopy', help='inject the computed CRC into the excluded ELF section')
         parser.add_argument('output', nargs='?')
         parser.add_argument('limit', nargs='?')
         args = parser.parse_args(argv)
+        if args.objcopy:
+            if args.output is None or len(args.exclude) != 1:
+                raise CrcError('E715')
+            emit('I713', args.exclude[0])
         if args.output is None and not args.image:
             raise CrcError('E707')
         if not os.path.exists(args.elf):
@@ -224,6 +258,8 @@ def run(argv):
             return
         crc = write_crc(args.output, image)
         emit('I709', f"{crc:08X}", len(image), f"{start:08X}")
+        if args.objcopy:
+            inject_crc(args.objcopy, args.exclude[0], args.output, args.elf)
         return
 
     if len(argv) not in (2, 3):
@@ -256,7 +292,8 @@ def main():
         run(sys.argv[1:])
     except CrcError as error:
         emit(error.code, *error.args_list)
-        emit('E708')
+        if not isinstance(error, InjectionError):
+            emit('E708')
         sys.exit(1)
     except OSError as error:
         emit('E711', error)

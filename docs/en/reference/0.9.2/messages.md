@@ -219,6 +219,9 @@ The list is built from the `cmake/stm32_yml_messages_catalog.cmake` catalog by `
 | `SCY-E710` | FATAL_ERROR | Usage: stm32\_crc.py &lt;input.bin&gt; &lt;output.bin&gt; \[limit\] \| --elf &lt;input.elf&gt; --flash &lt;origin&gt;:&lt;length&gt; --exclude &lt;section&gt; &lt;output.bin&gt; \[limit\] |
 | `SCY-E711` | FATAL_ERROR | I/O error: {1} |
 | `SCY-E712` | FATAL_ERROR | crc\_method: unknown value '{1}'. Expected auto or none (alias of auto). |
+| `SCY-E713` | FATAL_ERROR | \[STM32 CRC32\] Injection into '{1}' failed: objcopy exited with code {2}. {3} |
+| `SCY-E714` | FATAL_ERROR | \[STM32 CRC32\] Cannot run objcopy '{1}' for section '{2}': {3} |
+| `SCY-E715` | FATAL_ERROR | \[STM32 CRC32\] --objcopy requires a CRC output file and exactly one --exclude section. |
 | `SCY-W701` | WARNING | bin: could not find the FLASH region of the linker script or Python3; BIN is created by objcopy -O binary and may be large if the ELF has sections outside Flash. |
 | `SCY-W702` | WARNING | CRC calculation is disabled. Could not determine the FLASH size from {1}. Set 'flash\_size' in stm32\_config.yml. |
 | `SCY-W703` | WARNING | crc\_enable: section '{1}' (crc\_section\_name) is not found in script {2}. The post-build CRC step will fail. |
@@ -238,6 +241,9 @@ The list is built from the `cmake/stm32_yml_messages_catalog.cmake` catalog by `
 | `SCY-I710` | STATUS | \[STM32 CRC32\] Calculated: 0x{1} (Size: {2} bytes) |
 | `SCY-I711` | STATUS | \[STM32 CRC32\] Method: {1} (CRC calculation and placement) |
 | `SCY-I712` | STATUS | \[STM32 CRC32\] Place the 4-byte section at the end of the FLASH image, aligned to 4 bytes, in the user linker script. Configure does not verify the final section position. |
+| `SCY-I713` | STATUS | \[STM32 CRC32\] Injecting checksum into '{1}': |
+| `SCY-I714` | STATUS | \[STM32 CRC32\] Injection into '{1}' successful! |
+| `SCY-I715` | STATUS | \[STM32 CRC32\] objcopy: {1} |
 
 ## 8xx — Diagnostics
 

@@ -478,8 +478,10 @@ Missing tools, empty suites or skipped tests fail the run. `tests.log` and
 `summary.json` are published as `host-<OS>` artifacts. Pushes affecting scripts,
 cmake, stm32_yml.cmake, tests, ci/run_host_checks.py or host.yml trigger it;
 Markdown-only pushes do not. Manual dispatch is available. The 10-minute job
-limit is a guard, not expected duration. Locally the 20 tests take seconds;
+limit is a guard, not expected duration. Locally the 26 tests take seconds;
 GitHub timing is measured after push. Windows Configure/Build is now separate; TC-44 remains partial because of E010.
+
+Host CI also checks the CRC injection lifecycle (TC-92): RU/EN, objcopy failures and POST_BUILD termination. The suite contains 26 tests.
 
 ## Windows Configure/Build (TC-44)
 

@@ -490,6 +490,8 @@ ci/run_host_checks.py и host.yml. Только Markdown не запускает
 длительность. Локальные 20 тестов занимают несколько секунд; время GitHub
 измеряется после push. Windows Configure/Build теперь добавлен отдельно; TC-44 частичен из-за E010.
 
+В Host CI добавлены проверки жизненного цикла внедрения CRC (TC-92): RU/EN, ошибки objcopy и остановка POST_BUILD. Набор содержит 26 тестов.
+
 ## Windows Configure/Build (TC-44)
 
 Задание windows в Firmware запускается вручную вместе с Firmware и на тегах v*.
