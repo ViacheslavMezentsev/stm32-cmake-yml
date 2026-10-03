@@ -131,3 +131,13 @@ The YAML version does not select the loaded code. The configuration format
 is retained; `crc_method` may be omitted (`auto`). Section placement is not
 changed automatically. See the [release notes](../releases/v0.10.1.en.md),
 [CRC method](crc-methods.md) and [E010 limitation](errata/E010.md).
+
+## Updating from 0.10.1 to 0.10.2
+
+Use module `v0.10.2`, set `stm32_cmake_yml_version` to `0.10.2`, and configure
+from a clean build directory. YAML/TOML precedence is unchanged. Absolute
+`sources`, including another Windows drive, now resolve correctly; existing
+relative paths need no migration. Scripts parsing report text must expect `[cfg]`
+instead of `[yml]`; message codes and variable names remain unchanged.
+[TOML/include/Presets](presets.md) is an additional example, not a mandatory migration.
+[Release notes](../releases/v0.10.2.en.md); publication is still pending.

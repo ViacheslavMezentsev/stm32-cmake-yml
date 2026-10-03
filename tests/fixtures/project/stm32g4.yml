@@ -1,5 +1,5 @@
 # Synthetic configure-only G4 scenario.
-stm32_cmake_yml_version: 0.10.1
+stm32_cmake_yml_version: 0.10.2
 project_name: stm32g4_probe
 mcu: STM32G431CB
 languages: [C, ASM]

@@ -1,5 +1,5 @@
 # TC-96: equivalent to report.yml; the IOC intentionally omits heap_size.
-stm32_cmake_yml_version = "0.10.1"
+stm32_cmake_yml_version = "0.10.2"
 ioc_file = "report.ioc"
 mcu = "STM32F103C8T6"
 languages = ["C", "ASM"]

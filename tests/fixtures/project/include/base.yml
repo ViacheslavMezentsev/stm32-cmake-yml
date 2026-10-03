@@ -1,4 +1,4 @@
-stm32_cmake_yml_version: 0.10.1
+stm32_cmake_yml_version: 0.10.2
 project_name: include_probe
 mcu: STM32F103C8T6
 languages: [C, CXX, ASM]

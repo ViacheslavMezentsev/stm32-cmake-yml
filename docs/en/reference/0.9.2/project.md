@@ -45,7 +45,7 @@ checks both spellings when the file system provides a short name.
 
 
 ```yaml
-stm32_cmake_yml_version: 0.10.1
+stm32_cmake_yml_version: 0.10.2
 ```
 
 [0.9.2 implementation](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_config.cmake) · [Index](index.md)

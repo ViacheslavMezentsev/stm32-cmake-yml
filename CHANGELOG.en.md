@@ -12,6 +12,8 @@ on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 
 ## [Unreleased]
 
+## [0.10.2] - 2026-10-04
+
 - Reconciled the RU/EN roadmap: current scope, completed parts of earlier stages and deferred work are separated from the historical archive. TOML example CI is confirmed; 0.10.2 release preparation remains a separate stage.
 
 - Added a neutral TOML/include/Presets example with a G474 base, separate F411/G474 profiles and six TC-97 scenarios.

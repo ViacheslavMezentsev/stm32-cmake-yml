@@ -25,7 +25,13 @@ Docs, Configure, Host, CI environment и Firmware для этого SHA прош
 Пример TOML/include/Presets и TC-97 слиты: `2ee5530`.
 Docs, Configure, Host и [Firmware](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/actions/runs/37150032121)
 для этого SHA прошли, включая Windows TC-44; отчёты доступны в артефактах.
-Текущая ветка: `codex/roadmap-refresh` — сверка статусов и истории, не слита.
+Сверка дорожной карты слита: `c883928`, Docs PASS.
+Текущая ветка: `codex/release-0.10.2`; версия и релизные файлы подготовлены.
+Предварительные проверки PASS: 108 Linux unit-тестов, 55 Configure-сценариев
+на паре по умолчанию, схема, сообщения, документация и строгая проверка ТЗ.
+Логи: `build/release-0102-precheck/`. Полная локальная приёмка и CI итогового
+подписанного SHA, тег и публикация ещё впереди. Сначала коммит владельца, затем
+полный локальный прогон, после него push. E010 пока fixed, не released.
 Полная локальная приёмка PASS: 1590 Configure, 618 сборок, 336 QEMU + 612 Renode;
 Linux unit 108/108, проверки эмуляторов 6/6, Windows TC-44 и Host 34/34 PASS.
 Отчёты: `build/toml-stage/acceptance-summary.json`,
@@ -33,7 +39,7 @@ Linux unit 108/108, проверки эмуляторов 6/6, Windows TC-44 и 
 L1–L3 проверены на окончательном примере (`build/toml-final/source-manifest.json`);
 L4–L5 — на исходном снимке этапа (`build/toml-stage/source-manifest.json`):
 их входы не менялись. После проверок менялись только документация и комментарий TOML.
-Следующий этап: `codex/release-0.10.2`. Результаты этапа не заменяют
+Текущий этап: `codex/release-0.10.2`. Результаты предыдущего этапа не заменяют
 предрелизную приёмку на итоговом подписанном SHA.
 Полная локальная приёмка этапа `[cfg]` L0–L5 PASS: 1554 Configure,
 618 сборок, 336 QEMU + 612 Renode; Linux unit 107/107, проверки эмуляторов 6/6.
@@ -54,7 +60,7 @@ Linux unit 106/106, проверки эмуляторов 6/6. Нативный 
 не входят в Git). Проверялся снимок рабочего дерева от `cfa52c6`; runtime-код
 и тесты до коммита E010 после снимка не менялись. CI коммита `8624bae`
 затем прошёл (Firmware run 37133257759).
-Версия кода пока 0.10.1. Следующие ветки выполняются последовательно:
+Версия кода в релизной ветке 0.10.2, не выпущена. Следующие ветки выполняются последовательно:
 
 | Шаг / ветка | Результат | Проверка перед завершением |
 | --- | --- | --- |
@@ -67,13 +73,13 @@ Linux unit 106/106, проверки эмуляторов 6/6. Нативный 
 - [x] Исправление E010 слито: `8624bae`, TC-44 и Firmware PASS; не выпущено.
 - [x] Ввести `[cfg]`, сохранив приоритеты и имена `STM32_YML_*`: `37fec5c`.
 - [x] Добавить публичный пример и проверки, сохранив YAML-пример: `2ee5530`.
-- [ ] Сверить старые пункты дорожной карты на обоих языках — подготовлено в текущей ветке, не слито.
+- [x] Сверить старые пункты дорожной карты на обоих языках: `c883928`.
 - [ ] Пройти приёмку и выпустить 0.10.2.
 
 Локальные проверки выполняются до push; полный L0–L5 — при завершении
 функционального этапа. Владелец выполняет push, ручной Firmware на границах
-этапов, `git land`, тег и выпуск. Для текущей документационной ветки достаточно Docs; повторный Firmware не нужен.
-Полный прогон и Firmware обязательны на следующей, релизной ветке.
+этапов, `git land`, тег и выпуск. Для текущей релизной ветки обязательны полный локальный прогон и ручной Firmware
+на итоговом подписанном SHA. Сначала локальная приёмка, затем push.
 Вне состава: периферия RCC/PWR (TC-86), расширение Arduino runtime и матрицы MCU,
 USBDevice/VirtIO/CMSIS_DSP, GitLab-пример TC-53 и дополнительная оптимизация CI.
 
@@ -96,7 +102,7 @@ USBDevice/VirtIO/CMSIS_DSP, GitLab-пример TC-53 и дополнитель�
 
 ### До выпуска 0.10.2
 
-1. Слить текущую документационную ветку после Docs.
+1. Сверка документации слита на `c883928`, Docs прошёл.
 2. В `codex/release-0.10.2` обновить версию, примеры, changelog, справочник,
    статусы errata и компактные тексты `docs/releases/v0.10.2*.md` RU/EN.
 3. Выполнить полный локальный L0–L5 на итоговом подписанном коммите;
@@ -598,7 +604,13 @@ Docs, Configure, Host, CI environment and Firmware passed for that SHA.
 TOML/include/Presets example and TC-97 merged: `2ee5530`.
 Docs, Configure, Host and [Firmware](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/actions/runs/37150032121)
 passed for that SHA, including Windows TC-44; reports are available as artifacts.
-Current branch: `codex/roadmap-refresh` — status/history reconciliation, not merged.
+Roadmap reconciliation merged: `c883928`, Docs PASS.
+Current branch: `codex/release-0.10.2`; version and release files prepared.
+Preliminary checks PASS: 108 Linux unit tests, 55 Configure cases on the default
+tool pair, schema, messages, documentation and strict spec validation. Logs:
+`build/release-0102-precheck/`. Full local acceptance and CI on the final signed
+SHA, tagging and publication are pending. Owner commits first, then full local
+acceptance, then push. E010 remains fixed, not released.
 Full local acceptance PASS: 1590 Configure, 618 builds, 336 QEMU + 612 Renode;
 Linux units 108/108, emulator checks 6/6, Windows TC-44 and Host 34/34 PASS.
 Reports: `build/toml-stage/acceptance-summary.json`,
@@ -606,7 +618,7 @@ Reports: `build/toml-stage/acceptance-summary.json`,
 L1–L3 use the final example (`build/toml-final/source-manifest.json`);
 L4–L5 use the initial stage snapshot (`build/toml-stage/source-manifest.json`):
 their inputs are unchanged. Only documentation and a TOML comment changed afterwards.
-Next stage: `codex/release-0.10.2`. Stage results do not replace
+Current stage: `codex/release-0.10.2`. Previous stage results do not replace
 release acceptance on the final signed SHA.
 Full local L0–L5 acceptance for the `[cfg]` stage PASS: 1554 Configure, 618 builds,
 336 QEMU + 612 Renode; Linux units 107/107, emulation checks 6/6.
@@ -627,7 +639,7 @@ tc44_complete=true (24 s). Reports: `build/absolute-stage/acceptance-summary.jso
 The E010 working-tree snapshot was based on `cfa52c6`; runtime code and tests
 were unchanged between the snapshot and the E010 commit. CI for `8624bae`
 subsequently passed (Firmware run 37133257759).
-Runtime version remains 0.10.1. Subsequent branches are sequential:
+Runtime version on the release branch is 0.10.2, not released. Subsequent branches are sequential:
 
 | Step / branch | Deliverable | Checks before completion |
 | --- | --- | --- |
@@ -640,13 +652,13 @@ Runtime version remains 0.10.1. Subsequent branches are sequential:
 - [x] E010 fix merged: `8624bae`, TC-44 and Firmware PASS; not released.
 - [x] Introduce `[cfg]`, preserving precedence and `STM32_YML_*` names: `37fec5c`.
 - [x] Add the public example and checks while retaining the YAML example: `2ee5530`.
-- [ ] Reconcile historical roadmap items in both languages — prepared in this branch, not merged.
+- [x] Reconcile historical roadmap items in both languages: `c883928`.
 - [ ] Complete acceptance and publish 0.10.2.
 
 Run local checks before push and full L0–L5 at the end of each functional stage.
 The owner performs push, manual Firmware at stage boundaries, `git land`, tagging
-and publication. The current documentation branch only needs Docs; no repeated Firmware run.
-Full acceptance and Firmware are required on the next, release branch.
+and publication. The current release branch requires full local acceptance and manual Firmware
+on the final signed SHA. Local acceptance comes before push.
 Out of scope: RCC/PWR peripherals (TC-86), additional Arduino runtime and MCU
 matrix coverage, USBDevice/VirtIO/CMSIS_DSP, the GitLab example TC-53 and further CI optimization.
 
@@ -669,7 +681,7 @@ Historical entries below retain their original dates, counts and wording.
 
 ### Before releasing 0.10.2
 
-1. Merge the current documentation branch after Docs passes.
+1. Documentation reconciliation merged at `c883928`; Docs passed.
 2. In `codex/release-0.10.2`, align the version, examples, changelogs, reference,
    errata statuses and compact RU/EN `docs/releases/v0.10.2*.md` notes.
 3. Run full local L0–L5 on the final signed commit; verify CI and manually

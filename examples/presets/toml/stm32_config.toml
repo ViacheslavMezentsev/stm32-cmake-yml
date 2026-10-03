@@ -3,7 +3,7 @@
 # Подключения добавляют профили, но не выбирают их.
 include = ["config/F411.toml", "config/G474.toml"]
 
-stm32_cmake_yml_version = "0.10.1"
+stm32_cmake_yml_version = "0.10.2"
 project_name = "example_board"
 languages = ["C", "ASM"]
 sources = ["main.c"]

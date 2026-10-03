@@ -1,4 +1,4 @@
-stm32_cmake_yml_version: 0.10.1
+stm32_cmake_yml_version: 0.10.2
 ioc_file: bluepill-hsi.ioc
 mcu: STM32F103C8T6
 project_name: yaml_bluepill

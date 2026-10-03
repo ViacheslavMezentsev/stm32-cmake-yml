@@ -1431,14 +1431,14 @@
       {
         "code": "I001",
         "args": [
-          "0.10.1",
+          "0.10.2",
           null
         ]
       },
       {
         "code": "I003",
         "args": [
-          "0.10.1"
+          "0.10.2"
         ]
       }
     ],
@@ -1465,7 +1465,7 @@
       {
         "code": "I001",
         "args": [
-          "0.10.1",
+          "0.10.2",
           null
         ]
       },
@@ -1504,7 +1504,7 @@
       {
         "code": "I001",
         "args": [
-          "0.10.1",
+          "0.10.2",
           null
         ]
       },
@@ -1543,7 +1543,7 @@
       {
         "code": "I001",
         "args": [
-          "0.10.1",
+          "0.10.2",
           null
         ]
       },
@@ -1556,7 +1556,7 @@
       {
         "code": "W004",
         "args": [
-          "0.10.1",
+          "0.10.2",
           "0.9.1"
         ]
       }
@@ -1580,21 +1580,21 @@
       {
         "code": "I001",
         "args": [
-          "0.10.1",
+          "0.10.2",
           null
         ]
       },
       {
         "code": "I004",
         "args": [
-          "0.10.2"
+          "0.10.3"
         ]
       },
       {
         "code": "W003",
         "args": [
-          "0.10.1",
-          "0.10.2"
+          "0.10.2",
+          "0.10.3"
         ]
       }
     ],
@@ -1617,7 +1617,7 @@
       {
         "code": "I001",
         "args": [
-          "0.10.1",
+          "0.10.2",
           null
         ]
       }
@@ -1643,14 +1643,14 @@
       {
         "code": "I004",
         "args": [
-          "0.10.2"
+          "0.10.3"
         ]
       },
       {
         "code": "W003",
         "args": [
-          "0.10.1",
-          "0.10.2"
+          "0.10.2",
+          "0.10.3"
         ]
       }
     ]
@@ -1659,7 +1659,7 @@
     "name": "version-before-override",
     "args": [
       "-DPROJECT_CONFIG_FILE=version-newer.yml",
-      "-DSTM32_YML_OVERRIDE_stm32_cmake_yml_version=0.10.1",
+      "-DSTM32_YML_OVERRIDE_stm32_cmake_yml_version=0.10.2",
       "-DSTM32_YML_OVERRIDE_stm32_cmake_yml_version_check=false"
     ],
     "no_st_dependencies": true,
@@ -1667,14 +1667,14 @@
       {
         "code": "I004",
         "args": [
-          "0.10.2"
+          "0.10.3"
         ]
       },
       {
         "code": "W003",
         "args": [
-          "0.10.1",
-          "0.10.2"
+          "0.10.2",
+          "0.10.3"
         ]
       }
     ]
@@ -3718,7 +3718,7 @@
       {
         "code": "I001",
         "args": [
-          "0.10.1",
+          "0.10.2",
           null
         ]
       }
@@ -3741,7 +3741,7 @@
       {
         "code": "I001",
         "args": [
-          "0.10.1",
+          "0.10.2",
           null
         ]
       }
@@ -3764,7 +3764,7 @@
       {
         "code": "I001",
         "args": [
-          "0.10.1",
+          "0.10.2",
           null
         ]
       }
@@ -3787,7 +3787,7 @@
       {
         "code": "I001",
         "args": [
-          "0.10.1",
+          "0.10.2",
           null
         ]
       }
@@ -3810,7 +3810,7 @@
       {
         "code": "I001",
         "args": [
-          "0.10.1",
+          "0.10.2",
           null
         ]
       }
@@ -3833,7 +3833,7 @@
       {
         "code": "I001",
         "args": [
-          "0.10.1",
+          "0.10.2",
           null
         ]
       }
@@ -3855,7 +3855,7 @@
       {
         "code": "I001",
         "args": [
-          "0.10.1",
+          "0.10.2",
           null
         ]
       }
@@ -3867,7 +3867,7 @@
     },
     "lang": "ru",
     "log_contains": [
-      "stm32-cmake-yml: 0.10.1"
+      "stm32-cmake-yml: 0.10.2"
     ]
   },
   {
@@ -3888,7 +3888,7 @@
       {
         "code": "I001",
         "args": [
-          "0.10.1",
+          "0.10.2",
           null
         ]
       }
@@ -3917,14 +3917,14 @@
       {
         "code": "I001",
         "args": [
-          "0.10.1",
+          "0.10.2",
           null
         ]
       }
     ],
     "log_contains": [
       "Тестовое предупреждение только на русском: ok",
-      "stm32-cmake-yml: 0.10.1"
+      "stm32-cmake-yml: 0.10.2"
     ]
   },
   {
@@ -3939,7 +3939,7 @@
       {
         "code": "I001",
         "args": [
-          "0.10.1",
+          "0.10.2",
           null
         ]
       }
@@ -3958,13 +3958,13 @@
       {
         "code": "I001",
         "args": [
-          "0.10.1",
+          "0.10.2",
           null
         ]
       }
     ],
     "log_contains": [
-      "[SCY-I001] stm32-cmake-yml: 0.10.1",
+      "[SCY-I001] stm32-cmake-yml: 0.10.2",
       "[SCY-W901] Тестовое предупреждение"
     ]
   },
@@ -4021,7 +4021,7 @@
           {
             "code": "I001",
             "args": [
-              "0.10.1",
+              "0.10.2",
               null
             ]
           }
@@ -4035,7 +4035,7 @@
           {
             "code": "I001",
             "args": [
-              "0.10.1",
+              "0.10.2",
               null
             ]
           }
@@ -6274,7 +6274,7 @@
           "stm32_config.yml"
         ],
         "write_files": {
-          "stm32_config.yaml": "stm32_cmake_yml_version: 0.10.1\nproject_name: formats_probe\nmcu: STM32F103C8T6\nlanguages: [C, CXX, ASM]\nuse_cmsis: false\nuse_hal: false\nuse_freertos: false\nvalidate_linker_script: false\nsources: [main.c]\nbuild_artifacts: []\ncompile_definitions: [BASE=1]\nstack_size: 1K\ncustom:\n  enabled: false\n  count: 0\n  text: 'quoted \"value\" and C:\\folder'\nprofiles:\n  Demo:\n    stack_size: 2K\n    compile_definitions_append: [PROFILE=1]\n"
+          "stm32_config.yaml": "stm32_cmake_yml_version: 0.10.2\nproject_name: formats_probe\nmcu: STM32F103C8T6\nlanguages: [C, CXX, ASM]\nuse_cmsis: false\nuse_hal: false\nuse_freertos: false\nvalidate_linker_script: false\nsources: [main.c]\nbuild_artifacts: []\ncompile_definitions: [BASE=1]\nstack_size: 1K\ncustom:\n  enabled: false\n  count: 0\n  text: 'quoted \"value\" and C:\\folder'\nprofiles:\n  Demo:\n    stack_size: 2K\n    compile_definitions_append: [PROFILE=1]\n"
         }
       }
     ],
@@ -6312,7 +6312,7 @@
           "stm32_config.yml"
         ],
         "write_files": {
-          "stm32_config.toml": "stm32_cmake_yml_version = \"0.10.1\"\nproject_name = \"formats_probe\"\nmcu = \"STM32F103C8T6\"\nlanguages = [\"C\", \"CXX\", \"ASM\"]\nuse_cmsis = false\nuse_hal = false\nuse_freertos = false\nvalidate_linker_script = false\nsources = [\"main.c\"]\nbuild_artifacts = []\ncompile_definitions = [\"BASE=1\"]\nstack_size = \"1K\"\n\n[custom]\nenabled = false\ncount = 0\ntext = 'quoted \"value\" and C:\\folder'\n\n[profiles.Demo]\nstack_size = \"2K\"\ncompile_definitions_append = [\"PROFILE=1\"]\n"
+          "stm32_config.toml": "stm32_cmake_yml_version = \"0.10.2\"\nproject_name = \"formats_probe\"\nmcu = \"STM32F103C8T6\"\nlanguages = [\"C\", \"CXX\", \"ASM\"]\nuse_cmsis = false\nuse_hal = false\nuse_freertos = false\nvalidate_linker_script = false\nsources = [\"main.c\"]\nbuild_artifacts = []\ncompile_definitions = [\"BASE=1\"]\nstack_size = \"1K\"\n\n[custom]\nenabled = false\ncount = 0\ntext = 'quoted \"value\" and C:\\folder'\n\n[profiles.Demo]\nstack_size = \"2K\"\ncompile_definitions_append = [\"PROFILE=1\"]\n"
         }
       }
     ],
@@ -6361,7 +6361,7 @@
     "steps": [
       {
         "write_files": {
-          "stm32_config.toml": "stm32_cmake_yml_version = \"0.10.1\"\nproject_name = \"formats_probe\"\nmcu = \"STM32F103C8T6\"\nlanguages = [\"C\", \"CXX\", \"ASM\"]\nuse_cmsis = false\nuse_hal = false\nuse_freertos = false\nvalidate_linker_script = false\nsources = [\"main.c\"]\nbuild_artifacts = []\ncompile_definitions = [\"BASE=1\"]\nstack_size = \"1K\"\n\n[custom]\nenabled = false\ncount = 0\ntext = 'quoted \"value\" and C:\\folder'\n\n[profiles.Demo]\nstack_size = \"2K\"\ncompile_definitions_append = [\"PROFILE=1\"]\n"
+          "stm32_config.toml": "stm32_cmake_yml_version = \"0.10.2\"\nproject_name = \"formats_probe\"\nmcu = \"STM32F103C8T6\"\nlanguages = [\"C\", \"CXX\", \"ASM\"]\nuse_cmsis = false\nuse_hal = false\nuse_freertos = false\nvalidate_linker_script = false\nsources = [\"main.c\"]\nbuild_artifacts = []\ncompile_definitions = [\"BASE=1\"]\nstack_size = \"1K\"\n\n[custom]\nenabled = false\ncount = 0\ntext = 'quoted \"value\" and C:\\folder'\n\n[profiles.Demo]\nstack_size = \"2K\"\ncompile_definitions_append = [\"PROFILE=1\"]\n"
         }
       }
     ],
@@ -6382,7 +6382,7 @@
           "-DPROJECT_CONFIG_FILE=formats/base.toml"
         ],
         "write_files": {
-          "stm32_config.toml": "stm32_cmake_yml_version = \"0.10.1\"\nproject_name = \"formats_probe\"\nmcu = \"STM32F103C8T6\"\nlanguages = [\"C\", \"CXX\", \"ASM\"]\nuse_cmsis = false\nuse_hal = false\nuse_freertos = false\nvalidate_linker_script = false\nsources = [\"main.c\"]\nbuild_artifacts = []\ncompile_definitions = [\"BASE=1\"]\nstack_size = \"1K\"\n\n[custom]\nenabled = false\ncount = 0\ntext = 'quoted \"value\" and C:\\folder'\n\n[profiles.Demo]\nstack_size = \"2K\"\ncompile_definitions_append = [\"PROFILE=1\"]\n"
+          "stm32_config.toml": "stm32_cmake_yml_version = \"0.10.2\"\nproject_name = \"formats_probe\"\nmcu = \"STM32F103C8T6\"\nlanguages = [\"C\", \"CXX\", \"ASM\"]\nuse_cmsis = false\nuse_hal = false\nuse_freertos = false\nvalidate_linker_script = false\nsources = [\"main.c\"]\nbuild_artifacts = []\ncompile_definitions = [\"BASE=1\"]\nstack_size = \"1K\"\n\n[custom]\nenabled = false\ncount = 0\ntext = 'quoted \"value\" and C:\\folder'\n\n[profiles.Demo]\nstack_size = \"2K\"\ncompile_definitions_append = [\"PROFILE=1\"]\n"
         }
       },
       {},
@@ -6427,7 +6427,7 @@
     "steps": [
       {
         "write_files": {
-          "stm32_config.yml": "stm32_cmake_yml_version: 0.10.1\nproject_name: formats_probe\nmcu: STM32F103C8T6\nlanguages: [C, CXX, ASM]\nuse_cmsis: false\nuse_hal: false\nuse_freertos: false\nvalidate_linker_script: false\nsources: [main.c]\nbuild_artifacts: []\ncompile_definitions: [BASE=1]\nstack_size: 1K\ncustom:\n  enabled: false\n  count: 0\n  text: 'quoted \"value\" and C:\\folder'\nprofiles:\n  Demo:\n    stack_size: 2K\n    compile_definitions_append: [PROFILE=1]\n"
+          "stm32_config.yml": "stm32_cmake_yml_version: 0.10.2\nproject_name: formats_probe\nmcu: STM32F103C8T6\nlanguages: [C, CXX, ASM]\nuse_cmsis: false\nuse_hal: false\nuse_freertos: false\nvalidate_linker_script: false\nsources: [main.c]\nbuild_artifacts: []\ncompile_definitions: [BASE=1]\nstack_size: 1K\ncustom:\n  enabled: false\n  count: 0\n  text: 'quoted \"value\" and C:\\folder'\nprofiles:\n  Demo:\n    stack_size: 2K\n    compile_definitions_append: [PROFILE=1]\n"
         },
         "effective": {
           "project_name": "formats_probe",
@@ -6457,7 +6457,7 @@
           "stm32_config.yml"
         ],
         "write_files": {
-          "stm32_config.toml": "stm32_cmake_yml_version = \"0.10.1\"\nproject_name = \"formats_probe\"\nmcu = \"STM32F103C8T6\"\nlanguages = [\"C\", \"CXX\", \"ASM\"]\nuse_cmsis = false\nuse_hal = false\nuse_freertos = false\nvalidate_linker_script = false\nsources = [\"main.c\"]\nbuild_artifacts = []\ncompile_definitions = [\"BASE=1\"]\nstack_size = \"1K\"\n\n[custom]\nenabled = false\ncount = 0\ntext = 'quoted \"value\" and C:\\folder'\n\n[profiles.Demo]\nstack_size = \"2K\"\ncompile_definitions_append = [\"PROFILE=1\"]\n"
+          "stm32_config.toml": "stm32_cmake_yml_version = \"0.10.2\"\nproject_name = \"formats_probe\"\nmcu = \"STM32F103C8T6\"\nlanguages = [\"C\", \"CXX\", \"ASM\"]\nuse_cmsis = false\nuse_hal = false\nuse_freertos = false\nvalidate_linker_script = false\nsources = [\"main.c\"]\nbuild_artifacts = []\ncompile_definitions = [\"BASE=1\"]\nstack_size = \"1K\"\n\n[custom]\nenabled = false\ncount = 0\ntext = 'quoted \"value\" and C:\\folder'\n\n[profiles.Demo]\nstack_size = \"2K\"\ncompile_definitions_append = [\"PROFILE=1\"]\n"
         },
         "effective": {
           "project_name": "formats_probe",
@@ -6484,7 +6484,7 @@
       },
       {
         "write_files": {
-          "stm32_config.yaml": "stm32_cmake_yml_version: 0.10.1\nproject_name: formats_probe\nmcu: STM32F103C8T6\nlanguages: [C, CXX, ASM]\nuse_cmsis: false\nuse_hal: false\nuse_freertos: false\nvalidate_linker_script: false\nsources: [main.c]\nbuild_artifacts: []\ncompile_definitions: [BASE=1]\nstack_size: 1K\ncustom:\n  enabled: false\n  count: 0\n  text: 'quoted \"value\" and C:\\folder'\nprofiles:\n  Demo:\n    stack_size: 2K\n    compile_definitions_append: [PROFILE=1]\n"
+          "stm32_config.yaml": "stm32_cmake_yml_version: 0.10.2\nproject_name: formats_probe\nmcu: STM32F103C8T6\nlanguages: [C, CXX, ASM]\nuse_cmsis: false\nuse_hal: false\nuse_freertos: false\nvalidate_linker_script: false\nsources: [main.c]\nbuild_artifacts: []\ncompile_definitions: [BASE=1]\nstack_size: 1K\ncustom:\n  enabled: false\n  count: 0\n  text: 'quoted \"value\" and C:\\folder'\nprofiles:\n  Demo:\n    stack_size: 2K\n    compile_definitions_append: [PROFILE=1]\n"
         },
         "error": {
           "code": "E016"

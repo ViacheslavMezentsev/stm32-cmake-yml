@@ -5,7 +5,7 @@
 Baseline: `f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0`. [Semantics and version boundary](semantics.md) · [Errata](../../errata/index.md) · [Testing](../../testing.md).
 
 The `0.9.2` directory is retained to keep links stable. Cards also describe
-0.9.3, 0.10.0 and the prepared 0.10.1 changes; the historical baseline is not renamed.
+0.9.3–0.10.1 and the prepared 0.10.2 changes; the historical baseline is not renamed.
 See the [roadmap](../../../../TODO.md) for release status and the
 [migration guide](../../migration-0.10.md) for upgrade steps.
 

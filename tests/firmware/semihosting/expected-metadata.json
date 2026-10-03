@@ -1,5 +1,5 @@
 {
-  "FRAMEWORK": "0.10.1",
+  "FRAMEWORK": "0.10.2",
   "DATA_INIT": "12345678",
   "BSS_INIT": "00000000",
   "CTOR_INIT": "C0DEC0DE",

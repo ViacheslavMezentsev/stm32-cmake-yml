@@ -5,7 +5,7 @@
 Shared rules: [semantics](semantics.md). Baseline: `f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0`. Introduction history before 0.9.2 is not established; presence is confirmed in this baseline. Unless stated otherwise, configuration happens at Configure/Generate and actual commands execute at Build/Post-build.
 
 
-**For 0.10.1 (fix prepared):** Python CLI emits CRC/BIN diagnostics in UTF-8
+**Since 0.10.1:** Python CLI emits CRC/BIN diagnostics in UTF-8
 regardless of the host code page; importing the module leaves streams unchanged.
 Texts and binary artifacts are unchanged. [E009](../../errata/E009.md),
 [TC-88 regression](../../../../tests/test_crc_encoding.py).
@@ -54,7 +54,7 @@ crc_enable: false
 
 **Errata:** [E006](../../errata/E006.md).
 
-**Prepared for 0.10.1 (post-build):** injection start (`SCY-I713`),
+**Since 0.10.1 (post-build):** injection start (`SCY-I713`),
 calculated value (`SCY-I709`) and successful update (`SCY-I714`) use the RU/EN
 catalog, the `[STM32 CRC32]` prefix and the build JSONL log. The section name
 comes from effective `crc_section_name`, including profiles and overrides.
@@ -83,7 +83,7 @@ Details: [method, layout, length field and reading CRC](../../crc-methods.md).
 
 `CFG-CRC-METHOD` · **Type:** string: auto / none · **Default:** auto
 
-**Prepared for 0.10.1:** reserves selection of the complete CRC calculation
+**Since 0.10.1:** reserves selection of the complete CRC calculation
 and placement method. Alias: `crc.method`. Missing, `null`, empty string and
 `none` mean `auto`; `none` does not disable CRC. Only `crc_enable` enables CRC.
 Other values, including `false` and `0`, fail Configure with `SCY-E712`,
