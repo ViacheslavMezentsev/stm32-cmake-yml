@@ -303,7 +303,7 @@
               ]
             }
           ],
-          "description": "CFG-SOURCES: list of relative paths"
+          "description": "CFG-SOURCES: list of paths"
         },
         "sources_append": {
           "anyOf": [

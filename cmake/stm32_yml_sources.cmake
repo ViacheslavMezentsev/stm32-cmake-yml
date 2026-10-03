@@ -23,9 +23,10 @@ function(stm32_yml_setup_sources TARGET_NAME)
 
     # Перебираем список 'sources' из YAML-конфига.
     foreach(src_item IN LISTS sources)
-        set(full_path "${CMAKE_CURRENT_SOURCE_DIR}/${src_item}")
-        get_filename_component(filename ${src_item} NAME)
-        string(TOLOWER ${filename} filename_lower)
+        # ТЗ 4.6.1, TC-95: то же разрешение путей, что при планировании каталогов.
+        get_filename_component(full_path "${src_item}" ABSOLUTE BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
+        get_filename_component(filename "${full_path}" NAME)
+        string(TOLOWER "${filename}" filename_lower)
 
         set(is_special_file FALSE)
 
@@ -34,18 +35,18 @@ function(stm32_yml_setup_sources TARGET_NAME)
         if(NOT toolchain_backend STREQUAL "arduino" AND (use_hal OR use_cmsis))
             if(filename_lower STREQUAL SYSTEM_FILENAME_TARGET)
                 if(mcu_core)
-                    set(CMSIS_${MCU_FAMILY}_${mcu_core}_SYSTEM ${full_path} PARENT_SCOPE)
+                    set(CMSIS_${MCU_FAMILY}_${mcu_core}_SYSTEM "${full_path}" PARENT_SCOPE)
                 else()
-                    set(CMSIS_${MCU_FAMILY}_SYSTEM ${full_path} PARENT_SCOPE)
+                    set(CMSIS_${MCU_FAMILY}_SYSTEM "${full_path}" PARENT_SCOPE)
                 endif()
                 stm32_yml_msg(I302 "${full_path}")
                 set(is_special_file TRUE)
 
             elseif(filename_lower MATCHES ${STARTUP_FILENAME_PATTERN})
                 if(mcu_core)
-                    set(CMSIS_${MCU_FAMILY}_${mcu_core}_${MCU_TYPE}_STARTUP ${full_path} PARENT_SCOPE)
+                    set(CMSIS_${MCU_FAMILY}_${mcu_core}_${MCU_TYPE}_STARTUP "${full_path}" PARENT_SCOPE)
                 else()
-                    set(CMSIS_${MCU_FAMILY}_${MCU_TYPE}_STARTUP ${full_path} PARENT_SCOPE)
+                    set(CMSIS_${MCU_FAMILY}_${MCU_TYPE}_STARTUP "${full_path}" PARENT_SCOPE)
                 endif()
                 stm32_yml_msg(I303 "${full_path}")
                 set(is_special_file TRUE)
@@ -54,13 +55,13 @@ function(stm32_yml_setup_sources TARGET_NAME)
 
         # Стандартная обработка остальных файлов
         if(NOT is_special_file)
-            if(IS_DIRECTORY ${full_path})
+            if(IS_DIRECTORY "${full_path}")
                 # Подключение директории как модуля (CMakeLists.txt внутри обязателен);
                 # каталог сборки — по ТЗ 4.6.8 (внешние каталоги — в _deps/).
                 stm32_yml_add_subdirectory("${full_path}")
-            elseif(EXISTS ${full_path})
+            elseif(EXISTS "${full_path}")
                 # Добавление одиночного файла
-                list(APPEND LOCAL_PROJECT_SOURCES ${full_path})
+                list(APPEND LOCAL_PROJECT_SOURCES "${full_path}")
             else()
                 stm32_yml_msg(W302 "${src_item}")
             endif()

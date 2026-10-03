@@ -375,7 +375,7 @@
   },
   {
     "name": "baremetal-empty-list",
-    "windows": {"external_drive": true, "known_limitation": "E010"},
+    "windows": {"external_drive": true, "absolute_file": true, "build": true},
     "args": ["-DPROJECT_CONFIG_FILE=baremetal.yml", "-DSTM32_YML_PROFILE=empty"],
     "observed": {"include_directories": ""},
     "absent_properties": {"COMPILE_DEFINITIONS": ["BAREMETAL=1"]},
@@ -6793,6 +6793,90 @@
           "args": [
             "AUTO"
           ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "sources-absolute-mixed",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=baremetal.yml",
+      "-DSTM32_YML_OVERRIDE_link_options=nostartfiles"
+    ],
+    "absolute_sources": [
+      "main.c",
+      "extra.c",
+      "../external module"
+    ],
+    "extra_dirs": [
+      "../external module"
+    ],
+    "compiled_sources": [
+      "main.c",
+      "extra.c",
+      "../external module/extra.c"
+    ],
+    "no_st_dependencies": true,
+    "log_absent": [
+      "SCY-W302"
+    ],
+    "build_targets": [
+      "all"
+    ]
+  },
+  {
+    "name": "sources-absolute-missing",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=baremetal.yml"
+    ],
+    "absolute_sources": [
+      "main.c",
+      "missing file.c"
+    ],
+    "sources": [
+      "main.c"
+    ],
+    "messages": [
+      {
+        "code": "W302"
+      }
+    ]
+  },
+  {
+    "name": "sources-absolute-no-cmake",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=baremetal.yml"
+    ],
+    "absolute_sources": [
+      "main.c",
+      "WithoutCMake"
+    ],
+    "error": "does not contain a CMakeLists.txt file"
+  },
+  {
+    "name": "sources-absolute-cmsis",
+    "absolute_sources": [
+      "main.c",
+      "custom files/system_stm32f4xx.c",
+      "custom files/startup_stm32f411xe.s"
+    ],
+    "compiled_sources": [
+      "custom files/system_stm32f4xx.c",
+      "custom files/startup_stm32f411xe.s"
+    ],
+    "messages": [
+      {
+        "code": "I302"
+      },
+      {
+        "code": "I303"
+      }
+    ],
+    "steps": [
+      {
+        "write_files": {
+          "custom files/system_stm32f4xx.c": "void SystemInit(void) {}\n",
+          "custom files/startup_stm32f411xe.s": ".syntax unified\n.thumb\n"
         }
       }
     ]

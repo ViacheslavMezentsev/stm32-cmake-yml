@@ -488,7 +488,7 @@ Workflow `Host` выполняет одинаковый набор на `ubuntu-
 ci/run_host_checks.py и host.yml. Только Markdown не запускает этот workflow.
 Можно запустить вручную. Лимит job — 10 минут; это предохранитель, не целевая
 длительность. Локальные 20 тестов занимают несколько секунд; время GitHub
-измеряется после push. Windows Configure/Build теперь добавлен отдельно; TC-44 частичен из-за E010.
+измеряется после push. Windows Configure/Build добавлен отдельно; ограничение TC-44 в 0.10.1 описано в E010.
 
 В Host CI добавлены проверки жизненного цикла внедрения CRC (TC-92): RU/EN, ошибки objcopy и остановка POST_BUILD. Набор содержит 26 тестов.
 
@@ -505,6 +505,7 @@ python ci/install_windows.py --output build/windows-tools --cache build/windows-
 python ci/run_windows_checks.py --tools build/windows-tools --output build/windows-checks --external-root "$env:LOCALAPPDATA/Temp"
 ```
 
-Отчёт и логи — артефакт windows-configure-build. Четыре сценария положительные;
-пятый требует воспроизведения [E010](errata/E010.md), поэтому tc44_complete=false.
-Успех задания не закрывает TC-44. Эмуляторы на Windows отложены до необходимости.
+Отчёт и логи — артефакт windows-configure-build. Для 0.10.2 все пять сценариев
+положительные: другой диск проверяется для каталога и отдельного файла, включая
+сборку. Только полный успех вместе с Host даёт tc44_complete=true; ранее
+[регрессия E010](errata/E010.md) сохраняла false. Эмуляторы на Windows отложены до необходимости.

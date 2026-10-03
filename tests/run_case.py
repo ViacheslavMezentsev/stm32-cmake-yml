@@ -189,6 +189,10 @@ def verify(case, build, source):
             require("--gap-fill" not in ninja, "CRC image must not use objcopy --gap-fill")
 
     commands = json.loads((build / "compile_commands.json").read_text(encoding="utf-8"))
+    for filename in case.get("compiled_sources", []):
+        path = (source / filename).resolve()
+        require(sum(Path(entry["file"]).resolve() == path for entry in commands) == 1,
+                f"Missing or duplicate compile command: {path}")
     for filename in case.get("absent_commands", []):
         require(not any(Path(entry["file"]) == source / filename for entry in commands),
                 f"Unexpected compile command for {filename}")
@@ -352,6 +356,10 @@ def main():
     build = run / "build"
     shutil.copytree(tests / "fixtures/project", source)
     external = None
+    # TC-95: resolve test inputs on the host, independently of the framework.
+    if case.get("absolute_sources"):
+        paths = [(source / item).resolve().as_posix() for item in case["absolute_sources"]]
+        case["args"] = case.get("args", []) + ["-DSTM32_YML_OVERRIDE_sources=" + ";".join(paths)]
     if args.windows:
         require(os.name == 'nt' and case.get('windows'), 'Not a selected Windows case')
         windows = case['windows']
@@ -374,7 +382,8 @@ def main():
             external = Path(tempfile.mkdtemp(prefix='external module ', dir=args.external_root)).resolve()
             require(external.drive.lower() != source.drive.lower(), 'External directory must be on another drive')
             shutil.copytree(tests / 'fixtures/outside-module', external, dirs_exist_ok=True)
-            case['args'] = case.get('args', []) + ['-DSTM32_YML_OVERRIDE_sources=main.c;' + external.as_posix()]
+            (external / 'single file.c').write_text('int external_single(void) { return 2; }\n', encoding='utf-8')
+            case['args'] = case.get('args', []) + ['-DSTM32_YML_OVERRIDE_sources=main.c;' + external.as_posix() + ';' + (external / 'single file.c').as_posix(), '-DSTM32_YML_OVERRIDE_link_options=nostartfiles']
         if windows.get('registry_lang'):
             import winreg
             with winreg.OpenKey(winreg.HKEY_CURRENT_USER, r'Control Panel\International') as key:
@@ -523,11 +532,14 @@ def main():
         require(not (run / "home/.Arduino_Core_STM32_dl").exists(), "Arduino core downloads created")
     if external is not None:
         commands = json.loads((build / 'compile_commands.json').read_text(encoding='utf-8'))
-        require(not any(Path(c['file']).resolve() == external / 'extra.c' for c in commands),
-                'E010 changed: revisit the documented limitation and expected regression')
+        for filename in ('extra.c', 'single file.c'):
+            require(sum(Path(c['file']).resolve() == external / filename for c in commands) == 1,
+                    f'Missing or duplicate cross-drive source: {filename}')
         records = [json.loads(line) for line in (build / 'stm32_yml_messages.jsonl').read_text(encoding='utf-8').splitlines()]
-        require(any(r['code'] == 'SCY-W302' and r['args'] == [external.as_posix()] for r in records),
-                'E010 must report the exact skipped external directory')
+        require(not any(r['code'] == 'SCY-W302' for r in records), 'Valid cross-drive sources were skipped')
+        result = subprocess.run([args.cmake, '--build', str(build)], capture_output=True, text=True, timeout=300)
+        (run / 'external-build.log').write_text(result.stdout + result.stderr, encoding='utf-8')
+        require(result.returncode == 0, f'Cross-drive build failed: {result.stdout}{result.stderr}')
     print(f"PASS {args.case}")
 
 

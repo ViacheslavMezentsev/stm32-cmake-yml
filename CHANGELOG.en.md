@@ -12,7 +12,9 @@ on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 
 ## [Unreleased]
 
-- Documentation: approved the 0.10.2 plan and acceptance criteria in spec 2.23. The E010 fix, `[cfg]` label and TOML/include/Presets example are not implemented yet.
+- Fixed absolute files and directories in `sources`, including spaces and another Windows drive (E010). Added TC-95 and positive TC-44 build checks; relative paths and CMSIS startup/system replacement are preserved.
+
+- Documentation: approved the 0.10.2 plan and acceptance criteria in spec 2.23. The `[cfg]` label and TOML/include/Presets example are not implemented yet.
 
 ## [0.10.1] - 2026-10-03
 

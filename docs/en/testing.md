@@ -479,7 +479,7 @@ Missing tools, empty suites or skipped tests fail the run. `tests.log` and
 cmake, stm32_yml.cmake, tests, ci/run_host_checks.py or host.yml trigger it;
 Markdown-only pushes do not. Manual dispatch is available. The 10-minute job
 limit is a guard, not expected duration. Locally the 26 tests take seconds;
-GitHub timing is measured after push. Windows Configure/Build is now separate; TC-44 remains partial because of E010.
+GitHub timing is measured after push. Windows Configure/Build is separate; E010 describes the partial TC-44 coverage in 0.10.1.
 
 Host CI also checks the CRC injection lifecycle (TC-92): RU/EN, objcopy failures and POST_BUILD termination. The suite contains 26 tests.
 
@@ -496,6 +496,7 @@ python ci/install_windows.py --output build/windows-tools --cache build/windows-
 python ci/run_windows_checks.py --tools build/windows-tools --output build/windows-checks --external-root "$env:LOCALAPPDATA/Temp"
 ```
 
-Reports/logs are in windows-configure-build. Four cases are positive; the fifth
-requires [E010](errata/E010.md), so tc44_complete=false. Job success does not close
-TC-44. Windows emulators are deferred until needed.
+Reports/logs are in windows-configure-build. For 0.10.2 all five cases are
+positive: another drive is checked for both a directory and a file, including
+a build. Only full success including Host sets tc44_complete=true; the earlier
+[E010 regression](errata/E010.md) kept it false. Windows emulators are deferred until needed.

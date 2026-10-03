@@ -16,7 +16,7 @@ concurrency:
 
 jobs:
   windows:
-    name: Windows Configure/Build (TC-44, E010 limitation)
+    name: Windows Configure/Build (TC-44)
     runs-on: windows-latest
     timeout-minutes: 30
     steps:

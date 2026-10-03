@@ -20,7 +20,7 @@ def main():
     args.output.mkdir(parents=True, exist_ok=True)
     output, tools = args.output.resolve(), args.tools.resolve()
     report = {'status': 'failed', 'cases': [], 'versions': {},
-              'tc44_complete': False, 'known_limitations': ['E010']}
+              'tc44_complete': False, 'known_limitations': []}
     start = time.monotonic()
     try:
         if os.name != 'nt':
@@ -42,7 +42,7 @@ def main():
                 raise ValueError(f'Wrong {name}: {text}')
             report['versions'][name] = text
         cases = [c for c in json.loads((ROOT / 'tests/cases.json').read_text(encoding='utf-8')) if c.get('windows')]
-        required = {'minimal', 'ioc_backslash', 'crlf', 'external_drive', 'registry_lang', 'build'}
+        required = {'minimal', 'ioc_backslash', 'crlf', 'external_drive', 'registry_lang', 'build', 'absolute_file'}
         if not required <= {k for c in cases for k,v in c['windows'].items() if v}:
             raise ValueError('Incomplete TC-44 selection')
         with tempfile.TemporaryDirectory(prefix='stm32-windows-', dir=args.external_root) as external:
@@ -66,13 +66,14 @@ def main():
             print((output / 'host.log').read_text(encoding='utf-8', errors='replace'), flush=True)
         if host.returncode == 0 and all(c['returncode'] == 0 for c in report['cases']):
             report['status'] = 'passed'
+            report['tc44_complete'] = True
     except (OSError, ValueError, subprocess.SubprocessError) as error:
         report['error'] = str(error)
         print(f'Windows check error: {error}', flush=True)
     finally:
         report['duration_seconds'] = round(time.monotonic() - start, 3)
         (output / 'summary.json').write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8')
-    print(f"Windows checks: {report['status']}; TC-44 incomplete (E010)")
+    print(f"Windows checks: {report['status']}; TC-44 {'complete' if report['tc44_complete'] else 'incomplete'}")
     return 0 if report['status'] == 'passed' else 1
 
 

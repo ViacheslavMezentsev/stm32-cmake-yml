@@ -7,9 +7,11 @@
 <a id="sources"></a>
 ## `sources`
 
-`CFG-SOURCES` · **Тип:** list of relative paths · **Default:** []
+`CFG-SOURCES` · **Тип:** list of paths · **Default:** []
 
 Файлы добавляются к цели; каталоги подключаются через add_subdirectory и должны иметь CMakeLists.txt. Отсчёт от текущего исходного каталога, обычно корня. ../ разрешён для модулей. Отсутствующий путь предупреждает и пропускается; цель без исходников затем может не пройти Generate. При CMSIS/HAL startup/system файлы перехватываются для замены upstream-файлов.
+
+**Подготовлено для 0.10.2** (E010, ТЗ 4.6.1): `sources` поддерживает абсолютные файлы и каталоги, включая другой диск Windows и пробелы. Относительные пути по-прежнему разрешаются от текущего каталога исходников, а не от файла include. Для другого диска каталог сборки — `_deps/<путь без буквы диска>` по правилам 4.6.8. Подмена startup/system при CMSIS/HAL сохранена. В 0.10.1 и ранее абсолютные пути не поддерживались корректно; [E010](../../errata/E010.md).
 
 **Изменение в 0.10.0** (ТЗ 4.6.8): каталог сборки подключаемого каталога — его относительный путь от корня проекта, для каталога вне проекта — `_deps/<путь без ведущих ..>` (например, `../modules/etl` → `build/_deps/modules/etl`); при совпадении путей добавляется суффикс `-<4 символа SHA-1>`. Прежние имена `external_*`, `arduino_lib_*`, `arduino_custom_*`, `arduino_core` не используются; после перехода с 0.9.x нужна сборка в чистой папке.
 
@@ -21,7 +23,7 @@ sources: [main.c, helper.cpp]
 
 [Реализация 0.9.2](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_sources.cmake) · [Index](index.md)
 
-**Проверки (частичное покрытие):** `configure.profile-append`, `configure.profile-replace-and-append`, `configure.reconfigure-profile-lists`, `configure.source-directory-target`, `configure.source-missing-warning`, `configure.source-directory-requires-cmake`, `configure.module-explicit-link`, `configure.module-not-auto-linked`, `configure.module-missing-target`. [Test manifest](../../../../tests/cases.json).
+**Проверки (частичное покрытие):** `configure.profile-append`, `configure.profile-replace-and-append`, `configure.reconfigure-profile-lists`, `configure.source-directory-target`, `configure.source-missing-warning`, `configure.source-directory-requires-cmake`, `configure.module-explicit-link`, `configure.module-not-auto-linked`, `configure.module-missing-target`, `configure.sources-absolute-mixed`, `configure.sources-absolute-missing`, `configure.sources-absolute-no-cmake`, `configure.sources-absolute-cmsis`. [Test manifest](../../../../tests/cases.json).
 
 <a id="include-directories"></a>
 ## `include_directories`

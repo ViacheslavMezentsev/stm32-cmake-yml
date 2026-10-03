@@ -18,7 +18,15 @@ PR больше не требуются; старые ссылки остают�
 ### 0.10.2 — согласованный состав
 
 База: выпущенная [0.10.1](docs/releases/v0.10.1.md), main `cff041c`.
-Текущая ветка: `codex/plan-0.10.2`; подготовка ТЗ 2.23 и плана, ещё не слито.
+План и ТЗ 2.23 слиты: `cfa52c6`. Текущая ветка: `codex/absolute-sources`;
+исправление E010 и ТЗ 2.24 подготовлены, ещё не слито.
+Локальная приёмка L0–L5 PASS: 1530 Configure, 618 сборок, 336 QEMU + 612 Renode;
+Linux unit 106/106, проверки эмуляторов 6/6. Нативный Windows TC-44 PASS:
+5 сценариев и Host 34/34, tc44_complete=true (24 с). Отчёты:
+`build/absolute-stage/acceptance-summary.json`, `build/absolute-windows/summary.json`;
+полные Linux-логи — `build/absolute-stage/full-results.tar.gz` (локальные,
+не входят в Git). Проверялся снимок рабочего дерева от `cfa52c6`; runtime-код
+и тесты после снимка не менялись. CI на подписанном коммите ещё впереди.
 Версия кода пока 0.10.1. Следующие ветки выполняются последовательно:
 
 | Шаг / ветка | Результат | Проверка перед завершением |
@@ -29,7 +37,7 @@ PR больше не требуются; старые ссылки остают�
 | 4. `codex/roadmap-refresh` | Сверка выполненных и отложенных пунктов TODO RU/EN | Ссылки на код/тесты/решения; история отдельно от актуальных обязательств |
 | 5. `codex/release-0.10.2` | Версия, CHANGELOG, справочник/errata и релизный текст | Полный локальный L0–L5 и CI на итоговом подписанном SHA |
 
-- [ ] Исправить E010; до положительной проверки E010 open, TC-44 partial.
+- [ ] Слить исправление E010: fixed в рабочей ветке, TC-44 локально PASS; не выпущено.
 - [ ] Ввести `[cfg]`, сохранив приоритеты и имена `STM32_YML_*`.
 - [ ] Добавить публичный пример и проверки, сохранив YAML-пример.
 - [ ] Сверить старые пункты дорожной карты на обоих языках.
@@ -37,7 +45,7 @@ PR больше не требуются; старые ссылки остают�
 
 Локальные проверки выполняются до push; полный L0–L5 — при завершении
 функционального этапа. Владелец выполняет push, ручной Firmware на границах
-этапов, `git land`, тег и выпуск. Для этой ветки планирования Firmware не нужен.
+этапов, `git land`, тег и выпуск. После push этой функциональной ветки нужен ручной Firmware.
 Вне состава: периферия RCC/PWR (TC-86), расширение Arduino runtime и матрицы MCU,
 USBDevice/VirtIO/CMSIS_DSP, GitLab-пример TC-53 и дополнительная оптимизация CI.
 
@@ -484,7 +492,15 @@ keep defect details in errata.
 ### 0.10.2 — approved scope
 
 Baseline: published [0.10.1](docs/releases/v0.10.1.md), main `cff041c`.
-Current branch: `codex/plan-0.10.2`; spec 2.23 and plan prepared, not merged yet.
+Plan and spec 2.23 merged: `cfa52c6`. Current branch: `codex/absolute-sources`;
+E010 fix and spec 2.24 prepared, not merged yet. Local L0–L5 acceptance PASS:
+1530 Configure, 618 builds, 336 QEMU + 612 Renode; Linux units 106/106,
+emulation checks 6/6. Native Windows TC-44 PASS: 5 cases and Host 34/34,
+tc44_complete=true (24 s). Reports: `build/absolute-stage/acceptance-summary.json`,
+`build/absolute-windows/summary.json`; full Linux logs:
+`build/absolute-stage/full-results.tar.gz` (local, not tracked).
+The tested working-tree snapshot is based on `cfa52c6`; runtime code and tests
+have not changed since that snapshot. CI on the signed commit is pending.
 Runtime version remains 0.10.1. Subsequent branches are sequential:
 
 | Step / branch | Deliverable | Checks before completion |
@@ -495,7 +511,7 @@ Runtime version remains 0.10.1. Subsequent branches are sequential:
 | 4. `codex/roadmap-refresh` | Reconcile completed and deferred TODO items in RU/EN | Links to code/tests/decisions; separate history from current commitments |
 | 5. `codex/release-0.10.2` | Version, CHANGELOG, reference/errata and release text | Full local L0–L5 and CI on the final signed SHA |
 
-- [ ] Fix E010; until positive validation, E010 is open and TC-44 is partial.
+- [ ] Merge E010 fix: fixed in the working branch, local TC-44 PASS; not released.
 - [ ] Introduce `[cfg]`, preserving precedence and `STM32_YML_*` names.
 - [ ] Add the public example and checks while retaining the YAML example.
 - [ ] Reconcile historical roadmap items in both languages.
@@ -503,7 +519,7 @@ Runtime version remains 0.10.1. Subsequent branches are sequential:
 
 Run local checks before push and full L0–L5 at the end of each functional stage.
 The owner performs push, manual Firmware at stage boundaries, `git land`, tagging
-and publication. This planning branch does not require Firmware.
+and publication. This functional branch requires manual Firmware after push.
 Out of scope: RCC/PWR peripherals (TC-86), additional Arduino runtime and MCU
 matrix coverage, USBDevice/VirtIO/CMSIS_DSP, the GitLab example TC-53 and further CI optimization.
 

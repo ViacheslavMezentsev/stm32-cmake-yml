@@ -7,9 +7,11 @@ Shared rules: [semantics](semantics.md). Baseline: `f8ef5200fc7a4a96d6f3fe9111af
 <a id="sources"></a>
 ## `sources`
 
-`CFG-SOURCES` · **Type:** list of relative paths · **Default:** []
+`CFG-SOURCES` · **Type:** list of paths · **Default:** []
 
 Files are added to the target; directories use add_subdirectory and need CMakeLists.txt. Paths are relative to the current source directory, normally the root. ../ modules are supported. Missing paths warn and are skipped; a target with no sources can then fail Generate. With CMSIS/HAL, startup/system files override upstream sources.
+
+**Prepared for 0.10.2** (E010, spec 4.6.1): `sources` accepts absolute files and directories, including another Windows drive and spaces. Relative paths still resolve from the current source directory, not from the include file. A directory on another drive uses `_deps/<path without the drive letter>` under spec 4.6.8. CMSIS/HAL startup/system replacement is unchanged. Absolute paths did not work correctly in 0.10.1 and earlier; see [E010](../../errata/E010.md).
 
 **Change in 0.10.0** (spec 4.6.8): the build directory of an added directory is its path from the project root; a directory outside the project uses `_deps/<path without leading ..>` (for example, `../modules/etl` → `build/_deps/modules/etl`); clashing paths get a `-<4 SHA-1 characters>` suffix. The former `external_*`, `arduino_lib_*`, `arduino_custom_*` and `arduino_core` names are gone; after upgrading from 0.9.x build in a clean directory.
 
@@ -21,7 +23,7 @@ sources: [main.c, helper.cpp]
 
 [0.9.2 implementation](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/blob/f8ef5200fc7a4a96d6f3fe9111afb8f8825474b0/cmake/stm32_yml_sources.cmake) · [Index](index.md)
 
-**Checks (partial coverage):** `configure.profile-append`, `configure.profile-replace-and-append`, `configure.reconfigure-profile-lists`, `configure.source-directory-target`, `configure.source-missing-warning`, `configure.source-directory-requires-cmake`, `configure.module-explicit-link`, `configure.module-not-auto-linked`, `configure.module-missing-target`. [Test manifest](../../../../tests/cases.json).
+**Checks (partial coverage):** `configure.profile-append`, `configure.profile-replace-and-append`, `configure.reconfigure-profile-lists`, `configure.source-directory-target`, `configure.source-missing-warning`, `configure.source-directory-requires-cmake`, `configure.module-explicit-link`, `configure.module-not-auto-linked`, `configure.module-missing-target`, `configure.sources-absolute-mixed`, `configure.sources-absolute-missing`, `configure.sources-absolute-no-cmake`, `configure.sources-absolute-cmsis`. [Test manifest](../../../../tests/cases.json).
 
 <a id="include-directories"></a>
 ## `include_directories`
