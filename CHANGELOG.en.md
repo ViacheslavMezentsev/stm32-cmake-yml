@@ -10,6 +10,10 @@ on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 
 ---
 
+## [Unreleased]
+
+- Documentation: approved the 0.10.2 plan and acceptance criteria in spec 2.23. The E010 fix, `[cfg]` label and TOML/include/Presets example are not implemented yet.
+
 ## [0.10.1] - 2026-10-03
 
 - Fixed Git diagnostics for Windows 8.3 path aliases and added a regression. Host/Windows CI now print failure details in Actions while retaining blocking failures.

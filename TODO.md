@@ -4,8 +4,9 @@
 
 ## Русский
 
-Состояние на 2026-09-27. Ниже работа сгруппирована в пять этапов; этапы могут
-выполняться параллельно. Это план, а не обещание сроков или поддерживаемых функций.
+Состояние на 2026-10-03. Текущий согласованный состав — 0.10.2; ниже также
+сохранена история пяти первоначальных этапов. Это план, а не обещание сроков
+или поддерживаемых функций.
 Приоритет — Configure/Generate и совместимость существующих проектов.
 Новый порядок: рабочая ветка → локальные проверки → push и CI → merge в main.
 PR больше не требуются; старые ссылки остаются историей. [Порядок работы](docs/ru/maintenance.md).
@@ -13,6 +14,38 @@ PR больше не требуются; старые ссылки остают�
 `[x]` означает слито, `[ ]` — ещё не завершено. Подготовленный коммит и успешные
 локальные проверки не означают слияния или выпуска. Обновляйте статусы и ссылки
 на коммиты/ветки вместе с выполнением работы; подробности дефектов храните в errata.
+
+### 0.10.2 — согласованный состав
+
+База: выпущенная [0.10.1](docs/releases/v0.10.1.md), main `cff041c`.
+Текущая ветка: `codex/plan-0.10.2`; подготовка ТЗ 2.23 и плана, ещё не слито.
+Версия кода пока 0.10.1. Следующие ветки выполняются последовательно:
+
+| Шаг / ветка | Результат | Проверка перед завершением |
+| --- | --- | --- |
+| 1. `codex/absolute-sources` | Исправление E010: абсолютные файлы и каталоги, включая другой диск Windows | TC-95, положительная TC-44, прежние относительные пути и диагностика, минимальная сборка |
+| 2. `codex/config-source-label` | `[cfg]` вместо `[yml]` в отчёте RU/EN и JSONL | TC-96: YAML/TOML, IOC, профили, overrides, выравнивание, неизменные коды и уровни |
+| 3. `codex/toml-presets-example` | Нейтральный TOML + include + Presets; раздельные F411/G474, базовый G474 | TC-97: без include/профиля и оба профиля; замена списков, без чужих HAL-компонентов; документация RU/EN |
+| 4. `codex/roadmap-refresh` | Сверка выполненных и отложенных пунктов TODO RU/EN | Ссылки на код/тесты/решения; история отдельно от актуальных обязательств |
+| 5. `codex/release-0.10.2` | Версия, CHANGELOG, справочник/errata и релизный текст | Полный локальный L0–L5 и CI на итоговом подписанном SHA |
+
+- [ ] Исправить E010; до положительной проверки E010 open, TC-44 partial.
+- [ ] Ввести `[cfg]`, сохранив приоритеты и имена `STM32_YML_*`.
+- [ ] Добавить публичный пример и проверки, сохранив YAML-пример.
+- [ ] Сверить старые пункты дорожной карты на обоих языках.
+- [ ] Пройти приёмку и выпустить 0.10.2.
+
+Локальные проверки выполняются до push; полный L0–L5 — при завершении
+функционального этапа. Владелец выполняет push, ручной Firmware на границах
+этапов, `git land`, тег и выпуск. Для этой ветки планирования Firmware не нужен.
+Вне состава: периферия RCC/PWR (TC-86), расширение Arduino runtime и матрицы MCU,
+USBDevice/VirtIO/CMSIS_DSP, GitLab-пример TC-53 и дополнительная оптимизация CI.
+
+### История первоначальных этапов
+
+Числа проверок и статусы ниже относятся к указанным коммитам и датам,
+а не к текущему объёму набора. Незакрытый исторический пункт сам по себе
+не включается в 0.10.2.
 
 ### 1. Воспроизводимое окружение
 
@@ -193,8 +226,8 @@ Docs, Configure, Host и CI environment на main прошли для того �
 [Firmware по тегу](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/actions/runs/37063620662)
 успешен, включая Windows Configure/Build. E009 — released в 0.10.1;
 E010 остаётся open, TC-44 частичен.
-Текущая ветка: `codex/release-0.10.1-status` — фиксация факта выпуска
-в TODO и errata после публикации; подготовлено, ещё не слито.
+Фиксация факта выпуска в TODO и errata слита: `cff041c`
+(ветка `codex/release-0.10.1-status`).
 
 История предыдущего подэтапа:
 
@@ -437,7 +470,8 @@ RU/EN. Не добавлять новые ветки тестирования п
 
 ## English
 
-Status as of 2026-09-27. Work is grouped into five stages, which may overlap.
+Status as of 2026-10-03. The approved current scope is 0.10.2; the five original
+stages below are retained as history.
 The priority is Configure/Generate and compatibility with existing consumers.
 New workflow: working branch → local checks → push and CI → merge into main.
 PRs are no longer required; old links remain historical. [Workflow](docs/en/maintenance.md).
@@ -446,6 +480,37 @@ This roadmap does not promise delivery dates or unsupported features.
 `[x]` means merged; `[ ]` means incomplete. A prepared commit or a passing local
 run does not mean merged or released. Update statuses and commit/branch links as work lands;
 keep defect details in errata.
+
+### 0.10.2 — approved scope
+
+Baseline: published [0.10.1](docs/releases/v0.10.1.md), main `cff041c`.
+Current branch: `codex/plan-0.10.2`; spec 2.23 and plan prepared, not merged yet.
+Runtime version remains 0.10.1. Subsequent branches are sequential:
+
+| Step / branch | Deliverable | Checks before completion |
+| --- | --- | --- |
+| 1. `codex/absolute-sources` | Fix E010: absolute files and directories, including another Windows drive | TC-95, positive TC-44, existing relative paths and diagnostics, minimal build |
+| 2. `codex/config-source-label` | `[cfg]` replaces `[yml]` in RU/EN reports and JSONL | TC-96: YAML/TOML, IOC, profiles, overrides, alignment, unchanged codes and levels |
+| 3. `codex/toml-presets-example` | Neutral TOML + include + Presets; separate F411/G474 profiles, G474 base | TC-97: no include/profile and both profiles; list replacement without foreign HAL components; RU/EN docs |
+| 4. `codex/roadmap-refresh` | Reconcile completed and deferred TODO items in RU/EN | Links to code/tests/decisions; separate history from current commitments |
+| 5. `codex/release-0.10.2` | Version, CHANGELOG, reference/errata and release text | Full local L0–L5 and CI on the final signed SHA |
+
+- [ ] Fix E010; until positive validation, E010 is open and TC-44 is partial.
+- [ ] Introduce `[cfg]`, preserving precedence and `STM32_YML_*` names.
+- [ ] Add the public example and checks while retaining the YAML example.
+- [ ] Reconcile historical roadmap items in both languages.
+- [ ] Complete acceptance and publish 0.10.2.
+
+Run local checks before push and full L0–L5 at the end of each functional stage.
+The owner performs push, manual Firmware at stage boundaries, `git land`, tagging
+and publication. This planning branch does not require Firmware.
+Out of scope: RCC/PWR peripherals (TC-86), additional Arduino runtime and MCU
+matrix coverage, USBDevice/VirtIO/CMSIS_DSP, the GitLab example TC-53 and further CI optimization.
+
+### History of the original stages
+
+Counts and statuses below refer to their recorded commits and dates, not to the
+current test suite. An unchecked historical item is not automatically in 0.10.2.
 
 ### 1. Reproducible environment
 
@@ -626,8 +691,8 @@ Docs, Configure, Host and CI environment passed on main for the same SHA.
 [Tag Firmware](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/actions/runs/37063620662)
 passed, including Windows Configure/Build. E009 is released in 0.10.1;
 E010 remains open and TC-44 remains partial.
-Current branch: `codex/release-0.10.1-status` — recording publication
-in TODO and errata; prepared, not merged yet.
+Publication status in TODO and errata merged: `cff041c`
+(branch `codex/release-0.10.1-status`).
 
 Previous substep history:
 
