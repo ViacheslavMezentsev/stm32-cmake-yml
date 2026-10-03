@@ -58,6 +58,10 @@ def verify(case, build, source):
         for value in values:
             value = value.replace("{source}", source.as_posix())
             require(value not in actual, f"{key}: unexpected {value!r}")
+    if case.get("toml_example"):
+        actual = [item for item in observed("LINK_LIBRARIES").split(";") if item.startswith("HAL::")]
+        require(actual == case["properties"]["LINK_LIBRARIES"],
+                f"Unexpected or duplicated HAL components: {actual!r}")
     if "sources" in case:
         actual = [Path(p).relative_to(source).as_posix() for p in observed("SOURCES").split(";")]
         require(actual == case["sources"], f"Sources: {actual!r} != {case['sources']!r}")
@@ -373,6 +377,18 @@ def main():
     source = run / "w1/w2/source" if case.get("extra_dirs") else run / "source"
     build = run / "build"
     shutil.copytree(tests / "fixtures/project", source)
+    # TC-97: use the public example, not a duplicated configuration fixture.
+    if case.get("toml_example"):
+        observer = (source / "CMakeLists.txt").read_text(encoding="utf-8").split(
+            "# Observe public configuration", 1)[1]
+        shutil.copytree(args.framework / "examples/presets/toml", source, dirs_exist_ok=True)
+        cmakelists = source / "CMakeLists.txt"
+        cmakelists.write_text(cmakelists.read_text(encoding="utf-8") +
+                             "\n# Observe public configuration" + observer, encoding="utf-8")
+        if case.get("without_include"):
+            config = source / "stm32_config.toml"
+            config.write_text("\n".join(line for line in config.read_text(encoding="utf-8").splitlines()
+                                        if not line.startswith("include =")) + "\n", encoding="utf-8")
     external = None
     # TC-95: resolve test inputs on the host, independently of the framework.
     if case.get("absolute_sources"):
@@ -438,6 +454,11 @@ def main():
                "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON", *config_args,
                # Spec 4.16.12: L3 runs in English unless a case selects a language.
                f"-DSTM32_YML_LANG={case.get('lang', 'en')}", *case.get("args", [])]
+    if case.get("preset"):
+        # Let the real preset choose its config, build type and toolchain.
+        command = [arg for arg in command if not arg.startswith((
+            "-DPROJECT_CONFIG_FILE=", "-DCMAKE_BUILD_TYPE=", "-DCMAKE_TOOLCHAIN_FILE="))]
+        command += ["--preset", case["preset"]]
     catalog = messages_catalog.load(args.framework / "cmake/stm32_yml_messages_catalog.cmake")
     catalog.update(messages_catalog.load(source / "test_messages.cmake"))
     # "{run}" in environment values is the case directory (spec 4.9.14 search places).
@@ -478,7 +499,7 @@ def main():
         with log_path.open("w", encoding="utf-8") as log:
             log.write(shlex.join(step_command) + "\n\n")
             log.flush()
-            result = subprocess.run(step_command, env=env, stdout=log, stderr=subprocess.STDOUT, timeout=100)
+            result = subprocess.run(step_command, cwd=source, env=env, stdout=log, stderr=subprocess.STDOUT, timeout=100)
         for filename in ("CMakeCache.txt", "build.ninja", "compile_commands.json", "stm32_config.effective.json"):
             if (build / filename).is_file():
                 shutil.copy2(build / filename, report)

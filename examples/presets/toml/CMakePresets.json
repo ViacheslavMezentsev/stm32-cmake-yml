@@ -1,0 +1,71 @@
+{
+  "version": 3,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 21,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "base",
+      "hidden": true,
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "cacheVariables": {
+        "PROJECT_CONFIG_FILE": "${sourceDir}/stm32_config.toml",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": true,
+        "CMAKE_TOOLCHAIN_FILE": "$env{MODULES_DIR}/stm32-cmake/cmake/stm32_gcc.cmake"
+      }
+    },
+    {
+      "name": "f411ce-debug",
+      "inherits": "base",
+      "cacheVariables": {
+        "STM32_YML_PROFILE": "F411",
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "f411ce-release",
+      "inherits": "base",
+      "cacheVariables": {
+        "STM32_YML_PROFILE": "F411",
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "g474re-debug",
+      "inherits": "base",
+      "cacheVariables": {
+        "STM32_YML_PROFILE": "G474",
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "g474re-release",
+      "inherits": "base",
+      "cacheVariables": {
+        "STM32_YML_PROFILE": "G474",
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "f411ce-debug",
+      "configurePreset": "f411ce-debug"
+    },
+    {
+      "name": "f411ce-release",
+      "configurePreset": "f411ce-release"
+    },
+    {
+      "name": "g474re-debug",
+      "configurePreset": "g474re-debug"
+    },
+    {
+      "name": "g474re-release",
+      "configurePreset": "g474re-release"
+    }
+  ]
+}

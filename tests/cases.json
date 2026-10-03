@@ -7556,5 +7556,246 @@
         }
       }
     ]
+  },
+  {
+    "name": "example-toml-base",
+    "toml_example": true,
+    "args": [
+      "-DPROJECT_CONFIG_FILE=stm32_config.toml",
+      "-DCMAKE_BUILD_TYPE=Debug"
+    ],
+    "observed": {
+      "PROJECT_NAME": "example_board",
+      "MCU": "STM32G474RE",
+      "cubefw_package": "V1.6.3",
+      "include_directories": "include/G474"
+    },
+    "properties": {
+      "LINK_LIBRARIES": [
+        "HAL::STM32::G4::GPIO",
+        "HAL::STM32::G4::RCC",
+        "HAL::STM32::G4::PWR",
+        "HAL::STM32::G4::FDCAN"
+      ]
+    },
+    "absent_properties": {
+      "LINK_LIBRARIES": [
+        "HAL::STM32::F4::GPIO"
+      ]
+    },
+    "cache_values": {
+      "CMAKE_BUILD_TYPE": "Debug"
+    },
+    "effective": {
+      "mcu": "STM32G474RE",
+      "hal_components": [
+        "GPIO",
+        "RCC",
+        "PWR",
+        "FDCAN"
+      ]
+    }
+  },
+  {
+    "name": "example-toml-without-include",
+    "toml_example": true,
+    "args": [
+      "-DPROJECT_CONFIG_FILE=stm32_config.toml",
+      "-DCMAKE_BUILD_TYPE=Debug"
+    ],
+    "observed": {
+      "PROJECT_NAME": "example_board",
+      "MCU": "STM32G474RE",
+      "cubefw_package": "V1.6.3",
+      "include_directories": "include/G474"
+    },
+    "properties": {
+      "LINK_LIBRARIES": [
+        "HAL::STM32::G4::GPIO",
+        "HAL::STM32::G4::RCC",
+        "HAL::STM32::G4::PWR",
+        "HAL::STM32::G4::FDCAN"
+      ]
+    },
+    "absent_properties": {
+      "LINK_LIBRARIES": [
+        "HAL::STM32::F4::GPIO"
+      ]
+    },
+    "cache_values": {
+      "CMAKE_BUILD_TYPE": "Debug"
+    },
+    "effective": {
+      "mcu": "STM32G474RE",
+      "hal_components": [
+        "GPIO",
+        "RCC",
+        "PWR",
+        "FDCAN"
+      ]
+    },
+    "without_include": true
+  },
+  {
+    "name": "example-toml-f411ce-debug",
+    "toml_example": true,
+    "args": [
+      "-DPROJECT_CONFIG_FILE=stm32_config.toml",
+      "-DCMAKE_BUILD_TYPE=Debug"
+    ],
+    "observed": {
+      "PROJECT_NAME": "example_board",
+      "MCU": "STM32F411CE",
+      "cubefw_package": "V1.28.3",
+      "include_directories": "include/F411"
+    },
+    "properties": {
+      "LINK_LIBRARIES": [
+        "HAL::STM32::F4::GPIO",
+        "HAL::STM32::F4::RCC",
+        "HAL::STM32::F4::PWR"
+      ]
+    },
+    "absent_properties": {
+      "LINK_LIBRARIES": [
+        "HAL::STM32::G4::FDCAN"
+      ]
+    },
+    "cache_values": {
+      "CMAKE_BUILD_TYPE": "Debug",
+      "STM32_YML_PROFILE": "F411"
+    },
+    "effective": {
+      "mcu": "STM32G474RE",
+      "hal_components": [
+        "GPIO",
+        "RCC",
+        "PWR",
+        "FDCAN"
+      ]
+    },
+    "preset": "f411ce-debug"
+  },
+  {
+    "name": "example-toml-f411ce-release",
+    "toml_example": true,
+    "args": [
+      "-DPROJECT_CONFIG_FILE=stm32_config.toml",
+      "-DCMAKE_BUILD_TYPE=Release"
+    ],
+    "observed": {
+      "PROJECT_NAME": "example_board",
+      "MCU": "STM32F411CE",
+      "cubefw_package": "V1.28.3",
+      "include_directories": "include/F411"
+    },
+    "properties": {
+      "LINK_LIBRARIES": [
+        "HAL::STM32::F4::GPIO",
+        "HAL::STM32::F4::RCC",
+        "HAL::STM32::F4::PWR"
+      ]
+    },
+    "absent_properties": {
+      "LINK_LIBRARIES": [
+        "HAL::STM32::G4::FDCAN"
+      ]
+    },
+    "cache_values": {
+      "CMAKE_BUILD_TYPE": "Release",
+      "STM32_YML_PROFILE": "F411"
+    },
+    "effective": {
+      "mcu": "STM32G474RE",
+      "hal_components": [
+        "GPIO",
+        "RCC",
+        "PWR",
+        "FDCAN"
+      ]
+    },
+    "preset": "f411ce-release"
+  },
+  {
+    "name": "example-toml-g474re-debug",
+    "toml_example": true,
+    "args": [
+      "-DPROJECT_CONFIG_FILE=stm32_config.toml",
+      "-DCMAKE_BUILD_TYPE=Debug"
+    ],
+    "observed": {
+      "PROJECT_NAME": "example_board",
+      "MCU": "STM32G474RE",
+      "cubefw_package": "V1.6.3",
+      "include_directories": "include/G474"
+    },
+    "properties": {
+      "LINK_LIBRARIES": [
+        "HAL::STM32::G4::GPIO",
+        "HAL::STM32::G4::RCC",
+        "HAL::STM32::G4::PWR",
+        "HAL::STM32::G4::FDCAN"
+      ]
+    },
+    "absent_properties": {
+      "LINK_LIBRARIES": [
+        "HAL::STM32::F4::GPIO"
+      ]
+    },
+    "cache_values": {
+      "CMAKE_BUILD_TYPE": "Debug",
+      "STM32_YML_PROFILE": "G474"
+    },
+    "effective": {
+      "mcu": "STM32G474RE",
+      "hal_components": [
+        "GPIO",
+        "RCC",
+        "PWR",
+        "FDCAN"
+      ]
+    },
+    "preset": "g474re-debug"
+  },
+  {
+    "name": "example-toml-g474re-release",
+    "toml_example": true,
+    "args": [
+      "-DPROJECT_CONFIG_FILE=stm32_config.toml",
+      "-DCMAKE_BUILD_TYPE=Release"
+    ],
+    "observed": {
+      "PROJECT_NAME": "example_board",
+      "MCU": "STM32G474RE",
+      "cubefw_package": "V1.6.3",
+      "include_directories": "include/G474"
+    },
+    "properties": {
+      "LINK_LIBRARIES": [
+        "HAL::STM32::G4::GPIO",
+        "HAL::STM32::G4::RCC",
+        "HAL::STM32::G4::PWR",
+        "HAL::STM32::G4::FDCAN"
+      ]
+    },
+    "absent_properties": {
+      "LINK_LIBRARIES": [
+        "HAL::STM32::F4::GPIO"
+      ]
+    },
+    "cache_values": {
+      "CMAKE_BUILD_TYPE": "Release",
+      "STM32_YML_PROFILE": "G474"
+    },
+    "effective": {
+      "mcu": "STM32G474RE",
+      "hal_components": [
+        "GPIO",
+        "RCC",
+        "PWR",
+        "FDCAN"
+      ]
+    },
+    "preset": "g474re-release"
   }
 ]

@@ -116,6 +116,23 @@ class SchemaTests(unittest.TestCase):
 
 
 class PresetTests(unittest.TestCase):
+    def test_toml_preset_links(self):
+        # TC-97: preset schema accepted by CMake; each build selects its configure.
+        example = ROOT / "examples/presets/toml"
+        presets = json.loads((example / "CMakePresets.json").read_text(encoding="utf-8"))
+        expected = {f"{chip}-{mode}" for chip in ("f411ce", "g474re")
+                    for mode in ("debug", "release")}
+        visible = {p["name"] for p in presets["configurePresets"] if not p.get("hidden")}
+        self.assertEqual(visible, expected)
+        self.assertEqual({p["name"] for p in presets["buildPresets"]}, expected)
+        for preset in presets["buildPresets"]:
+            self.assertEqual(preset["name"], preset["configurePreset"])
+        result = subprocess.run(["cmake", "--list-presets=all"], cwd=example,
+                                capture_output=True, text=True, timeout=30)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        for name in expected:
+            self.assertIn(name, result.stdout)
+
     def test_documented_files_match_both_translations(self):
         for lang in ("ru", "en"):
             doc = (ROOT / f"docs/{lang}/presets.md").read_text(encoding="utf-8")

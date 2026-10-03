@@ -1,0 +1,12 @@
+# Named profile / Именованный профиль: G474.
+# Select through STM32_YML_PROFILE; include alone does not activate it.
+# Выбор через STM32_YML_PROFILE; include сам по себе профиль не активирует.
+[profiles.G474]
+# MCU and matching installed Cube package / MCU и соответствующий пакет Cube.
+mcu = "STM32G474RE"
+cubefw_package = "V1.6.3"
+# Header paths remain project-relative / Пути заголовков от корня проекта.
+include_directories = ["include/G474"]
+# (Опционально / Optional) Full replacement, not _append.
+# Полная замена списка: компоненты другой платы не должны наследоваться.
+hal_components = ["GPIO", "RCC", "PWR", "FDCAN"]

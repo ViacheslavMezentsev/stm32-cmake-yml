@@ -1,0 +1,12 @@
+# Named profile / Именованный профиль: F411.
+# Select through STM32_YML_PROFILE; include alone does not activate it.
+# Выбор через STM32_YML_PROFILE; include сам по себе профиль не активирует.
+[profiles.F411]
+# MCU and matching installed Cube package / MCU и соответствующий пакет Cube.
+mcu = "STM32F411CE"
+cubefw_package = "V1.28.3"
+# Header paths remain project-relative / Пути заголовков от корня проекта.
+include_directories = ["include/F411"]
+# (Опционально / Optional) Full replacement, not _append.
+# Полная замена списка: компоненты другой платы не должны наследоваться.
+hal_components = ["GPIO", "RCC", "PWR"]

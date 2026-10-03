@@ -1,4 +1,4 @@
-# CMakePresets together with stm32_config.yml
+# CMakePresets with project configuration
 
 [Documentation](index.md) · [Русский](../ru/presets.md)
 
@@ -222,3 +222,67 @@ Presets are not generated from YAML: the developer maintains both files.
 Example files: [CMakePresets.json](../../examples/presets/CMakePresets.json), [stm32_config.yml](../../examples/presets/stm32_config.yml), [CMakeLists.txt](../../examples/presets/CMakeLists.txt).
 
 See also: [Arduino](arduino.md), [JSON Schema](schema.md).
+
+## TOML, include and separate profiles (0.10.2)
+
+The additional [example](../../examples/presets/toml/CMakeLists.txt) uses the STM32
+backend; the YAML/Arduino example above remains available. This is a
+**Configure/Generate** example, not a ready firmware: `main.c` initializes nothing
+and the HAL headers are configure-only placeholders. Before building, replace
+those headers with complete CubeMX HAL configurations and provide application
+code, clock initialization and handlers. CRC is disabled. The automatically
+selected linker script uses stm32-cmake's standard heap/stack sizes; add a custom
+`.ld.in` separately when needed.
+
+| File | Purpose |
+| --- | --- |
+| [stm32_config.toml](../../examples/presets/toml/stm32_config.toml) | Shared settings and the G474RE base board |
+| [config/F411.toml](../../examples/presets/toml/config/F411.toml) | Named F411 profile, its MCU, CubeF4 and complete HAL list |
+| [config/G474.toml](../../examples/presets/toml/config/G474.toml) | Named G474 profile, its MCU, CubeG4 and complete HAL list |
+| [CMakePresets.json](../../examples/presets/toml/CMakePresets.json) | Four presets, profile selection, Debug/Release and separate build directories |
+| [CMakeLists.txt](../../examples/presets/toml/CMakeLists.txt) | Framework integration and space for project-owned targets |
+
+Includes merge left to right, followed by the root file. Profile selection follows
+merging; overrides follow the profile. Including `config/F411.toml` does not select
+F411. With an empty `STM32_YML_PROFILE`, root G474 settings apply. Commenting out
+`include` preserves the G474 base while removing named profiles. Clear a cached
+profile explicitly with `-DSTM32_YML_PROFILE=` or use a fresh build directory.
+
+Include paths are relative to their containing file. Configuration paths such as
+`sources`, `include_directories` and `linker_script` remain project-relative; they
+are not rebased to the profile file's directory. A normal list **replaces** the
+previous list; `hal_components_append` would append to the base. F411 therefore
+provides its complete `hal_components`, excluding G4 FDCAN. G474 also replaces
+the list instead of duplicating existing entries. Profile names are `F411` and
+`G474`; preset names are `f411ce-debug`, `f411ce-release`, `g474re-debug` and
+`g474re-release`. Preset inheritance and configuration merging are independent.
+
+Install CMake ≥ 3.21, Ninja, Python, yq and ARM GCC; provide stm32-cmake and
+CubeF4 V1.28.3 / CubeG4 V1.6.3. `MODULES_DIR` points to the directory containing
+stm32-cmake; `CMAKE_USER_HOME` points to the parent of `STM32Cube/Repository`.
+The framework defaults to `modules/stm32-cmake-yml` within the example; override
+`STM32_YML_FRAMEWORK_DIR` on the command line or in CMakeUserPresets.json.
+The example does not download dependencies. From `examples/presets/toml`:
+
+```sh
+cmake --list-presets
+cmake --preset g474re-debug -DSTM32_YML_FRAMEWORK_DIR=/path/to/stm32-cmake-yml
+cmake --preset f411ce-release -DSTM32_YML_FRAMEWORK_DIR=/path/to/stm32-cmake-yml
+```
+
+For the base configuration with no selected profile, supply your toolchain path:
+
+```sh
+cmake -S . -B build/base -G Ninja -DCMAKE_BUILD_TYPE=Debug -DPROJECT_CONFIG_FILE=stm32_config.toml -DSTM32_YML_PROFILE= -DSTM32_YML_FRAMEWORK_DIR=/path/to/stm32-cmake-yml -DCMAKE_TOOLCHAIN_FILE=/path/to/stm32-cmake/cmake/stm32_gcc.cmake
+```
+
+Once complete firmware sources are provided, the build preset uses its matching
+configure preset: `cmake --build --preset g474re-debug`. Select the same CMake Tools
+preset in VS Code. This example registers no HIL tests. Future names `g474re-hil`,
+`g474re-hil-host`, `g474re-hil-hw` and `g474re-hil-hw-remote` imply Debug and a
+separately integrated project test module.
+
+TC-97 reads these public files and checks the base, disabled include and four real
+presets across the Configure matrix. The test copy only adds value/target observers
+and redirects the build directory into an isolated folder. This does not validate
+user firmware or HIL.

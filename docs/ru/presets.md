@@ -1,4 +1,4 @@
-# CMakePresets вместе со stm32_config.yml
+# CMakePresets вместе с конфигурацией проекта
 
 [Документация](index.md) · [English](../en/presets.md)
 
@@ -221,3 +221,68 @@ xPack, Python, GDB и стенду задавайте в окружении ил
 Файлы примера: [CMakePresets.json](../../examples/presets/CMakePresets.json), [stm32_config.yml](../../examples/presets/stm32_config.yml), [CMakeLists.txt](../../examples/presets/CMakeLists.txt).
 
 Далее: [Arduino](arduino.md), [JSON Schema](schema.md).
+
+## TOML, include и отдельные профили (0.10.2)
+
+Дополнительный [пример](../../examples/presets/toml/CMakeLists.txt) использует
+STM32 backend и сохраняет прежний YAML/Arduino-пример выше. Это **Configure/Generate**
+пример, не готовая прошивка: `main.c` ничего не инициализирует, HAL-заголовки —
+заглушки для конфигурирования. Перед сборкой замените их полноценными CubeMX
+HAL-конфигурациями и добавьте код приложения, тактирование и обработчики.
+CRC здесь не включён; автоматически выбранный linker script использует стандартные
+размеры heap/stack stm32-cmake. Пользовательский `.ld.in` добавляется отдельно.
+
+| Файл | Назначение |
+| --- | --- |
+| [stm32_config.toml](../../examples/presets/toml/stm32_config.toml) | Общие параметры и базовый G474RE |
+| [config/F411.toml](../../examples/presets/toml/config/F411.toml) | Именованный профиль F411, собственный MCU, CubeF4 и полный HAL-список |
+| [config/G474.toml](../../examples/presets/toml/config/G474.toml) | Именованный профиль G474, собственный MCU, CubeG4 и полный HAL-список |
+| [CMakePresets.json](../../examples/presets/toml/CMakePresets.json) | Четыре пресета, выбор профиля, Debug/Release и отдельные build-каталоги |
+| [CMakeLists.txt](../../examples/presets/toml/CMakeLists.txt) | Подключение фреймворка и место для пользовательских целей |
+
+`include` обрабатывается слева направо, затем применяется основной файл.
+Профиль выбирается после слияния, overrides — после профиля. Подключение
+`config/F411.toml` само по себе не выбирает F411. При пустом `STM32_YML_PROFILE`
+используются корневые параметры G474; если закомментировать строку `include`,
+базовый G474 остаётся работоспособным, а именованные профили исчезают.
+Старый профиль может остаться в кэше: очищайте его явно
+`-DSTM32_YML_PROFILE=` или используйте новый build-каталог.
+
+Пути в `include` относительны к содержащему его файлу. Пути параметров
+`sources`, `include_directories`, `linker_script` не перебазируются относительно
+файла профиля: они остаются путями проекта. Обычный список **заменяет** прежний;
+`hal_components_append` добавил бы компоненты к базовым. Поэтому F411 задаёт
+полный `hal_components`, исключая G4 FDCAN; G474 также задаёт полный список,
+не добавляя второй раз уже имеющиеся компоненты. Имена профилей — `F411`, `G474`,
+а имена пресетов — `f411ce-debug`, `f411ce-release`, `g474re-debug`, `g474re-release`.
+`inherits` пресетов и слияние конфигурации — независимые механизмы.
+
+Для проверки установите CMake ≥ 3.21, Ninja, Python, yq и ARM GCC; подготовьте
+stm32-cmake и CubeF4 V1.28.3 / CubeG4 V1.6.3. `MODULES_DIR` указывает на каталог
+с `stm32-cmake`, `CMAKE_USER_HOME` — на каталог с `STM32Cube/Repository`.
+Фреймворк по умолчанию ищется в `modules/stm32-cmake-yml` внутри примера;
+либо передайте `STM32_YML_FRAMEWORK_DIR` из консоли или CMakeUserPresets.json.
+Пример сам зависимости не скачивает. Из каталога `examples/presets/toml`:
+
+```sh
+cmake --list-presets
+cmake --preset g474re-debug -DSTM32_YML_FRAMEWORK_DIR=/path/to/stm32-cmake-yml
+cmake --preset f411ce-release -DSTM32_YML_FRAMEWORK_DIR=/path/to/stm32-cmake-yml
+```
+
+Для базовой конфигурации без выбранного профиля (путь toolchain подставьте свой):
+
+```sh
+cmake -S . -B build/base -G Ninja -DCMAKE_BUILD_TYPE=Debug -DPROJECT_CONFIG_FILE=stm32_config.toml -DSTM32_YML_PROFILE= -DSTM32_YML_FRAMEWORK_DIR=/path/to/stm32-cmake-yml -DCMAKE_TOOLCHAIN_FILE=/path/to/stm32-cmake/cmake/stm32_gcc.cmake
+```
+
+После подготовки полноценной прошивки build-пресет связан с одноимённым
+configure-пресетом: `cmake --build --preset g474re-debug`. В VS Code выбирается
+тот же пресет CMake Tools. HIL здесь не регистрируется; будущие имена
+`g474re-hil`, `g474re-hil-host`, `g474re-hil-hw`, `g474re-hil-hw-remote`
+предполагают Debug и отдельно подключённый проектный модуль тестов.
+
+TC-97 читает эти публичные файлы и проверяет базовый вариант, отключённый
+include и четыре настоящих пресета на матрице Configure. В тестовой копии
+добавляется только наблюдение значений/целей, build-каталог перенаправляется
+в изолированную папку. Это не проверка пользовательской прошивки или HIL.

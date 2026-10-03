@@ -21,8 +21,16 @@ PR больше не требуются; старые ссылки остают�
 План и ТЗ 2.23 слиты: `cfa52c6`. Исправление E010 и ТЗ 2.24 слиты: `8624bae`;
 Docs, Configure, Host, CI environment и Firmware для этого SHA прошли.
 `[cfg]` и ТЗ 2.25 слиты в main: `37fec5c`.
-Текущая ветка: `codex/plan-0.10.3` — только план и актуализация статуса.
-Следующий функциональный этап 0.10.2: `codex/toml-presets-example`.
+План 0.10.3 слит: `2f753e3`, Docs PASS.
+Текущая ветка: `codex/toml-presets-example`; пример и TC-97 подготовлены, не слиты.
+Полная локальная приёмка PASS: 1590 Configure, 618 сборок, 336 QEMU + 612 Renode;
+Linux unit 108/108, проверки эмуляторов 6/6, Windows TC-44 и Host 34/34 PASS.
+Отчёты: `build/toml-stage/acceptance-summary.json`,
+`build/toml-stage/full-results.tar.gz`, `build/toml-windows/summary.json`.
+L1–L3 проверены на окончательном примере (`build/toml-final/source-manifest.json`);
+L4–L5 — на исходном снимке этапа (`build/toml-stage/source-manifest.json`):
+их входы не менялись. После проверок менялись только документация и комментарий TOML.
+CI подписанного коммита ещё впереди. Следующий этап: `codex/roadmap-refresh`.
 Полная локальная приёмка этапа `[cfg]` L0–L5 PASS: 1554 Configure,
 618 сборок, 336 QEMU + 612 Renode; Linux unit 107/107, проверки эмуляторов 6/6.
 Windows TC-44 и Host 34/34 PASS (27 с). Отчёты:
@@ -60,8 +68,7 @@ Linux unit 106/106, проверки эмуляторов 6/6. Нативный 
 
 Локальные проверки выполняются до push; полный L0–L5 — при завершении
 функционального этапа. Владелец выполняет push, ручной Firmware на границах
-этапов, `git land`, тег и выпуск. Для текущей ветки плана достаточно проверки
-документации; повторный Firmware не требуется.
+этапов, `git land`, тег и выпуск. После локальной приёмки текущего этапа нужен ручной Firmware на ветке.
 Вне состава: периферия RCC/PWR (TC-86), расширение Arduino runtime и матрицы MCU,
 USBDevice/VirtIO/CMSIS_DSP, GitLab-пример TC-53 и дополнительная оптимизация CI.
 
@@ -546,8 +553,16 @@ Baseline: published [0.10.1](docs/releases/v0.10.1.md), main `cff041c`.
 Plan and spec 2.23 merged: `cfa52c6`. E010 fix and spec 2.24 merged: `8624bae`;
 Docs, Configure, Host, CI environment and Firmware passed for that SHA.
 `[cfg]` and spec 2.25 merged into main: `37fec5c`.
-Current branch: `codex/plan-0.10.3` — planning and status updates only.
-Next functional 0.10.2 stage: `codex/toml-presets-example`.
+0.10.3 plan merged: `2f753e3`, Docs PASS.
+Current branch: `codex/toml-presets-example`; example and TC-97 prepared, not merged.
+Full local acceptance PASS: 1590 Configure, 618 builds, 336 QEMU + 612 Renode;
+Linux units 108/108, emulator checks 6/6, Windows TC-44 and Host 34/34 PASS.
+Reports: `build/toml-stage/acceptance-summary.json`,
+`build/toml-stage/full-results.tar.gz`, `build/toml-windows/summary.json`.
+L1–L3 use the final example (`build/toml-final/source-manifest.json`);
+L4–L5 use the initial stage snapshot (`build/toml-stage/source-manifest.json`):
+their inputs are unchanged. Only documentation and a TOML comment changed afterwards.
+CI for the signed commit is pending. Next stage: `codex/roadmap-refresh`.
 Full local L0–L5 acceptance for the `[cfg]` stage PASS: 1554 Configure, 618 builds,
 336 QEMU + 612 Renode; Linux units 107/107, emulation checks 6/6.
 Windows TC-44 and Host 34/34 PASS (27 s). Reports:
@@ -585,8 +600,7 @@ Runtime version remains 0.10.1. Subsequent branches are sequential:
 
 Run local checks before push and full L0–L5 at the end of each functional stage.
 The owner performs push, manual Firmware at stage boundaries, `git land`, tagging
-and publication. The current planning branch needs documentation validation;
-another Firmware run is not required.
+and publication. After local acceptance, this stage requires manual Firmware on the branch.
 Out of scope: RCC/PWR peripherals (TC-86), additional Arduino runtime and MCU
 matrix coverage, USBDevice/VirtIO/CMSIS_DSP, the GitLab example TC-53 and further CI optimization.
 

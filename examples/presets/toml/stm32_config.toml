@@ -1,0 +1,27 @@
+# Shared configuration / Общая конфигурация.
+# Includes add named profiles; they do not select a profile.
+# Подключения добавляют профили, но не выбирают их.
+include = ["config/F411.toml", "config/G474.toml"]
+
+stm32_cmake_yml_version = "0.10.1"
+project_name = "example_board"
+languages = ["C", "ASM"]
+sources = ["main.c"]
+include_directories = ["include/G474"]
+
+# Base board when no external profile is selected, even without include.
+# Базовая плата без внешнего профиля, в том числе при отключении include.
+mcu = "STM32G474RE"
+cubefw_package = "V1.6.3"
+use_cmsis = true
+use_hal = true
+hal_components = ["GPIO", "RCC", "PWR", "FDCAN"]
+
+# (Опционально / Optional) Heap: 512 bytes (default / по умолчанию).
+heap_size = 512
+# (Опционально / Optional) Stack: 1024 bytes (default / по умолчанию).
+stack_size = 1024
+# (Опционально / Optional) NoSys, Semihosting, none.
+# Unset by default / По умолчанию не задано; NoSys is explicit here.
+# Newlib Nano is controlled separately by use_newlib_nano.
+system_library = "NoSys"
