@@ -21,5 +21,5 @@ Addition for 0.10.0, checked 2026-10-02.
 
 | ID | Issue | Status |
 | --- | --- | --- |
-| [E009](E009.md) | Python CRC/BIN diagnostic encoding | Merged into main; 0.10.1 release pending |
+| [E009](E009.md) | Python CRC/BIN diagnostic encoding | Fixed in 0.10.1 |
 | [E010](E010.md) | Absolute sources on another drive | Open; fix deferred |

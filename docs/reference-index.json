@@ -2627,7 +2627,8 @@
         "en": "docs/en/errata/E009.md"
       },
       "evidence": "reproduced",
-      "status": "merged"
+      "status": "released",
+      "fixed_release": "0.10.1"
     },
     {
       "id": "E010",

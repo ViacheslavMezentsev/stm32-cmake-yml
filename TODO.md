@@ -175,21 +175,26 @@ Firmware на GitHub запускается вручную на границах
   путей артефактов и фрагменты из CHANGELOG), карточки справочника
   с отметками 0.10.0, CHANGELOG, ТЗ к выпуску, L0–L5, Firmware в CI, тег `v0.10.0`.
 
-### Согласованный состав 0.10.1 — реализация
+### Согласованный состав 0.10.1 — выпущено
 
-Текущая ветка: `codex/release-0.10.1`, от main `432d13b`.
-Git-диагностика слита; на 432d13b успешны Docs, Configure, Host, CI environment
-и Firmware (Windows 1:02, Linux 31:40). Готовятся версия 0.10.1, ТЗ 2.22,
-CHANGELOG и тексты docs/releases/v0.10.1.md / v0.10.1.en.md.
-После подписанного коммита владельца — полная локальная приёмка L0–L5,
-push и CI/Firmware того же SHA, land, тег и публикация. E009 до публикации
-имеет статус merged; E010 остаётся open. Выпуск ещё не принят.
+[Релиз v0.10.1](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/releases/tag/v0.10.1)
+опубликован 03.10.2026 (Asia/Yekaterinburg). Подписанный тег указывает на
+`fe649239e5a447276d1242e29044053a1801f611`; релизная ветка слита в main.
+ТЗ 2.22, CHANGELOG и тексты RU/EN включены в тег.
 
-Предварительно на рабочем дереве: 1506 Configure PASS в Docker volume,
-Linux unit 106/106, Windows unit 103 PASS + 3 skip, Windows Configure/Build
-и Host 34/34 PASS; Schema, справочник (100 страниц), сообщения и ТЗ PASS.
-Отчёты: build/release-0.10.1-preflight/reports.zip и build/release-0.10.1-windows/.
-Полный L0–L5 на подписанном релизном SHA не заменяется этим прогоном.
+Полная локальная приёмка L0–L5 на этом чистом SHA: 1506 Configure,
+618 сборок, 336 QEMU и 612 Renode PASS. Linux unit 106/106,
+Windows unit 103 PASS + 3 skip, Windows Configure/Build и Host 34/34 PASS;
+схема, справочник, сообщения и ТЗ PASS.
+Отчёты: `build/release-0.10.1-fe64923/acceptance-summary.json`;
+полный архив: `build/release-0.10.1-fe64923/reports/full-results.tar.gz`.
+
+Docs, Configure, Host и CI environment на main прошли для того же SHA.
+[Firmware по тегу](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/actions/runs/37063620662)
+успешен, включая Windows Configure/Build. E009 — released в 0.10.1;
+E010 остаётся open, TC-44 частичен.
+Текущая ветка: `codex/release-0.10.1-status` — фиксация факта выпуска
+в TODO и errata после публикации; подготовлено, ещё не слито.
 
 История предыдущего подэтапа:
 
@@ -603,21 +608,26 @@ at the end of each stage. Branches are merged by fast-forward (`git land`).
   path table and snippets from the CHANGELOG), reference cards marked
   0.10.0, CHANGELOG, release spec, L0–L5, Firmware in CI, tag `v0.10.0`.
 
-### Agreed 0.10.1 scope — implementation
+### Agreed 0.10.1 scope — released
 
-Current branch: `codex/release-0.10.1`, from main `432d13b`.
-Git diagnostics merged; Docs, Configure, Host, CI environment and Firmware
-passed on 432d13b (Windows 1:02, Linux 31:40). Preparing version 0.10.1,
-spec 2.22, changelogs and docs/releases/v0.10.1.md / v0.10.1.en.md.
-After the owner's signed commit: full local L0–L5 acceptance, push and
-CI/Firmware on that SHA, land, tag and publication. E009 stays merged until
-publication; E010 remains open. The release has not been accepted yet.
+[Release v0.10.1](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/releases/tag/v0.10.1)
+was published on 2026-10-03 (Asia/Yekaterinburg). The signed tag points to
+`fe649239e5a447276d1242e29044053a1801f611`; the release branch was merged into main.
+Spec 2.22, changelogs and RU/EN release notes are included in the tag.
 
-Working-tree preflight: 1506 Configure PASS in a Docker volume; Linux units
-106/106, Windows units 103 PASS + 3 skips; Windows Configure/Build and Host
-34/34 PASS. Schema, reference (100 pages), messages and spec checks passed.
-Reports: build/release-0.10.1-preflight/reports.zip and build/release-0.10.1-windows/.
-This does not replace full L0–L5 acceptance on the signed release SHA.
+Full local L0–L5 acceptance on that clean SHA: 1506 Configure,
+618 builds, 336 QEMU and 612 Renode checks PASS. Linux units 106/106,
+Windows units 103 PASS + 3 skips, Windows Configure/Build and Host 34/34 PASS;
+schema, reference, messages and spec checks PASS.
+Reports: `build/release-0.10.1-fe64923/acceptance-summary.json`;
+full archive: `build/release-0.10.1-fe64923/reports/full-results.tar.gz`.
+
+Docs, Configure, Host and CI environment passed on main for the same SHA.
+[Tag Firmware](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/actions/runs/37063620662)
+passed, including Windows Configure/Build. E009 is released in 0.10.1;
+E010 remains open and TC-44 remains partial.
+Current branch: `codex/release-0.10.1-status` — recording publication
+in TODO and errata; prepared, not merged yet.
 
 Previous substep history:
 
