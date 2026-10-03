@@ -12,9 +12,11 @@ on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 
 ## [Unreleased]
 
+- The IOC summary uses `[cfg]` instead of `[yml]` for YAML/TOML. Updated RU/EN and JSONL while preserving codes, levels, argument order and precedence; added TC-96 for profiles, overrides and alignment.
+
 - Fixed absolute files and directories in `sources`, including spaces and another Windows drive (E010). Added TC-95 and positive TC-44 build checks; relative paths and CMSIS startup/system replacement are preserved.
 
-- Documentation: approved the 0.10.2 plan and acceptance criteria in spec 2.23. The `[cfg]` label and TOML/include/Presets example are not implemented yet.
+- Documentation: approved the 0.10.2 plan and acceptance criteria in spec 2.23. The TOML/include/Presets example is not implemented yet.
 
 ## [0.10.1] - 2026-10-03
 

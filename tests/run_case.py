@@ -244,7 +244,7 @@ def verify(case, build, source):
                 require(f"-D{definition}" in command, f"{path}: missing {definition}")
 
 
-def verify_messages(expectation, build, catalog, normalized):
+def verify_messages(expectation, build, catalog, normalized, raw_output=None):
     """Spec 4.16.10, 4.16.12: records of the message file plus the catalog text in the log."""
     path = build / "stm32_yml_messages.jsonl"
     require(path.is_file(), "Missing stm32_yml_messages.jsonl")
@@ -258,6 +258,24 @@ def verify_messages(expectation, build, catalog, normalized):
         shown = f"[SCY-{code}] {text}" if expectation.get("message_codes") else text
         require(" ".join(shown.split()) in normalized, f"{code}: text is not in the log: {shown!r}")
     codes = [record["code"].removeprefix("SCY-") for record in records]
+
+    # TC-96: independently check source/value arguments and uncollapsed columns.
+    if "source_report" in expectation:
+        report = [r for r in records if r['code'] in {f'SCY-I{i:03d}' for i in range(20, 31)}]
+        actual = {r['code'].removeprefix('SCY-'): r['args'] for r in report}
+        require(len(actual) == len(report), "Duplicate final-report records")
+        require(actual == expectation['source_report'], f"Incorrect source report: {actual}")
+        require(raw_output is not None, "Source-report test needs the original log")
+        for r in report:
+            require(r['level'] == 'STATUS', "Final-report level changed")
+            require('[yml]' not in r['text'], "Legacy YAML source label in final report")
+            text = r['text']
+            if r['code'] == 'SCY-I020':
+                require(all(tag in text for tag in ('[cfg]', '[ioc]', '[auto]')), "Incomplete legend")
+            elif '[' in text:
+                require(text.index('[') == 14, f"Misaligned source column: {text!r}")
+            shown = f"[SCY-{r['code'].removeprefix('SCY-')}] {text}" if expectation.get('message_codes') else text
+            require('-- ' + shown in raw_output.splitlines(), f"Changed console spacing: {shown!r}")
 
     # Spec 4.16.11: 7xx texts for the CRC script in the Configure language.
     build_json = json.loads((build / "stm32_yml_build_messages.json").read_text(encoding="utf-8"))
@@ -484,7 +502,7 @@ def main():
             else:
                 require(result.returncode == 0, f"CMake returned {result.returncode}")
                 verify(expectation, build, source)
-            verify_messages(expectation, build, catalog, normalized)
+            verify_messages(expectation, build, catalog, normalized, raw_output=output)
             for target in expectation.get("build_targets", []) if "error" not in expectation else []:
                 # Spec 4.9.15, TC-72: the wrapper compiles with Arduino::Platform alone.
                 result = subprocess.run([args.cmake, "--build", str(build), "--target", target],

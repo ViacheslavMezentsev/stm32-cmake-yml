@@ -25,6 +25,21 @@ stm32_yml_msg(W002 "a" "b")
 
 
 class CheckMessages(unittest.TestCase):
+    def test_configuration_source_labels(self):
+        # TC-96: I026 is retained in the catalog even when normal false uses I030.
+        catalog = messages_catalog.load(ROOT / check_messages.CATALOG)
+        for lang in ('ru', 'en'):
+            with self.subTest(lang=lang):
+                legend = messages_catalog.render(catalog['I020'], lang, [])
+                disabled = messages_catalog.render(catalog['I026'], lang, [])
+                self.assertIn('[cfg]', legend)
+                self.assertIn('[cfg]', disabled)
+                self.assertNotIn('[yml]', legend + disabled)
+                self.assertNotIn('.yml', disabled)
+                self.assertEqual(disabled.index('[cfg]'), 14)
+                self.assertNotRegex(disabled, r'\{\d+\}')
+
+
     def tree(self, catalog=CATALOG, source=SOURCE, extra=None):
         directory = tempfile.TemporaryDirectory()
         self.addCleanup(directory.cleanup)

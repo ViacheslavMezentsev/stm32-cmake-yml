@@ -181,6 +181,10 @@
         "en": "docs/en/reference/0.9.2/project.md#ioc-file"
       },
       "tests": [
+        "configure.report-yml-ru",
+        "configure.report-yml-en",
+        "configure.report-toml-ru",
+        "configure.report-toml-en",
         "configure.ioc-bluepill-defaults",
         "configure.yaml-over-ioc",
         "configure.missing-ioc",

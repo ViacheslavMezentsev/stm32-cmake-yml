@@ -6880,5 +6880,681 @@
         }
       }
     ]
+  },
+  {
+    "name": "report-yml-ru",
+    "lang": "ru",
+    "message_lang": "ru",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=report.yml"
+    ],
+    "steps": [
+      {
+        "source_report": {
+          "I020": [],
+          "I021": [
+            "STM32F103C8T6",
+            "[cfg]"
+          ],
+          "I022": [
+            "freertos_ioc_probe",
+            "[ioc]"
+          ],
+          "I023": [
+            "V1.8.7",
+            "[ioc]"
+          ],
+          "I024": [
+            "512",
+            "[auto]"
+          ],
+          "I025": [
+            "1024",
+            "[ioc]"
+          ],
+          "I027": [
+            "[ioc]"
+          ],
+          "I028": [
+            "v1",
+            "[ioc]"
+          ],
+          "I029": [
+            "ARM_CM3, Heap::4",
+            "[auto]"
+          ]
+        }
+      },
+      {
+        "args": [
+          "-DSTM32_YML_PROFILE=Demo"
+        ],
+        "source_report": {
+          "I020": [],
+          "I021": [
+            "STM32F103C8T6",
+            "[cfg]"
+          ],
+          "I022": [
+            "freertos_ioc_probe",
+            "[ioc]"
+          ],
+          "I023": [
+            "V1.8.7",
+            "[ioc]"
+          ],
+          "I024": [
+            "1K",
+            "[cfg]"
+          ],
+          "I025": [
+            "2K",
+            "[cfg]"
+          ],
+          "I027": [
+            "[cfg]"
+          ],
+          "I028": [
+            "none",
+            "[cfg]"
+          ],
+          "I029": [
+            "ARM_CM3, Heap::2",
+            "[cfg]"
+          ]
+        },
+        "observed": {
+          "heap_size": "1K",
+          "stack_size": "2K",
+          "use_freertos": "TRUE",
+          "cmsis_rtos_api": "none"
+        }
+      },
+      {
+        "args": [
+          "-DSTM32_YML_OVERRIDE_heap_size=1536",
+          "-DSTM32_YML_OVERRIDE_use_freertos=false"
+        ],
+        "source_report": {
+          "I020": [],
+          "I021": [
+            "STM32F103C8T6",
+            "[cfg]"
+          ],
+          "I022": [
+            "freertos_ioc_probe",
+            "[ioc]"
+          ],
+          "I023": [
+            "V1.8.7",
+            "[ioc]"
+          ],
+          "I024": [
+            "1536",
+            "[cfg]"
+          ],
+          "I025": [
+            "2K",
+            "[cfg]"
+          ],
+          "I030": []
+        },
+        "observed": {
+          "heap_size": "1536",
+          "use_freertos": "false"
+        }
+      },
+      {
+        "args": [
+          "-DSTM32_YML_PROFILE=",
+          "-USTM32_YML_OVERRIDE_*"
+        ],
+        "source_report": {
+          "I020": [],
+          "I021": [
+            "STM32F103C8T6",
+            "[cfg]"
+          ],
+          "I022": [
+            "freertos_ioc_probe",
+            "[ioc]"
+          ],
+          "I023": [
+            "V1.8.7",
+            "[ioc]"
+          ],
+          "I024": [
+            "512",
+            "[auto]"
+          ],
+          "I025": [
+            "1024",
+            "[ioc]"
+          ],
+          "I027": [
+            "[ioc]"
+          ],
+          "I028": [
+            "v1",
+            "[ioc]"
+          ],
+          "I029": [
+            "ARM_CM3, Heap::4",
+            "[auto]"
+          ]
+        },
+        "observed": {
+          "heap_size": "512",
+          "use_freertos": "true"
+        }
+      }
+    ]
+  },
+  {
+    "name": "report-yml-en",
+    "lang": "en",
+    "message_lang": "en",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=report.yml"
+    ],
+    "steps": [
+      {
+        "source_report": {
+          "I020": [],
+          "I021": [
+            "STM32F103C8T6",
+            "[cfg]"
+          ],
+          "I022": [
+            "freertos_ioc_probe",
+            "[ioc]"
+          ],
+          "I023": [
+            "V1.8.7",
+            "[ioc]"
+          ],
+          "I024": [
+            "512",
+            "[auto]"
+          ],
+          "I025": [
+            "1024",
+            "[ioc]"
+          ],
+          "I027": [
+            "[ioc]"
+          ],
+          "I028": [
+            "v1",
+            "[ioc]"
+          ],
+          "I029": [
+            "ARM_CM3, Heap::4",
+            "[auto]"
+          ]
+        }
+      },
+      {
+        "args": [
+          "-DSTM32_YML_PROFILE=Demo"
+        ],
+        "source_report": {
+          "I020": [],
+          "I021": [
+            "STM32F103C8T6",
+            "[cfg]"
+          ],
+          "I022": [
+            "freertos_ioc_probe",
+            "[ioc]"
+          ],
+          "I023": [
+            "V1.8.7",
+            "[ioc]"
+          ],
+          "I024": [
+            "1K",
+            "[cfg]"
+          ],
+          "I025": [
+            "2K",
+            "[cfg]"
+          ],
+          "I027": [
+            "[cfg]"
+          ],
+          "I028": [
+            "none",
+            "[cfg]"
+          ],
+          "I029": [
+            "ARM_CM3, Heap::2",
+            "[cfg]"
+          ]
+        },
+        "observed": {
+          "heap_size": "1K",
+          "stack_size": "2K",
+          "use_freertos": "TRUE",
+          "cmsis_rtos_api": "none"
+        }
+      },
+      {
+        "args": [
+          "-DSTM32_YML_OVERRIDE_heap_size=1536",
+          "-DSTM32_YML_OVERRIDE_use_freertos=false"
+        ],
+        "source_report": {
+          "I020": [],
+          "I021": [
+            "STM32F103C8T6",
+            "[cfg]"
+          ],
+          "I022": [
+            "freertos_ioc_probe",
+            "[ioc]"
+          ],
+          "I023": [
+            "V1.8.7",
+            "[ioc]"
+          ],
+          "I024": [
+            "1536",
+            "[cfg]"
+          ],
+          "I025": [
+            "2K",
+            "[cfg]"
+          ],
+          "I030": []
+        },
+        "observed": {
+          "heap_size": "1536",
+          "use_freertos": "false"
+        }
+      },
+      {
+        "args": [
+          "-DSTM32_YML_PROFILE=",
+          "-USTM32_YML_OVERRIDE_*"
+        ],
+        "source_report": {
+          "I020": [],
+          "I021": [
+            "STM32F103C8T6",
+            "[cfg]"
+          ],
+          "I022": [
+            "freertos_ioc_probe",
+            "[ioc]"
+          ],
+          "I023": [
+            "V1.8.7",
+            "[ioc]"
+          ],
+          "I024": [
+            "512",
+            "[auto]"
+          ],
+          "I025": [
+            "1024",
+            "[ioc]"
+          ],
+          "I027": [
+            "[ioc]"
+          ],
+          "I028": [
+            "v1",
+            "[ioc]"
+          ],
+          "I029": [
+            "ARM_CM3, Heap::4",
+            "[auto]"
+          ]
+        },
+        "observed": {
+          "heap_size": "512",
+          "use_freertos": "true"
+        }
+      }
+    ]
+  },
+  {
+    "name": "report-toml-ru",
+    "lang": "ru",
+    "message_lang": "ru",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=report.toml"
+    ],
+    "steps": [
+      {
+        "source_report": {
+          "I020": [],
+          "I021": [
+            "STM32F103C8T6",
+            "[cfg]"
+          ],
+          "I022": [
+            "freertos_ioc_probe",
+            "[ioc]"
+          ],
+          "I023": [
+            "V1.8.7",
+            "[ioc]"
+          ],
+          "I024": [
+            "512",
+            "[auto]"
+          ],
+          "I025": [
+            "1024",
+            "[ioc]"
+          ],
+          "I027": [
+            "[ioc]"
+          ],
+          "I028": [
+            "v1",
+            "[ioc]"
+          ],
+          "I029": [
+            "ARM_CM3, Heap::4",
+            "[auto]"
+          ]
+        }
+      },
+      {
+        "args": [
+          "-DSTM32_YML_PROFILE=Demo"
+        ],
+        "source_report": {
+          "I020": [],
+          "I021": [
+            "STM32F103C8T6",
+            "[cfg]"
+          ],
+          "I022": [
+            "freertos_ioc_probe",
+            "[ioc]"
+          ],
+          "I023": [
+            "V1.8.7",
+            "[ioc]"
+          ],
+          "I024": [
+            "1K",
+            "[cfg]"
+          ],
+          "I025": [
+            "2K",
+            "[cfg]"
+          ],
+          "I027": [
+            "[cfg]"
+          ],
+          "I028": [
+            "none",
+            "[cfg]"
+          ],
+          "I029": [
+            "ARM_CM3, Heap::2",
+            "[cfg]"
+          ]
+        },
+        "observed": {
+          "heap_size": "1K",
+          "stack_size": "2K",
+          "use_freertos": "TRUE",
+          "cmsis_rtos_api": "none"
+        }
+      },
+      {
+        "args": [
+          "-DSTM32_YML_OVERRIDE_heap_size=1536",
+          "-DSTM32_YML_OVERRIDE_use_freertos=false"
+        ],
+        "source_report": {
+          "I020": [],
+          "I021": [
+            "STM32F103C8T6",
+            "[cfg]"
+          ],
+          "I022": [
+            "freertos_ioc_probe",
+            "[ioc]"
+          ],
+          "I023": [
+            "V1.8.7",
+            "[ioc]"
+          ],
+          "I024": [
+            "1536",
+            "[cfg]"
+          ],
+          "I025": [
+            "2K",
+            "[cfg]"
+          ],
+          "I030": []
+        },
+        "observed": {
+          "heap_size": "1536",
+          "use_freertos": "false"
+        }
+      },
+      {
+        "args": [
+          "-DSTM32_YML_PROFILE=",
+          "-USTM32_YML_OVERRIDE_*"
+        ],
+        "source_report": {
+          "I020": [],
+          "I021": [
+            "STM32F103C8T6",
+            "[cfg]"
+          ],
+          "I022": [
+            "freertos_ioc_probe",
+            "[ioc]"
+          ],
+          "I023": [
+            "V1.8.7",
+            "[ioc]"
+          ],
+          "I024": [
+            "512",
+            "[auto]"
+          ],
+          "I025": [
+            "1024",
+            "[ioc]"
+          ],
+          "I027": [
+            "[ioc]"
+          ],
+          "I028": [
+            "v1",
+            "[ioc]"
+          ],
+          "I029": [
+            "ARM_CM3, Heap::4",
+            "[auto]"
+          ]
+        },
+        "observed": {
+          "heap_size": "512",
+          "use_freertos": "true"
+        }
+      }
+    ]
+  },
+  {
+    "name": "report-toml-en",
+    "lang": "en",
+    "message_lang": "en",
+    "args": [
+      "-DPROJECT_CONFIG_FILE=report.toml"
+    ],
+    "steps": [
+      {
+        "source_report": {
+          "I020": [],
+          "I021": [
+            "STM32F103C8T6",
+            "[cfg]"
+          ],
+          "I022": [
+            "freertos_ioc_probe",
+            "[ioc]"
+          ],
+          "I023": [
+            "V1.8.7",
+            "[ioc]"
+          ],
+          "I024": [
+            "512",
+            "[auto]"
+          ],
+          "I025": [
+            "1024",
+            "[ioc]"
+          ],
+          "I027": [
+            "[ioc]"
+          ],
+          "I028": [
+            "v1",
+            "[ioc]"
+          ],
+          "I029": [
+            "ARM_CM3, Heap::4",
+            "[auto]"
+          ]
+        }
+      },
+      {
+        "args": [
+          "-DSTM32_YML_PROFILE=Demo"
+        ],
+        "source_report": {
+          "I020": [],
+          "I021": [
+            "STM32F103C8T6",
+            "[cfg]"
+          ],
+          "I022": [
+            "freertos_ioc_probe",
+            "[ioc]"
+          ],
+          "I023": [
+            "V1.8.7",
+            "[ioc]"
+          ],
+          "I024": [
+            "1K",
+            "[cfg]"
+          ],
+          "I025": [
+            "2K",
+            "[cfg]"
+          ],
+          "I027": [
+            "[cfg]"
+          ],
+          "I028": [
+            "none",
+            "[cfg]"
+          ],
+          "I029": [
+            "ARM_CM3, Heap::2",
+            "[cfg]"
+          ]
+        },
+        "observed": {
+          "heap_size": "1K",
+          "stack_size": "2K",
+          "use_freertos": "TRUE",
+          "cmsis_rtos_api": "none"
+        }
+      },
+      {
+        "args": [
+          "-DSTM32_YML_OVERRIDE_heap_size=1536",
+          "-DSTM32_YML_OVERRIDE_use_freertos=false"
+        ],
+        "source_report": {
+          "I020": [],
+          "I021": [
+            "STM32F103C8T6",
+            "[cfg]"
+          ],
+          "I022": [
+            "freertos_ioc_probe",
+            "[ioc]"
+          ],
+          "I023": [
+            "V1.8.7",
+            "[ioc]"
+          ],
+          "I024": [
+            "1536",
+            "[cfg]"
+          ],
+          "I025": [
+            "2K",
+            "[cfg]"
+          ],
+          "I030": []
+        },
+        "observed": {
+          "heap_size": "1536",
+          "use_freertos": "false"
+        }
+      },
+      {
+        "args": [
+          "-DSTM32_YML_PROFILE=",
+          "-USTM32_YML_OVERRIDE_*"
+        ],
+        "source_report": {
+          "I020": [],
+          "I021": [
+            "STM32F103C8T6",
+            "[cfg]"
+          ],
+          "I022": [
+            "freertos_ioc_probe",
+            "[ioc]"
+          ],
+          "I023": [
+            "V1.8.7",
+            "[ioc]"
+          ],
+          "I024": [
+            "512",
+            "[auto]"
+          ],
+          "I025": [
+            "1024",
+            "[ioc]"
+          ],
+          "I027": [
+            "[ioc]"
+          ],
+          "I028": [
+            "v1",
+            "[ioc]"
+          ],
+          "I029": [
+            "ARM_CM3, Heap::4",
+            "[auto]"
+          ]
+        },
+        "observed": {
+          "heap_size": "512",
+          "use_freertos": "true"
+        }
+      }
+    ]
   }
 ]

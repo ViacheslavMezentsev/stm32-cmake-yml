@@ -18,15 +18,26 @@ PR больше не требуются; старые ссылки остают�
 ### 0.10.2 — согласованный состав
 
 База: выпущенная [0.10.1](docs/releases/v0.10.1.md), main `cff041c`.
-План и ТЗ 2.23 слиты: `cfa52c6`. Текущая ветка: `codex/absolute-sources`;
-исправление E010 и ТЗ 2.24 подготовлены, ещё не слито.
+План и ТЗ 2.23 слиты: `cfa52c6`. Исправление E010 и ТЗ 2.24 слиты: `8624bae`;
+Docs, Configure, Host, CI environment и Firmware для этого SHA прошли.
+Текущая ветка: `codex/config-source-label`; `[cfg]` и ТЗ 2.25 подготовлены,
+ещё не слито. Полная локальная приёмка L0–L5 PASS: 1554 Configure,
+618 сборок, 336 QEMU + 612 Renode; Linux unit 107/107, проверки эмуляторов 6/6.
+Windows TC-44 и Host 34/34 PASS (27 с). Отчёты:
+`build/cfg-stage/acceptance-summary.json`, `build/cfg-windows/summary.json`;
+архив L3–L5 — `build/cfg-stage/full-results.tar.gz` (локальные, не входят в Git).
+Снимок рабочего дерева от `8624bae`; код и тесты после снимка не менялись.
+CI нового подписанного коммита ещё впереди.
+
+Результаты предыдущего этапа E010:
 Локальная приёмка L0–L5 PASS: 1530 Configure, 618 сборок, 336 QEMU + 612 Renode;
 Linux unit 106/106, проверки эмуляторов 6/6. Нативный Windows TC-44 PASS:
 5 сценариев и Host 34/34, tc44_complete=true (24 с). Отчёты:
 `build/absolute-stage/acceptance-summary.json`, `build/absolute-windows/summary.json`;
 полные Linux-логи — `build/absolute-stage/full-results.tar.gz` (локальные,
 не входят в Git). Проверялся снимок рабочего дерева от `cfa52c6`; runtime-код
-и тесты после снимка не менялись. CI на подписанном коммите ещё впереди.
+и тесты до коммита E010 после снимка не менялись. CI коммита `8624bae`
+затем прошёл (Firmware run 37133257759).
 Версия кода пока 0.10.1. Следующие ветки выполняются последовательно:
 
 | Шаг / ветка | Результат | Проверка перед завершением |
@@ -37,7 +48,7 @@ Linux unit 106/106, проверки эмуляторов 6/6. Нативный 
 | 4. `codex/roadmap-refresh` | Сверка выполненных и отложенных пунктов TODO RU/EN | Ссылки на код/тесты/решения; история отдельно от актуальных обязательств |
 | 5. `codex/release-0.10.2` | Версия, CHANGELOG, справочник/errata и релизный текст | Полный локальный L0–L5 и CI на итоговом подписанном SHA |
 
-- [ ] Слить исправление E010: fixed в рабочей ветке, TC-44 локально PASS; не выпущено.
+- [x] Исправление E010 слито: `8624bae`, TC-44 и Firmware PASS; не выпущено.
 - [ ] Ввести `[cfg]`, сохранив приоритеты и имена `STM32_YML_*`.
 - [ ] Добавить публичный пример и проверки, сохранив YAML-пример.
 - [ ] Сверить старые пункты дорожной карты на обоих языках.
@@ -492,15 +503,26 @@ keep defect details in errata.
 ### 0.10.2 — approved scope
 
 Baseline: published [0.10.1](docs/releases/v0.10.1.md), main `cff041c`.
-Plan and spec 2.23 merged: `cfa52c6`. Current branch: `codex/absolute-sources`;
-E010 fix and spec 2.24 prepared, not merged yet. Local L0–L5 acceptance PASS:
+Plan and spec 2.23 merged: `cfa52c6`. E010 fix and spec 2.24 merged: `8624bae`;
+Docs, Configure, Host, CI environment and Firmware passed for that SHA.
+Current branch: `codex/config-source-label`; `[cfg]` and spec 2.25 prepared,
+not merged yet. Full local L0–L5 acceptance PASS: 1554 Configure, 618 builds,
+336 QEMU + 612 Renode; Linux units 107/107, emulation checks 6/6.
+Windows TC-44 and Host 34/34 PASS (27 s). Reports:
+`build/cfg-stage/acceptance-summary.json`, `build/cfg-windows/summary.json`;
+L3–L5 archive: `build/cfg-stage/full-results.tar.gz` (local, not tracked).
+The working-tree snapshot is based on `8624bae`; code and tests are unchanged
+since that snapshot. CI for the new signed commit is pending.
+
+Previous E010 stage results: local L0–L5 acceptance PASS:
 1530 Configure, 618 builds, 336 QEMU + 612 Renode; Linux units 106/106,
 emulation checks 6/6. Native Windows TC-44 PASS: 5 cases and Host 34/34,
 tc44_complete=true (24 s). Reports: `build/absolute-stage/acceptance-summary.json`,
 `build/absolute-windows/summary.json`; full Linux logs:
 `build/absolute-stage/full-results.tar.gz` (local, not tracked).
-The tested working-tree snapshot is based on `cfa52c6`; runtime code and tests
-have not changed since that snapshot. CI on the signed commit is pending.
+The E010 working-tree snapshot was based on `cfa52c6`; runtime code and tests
+were unchanged between the snapshot and the E010 commit. CI for `8624bae`
+subsequently passed (Firmware run 37133257759).
 Runtime version remains 0.10.1. Subsequent branches are sequential:
 
 | Step / branch | Deliverable | Checks before completion |
@@ -511,7 +533,7 @@ Runtime version remains 0.10.1. Subsequent branches are sequential:
 | 4. `codex/roadmap-refresh` | Reconcile completed and deferred TODO items in RU/EN | Links to code/tests/decisions; separate history from current commitments |
 | 5. `codex/release-0.10.2` | Version, CHANGELOG, reference/errata and release text | Full local L0–L5 and CI on the final signed SHA |
 
-- [ ] Merge E010 fix: fixed in the working branch, local TC-44 PASS; not released.
+- [x] E010 fix merged: `8624bae`, TC-44 and Firmware PASS; not released.
 - [ ] Introduce `[cfg]`, preserving precedence and `STM32_YML_*` names.
 - [ ] Add the public example and checks while retaining the YAML example.
 - [ ] Reconcile historical roadmap items in both languages.

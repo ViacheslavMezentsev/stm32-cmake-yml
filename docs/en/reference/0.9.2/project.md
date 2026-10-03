@@ -99,6 +99,16 @@ Path relative to the project root. IOC supplies MCU, name, heap/stack, Cube FW a
 
 **Omission and emptiness:** see [shared rules](semantics.md#empty-values); exceptions are stated above. Profiles/overrides apply before defaults. Backend/path restrictions are stated in the description.
 
+**Prepared for 0.10.2** (spec 4.4.5, TC-96): the IOC summary uses `[cfg]`
+instead of `[yml]` for YAML/TOML configuration values, including profiles and
+CMake overrides. `[ioc]` and `[auto]` remain. Source labels precede values in
+one aligned RU/EN column. Codes, levels, JSONL argument order and value selection
+rules are unchanged; only the label and related wording change. `STM32_YML_*`
+names remain. The ordinary disabled FreeRTOS row (I030) still has no label;
+I026 is retained with format-neutral catalog wording.
+
+Checks: `configure.report-yml-ru`, `configure.report-yml-en`, `configure.report-toml-ru`, `configure.report-toml-en`.
+
 ```yaml
 ioc_file: bluepill-hsi.ioc
 ```

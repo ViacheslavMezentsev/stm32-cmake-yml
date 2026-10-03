@@ -42,13 +42,13 @@
 | `SCY-I012` | STATUS | Defines только для C: {1} |
 | `SCY-I013` | STATUS | Флаги только для C++: {1} |
 | `SCY-I014` | STATUS | Defines только для C++: {1} |
-| `SCY-I020` | STATUS | Итоговые параметры проекта (источник: \[yml\]=конфиг / \[ioc\]=CubeMX / \[auto\]=авто): |
+| `SCY-I020` | STATUS | Итоговые параметры проекта (источник: \[cfg\]=конфиг / \[ioc\]=CubeMX / \[auto\]=авто): |
 | `SCY-I021` | STATUS | MCU:        {2} {1} |
 | `SCY-I022` | STATUS | Проект:     {2} {1} |
 | `SCY-I023` | STATUS | CubeFW:     {2} {1} |
 | `SCY-I024` | STATUS | Heap Size:  {2} {1} байт |
 | `SCY-I025` | STATUS | Stack Size: {2} {1} байт |
-| `SCY-I026` | STATUS | FreeRTOS:   \[yml\] ОТКЛЮЧЕН (переопределено в .yml) |
+| `SCY-I026` | STATUS | FreeRTOS:   \[cfg\] ОТКЛЮЧЕН (переопределено в конфигурации) |
 | `SCY-I027` | STATUS | FreeRTOS:   {1} Включен |
 | `SCY-I028` | STATUS | API:      {2} {1} |
 | `SCY-I029` | STATUS | Порт:     {2} {1} |

@@ -72,9 +72,9 @@ function(stm32_yml_prepare_project_data OUT_PROJECT_NAME_VAR OUT_LANGUAGES_VAR)
         stm32_yml_apply_profile("${CONFIG_FILE_PATH}")
     endif()
 
-    # Сохраняем значения, явно заданные пользователем в .yml, до того как
-    # override-логика и ensure_default_value могут их изменить.
-    # Используются хелпером _stm32_yml_src для расстановки меток [yml]/[ioc]/[auto].
+    # Сохраняем значения, после загрузки YAML/TOML, профиля и CMake-overrides,
+    # до дополнения из IOC и применения defaults.
+    # Используются хелпером _stm32_yml_src для расстановки меток [cfg]/[ioc]/[auto].
     set(_YAML_mcu                "${mcu}")
     set(_YAML_project_name       "${project_name}")
     set(_YAML_heap_size          "${heap_size}")
@@ -101,13 +101,13 @@ function(stm32_yml_prepare_project_data OUT_PROJECT_NAME_VAR OUT_LANGUAGES_VAR)
     endmacro()
 
     # Хелпер: определяет и возвращает метку источника значения переменной.
-    # yml_raw  — значение, пришедшее из YAML (до override-логики)
+    # yml_raw  — значение конфигурации после профиля/override, до IOC/defaults
     # ioc_raw  — значение, пришедшее из .ioc
     # final    — итоговое значение
     # out_var  — имя переменной, в которую запишется метка
     macro(_stm32_yml_src yml_raw ioc_raw final out_var)
         if(NOT "${yml_raw}" STREQUAL "" AND "${final}" STREQUAL "${yml_raw}")
-            set(${out_var} "[yml]")
+            set(${out_var} "[cfg]")
         elseif(NOT "${ioc_raw}" STREQUAL "" AND "${final}" STREQUAL "${ioc_raw}")
             set(${out_var} "[ioc]")
         else()
@@ -225,11 +225,10 @@ function(stm32_yml_prepare_project_data OUT_PROJECT_NAME_VAR OUT_LANGUAGES_VAR)
         endif()
 
         # =======================================================
-        # Итоговая таблица: значения + источник [yml]/[ioc]/[auto]
+        # Итоговая таблица: значения + источник [cfg]/[ioc]/[auto]
         # =======================================================
-        # Сохраняем «сырые» значения YAML для определения источника.
-        # После блока override-логики (патч задачи 4) переменные уже итоговые,
-        # а YAML_RAW_* — то, что было явно задано пользователем в .yml.
+        # Используем сохранённые значения конфигурации для определения источника.
+        # _YAML_* включают профиль/override, но ещё не включают IOC/defaults.
         set(_yml_raw_mcu            "${_YAML_mcu}")
         set(_yml_raw_project_name   "${_YAML_project_name}")
         set(_yml_raw_heap_size      "${_YAML_heap_size}")
@@ -254,10 +253,10 @@ function(stm32_yml_prepare_project_data OUT_PROJECT_NAME_VAR OUT_LANGUAGES_VAR)
 
         if(use_freertos)
             # Источник самого флага use_freertos определяем явно: булевы значения
-            # из yml ("true") и из .ioc ("TRUE") различаются регистром, поэтому
+            # из конфигурации ("true") и из .ioc ("TRUE") различаются регистром, поэтому
             # обобщённый хелпер _stm32_yml_src здесь дал бы ложный [auto].
             if(NOT "${_yml_raw_freertos}" STREQUAL "")
-                set(_src_freertos_flag "[yml]")
+                set(_src_freertos_flag "[cfg]")
             elseif(IOC_USE_FREERTOS)
                 set(_src_freertos_flag "[ioc]")
             else()

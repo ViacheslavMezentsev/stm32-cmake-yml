@@ -119,8 +119,8 @@ stm32_yml_msg_def(I014
     "Defines только для C++: {1}"
     "C++-only defines: {1}")
 stm32_yml_msg_def(I020
-    "Итоговые параметры проекта (источник: [yml]=конфиг / [ioc]=CubeMX / [auto]=авто):"
-    "Final project parameters (source: [yml]=configuration / [ioc]=CubeMX / [auto]=automatic):")
+    "Итоговые параметры проекта (источник: [cfg]=конфиг / [ioc]=CubeMX / [auto]=авто):"
+    "Final project parameters (source: [cfg]=configuration / [ioc]=CubeMX / [auto]=automatic):")
 stm32_yml_msg_def(I021
     "  MCU:        {2} {1}"
     "  MCU:        {2} {1}")
@@ -137,8 +137,8 @@ stm32_yml_msg_def(I025
     "  Stack Size: {2} {1} байт"
     "  Stack Size: {2} {1} bytes")
 stm32_yml_msg_def(I026
-    "  FreeRTOS:   [yml] ОТКЛЮЧЕН (переопределено в .yml)"
-    "  FreeRTOS:   [yml] DISABLED (overridden in .yml)")
+    "  FreeRTOS:   [cfg] ОТКЛЮЧЕН (переопределено в конфигурации)"
+    "  FreeRTOS:   [cfg] DISABLED (overridden in configuration)")
 stm32_yml_msg_def(I027
     "  FreeRTOS:   {1} Включен"
     "  FreeRTOS:   {1} Enabled")
