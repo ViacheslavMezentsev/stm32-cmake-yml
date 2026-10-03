@@ -4,7 +4,7 @@
 
 ## Русский
 
-Состояние на 2026-10-03. Текущий согласованный состав — 0.10.2; ниже также
+Состояние на 2026-10-04. Текущий согласованный состав — 0.10.2; ниже также
 сохранена история пяти первоначальных этапов. Это план, а не обещание сроков
 или поддерживаемых функций.
 Приоритет — Configure/Generate и совместимость существующих проектов.
@@ -20,14 +20,18 @@ PR больше не требуются; старые ссылки остают�
 База: выпущенная [0.10.1](docs/releases/v0.10.1.md), main `cff041c`.
 План и ТЗ 2.23 слиты: `cfa52c6`. Исправление E010 и ТЗ 2.24 слиты: `8624bae`;
 Docs, Configure, Host, CI environment и Firmware для этого SHA прошли.
-Текущая ветка: `codex/config-source-label`; `[cfg]` и ТЗ 2.25 подготовлены,
-ещё не слито. Полная локальная приёмка L0–L5 PASS: 1554 Configure,
+`[cfg]` и ТЗ 2.25 слиты в main: `37fec5c`.
+Текущая ветка: `codex/plan-0.10.3` — только план и актуализация статуса.
+Следующий функциональный этап 0.10.2: `codex/toml-presets-example`.
+Полная локальная приёмка этапа `[cfg]` L0–L5 PASS: 1554 Configure,
 618 сборок, 336 QEMU + 612 Renode; Linux unit 107/107, проверки эмуляторов 6/6.
 Windows TC-44 и Host 34/34 PASS (27 с). Отчёты:
 `build/cfg-stage/acceptance-summary.json`, `build/cfg-windows/summary.json`;
 архив L3–L5 — `build/cfg-stage/full-results.tar.gz` (локальные, не входят в Git).
 Снимок рабочего дерева от `8624bae`; код и тесты после снимка не менялись.
-CI нового подписанного коммита ещё впереди.
+Docs, Configure и Host для `37fec5c` прошли;
+[Firmware](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/actions/runs/37138612419)
+также прошёл, включая Windows TC-44; артефакты отчётов доступны.
 
 Результаты предыдущего этапа E010:
 Локальная приёмка L0–L5 PASS: 1530 Configure, 618 сборок, 336 QEMU + 612 Renode;
@@ -49,16 +53,52 @@ Linux unit 106/106, проверки эмуляторов 6/6. Нативный 
 | 5. `codex/release-0.10.2` | Версия, CHANGELOG, справочник/errata и релизный текст | Полный локальный L0–L5 и CI на итоговом подписанном SHA |
 
 - [x] Исправление E010 слито: `8624bae`, TC-44 и Firmware PASS; не выпущено.
-- [ ] Ввести `[cfg]`, сохранив приоритеты и имена `STM32_YML_*`.
+- [x] Ввести `[cfg]`, сохранив приоритеты и имена `STM32_YML_*`: `37fec5c`.
 - [ ] Добавить публичный пример и проверки, сохранив YAML-пример.
 - [ ] Сверить старые пункты дорожной карты на обоих языках.
 - [ ] Пройти приёмку и выпустить 0.10.2.
 
 Локальные проверки выполняются до push; полный L0–L5 — при завершении
 функционального этапа. Владелец выполняет push, ручной Firmware на границах
-этапов, `git land`, тег и выпуск. После push этой функциональной ветки нужен ручной Firmware.
+этапов, `git land`, тег и выпуск. Для текущей ветки плана достаточно проверки
+документации; повторный Firmware не требуется.
 Вне состава: периферия RCC/PWR (TC-86), расширение Arduino runtime и матрицы MCU,
 USBDevice/VirtIO/CMSIS_DSP, GitLab-пример TC-53 и дополнительная оптимизация CI.
+
+### 0.10.3 — совместимость Arduino Core в режиме native
+
+Согласовано 2026-10-04. Это отдельный будущий этап; состав 0.10.2 не расширяется.
+Пока подтверждена только закреплённая версия Core 2.12.0. Цель — исследовать
+и адаптировать `native` для всех стабильных тегов от **2.9.0 до последнего**.
+По [списку тегов Arduino Core](https://github.com/stm32duino/Arduino_Core_STM32/tags)
+на дату планирования это **2.9.0, 2.10.0, 2.10.1, 2.11.0, 2.12.0 и 3.0.0**.
+Перед началом этапа список сверяется заново; верхняя граница и SHA каждого тега
+фиксируются в плане и lock-файле. CI не должен загружать плавающий `latest`.
+Предварительные релизы рассматриваются отдельно от стабильного диапазона.
+
+- [ ] **Аудит и ТЗ:** сравнить CMake API, boards/variants, имена целей, CMSIS,
+  startup/linker и флаги всех выбранных тегов. Установить, присутствует ли native
+  CMake в 2.9.0; отсутствие API нельзя скрывать переключением на `wrappers`.
+  Отдельно оценить переход на 3.x. Оформить требования, TC и ревизию ТЗ до кода.
+- [ ] **Параметризация и адаптация:** убрать привязку тестов к каталогу 2.12.0,
+  закрепить независимые исходники Core; выбирать адаптер по проверенным
+  возможностям/API, с понятной диагностикой неподдерживаемой структуры.
+  Не модифицировать Core и не загружать зависимости на этапе Configure.
+- [ ] **Регрессии:** для каждого тега проверить Configure/Generate, выбор платы,
+  оба значения `use_core_main`, пути CMSIS, цели/флаги и минимальную сборку.
+  Проверить отсутствие регрессии `wrappers` на текущей закреплённой базе.
+- [ ] **Экономичная матрица:** каждый тег — одна закреплённая пара GCC/CMake;
+  полный набор пар — для базовой версии Core. Добавлять пары по обнаруженным
+  различиям и рискам; измерить длительность до включения в постоянный CI.
+  Запуски в симуляторах — только для совместимых сценариев; успешная сборка
+  не подтверждает работу периферии, штатной инициализации или всей версии Core.
+- [ ] **Приёмка и документация:** таблица точных проверенных тегов/SHA, режимов,
+  плат и ограничений RU/EN; локальные проверки до push, полный L0–L5 в конце
+  этапа и ручной Firmware. Не объявлять весь диапазон поддержанным по проверке
+  только его границ. Неподдерживаемые теги — явное ограничение и отдельное решение.
+
+Детальный состав 0.10.3 утверждается после аудита. Расширение MCU, периферии и
+дополнительных библиотек Core не включается автоматически в этот этап.
 
 ### История первоначальных этапов
 
@@ -489,7 +529,7 @@ RU/EN. Не добавлять новые ветки тестирования п
 
 ## English
 
-Status as of 2026-10-03. The approved current scope is 0.10.2; the five original
+Status as of 2026-10-04. The approved current scope is 0.10.2; the five original
 stages below are retained as history.
 The priority is Configure/Generate and compatibility with existing consumers.
 New workflow: working branch → local checks → push and CI → merge into main.
@@ -505,14 +545,18 @@ keep defect details in errata.
 Baseline: published [0.10.1](docs/releases/v0.10.1.md), main `cff041c`.
 Plan and spec 2.23 merged: `cfa52c6`. E010 fix and spec 2.24 merged: `8624bae`;
 Docs, Configure, Host, CI environment and Firmware passed for that SHA.
-Current branch: `codex/config-source-label`; `[cfg]` and spec 2.25 prepared,
-not merged yet. Full local L0–L5 acceptance PASS: 1554 Configure, 618 builds,
+`[cfg]` and spec 2.25 merged into main: `37fec5c`.
+Current branch: `codex/plan-0.10.3` — planning and status updates only.
+Next functional 0.10.2 stage: `codex/toml-presets-example`.
+Full local L0–L5 acceptance for the `[cfg]` stage PASS: 1554 Configure, 618 builds,
 336 QEMU + 612 Renode; Linux units 107/107, emulation checks 6/6.
 Windows TC-44 and Host 34/34 PASS (27 s). Reports:
 `build/cfg-stage/acceptance-summary.json`, `build/cfg-windows/summary.json`;
 L3–L5 archive: `build/cfg-stage/full-results.tar.gz` (local, not tracked).
 The working-tree snapshot is based on `8624bae`; code and tests are unchanged
-since that snapshot. CI for the new signed commit is pending.
+since that snapshot. Docs, Configure and Host passed for `37fec5c`;
+[Firmware](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/actions/runs/37138612419)
+also passed, including Windows TC-44; report artifacts are available.
 
 Previous E010 stage results: local L0–L5 acceptance PASS:
 1530 Configure, 618 builds, 336 QEMU + 612 Renode; Linux units 106/106,
@@ -534,16 +578,53 @@ Runtime version remains 0.10.1. Subsequent branches are sequential:
 | 5. `codex/release-0.10.2` | Version, CHANGELOG, reference/errata and release text | Full local L0–L5 and CI on the final signed SHA |
 
 - [x] E010 fix merged: `8624bae`, TC-44 and Firmware PASS; not released.
-- [ ] Introduce `[cfg]`, preserving precedence and `STM32_YML_*` names.
+- [x] Introduce `[cfg]`, preserving precedence and `STM32_YML_*` names: `37fec5c`.
 - [ ] Add the public example and checks while retaining the YAML example.
 - [ ] Reconcile historical roadmap items in both languages.
 - [ ] Complete acceptance and publish 0.10.2.
 
 Run local checks before push and full L0–L5 at the end of each functional stage.
 The owner performs push, manual Firmware at stage boundaries, `git land`, tagging
-and publication. This functional branch requires manual Firmware after push.
+and publication. The current planning branch needs documentation validation;
+another Firmware run is not required.
 Out of scope: RCC/PWR peripherals (TC-86), additional Arduino runtime and MCU
 matrix coverage, USBDevice/VirtIO/CMSIS_DSP, the GitLab example TC-53 and further CI optimization.
+
+### 0.10.3 — Arduino Core native compatibility
+
+Agreed on 2026-10-04. This is a separate future stage; 0.10.2 scope is unchanged.
+Only pinned Core 2.12.0 is currently verified. The goal is to investigate and
+adapt `native` for every stable tag from **2.9.0 through the latest**.
+The [Arduino Core tag list](https://github.com/stm32duino/Arduino_Core_STM32/tags)
+at planning time contains **2.9.0, 2.10.0, 2.10.1, 2.11.0, 2.12.0 and 3.0.0**.
+Recheck the list when the stage starts; record the upper bound and each tag's
+SHA in the plan and lock file. CI must not download a floating `latest`.
+Consider prereleases separately from the stable range.
+
+- [ ] **Audit and specification:** compare CMake APIs, boards/variants, target
+  names, CMSIS, startup/linker and flags across all selected tags. Establish
+  whether 2.9.0 provides native CMake; do not hide a missing API by switching
+  to `wrappers`. Assess the 3.x transition separately. Define requirements,
+  test cases and a spec revision before changing code.
+- [ ] **Parameterization and adaptation:** remove the tests' fixed 2.12.0 path,
+  pin independent Core sources, and select adapters by verified capabilities/API
+  with clear diagnostics for unsupported layouts. Do not modify Core or fetch
+  dependencies during Configure.
+- [ ] **Regressions:** for every tag check Configure/Generate, board selection,
+  both `use_core_main` values, CMSIS paths, targets/flags and a minimal build.
+  Check `wrappers` for regressions on the current pinned baseline.
+- [ ] **Economical matrix:** one pinned GCC/CMake pair per tag; the full set of
+  pairs for the baseline Core. Add pairs based on observed differences and risks;
+  measure duration before enabling ongoing CI. Run simulators only for compatible
+  scenarios; a successful build does not establish peripheral support, standard
+  initialization or compatibility with every feature of that Core release.
+- [ ] **Acceptance and documentation:** RU/EN table of exact tested tags/SHAs,
+  modes, boards and limitations; local checks before push, full L0–L5 at stage
+  completion and manual Firmware. Do not claim range compatibility from testing
+  only its endpoints. Record unsupported tags explicitly for a separate decision.
+
+Finalize the detailed 0.10.3 scope after the audit. Additional MCU families,
+peripherals and Core libraries are not automatically included in this stage.
 
 ### History of the original stages
 
