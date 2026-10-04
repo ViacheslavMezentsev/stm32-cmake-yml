@@ -22,4 +22,4 @@ Addition for 0.10.0, checked 2026-10-02.
 | ID | Issue | Status |
 | --- | --- | --- |
 | [E009](E009.md) | Python CRC/BIN diagnostic encoding | Fixed in 0.10.1 |
-| [E010](E010.md) | Absolute sources on another drive | Fixed in main; intended for 0.10.2, not released |
+| [E010](E010.md) | Absolute sources on another drive | Released in 0.10.2 |

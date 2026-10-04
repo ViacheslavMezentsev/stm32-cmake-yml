@@ -140,4 +140,4 @@ from a clean build directory. YAML/TOML precedence is unchanged. Absolute
 relative paths need no migration. Scripts parsing report text must expect `[cfg]`
 instead of `[yml]`; message codes and variable names remain unchanged.
 [TOML/include/Presets](presets.md) is an additional example, not a mandatory migration.
-[Release notes](../releases/v0.10.2.en.md); publication is still pending.
+[Release notes](../releases/v0.10.2.en.md) · [GitHub Release](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/releases/tag/v0.10.2).

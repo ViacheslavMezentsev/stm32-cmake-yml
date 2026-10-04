@@ -4,7 +4,7 @@
 
 ## Русский
 
-Состояние на 2026-10-04. Текущий согласованный состав — 0.10.2; ниже также
+Состояние на 2026-10-04. Выпущена 0.10.2; следующий согласованный этап — 0.10.3; ниже также
 сохранена история пяти первоначальных этапов. Это план, а не обещание сроков
 или поддерживаемых функций.
 Приоритет — Configure/Generate и совместимость существующих проектов.
@@ -15,7 +15,7 @@ PR больше не требуются; старые ссылки остают�
 локальные проверки не означают слияния или выпуска. Обновляйте статусы и ссылки
 на коммиты/ветки вместе с выполнением работы; подробности дефектов храните в errata.
 
-### 0.10.2 — согласованный состав
+### 0.10.2 — выпущено
 
 База: выпущенная [0.10.1](docs/releases/v0.10.1.md), main `cff041c`.
 План и ТЗ 2.23 слиты: `cfa52c6`. Исправление E010 и ТЗ 2.24 слиты: `8624bae`;
@@ -26,12 +26,19 @@ Docs, Configure, Host, CI environment и Firmware для этого SHA прош
 Docs, Configure, Host и [Firmware](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/actions/runs/37150032121)
 для этого SHA прошли, включая Windows TC-44; отчёты доступны в артефактах.
 Сверка дорожной карты слита: `c883928`, Docs PASS.
-Текущая ветка: `codex/release-0.10.2`; версия и релизные файлы подготовлены.
-Предварительные проверки PASS: 108 Linux unit-тестов, 55 Configure-сценариев
-на паре по умолчанию, схема, сообщения, документация и строгая проверка ТЗ.
-Логи: `build/release-0102-precheck/`. Полная локальная приёмка и CI итогового
-подписанного SHA, тег и публикация ещё впереди. Сначала коммит владельца, затем
-полный локальный прогон, после него push. E010 пока fixed, не released.
+Релиз [v0.10.2](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/releases/tag/v0.10.2) опубликован 2026-10-04.
+Подписанный тег указывает на `3333d0bf3599ef0f51f94f11864f91d46ceb1848`.
+На этом чистом подписанном SHA локально прошли L0–L5: 1590 Configure,
+618 сборок, 336 QEMU + 612 Renode; Linux unit 108/108, проверки эмуляторов 6/6,
+Windows unit 105 PASS / 3 POSIX-only skips, TC-44 и Host 34/34 PASS.
+Локальные отчёты: `build/release-0.10.2-3333d0b/acceptance-summary.json`,
+`full-results.tar.gz` и `windows/summary.json` в том же каталоге (не входят в Git).
+Docs, Configure, Host, CI environment и Firmware на релизном SHA прошли.
+[Firmware тега](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/actions/runs/37162298740):
+Windows и smoke PASS, отчёты сохранены; badge skipped. E010 — released в 0.10.2.
+Текущая ветка: `codex/release-0.10.2-status` — документальная фиксация выпуска.
+
+Результаты предыдущего этапа TOML:
 Полная локальная приёмка PASS: 1590 Configure, 618 сборок, 336 QEMU + 612 Renode;
 Linux unit 108/108, проверки эмуляторов 6/6, Windows TC-44 и Host 34/34 PASS.
 Отчёты: `build/toml-stage/acceptance-summary.json`,
@@ -39,8 +46,6 @@ Linux unit 108/108, проверки эмуляторов 6/6, Windows TC-44 и 
 L1–L3 проверены на окончательном примере (`build/toml-final/source-manifest.json`);
 L4–L5 — на исходном снимке этапа (`build/toml-stage/source-manifest.json`):
 их входы не менялись. После проверок менялись только документация и комментарий TOML.
-Текущий этап: `codex/release-0.10.2`. Результаты предыдущего этапа не заменяют
-предрелизную приёмку на итоговом подписанном SHA.
 Полная локальная приёмка этапа `[cfg]` L0–L5 PASS: 1554 Configure,
 618 сборок, 336 QEMU + 612 Renode; Linux unit 107/107, проверки эмуляторов 6/6.
 Windows TC-44 и Host 34/34 PASS (27 с). Отчёты:
@@ -60,7 +65,7 @@ Linux unit 106/106, проверки эмуляторов 6/6. Нативный 
 не входят в Git). Проверялся снимок рабочего дерева от `cfa52c6`; runtime-код
 и тесты до коммита E010 после снимка не менялись. CI коммита `8624bae`
 затем прошёл (Firmware run 37133257759).
-Версия кода в релизной ветке 0.10.2, не выпущена. Следующие ветки выполняются последовательно:
+Завершённые ветки выпуска 0.10.2:
 
 | Шаг / ветка | Результат | Проверка перед завершением |
 | --- | --- | --- |
@@ -70,16 +75,15 @@ Linux unit 106/106, проверки эмуляторов 6/6. Нативный 
 | 4. `codex/roadmap-refresh` | Сверка выполненных и отложенных пунктов TODO RU/EN | Ссылки на код/тесты/решения; история отдельно от актуальных обязательств |
 | 5. `codex/release-0.10.2` | Версия, CHANGELOG, справочник/errata и релизный текст | Полный локальный L0–L5 и CI на итоговом подписанном SHA |
 
-- [x] Исправление E010 слито: `8624bae`, TC-44 и Firmware PASS; не выпущено.
+- [x] Исправление E010 слито: `8624bae`, TC-44 и Firmware PASS; выпущено в 0.10.2.
 - [x] Ввести `[cfg]`, сохранив приоритеты и имена `STM32_YML_*`: `37fec5c`.
 - [x] Добавить публичный пример и проверки, сохранив YAML-пример: `2ee5530`.
 - [x] Сверить старые пункты дорожной карты на обоих языках: `c883928`.
-- [ ] Пройти приёмку и выпустить 0.10.2.
+- [x] Пройти приёмку и выпустить 0.10.2: `3333d0b`, тег `v0.10.2`.
 
 Локальные проверки выполняются до push; полный L0–L5 — при завершении
 функционального этапа. Владелец выполняет push, ручной Firmware на границах
-этапов, `git land`, тег и выпуск. Для текущей релизной ветки обязательны полный локальный прогон и ручной Firmware
-на итоговом подписанном SHA. Сначала локальная приёмка, затем push.
+этапов, `git land`, тег и выпуск. Для 0.10.2 этот порядок выполнен на итоговом подписанном SHA.
 Вне состава: периферия RCC/PWR (TC-86), расширение Arduino runtime и матрицы MCU,
 USBDevice/VirtIO/CMSIS_DSP, GitLab-пример TC-53 и дополнительная оптимизация CI.
 
@@ -92,7 +96,7 @@ USBDevice/VirtIO/CMSIS_DSP, GitLab-пример TC-53 и дополнитель�
 | --- | --- | --- |
 | Semihosting и bare metal | Реализованы в `c25f7b1` / `ba9bde7` и расширены последующими этапами; [текущие сценарии](docs/ru/firmware-testing.md) | GPIO/blink на HSI не объявляется проверенным этими тестами; периферия — отдельное согласование |
 | Таймаут, результат и артефакты симуляторов | Реализованы: [QEMU runner](ci/run_qemu_smoke.py), [Renode runner](ci/run_renode_smoke.py), [Firmware CI](.github/workflows/firmware.yml); CRC corruption и hang имеют отдельные ожидания | Команды VS Code и расширение моделей не являются условиями 0.10.2 |
-| Windows, перенесённый этап 5 / TC-44 | Host CI и native Configure/Build реализованы; E010 исправлено в `8624bae`, TC-44 полностью прошёл, включая CI `2ee5530` | E010 ещё не выпущено: входит в 0.10.2; эмуляторы Windows отложены |
+| Windows, перенесённый этап 5 / TC-44 | Host CI и native Configure/Build реализованы; E010 исправлено в `8624bae`, TC-44 полностью прошёл, включая CI `2ee5530` | E010 выпущено в 0.10.2; эмуляторы Windows отложены |
 | Ограниченное распараллеливание | Configure разделён по GCC, внутри `ctest -j 4`; [реализация](.github/workflows/configure.yml). Renode работает пакетно; [команды локального прогона](docs/ru/local-docker-testing.md) | Дальнейшая оптимизация — по измерениям и отдельному решению, не долг 0.10.2 |
 | Полный Arduino runtime / TC-86 | `native` Configure и сборки существуют; это не проверка полного запуска Core, RCC/PWR и периферии | Отложено; проверка диапазона версий Core для 0.10.3 не закрывает TC-86 |
 | Пример GitLab / TC-53 | Отложен по решению автора; GitHub CI не является доказательством GitLab pipeline | Не входит в 0.10.2 и не включён автоматически в 0.10.3 |
@@ -100,15 +104,12 @@ USBDevice/VirtIO/CMSIS_DSP, GitLab-пример TC-53 и дополнитель�
 | Следующие пробелы покрытия | Выбор по [индексу](docs/reference-index.json) и [ТЗ](docs/TECHNICAL_SPECIFICATION.md); отсутствие теста не означает дефект | Постоянное сопровождение, не обещание проверить все комбинации |
 | Согласованность карточек, тестов и errata | Постоянное [правило сопровождения](docs/ru/maintenance.md); E003/E005 закрыты по замыслу, E009 выпущено в 0.10.1 | Не отмечается навсегда выполненным; новые изменения требуют новой проверки |
 
-### До выпуска 0.10.2
+### После выпуска 0.10.2
 
-1. Сверка документации слита на `c883928`, Docs прошёл.
-2. В `codex/release-0.10.2` обновить версию, примеры, changelog, справочник,
-   статусы errata и компактные тексты `docs/releases/v0.10.2*.md` RU/EN.
-3. Выполнить полный локальный L0–L5 на итоговом подписанном коммите;
-   проверить CI и вручную запустить Firmware на том же SHA.
-4. Владелец выполняет land, подписанный тег и публикацию по
-   [порядку выпуска](docs/ru/maintenance.md). До этого 0.10.2 не считается выпущенной.
+Приёмка, слияние, подписанный тег и публикация завершены. Ветка
+`codex/release-0.10.2-status` фиксирует E010 released, результаты и ссылки RU/EN.
+После локальных проверок документации — подписанный коммит владельца, push,
+проверка CI и `git land`. Повтор L0–L5 для этой документальной ветки не требуется.
 
 ### 0.10.3 — совместимость Arduino Core в режиме native
 
@@ -583,7 +584,7 @@ RU/EN. Не добавлять новые ветки тестирования п
 
 ## English
 
-Status as of 2026-10-04. The approved current scope is 0.10.2; the five original
+Status as of 2026-10-04. 0.10.2 is released; the next agreed stage is 0.10.3; the five original
 stages below are retained as history.
 The priority is Configure/Generate and compatibility with existing consumers.
 New workflow: working branch → local checks → push and CI → merge into main.
@@ -594,7 +595,7 @@ This roadmap does not promise delivery dates or unsupported features.
 run does not mean merged or released. Update statuses and commit/branch links as work lands;
 keep defect details in errata.
 
-### 0.10.2 — approved scope
+### 0.10.2 — released
 
 Baseline: published [0.10.1](docs/releases/v0.10.1.md), main `cff041c`.
 Plan and spec 2.23 merged: `cfa52c6`. E010 fix and spec 2.24 merged: `8624bae`;
@@ -605,12 +606,19 @@ TOML/include/Presets example and TC-97 merged: `2ee5530`.
 Docs, Configure, Host and [Firmware](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/actions/runs/37150032121)
 passed for that SHA, including Windows TC-44; reports are available as artifacts.
 Roadmap reconciliation merged: `c883928`, Docs PASS.
-Current branch: `codex/release-0.10.2`; version and release files prepared.
-Preliminary checks PASS: 108 Linux unit tests, 55 Configure cases on the default
-tool pair, schema, messages, documentation and strict spec validation. Logs:
-`build/release-0102-precheck/`. Full local acceptance and CI on the final signed
-SHA, tagging and publication are pending. Owner commits first, then full local
-acceptance, then push. E010 remains fixed, not released.
+Release [v0.10.2](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/releases/tag/v0.10.2) published on 2026-10-04.
+The signed tag points to `3333d0bf3599ef0f51f94f11864f91d46ceb1848`.
+Local L0–L5 passed on this clean signed SHA: 1590 Configure, 618 builds,
+336 QEMU + 612 Renode; Linux units 108/108, emulator checks 6/6,
+Windows units 105 PASS / 3 POSIX-only skips, TC-44 and Host 34/34 PASS.
+Local reports: `build/release-0.10.2-3333d0b/acceptance-summary.json`,
+`full-results.tar.gz` and `windows/summary.json` in the same directory (not tracked).
+Docs, Configure, Host, CI environment and Firmware passed on the release SHA.
+[Tag Firmware](https://github.com/ViacheslavMezentsev/stm32-cmake-yml/actions/runs/37162298740):
+Windows and smoke PASS, reports retained; badge skipped. E010 is released in 0.10.2.
+Current branch: `codex/release-0.10.2-status` — recording the published release.
+
+Previous TOML stage results:
 Full local acceptance PASS: 1590 Configure, 618 builds, 336 QEMU + 612 Renode;
 Linux units 108/108, emulator checks 6/6, Windows TC-44 and Host 34/34 PASS.
 Reports: `build/toml-stage/acceptance-summary.json`,
@@ -618,8 +626,6 @@ Reports: `build/toml-stage/acceptance-summary.json`,
 L1–L3 use the final example (`build/toml-final/source-manifest.json`);
 L4–L5 use the initial stage snapshot (`build/toml-stage/source-manifest.json`):
 their inputs are unchanged. Only documentation and a TOML comment changed afterwards.
-Current stage: `codex/release-0.10.2`. Previous stage results do not replace
-release acceptance on the final signed SHA.
 Full local L0–L5 acceptance for the `[cfg]` stage PASS: 1554 Configure, 618 builds,
 336 QEMU + 612 Renode; Linux units 107/107, emulation checks 6/6.
 Windows TC-44 and Host 34/34 PASS (27 s). Reports:
@@ -639,7 +645,7 @@ tc44_complete=true (24 s). Reports: `build/absolute-stage/acceptance-summary.jso
 The E010 working-tree snapshot was based on `cfa52c6`; runtime code and tests
 were unchanged between the snapshot and the E010 commit. CI for `8624bae`
 subsequently passed (Firmware run 37133257759).
-Runtime version on the release branch is 0.10.2, not released. Subsequent branches are sequential:
+Completed 0.10.2 release branches:
 
 | Step / branch | Deliverable | Checks before completion |
 | --- | --- | --- |
@@ -649,16 +655,15 @@ Runtime version on the release branch is 0.10.2, not released. Subsequent branch
 | 4. `codex/roadmap-refresh` | Reconcile completed and deferred TODO items in RU/EN | Links to code/tests/decisions; separate history from current commitments |
 | 5. `codex/release-0.10.2` | Version, CHANGELOG, reference/errata and release text | Full local L0–L5 and CI on the final signed SHA |
 
-- [x] E010 fix merged: `8624bae`, TC-44 and Firmware PASS; not released.
+- [x] E010 fix merged: `8624bae`, TC-44 and Firmware PASS; released in 0.10.2.
 - [x] Introduce `[cfg]`, preserving precedence and `STM32_YML_*` names: `37fec5c`.
 - [x] Add the public example and checks while retaining the YAML example: `2ee5530`.
 - [x] Reconcile historical roadmap items in both languages: `c883928`.
-- [ ] Complete acceptance and publish 0.10.2.
+- [x] Complete acceptance and publish 0.10.2: `3333d0b`, tag `v0.10.2`.
 
 Run local checks before push and full L0–L5 at the end of each functional stage.
 The owner performs push, manual Firmware at stage boundaries, `git land`, tagging
-and publication. The current release branch requires full local acceptance and manual Firmware
-on the final signed SHA. Local acceptance comes before push.
+and publication. For 0.10.2 this sequence was completed on the final signed SHA.
 Out of scope: RCC/PWR peripherals (TC-86), additional Arduino runtime and MCU
 matrix coverage, USBDevice/VirtIO/CMSIS_DSP, the GitLab example TC-53 and further CI optimization.
 
@@ -671,7 +676,7 @@ Historical entries below retain their original dates, counts and wording.
 | --- | --- | --- |
 | Semihosting and bare metal | Implemented in `c25f7b1` / `ba9bde7` and expanded later; [current scenarios](docs/en/firmware-testing.md) | These tests do not establish GPIO/blink on HSI support; peripherals require a separate decision |
 | Simulator timeout, result and artifacts | Implemented in the [QEMU runner](ci/run_qemu_smoke.py), [Renode runner](ci/run_renode_smoke.py) and [Firmware CI](.github/workflows/firmware.yml); CRC corruption and hang have distinct expectations | VS Code commands and model extensions are not 0.10.2 prerequisites |
-| Windows, deferred stage 5 / TC-44 | Host CI and native Configure/Build implemented; E010 fixed in `8624bae`, complete TC-44 passed, including CI at `2ee5530` | E010 is not released yet: included in 0.10.2; Windows simulators deferred |
+| Windows, deferred stage 5 / TC-44 | Host CI and native Configure/Build implemented; E010 fixed in `8624bae`, complete TC-44 passed, including CI at `2ee5530` | E010 released in 0.10.2; Windows simulators deferred |
 | Bounded parallelism | Configure split by GCC with `ctest -j 4`; [implementation](.github/workflows/configure.yml). Renode uses batches; [local commands](docs/en/local-docker-testing.md) | Further optimization needs measurements and a separate decision, not a 0.10.2 obligation |
 | Full Arduino runtime / TC-86 | Native Configure and builds exist; this does not validate complete Core startup, RCC/PWR or peripherals | Deferred; Core version-range testing in 0.10.3 does not close TC-86 |
 | GitLab example / TC-53 | Deferred by the author; GitHub CI does not establish a working GitLab pipeline | Outside 0.10.2 and not automatically included in 0.10.3 |
@@ -679,15 +684,12 @@ Historical entries below retain their original dates, counts and wording.
 | Further coverage gaps | Prioritize using the [index](docs/reference-index.json) and [spec](docs/TECHNICAL_SPECIFICATION.md); missing tests do not imply defects | Ongoing maintenance, not a promise to test every combination |
 | Aligned cards, tests and errata | An ongoing [maintenance rule](docs/en/maintenance.md); E003/E005 closed by design, E009 released in 0.10.1 | Never permanently complete: new changes require new checks |
 
-### Before releasing 0.10.2
+### After releasing 0.10.2
 
-1. Documentation reconciliation merged at `c883928`; Docs passed.
-2. In `codex/release-0.10.2`, align the version, examples, changelogs, reference,
-   errata statuses and compact RU/EN `docs/releases/v0.10.2*.md` notes.
-3. Run full local L0–L5 on the final signed commit; verify CI and manually
-   trigger Firmware for the same SHA.
-4. The owner performs land, signed tagging and publication following the
-   [release procedure](docs/en/maintenance.md). Until then, 0.10.2 is not released.
+Acceptance, landing, signed tagging and publication are complete. Branch
+`codex/release-0.10.2-status` records E010 released, results and RU/EN links.
+After local documentation checks: owner-signed commit, push, CI verification
+and `git land`. This documentation branch does not require another L0–L5 run.
 
 ### 0.10.3 — Arduino Core native compatibility
 

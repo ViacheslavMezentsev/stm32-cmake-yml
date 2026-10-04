@@ -186,6 +186,16 @@ git config --global gpg.ssh.allowedSignersFile ~/.ssh/allowed_signers
 - The full job log is not available without signing in to GitHub (the API returns
   403); diagnostic artifacts are kept for 14 days.
 
+### Firmware cancelled after pushing a tag
+
+Pushing a `v*` tag starts Firmware automatically. Do not also start manual
+Firmware for the same tag: `concurrency.group: firmware-${{ github.ref }}`
+and `cancel-in-progress: true` cancel the earlier run for that ref.
+`Cancelled` does not indicate a test or tag failure. Verify the replacement
+run SHA, wait for `completed` / `success`, and inspect jobs and artifacts.
+If there is no replacement or it fails, investigate and rerun Firmware on
+the same tag; cancellation does not require recreating the tag.
+
 ## Local Configure tests in Docker Desktop
 
 Many small files on a Windows bind mount slow fixture copies and Configure.

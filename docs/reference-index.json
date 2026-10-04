@@ -2648,7 +2648,8 @@
         "en": "docs/en/errata/E010.md"
       },
       "evidence": "reproduced",
-      "status": "fixed"
+      "status": "released",
+      "fixed_release": "0.10.2"
     }
   ],
   "audit_date": "2026-09-27",
